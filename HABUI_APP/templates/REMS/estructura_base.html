@@ -1,0 +1,103 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block titulo %}Sistema REMS{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link 
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+      rel="stylesheet" 
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
+      crossorigin="anonymous"/>
+    <!-- ajusta contenido para navegadores -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Iconos bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Estilos  personalizados-->
+    <link rel="stylesheet" href="{% static 'css/estilos_panel_rems.css' %}">
+  </head>
+
+  <body>
+    <!-- Header superior -->
+    <header class="navbar navbar-dark bg-primary fixed-top d-flex justify-content-between align-items-center px-3" style="height: 85px;">
+      <!-- Botón volver al panel -->
+      <a href="{% url 'panel_principal' %}" class="btn btn-outline-light d-flex align-items-center gap-2">
+        <i class="bi bi-arrow-left-circle-fill fs-5"></i>
+        <span class="d-none d-sm-inline">Panel principal</span>
+      </a>
+      <!-- Título centrado -->
+      <div class="text-center flex-grow-1">
+        <span class="encabezado">Sistema de Monitoreo de Recursos  REMS</span>
+        
+      </div>
+
+      <!-- Espaciador para alinear bien -->
+      <div style="width: 110px;"></div>
+
+      <!-- Botón de menú en móviles -->
+      <button 
+        class="navbar-toggler d-md-none" 
+        type="button" 
+        data-bs-toggle="collapse" 
+        data-bs-target="#sidebarMenu" 
+        aria-controls="sidebarMenu" 
+        aria-expanded="false" 
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </header>
+
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+          <div class="position-sticky pt-3">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link {% if request.path == '/energia_rems' %}active{% endif %}" href="{% url 'panel_energia_rems' %}">
+                  <i class="bi bi-lightning-charge-fill me-2"></i>Energía</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.path == '/agua_rems' %}active{% endif %}" href="{% url 'panel_agua_rems' %}">
+                  <i class="bi bi-droplet-fill me-2"></i>Agua</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.path == '/oxigeno_rems' %}active{% endif %}" href="{% url 'panel_oxigeno_rems' %}">
+                  <i class="bi bi-cloud-fog2-fill me-2"></i>Oxígeno</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.path == '/alimentos_rems' %}active{% endif %}" href="{% url 'panel_alimentos_rems' %}">
+                  <i class="bi bi-cup-straw me-2"></i>Alimentos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.path == '/todos_los_recursos' %}active{% endif %}" href="{% url 'all_resources' %}">
+                  <i class="bi bi-grid-1x2-fill me-2"></i>Todos los recursos</a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <!-- Contenido -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-4">
+          {% block contenido %}
+          
+          {% endblock %}
+        </main>
+      </div>
+    </div>
+
+    <footer class="text-center py-3 bg-light border-top mt-auto">
+      <small>&copy; 2025 MACII CREDES</small>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script 
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
+      integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" 
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

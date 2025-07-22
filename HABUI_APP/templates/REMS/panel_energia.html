@@ -1,0 +1,89 @@
+{% extends "REMS/estructura_base.html" %}
+
+{% block titulo %} Sistema REMS{% endblock %}
+
+{% block contenido %} 
+<div class="row text-center">
+        <div class="col-md-4">
+        <h5>Gráfica 1: Voltaje</h5>
+        <canvas id="chart1"></canvas>       
+        <button class="btn btn-sm btn-danger mt-2" onclick="downloadChart('chart1', 'voltaje')">Guardar imagen</button>
+        </div>
+        <div class="col-md-4">
+        <h5>Gráfica 2: Corriente</h5>
+        <canvas id="chart2"></canvas>
+        </div>
+        <div class="col-md-4">
+        <h5>Gráfica 3: Potencia</h5>
+        <canvas id="chart3"></canvas>
+        </div>
+    </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+    <script>
+    const dataTemplate = () => ({
+        labels: ['T1', 'T2', 'T3'],
+        datasets: [{
+            label: 'Medición',
+            data: [12, 19, 3],
+            borderColor: 'blue',
+            fill: false
+        }]
+    });
+
+    const chart1 = new Chart(document.getElementById('chart1'), {
+        type: 'line',
+        data: dataTemplate(),
+        options: {
+        responsive: false,
+        plugins: {
+            zoom: {
+                pan: {
+                    enabled: true,
+                    mode: 'x' // o 'xy'
+                },
+                zoom: {
+                    wheel: { enabled: true },
+                    pinch: { enabled: true },
+                    mode: 'x'
+                }
+            }
+        }
+    }
+    });
+
+    const chart2 = new Chart(document.getElementById('chart2'), {
+        type: 'bar',
+        data: dataTemplate(),
+        options: { responsive: false }
+    });
+
+    const chart3 = new Chart(document.getElementById('chart3'), {
+        type: 'line',
+        data: dataTemplate(),
+        options: { responsive: false }
+    });
+
+    // descargar imagen
+    function downloadChart(canvasId, fileName) {
+        const canvas = document.getElementById(canvasId);
+        const link = document.createElement('a');
+        link.download = fileName + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+
+    // Simular actualización en tiempo real
+    setInterval(() => {
+        const now = `T${Math.floor(Math.random()*10)}`;
+        [chart1, chart2, chart3].forEach(chart => {
+            chart.data.labels.push(now);
+            chart.data.datasets[0].data.push(Math.random() * 100);
+            chart.update();
+        });
+    }, 2000);
+    </script>
+
+
+{% endblock %}
