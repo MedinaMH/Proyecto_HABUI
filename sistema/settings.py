@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-1a+0y=d@mpw3f0mg7k-d7!lv*rrbbgv9^_c$inhfls871wgfu2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.7.65', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['192.168.1.75', 'localhost', '127.0.0.1']
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR,'HABUI_APP','static')]
 # Application definition
