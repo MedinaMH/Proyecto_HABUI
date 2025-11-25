@@ -4,7 +4,773 @@
 
 {% block contenido %} 
 
-Panel de monitoreo de agua
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="row">
+  <div class="col-md-6">
+    <h5>Nivel del agua (cm)</h5>
+    <canvas id="nivelChart"></canvas>
+  </div>
+  <div class="col-md-6">
+    <h5>pH del agua</h5>
+    <canvas id="phChart"></canvas>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Crear los gráficos
+  const ctxNivel = document.getElementById('nivelChart').getContext('2d');
+  const ctxPh = document.getElementById('phChart').getContext('2d');
+
+  const nivelChart = new Chart(ctxNivel, {
+    type: 'line',
+    data: { labels: [], datasets: [{ label: 'Nivel (cm)', data: [], borderColor: 'blue', fill: false }] },
+    options: { responsive: true }
+  });
+
+  const phChart = new Chart(ctxPh, {
+    type: 'line',
+    data: { labels: [], datasets: [{ label: 'pH', data: [], borderColor: 'green', fill: false }] },
+    options: { responsive: true }
+  });
+
+  // Conexión WebSocket
+  const socket = new WebSocket('ws://' + window.location.host + '/ws/agua/');
+
+  socket.onopen = function() {
+    console.log("✅ Conectado al WebSocket");
+  };
+
+  socket.onmessage = function(event) {
+  const data = JSON.parse(event.data);
+  console.log("📩 Datos recibidos:", data);
+
+  // Campos del JSON recibido
+  const t = data.fecha_hora;
+  const nivel = data.nivel;
+  const ph = data.ph;
+
+  // Actualiza los gráficos
+  nivelChart.data.labels.push(t);
+  nivelChart.data.datasets[0].data.push(nivel);
+  nivelChart.update();
+
+  phChart.data.labels.push(t);
+  phChart.data.datasets[0].data.push(ph);
+  phChart.update();
+};
 
 
+  socket.onclose = function() {
+    console.log("❌ WebSocket cerrado");
+  };
+});
+</script> -->
+{% load static %}
+
+<!-- Cargar D3.js local -->
+<!-- <script src="{% static 'js/d3.js' %}"></script>
+
+<h3>💧 Monitoreo de Agua — D3.js en tiempo real</h3>
+
+<div id="grafico-nivel" class="mb-5"></div>
+<div id="grafico-ph"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+  // ===== CONFIGURACIÓN GENERAL =====
+  const width = 640;
+  const height = 400;
+  const margin = { top: 20, right: 30, bottom: 30, left: 50 };
+
+  // Función genérica para crear una gráfica vacía
+  function crearGrafico(idContenedor, tituloY, color) {
+    const container = d3.select(idContenedor);
+    const svg = container.append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    const g = svg.append("g");
+
+    // Escalas
+    const x = d3.scaleUtc()
+      .domain([new Date(), new Date(Date.now() + 60000)]) // rango inicial de 1 minuto
+      .range([margin.left, width - margin.right]);
+
+    const y = d3.scaleLinear()
+      .domain([0, 100])
+      .range([height - margin.bottom, margin.top]);
+
+    // Ejes
+    const ejeX = g.append("g")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x));
+
+    const ejeY = g.append("g")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y));
+
+    ejeY.append("text")
+      .attr("x", 4)
+      .attr("y", margin.top - 10)
+      .attr("fill", "black")
+      .attr("text-anchor", "start")
+      .text(tituloY);
+
+    // Línea inicial
+    const linea = d3.line()
+      .x(d => x(d.tiempo))
+      .y(d => y(d.valor));
+
+    const path = g.append("path")
+      .datum([])
+      .attr("fill", "none")
+      .attr("stroke", color)
+      .attr("stroke-width", 2);
+
+    // Devuelve referencias para actualizar después
+    return { x, y, ejeX, ejeY, linea, path, datos: [] };
+  }
+
+  // Crear las dos gráficas
+  const graficoNivel = crearGrafico("#grafico-nivel", "Nivel (cm)", "steelblue");
+  const graficoPh = crearGrafico("#grafico-ph", "pH", "seagreen");
+
+  // ===== FUNCIÓN PARA ACTUALIZAR LA GRÁFICA =====
+  function actualizarGrafico(grafico, nuevoDato) {
+    const ahora = new Date();
+    grafico.datos.push({ tiempo: ahora, valor: nuevoDato });
+
+    // Mantener solo los últimos 60 datos
+    if (grafico.datos.length > 60) grafico.datos.shift();
+
+    // Actualizar dominio X dinámico (último minuto)
+    const inicio = new Date(ahora.getTime() - 60000);
+    grafico.x.domain([inicio, ahora]);
+
+    // Redibujar ejes y línea
+    grafico.ejeX.transition().duration(300).call(d3.axisBottom(grafico.x).ticks(5));
+    grafico.path
+      .datum(grafico.datos)
+      .attr("d", grafico.linea);
+  }
+
+  // ===== CONEXIÓN WEBSOCKET =====
+  const socket = new WebSocket('ws://' + window.location.host + '/ws/agua/');
+
+  socket.onopen = () => console.log("✅ Conectado al WebSocket");
+
+  socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    // Campos esperados: fecha_hora, nivel, ph
+    console.log("📩 Datos recibidos:", data);
+
+    if (data.nivel !== undefined) actualizarGrafico(graficoNivel, data.nivel);
+    if (data.ph !== undefined) actualizarGrafico(graficoPh, data.ph);
+  };
+
+  socket.onclose = () => console.log("❌ WebSocket cerrado");
+
+});
+</script> -->
+
+<!-- Cargar D3.js local -->
+<!-- <script src="{% static 'js/d3.js' %}"></script>
+
+<h3 style="color: #00bfff; font-weight:600;">💧 Monitoreo de Agua — D3.js en Tiempo Real</h3> -->
+
+<!-- Contenedores -->
+<!-- <div id="grafico-nivel" class="mb-5"></div>
+<div id="grafico-ph"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+  // ===== CONFIGURACIÓN GENERAL =====
+  const width = 640;
+  const height = 320;
+  const margin = { top: 30, right: 30, bottom: 30, left: 50 };
+
+  // ===== ESTILO GLOBAL =====
+  d3.select("body").style("background-color", "#0b0f19");
+  d3.selectAll("h3").style("font-family", "Segoe UI, sans-serif");
+
+  // ===== FUNCIÓN GENÉRICA =====
+  function crearGrafico(idContenedor, tituloY, color) {
+    const container = d3.select(idContenedor);
+
+    const svg = container.append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .style("background", "#111")
+      .style("border-radius", "12px")
+      .style("box-shadow", "0 0 10px rgba(0,255,255,0.2)");
+
+    const g = svg.append("g");
+
+    // Escalas
+    const x = d3.scaleUtc()
+      .domain([new Date(), new Date(Date.now() + 60000)]) // 1 min
+      .range([margin.left, width - margin.right]);
+
+    const y = d3.scaleLinear()
+      .domain([0, 100])
+      .range([height - margin.bottom, margin.top]);
+
+    // Ejes
+    const ejeX = g.append("g")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x).ticks(5).tickSizeOuter(0))
+      .attr("color", "#888");
+
+    const ejeY = g.append("g")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y).ticks(5).tickSizeOuter(0))
+      .attr("color", "#888");
+
+    ejeY.append("text")
+      .attr("x", 6)
+      .attr("y", margin.top - 10)
+      .attr("fill", "#00bfff")
+      .attr("font-size", "13px")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "start")
+      .text(tituloY);
+
+    // Línea inicial
+    const linea = d3.line()
+      .x(d => x(d.tiempo))
+      .y(d => y(d.valor))
+      .curve(d3.curveMonotoneX);
+
+    const path = g.append("path")
+      .datum([])
+      .attr("fill", "none")
+      .attr("stroke", color)
+      .attr("stroke-width", 2);
+
+    return { x, y, ejeX, ejeY, linea, path, datos: [] };
+  }
+
+  // ===== CREAR GRÁFICAS =====
+  const graficoNivel = crearGrafico("#grafico-nivel", "Nivel (cm)", "#1e90ff");
+  const graficoPh = crearGrafico("#grafico-ph", "pH", "#32cd32");
+
+  // ===== ACTUALIZACIÓN =====
+  function actualizarGrafico(grafico, nuevoDato) {
+    const ahora = new Date();
+    grafico.datos.push({ tiempo: ahora, valor: nuevoDato });
+
+    if (grafico.datos.length > 60) grafico.datos.shift();
+
+    const inicio = new Date(ahora.getTime() - 60000);
+    grafico.x.domain([inicio, ahora]);
+
+    grafico.ejeX.transition().duration(300)
+      .call(d3.axisBottom(grafico.x).ticks(5).tickSizeOuter(0));
+
+    grafico.path
+      .datum(grafico.datos)
+      .transition()
+      .duration(300)
+      .attr("d", grafico.linea);
+  }
+
+  // ===== WEBSOCKET =====
+  const socket = new WebSocket('ws://' + window.location.host + '/ws/agua/');
+
+  socket.onopen = () => console.log("✅ Conectado al WebSocket");
+
+  socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.nivel !== undefined) actualizarGrafico(graficoNivel, data.nivel);
+    if (data.ph !== undefined) actualizarGrafico(graficoPh, data.ph);
+  };
+
+  socket.onclose = () => console.log("❌ WebSocket cerrado");
+});
+</script> -->
+
+
+
+<script src="{% static 'js/d3.js' %}"></script>
+
+<h3 style="color: #00bfff; font-weight:600;">💧 Monitoreo de Agua del Hábitat</h3>
+
+<div id="grafico-nivel" class="mb-5"></div>
+<div id="grafico-ph"></div>
+<div id="serie-temporal" style="margin-top:40px;"></div>
+<div id="heatmap-diario" style="margin-top:40px;"></div>
+
+<!-- NUEVAS GRÁFICAS -->
+<div id="serie-temporal"></div>
+<div id="heatmap-diario"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  d3.select("body").style("background-color", "#0b0f19");
+
+  // ============================================================
+  // ============ GRAFICO DE TANQUE ===========
+  // ============================================================
+
+  function tanqueAgua(containerId, valorInicial) {
+
+    const width = 140;
+    const height = 260;
+
+    const svg = d3.select(containerId)
+      .html("")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", 20)
+      .attr("fill", "#00bfff")
+      .attr("font-size", "16px")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle")
+      .text("Nivel");
+
+    svg.append("rect")
+      .attr("x", width / 2 - 35)
+      .attr("y", 40)
+      .attr("width", 70)
+      .attr("height", height - 70)
+      .attr("fill", "#0f172a")
+      .attr("stroke", "#00bfff")
+      .attr("stroke-width", 3)
+      .attr("rx", 12);
+
+    const agua = svg.append("rect")
+      .attr("x", width / 2 - 33)
+      .attr("width", 66)
+      .attr("fill", "url(#gradAgua)")
+      .attr("rx", 10);
+
+    const defs = svg.append("defs");
+    const grad = defs.append("linearGradient")
+      .attr("id", "gradAgua")
+      .attr("x1", "0%")
+      .attr("y1", "100%")
+      .attr("x2", "0%")
+      .attr("y2", "0%");
+    grad.append("stop").attr("offset", "0%").attr("stop-color", "#0077ff");
+    grad.append("stop").attr("offset", "100%").attr("stop-color", "#00e5ff");
+
+    const texto = svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", height - 5)
+      .attr("fill", "#00bfff")
+      .attr("font-size", "22px")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle");
+
+    const escala = d3.scaleLinear()
+      .domain([0, 100])
+      .range([height - 30, 40]);
+
+    function actualizar(valor) {
+      let y = escala(valor);
+      let h = (height - 30) - y;
+
+      agua
+        .transition().duration(500)
+        .attr("y", y).attr("height", h);
+
+      texto.text(valor.toFixed(1) + "%");
+    }
+
+    actualizar(valorInicial);
+    return actualizar;
+  }
+
+  const actualizarNivel = tanqueAgua("#grafico-nivel", 0);
+
+  // ============================================================
+  // ==================== TERMÓMETRO DE PH =======================
+  // ============================================================
+
+  function crearTermometro(containerId) {
+    const width = 120;
+    const height = 260;
+
+    const svg = d3.select(containerId)
+      .html("")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", 20)
+      .attr("fill", "#32cd32")
+      .attr("font-size", "16px")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle")
+      .text("pH");
+
+    const scale = d3.scaleLinear()
+      .domain([0, 14])
+      .range([height - 30, 40]);
+
+    svg.append("rect")
+      .attr("x", width / 2 - 20)
+      .attr("y", 40)
+      .attr("width", 40)
+      .attr("height", height - 70)
+      .attr("fill", "#111")
+      .attr("stroke", "#32cd32")
+      .attr("stroke-width", 3)
+      .attr("rx", 10);
+
+    const nivel = svg.append("rect")
+      .attr("x", width / 2 - 18)
+      .attr("width", 36)
+      .attr("fill", "#32cd32")
+      .attr("rx", 8);
+
+    const texto = svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", height - 5)
+      .attr("fill", "#32cd32")
+      .attr("font-size", "22px")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle");
+
+    function actualizarPH(valor) {
+      let y = scale(valor);
+      let h = (height - 30) - y;
+
+      nivel.transition().duration(400)
+        .attr("y", y).attr("height", h);
+
+      texto.text(valor.toFixed(2));
+    }
+
+    return actualizarPH;
+  }
+
+  const actualizarPh = crearTermometro("#grafico-ph");
+
+
+// ============================================================
+// =========== SERIE TEMPORAL PROGRESIVA =============
+// ============================================================
+
+function crearSerieTemporal() {
+
+    const margin = { top: 40, right: 50, bottom: 40, left: 50 };
+    const width = 500 - margin.left - margin.right;
+    const height = 250 - margin.top - margin.bottom;
+
+    const svg = d3.select("#serie-temporal")
+        .html("")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .style("background", "#111827")
+        .style("border", "2px solid #00bfff")
+        .style("border-radius", "10px")
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const data = [];
+
+    // IMPORTANTE: escala lineal para que la línea avance paso a paso
+    const x = d3.scaleLinear().range([0, width]);
+
+    const yNivel = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+    const yPh = d3.scaleLinear().domain([0, 14]).range([height, 0]);
+
+    const lineaNivel = d3.line()
+        .x(d => x(d.index))
+        .y(d => yNivel(d.nivel));
+
+    const lineaPh = d3.line()
+        .x(d => x(d.index))
+        .y(d => yPh(d.ph));
+
+    // ------- Tooltip -------
+    const tooltip = d3.select("#serie-temporal")
+        .append("div")
+        .style("position", "absolute")
+        .style("padding", "8px 12px")
+        .style("background", "rgba(0,0,0,0.80)")
+        .style("color", "#00eaff")
+        .style("border", "1px solid #00eaff")
+        .style("border-radius", "6px")
+        .style("font-size", "13px")
+        .style("pointer-events", "none")
+        .style("opacity", 0);
+
+    const focus = svg.append("circle")
+        .attr("r", 6)
+        .attr("fill", "#00eaff")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2)
+        .style("opacity", 0);
+
+    const verticalLine = svg.append("line")
+        .attr("stroke", "#00eaff")
+        .attr("stroke-width", 1)
+        .style("opacity", 0);
+
+    // Ejes
+    svg.append("g").attr("class", "x-axis").attr("transform", `translate(0,${height})`);
+    svg.append("g").attr("class", "y-axis-nivel");
+    svg.append("g").attr("class", "y-axis-ph").attr("transform", `translate(${width},0)`);
+
+    // Título
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", -10)
+        .attr("fill", "#00eaff")
+        .attr("font-size", "16px")
+        .attr("font-weight", "bold")
+        .attr("text-anchor", "middle")
+        .text("Serie Temporal • Nivel (%) y pH");
+
+    // ============================================================
+    // =============== ACTUALIZAR GRAFICA =========================
+    // ============================================================
+
+    function actualizarSerieTemporal(nivel, ph) {
+
+        // índice progresivo para que se dibuje paso a paso
+        const index = data.length;
+
+        data.push({
+            index,
+            nivel,
+            ph,
+            fecha: new Date()
+        });
+
+        // Mantener lista a un tamaño razonable
+        if (data.length > 200) data.shift();
+
+        // El dominio crece con los puntos
+        x.domain([0, Math.max(30, data.length - 1)]);
+
+        svg.select(".x-axis").call(d3.axisBottom(x).ticks(5));
+        svg.select(".y-axis-nivel").call(d3.axisLeft(yNivel).ticks(5));
+        svg.select(".y-axis-ph").call(d3.axisRight(yPh).ticks(5));
+
+        // ----- Dibujar líneas con transición -------
+        svg.selectAll(".line-nivel")
+            .data([data])
+            .join("path")
+            .attr("class", "line-nivel")
+            .transition()
+            .duration(400)
+            .attr("d", lineaNivel)
+            .attr("stroke", "#00bfff")
+            .attr("stroke-width", 2)
+            .attr("fill", "none");
+
+        svg.selectAll(".line-ph")
+            .data([data])
+            .join("path")
+            .attr("class", "line-ph")
+            .transition()
+            .duration(400)
+            .attr("d", lineaPh)
+            .attr("stroke", "#32cd32")
+            .attr("stroke-width", 2)
+            .attr("fill", "none");
+
+        // Overlay interactivo
+        svg.selectAll(".overlay").data([null]).join("rect")
+            .attr("class", "overlay")
+            .attr("width", width)
+            .attr("height", height)
+            .style("fill", "none")
+            .style("pointer-events", "all")
+            .on("mousemove", function (event) {
+
+                const [mx] = d3.pointer(event);
+                const indexHover = Math.round(x.invert(mx));
+
+                const punto = data[indexHover];
+                if (!punto) return;
+
+                focus
+                    .attr("cx", x(punto.index))
+                    .attr("cy", yNivel(punto.nivel))
+                    .style("opacity", 1);
+
+                verticalLine
+                    .attr("x1", x(punto.index))
+                    .attr("x2", x(punto.index))
+                    .attr("y1", 0)
+                    .attr("y2", height)
+                    .style("opacity", 1);
+
+                tooltip
+                    .html(`
+                        <strong>${punto.fecha.toLocaleTimeString()}</strong><br>
+                        Nivel: ${punto.nivel}%<br>
+                        pH: ${punto.ph}
+                    `)
+                    .style("left", (event.pageX + 15) + "px")
+                    .style("top", (event.pageY - 20) + "px")
+                    .style("opacity", 1);
+            })
+            .on("mouseout", () => {
+                focus.style("opacity", 0);
+                verticalLine.style("opacity", 0);
+                tooltip.style("opacity", 0);
+            });
+    }
+
+    return actualizarSerieTemporal;
+}
+
+const actualizarSerieTemporal = crearSerieTemporal();
+
+
+// ============================================================
+// ================ HEATMAP DIARIO ===================
+// ============================================================
+
+const heatmapData = new Array(24).fill(null);
+
+function crearHeatmapDiario() {
+
+    const svg = d3.select("#heatmap-diario")
+        .html("") 
+        .append("svg")
+        .attr("width", 500)
+        .attr("height", 200)
+        .style("background", "#111827")
+        .style("border", "2px solid #00bfff")
+        .style("border-radius", "10px");
+
+    // Título
+    svg.append("text")
+        .attr("x", 250)
+        .attr("y", 25)
+        .attr("fill", "#00eaff")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "16px")
+        .attr("font-weight", "bold")
+        .text("Heatmap Diario • Nivel del Tanque (%)");
+
+    // Leyenda
+    const defs = svg.append("defs");
+    const grad = defs.append("linearGradient")
+        .attr("id", "gradLegenda")
+        .attr("x1", "0%").attr("y1", "0%")
+        .attr("x2", "100%").attr("y2", "0%");
+
+    grad.append("stop").attr("offset", "0%").attr("stop-color", "#00111f");
+    grad.append("stop").attr("offset", "100%").attr("stop-color", "#00e5ff");
+
+    svg.append("rect")
+        .attr("x", 40)
+        .attr("y", 150)
+        .attr("width", 420)
+        .attr("height", 12)
+        .attr("fill", "url(#gradLegenda)")
+        .attr("rx", 4);
+
+    svg.append("text").attr("x", 40).attr("y", 145).attr("fill", "#00bfff").text("0%");
+    svg.append("text").attr("x", 450).attr("y", 145).attr("fill", "#00eaff").attr("text-anchor", "end").text("100%");
+
+    // Tooltip
+    const tooltip = d3.select("#heatmap-diario")
+        .append("div")
+        .style("position", "absolute")
+        .style("padding", "6px 10px")
+        .style("background", "rgba(0,0,0,0.80)")
+        .style("color", "#00eaff")
+        .style("border", "1px solid #00eaff")
+        .style("border-radius", "6px")
+        .style("font-size", "12px")
+        .style("pointer-events", "none")
+        .style("opacity", 0);
+
+    const horas = d3.scaleBand()
+        .domain(d3.range(0, 24))
+        .range([40, 460])
+        .padding(0.08);
+
+    const color = d3.scaleLinear()
+        .domain([0, 100])
+        .range(["#00111f", "#00e5ff"]);
+
+    // Función para actualizar
+    function actualizarHeatmapDiario(nivel) {
+
+        const hora = new Date().getHours();
+        heatmapData[hora] = nivel;
+
+        svg.selectAll("rect.celda").remove();
+
+        svg.selectAll("rect.celda")
+            .data(d3.range(0, 24))
+            .enter()
+            .append("rect")
+            .attr("class", "celda")
+            .attr("x", d => horas(d))
+            .attr("y", 60)
+            .attr("width", horas.bandwidth())
+            .attr("height", 60)
+            .attr("rx", 4)
+            .attr("fill", d =>
+                heatmapData[d] !== null ? color(heatmapData[d]) : "#0d1a2a"
+            )
+            .on("mousemove", (event, d) => {
+
+                tooltip
+                    .html(`
+                        <strong>Hora:</strong> ${d}:00<br>
+                        <strong>Nivel:</strong> ${heatmapData[d] ?? "—"}%
+                    `)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 20) + "px")
+                    .style("opacity", 1);
+
+                d3.select(event.target)
+                    .attr("stroke", "#ffffff")
+                    .attr("stroke-width", 2);
+            })
+            .on("mouseout", (event) => {
+                tooltip.style("opacity", 0);
+                d3.select(event.target)
+                    .attr("stroke", "none");
+            });
+    }
+
+    return actualizarHeatmapDiario;
+}
+
+const actualizarHeatmapDiario = crearHeatmapDiario();
+
+
+  // ============================================================
+  // ======================  WEBSOCKET  =========================
+  // ============================================================
+
+  const socket = new WebSocket("ws://" + window.location.host + "/ws/agua/");
+
+  socket.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+
+    if (data.nivel !== undefined) {
+      actualizarNivel(data.nivel);
+      actualizarSerieTemporal(data.nivel, data.ph);
+      actualizarHeatmapDiario(data.nivel);
+    }
+    if (data.ph !== undefined) actualizarPh(data.ph);
+  };
+
+});
+</script>
 {% endblock %}

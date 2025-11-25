@@ -3,7 +3,7 @@
 {% block titulo %} Sistema REMS{% endblock %}
 
 {% block contenido %} 
-<div class="row text-center">
+<!-- <div class="row text-center">
         <div class="col-md-4">
         <h5>Gráfica 1: Voltaje</h5>
         <canvas id="chart1"></canvas>       
@@ -16,9 +16,25 @@
         <div class="col-md-4">
         <h5>Gráfica 3: Potencia</h5>
         <canvas id="chart3"></canvas>
+        </div> -->
+        <!-- ======== Gráfica ALTair ======== -->
+        <!-- <div class="col-md-4">
+            <h3>Gráfica con Altair</h3>
+            <div id="grafica"></div>
+        </div> -->
+
+        <!-- ======== Gráfica Plotly ======== -->
+        <!-- <div class="col-md-4">
+            <h3>Gráfica con Plotly</h3>
+            {{ plotly_html|safe }}
         </div>
-    </div>
-    </div>
+        <script type="text/javascript">
+            const spec = JSON.parse('{{ alt_json|escapejs }}');
+            vegaEmbed('#grafica', spec)
+            .then(result => console.log("Altair cargado correctamente"))
+            .catch(err => console.error("Error:", err));
+        </script>
+</div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
     <script>
@@ -36,7 +52,7 @@
         type: 'line',
         data: dataTemplate(),
         options: {
-        responsive: false,
+        responsive: true,
         plugins: {
             zoom: {
                 pan: {
@@ -82,8 +98,772 @@
             chart.data.datasets[0].data.push(Math.random() * 100);
             chart.update();
         });
-    }, 2000);
-    </script>
+    }, 2000);9
+    </script> -->
 
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="row">
+  <div class="col-md-4">
+    <h5>Tensión (V)</h5>
+    <canvas id="voltajeChart"></canvas>
+  </div>
+  <div class="col-md-4">
+    <h5>Corriente (A)</h5>
+    <canvas id="corrienteChart"></canvas>
+  </div>
+  <div class="col-md-4">
+    <h5>Potencia Activa (W)</h5>
+    <canvas id="potenciaChart"></canvas>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const charts = {
+    voltaje: new Chart(document.getElementById('voltajeChart').getContext('2d'), {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Tensión (V)', data: [], borderColor: 'orange', fill: false }] }
+    }),
+    corriente: new Chart(document.getElementById('corrienteChart').getContext('2d'), {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Corriente (A)', data: [], borderColor: 'green', fill: false }] }
+    }),
+    potencia: new Chart(document.getElementById('potenciaChart').getContext('2d'), {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Potencia (W)', data: [], borderColor: 'blue', fill: false }] }
+    })
+  };
+
+  const socket = new WebSocket('ws://' + window.location.host + '/ws/energia/');
+
+  socket.onopen = () => console.log("✅ Conectado al WebSocket de energía");
+
+  socket.onmessage = event => {
+    const data = JSON.parse(event.data);
+    console.log("📩 Datos recibidos:", data);
+
+    const t = new Date().toLocaleTimeString();
+
+    charts.voltaje.data.labels.push(t);
+    charts.corriente.data.labels.push(t);
+    charts.potencia.data.labels.push(t);
+
+    charts.voltaje.data.datasets[0].data.push(data.tension);
+    charts.corriente.data.datasets[0].data.push(data.corriente);
+    charts.potencia.data.datasets[0].data.push(data.potencia);
+
+    Object.values(charts).forEach(chart => chart.update());
+  };
+
+  socket.onclose = () => console.log("❌ WebSocket cerrado");
+});
+</script> -->
+
+
+
+
+<!-- <h2>🔋 Flujo de Energía Tiempo Real</h2>
+
+<div>
+  <p>⚡ <strong>Tensión:</strong> <span id="tension">--</span> V</p>
+  <p>🔌 <strong>Corriente:</strong> <span id="corriente">--</span> A</p>
+  <p>💡 <strong>Potencia:</strong> <span id="potencia">--</span> W</p>
+</div>
+
+<svg id="energyChart" width="100%" height="400"></svg> -->
+
+<!-- D3.js -->
+<!-- <script src="https://d3js.org/d3.v7.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const ws = new WebSocket("ws://" + window.location.host + "/ws/energia/");
+  const svg = d3.select("#energyChart");
+  const width = window.innerWidth * 0.9;
+  const height = 400;
+
+  svg.attr("viewBox", `0 0 ${width} ${height}`);
+
+  const margin = { top: 40, right: 80, bottom: 50, left: 80 };
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // Configuración de escalas y ejes
+  const x = d3.scaleLinear().domain([0, 50]).range([0, chartWidth]);
+  const y = d3.scaleLinear().domain([0, 1000]).range([chartHeight, 0]);
+
+  const xAxis = g.append("g")
+    .attr("transform", `translate(0,${chartHeight})`)
+    .call(d3.axisBottom(x).ticks(10));
+
+  const yAxis = g.append("g").call(d3.axisLeft(y));
+
+  // Colores para cada serie
+  const colors = {
+    tension: "#2ca02c",   // verde
+    corriente: "#1f77b4", // azul
+    potencia: "#ff7f0e"   // naranja
+  };
+
+  // Datos iniciales (50 puntos vacíos)
+  const maxPoints = 50;
+  const data = {
+    tension: Array(maxPoints).fill(0),
+    corriente: Array(maxPoints).fill(0),
+    potencia: Array(maxPoints).fill(0)
+  };
+
+  // Generadores de línea
+  const lineTension = d3.line()
+    .x((d, i) => x(i))
+    .y(d => y(d));
+
+  const lineCorriente = d3.line()
+    .x((d, i) => x(i))
+    .y(d => y(d));
+
+  const linePotencia = d3.line()
+    .x((d, i) => x(i))
+    .y(d => y(d));
+
+  // Paths iniciales
+  const pathTension = g.append("path")
+    .datum(data.tension)
+    .attr("fill", "none")
+    .attr("stroke", colors.tension)
+    .attr("stroke-width", 2);
+
+  const pathCorriente = g.append("path")
+    .datum(data.corriente)
+    .attr("fill", "none")
+    .attr("stroke", colors.corriente)
+    .attr("stroke-width", 2);
+
+  const pathPotencia = g.append("path")
+    .datum(data.potencia)
+    .attr("fill", "none")
+    .attr("stroke", colors.potencia)
+    .attr("stroke-width", 2);
+
+  // Leyenda
+  const legend = svg.append("g")
+    .attr("transform", `translate(${margin.left + 20},20)`);
+
+  const legendData = [
+    { name: "Tensión", color: colors.tension },
+    { name: "Corriente", color: colors.corriente },
+    { name: "Potencia", color: colors.potencia }
+  ];
+
+  legend.selectAll("rect")
+    .data(legendData)
+    .enter()
+    .append("rect")
+    .attr("x", (d, i) => i * 120)
+    .attr("width", 20)
+    .attr("height", 10)
+    .attr("fill", d => d.color);
+
+  legend.selectAll("text")
+    .data(legendData)
+    .enter()
+    .append("text")
+    .attr("x", (d, i) => i * 120 + 25)
+    .attr("y", 10)
+    .attr("font-size", "12px")
+    .text(d => d.name);
+
+  // Función de actualización de gráficos
+  function updateChart() {
+    pathTension.attr("d", lineTension(data.tension));
+    pathCorriente.attr("d", lineCorriente(data.corriente));
+    pathPotencia.attr("d", linePotencia(data.potencia));
+  }
+
+  // Conexión WebSocket
+  ws.onmessage = function(event) {
+    const msg = JSON.parse(event.data);
+    const tension = msg.tension;
+    const corriente = msg.corriente;
+    const potencia = msg.potencia;
+
+    document.getElementById("tension").textContent = tension.toFixed(2);
+    document.getElementById("corriente").textContent = corriente.toFixed(2);
+    document.getElementById("potencia").textContent = potencia.toFixed(2);
+
+    // Actualizar datos (FIFO)
+    data.tension.push(tension);   data.tension.shift();
+    data.corriente.push(corriente); data.corriente.shift();
+    data.potencia.push(potencia); data.potencia.shift();
+
+    // Escala Y dinámica (según potencia máxima)
+    const maxY = Math.max(
+      d3.max(data.tension),
+      d3.max(data.corriente),
+      d3.max(data.potencia)
+    ) * 1.1;
+
+    y.domain([0, maxY]);
+    yAxis.transition().duration(300).call(d3.axisLeft(y));
+
+    // Actualizar líneas con animación
+    updateChart();
+  };
+
+  updateChart(); // inicial
+});
+</script> -->
+
+
+
+
+<!-- {% load static %}
+
+<h2>🔋 Flujo de Energía en Tiempo Real</h2>
+
+<div>
+  <p>⚡ <strong>Tensión:</strong> <span id="tension">--</span> V</p>
+  <p>🔌 <strong>Corriente:</strong> <span id="corriente">--</span> A</p>
+  <p>💡 <strong>Potencia:</strong> <span id="potencia">--</span> W</p>
+</div> -->
+
+<!-- Gráfico principal de líneas -->
+<!-- <svg id="energyChart" width="100%" height="400"></svg> -->
+
+<!-- Gauge adicional para potencia -->
+<!-- <div style="text-align:center; margin-top:40px;">
+  <h3>⚙️ Medidor de Potencia</h3>
+  <svg id="gaugeChart" width="300" height="300"></svg>
+</div> -->
+
+<!-- D3.js (local) -->
+<!-- <script src="{% static 'js/d3.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const ws = new WebSocket("ws://" + window.location.host + "/ws/energia/");
+
+  // === GRÁFICO DE LÍNEAS ===
+const svg = d3.select("#energyChart");
+const width = window.innerWidth * 0.9;
+const height = 400;
+
+svg.attr("viewBox", `0 0 ${width} ${height}`);
+
+const margin = { top: 40, right: 80, bottom: 50, left: 80 };
+const chartWidth = width - margin.left - margin.right;
+const chartHeight = height - margin.top - margin.bottom;
+
+const g = svg.append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+const x = d3.scaleLinear().domain([0, 50]).range([0, chartWidth]);
+const y = d3.scaleLinear().domain([0, 1000]).range([chartHeight, 0]);
+
+const xAxis = g.append("g")
+  .attr("transform", `translate(0,${chartHeight})`)
+  .call(d3.axisBottom(x).ticks(10));
+
+const yAxis = g.append("g").call(d3.axisLeft(y));
+
+const colors = {
+  tension: "#2ca02c",
+  corriente: "#1f77b4",
+  potencia: "#ff7f0e"
+};
+
+const maxPoints = 50;
+const data = {
+  tension: Array(maxPoints).fill(0),
+  corriente: Array(maxPoints).fill(0),
+  potencia: Array(maxPoints).fill(0)
+};
+
+const line = d3.line()
+  .x((d, i) => x(i))
+  .y(d => y(d))
+  .curve(d3.curveMonotoneX);
+
+// Líneas
+const pathTension = g.append("path")
+  .datum(data.tension)
+  .attr("fill", "none")
+  .attr("stroke", colors.tension)
+  .attr("stroke-width", 2);
+
+const pathCorriente = g.append("path")
+  .datum(data.corriente)
+  .attr("fill", "none")
+  .attr("stroke", colors.corriente)
+  .attr("stroke-width", 2);
+
+const pathPotencia = g.append("path")
+  .datum(data.potencia)
+  .attr("fill", "none")
+  .attr("stroke", colors.potencia)
+  .attr("stroke-width", 2);
+
+// === Tooltip ===
+const tooltip = d3.select("body").append("div")
+  .style("position", "absolute")
+  .style("padding", "6px 10px")
+  .style("background", "rgba(0,0,0,0.75)")
+  .style("color", "white")
+  .style("border-radius", "5px")
+  .style("font-size", "12px")
+  .style("pointer-events", "none")
+  .style("opacity", 0);
+
+const focusCircle = g.append("circle")
+  .attr("r", 5)
+  .attr("fill", "#ff7f0e")
+  .style("opacity", 0);
+
+// === Overlay para detección del mouse ===
+const overlay = g.append("rect")
+  .attr("width", chartWidth)
+  .attr("height", chartHeight)
+  .attr("fill", "transparent")
+  .on("mousemove", mousemove)
+  .on("mouseout", mouseout);
+
+// === Zoom y Paneo ===
+const zoom = d3.zoom()
+  .scaleExtent([1, 10]) // límites del zoom
+  .translateExtent([[0, 0], [chartWidth, chartHeight]])
+  .on("zoom", (event) => {
+    const transform = event.transform;
+    const newX = transform.rescaleX(x);
+    xAxis.call(d3.axisBottom(newX));
+    pathTension.attr("d", line.x((d, i) => newX(i)));
+    pathCorriente.attr("d", line.x((d, i) => newX(i)));
+    pathPotencia.attr("d", line.x((d, i) => newX(i)));
+  });
+
+svg.call(zoom);
+
+// === Función para mostrar datos en tooltip ===
+function mousemove(event) {
+  const [mx] = d3.pointer(event);
+  const i = Math.round(x.invert(mx));
+  const tension = data.tension[i];
+  const corriente = data.corriente[i];
+  const potencia = data.potencia[i];
+
+  if (i >= 0 && i < data.tension.length) {
+    focusCircle
+      .attr("cx", x(i))
+      .attr("cy", y(potencia))
+      .style("opacity", 1);
+
+    tooltip
+      .html(`
+        <strong>Punto ${i}</strong><br>
+        ⚡ Tensión: ${tension?.toFixed(2)} V<br>
+        🔌 Corriente: ${corriente?.toFixed(2)} A<br>
+        💡 Potencia: ${potencia?.toFixed(2)} W
+      `)
+      .style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 30) + "px")
+      .style("opacity", 1);
+  }
+}
+
+function mouseout() {
+  focusCircle.style("opacity", 0);
+  tooltip.style("opacity", 0);
+}
+
+// === Actualización normal del gráfico ===
+function updateChart() {
+  pathTension.attr("d", line(data.tension));
+  pathCorriente.attr("d", line(data.corriente));
+  pathPotencia.attr("d", line(data.potencia));
+}
+
+  // === GAUGE DE POTENCIA ===
+  const gaugeSvg = d3.select("#gaugeChart")
+    .attr("viewBox", "0 0 300 300");
+
+  const gWidth = 300, gHeight = 300;
+  const radius = 120;
+  const cx = gWidth / 2, cy = gHeight / 2;
+
+  const maxPotencia = 5000;
+  const scale = d3.scaleLinear().domain([0, maxPotencia]).range([-Math.PI / 2, Math.PI / 2]);
+
+  const arcBg = d3.arc()
+    .innerRadius(radius - 30)
+    .outerRadius(radius)
+    .startAngle(-Math.PI / 2)
+    .endAngle(Math.PI / 2);
+
+  gaugeSvg.append("path")
+    .attr("d", arcBg)
+    .attr("fill", "#ddd")
+    .attr("transform", `translate(${cx},${cy})`);
+
+  const arcValue = d3.arc()
+    .innerRadius(radius - 30)
+    .outerRadius(radius)
+    .startAngle(-Math.PI / 2);
+
+  const arcPath = gaugeSvg.append("path")
+    .attr("fill", "#ff7f0e")
+    .attr("transform", `translate(${cx},${cy})`);
+
+  const needle = gaugeSvg.append("line")
+    .attr("x1", cx)
+    .attr("y1", cy)
+    .attr("x2", cx)
+    .attr("y2", cy - radius + 20)
+    .attr("stroke", "#222")
+    .attr("stroke-width", 3)
+    .attr("stroke-linecap", "round")
+    .attr("transform", `rotate(-90,${cx},${cy})`);
+
+  const valueText = gaugeSvg.append("text")
+    .attr("x", cx)
+    .attr("y", cy + 50)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "22px")
+    .attr("font-weight", "bold")
+    .text("-- W");
+
+  function updateGauge(potencia) {
+    const angle = scale(potencia);
+    const arc = arcValue.endAngle(angle);
+    arcPath.attr("d", arc);
+    valueText.text(`${potencia.toFixed(0)} W`);
+    needle.transition()
+      .duration(500)
+      .attr("transform", `rotate(${(angle * 180 / Math.PI)},${cx},${cy})`);
+  }
+
+  // === WebSocket ===
+  ws.onmessage = function(event) {
+    const msg = JSON.parse(event.data);
+    const tension = msg.tension;
+    const corriente = msg.corriente;
+    const potencia = msg.potencia;
+
+    document.getElementById("tension").textContent = tension.toFixed(2);
+    document.getElementById("corriente").textContent = corriente.toFixed(2);
+    document.getElementById("potencia").textContent = potencia.toFixed(2);
+
+    data.tension.push(tension); data.tension.shift();
+    data.corriente.push(corriente); data.corriente.shift();
+    data.potencia.push(potencia); data.potencia.shift();
+
+    const maxY = Math.max(
+      d3.max(data.tension),
+      d3.max(data.corriente),
+      d3.max(data.potencia)
+    ) * 1.1;
+
+    y.domain([0, maxY]);
+    yAxis.transition().duration(300).call(d3.axisLeft(y));
+
+    updateChart();
+    updateGauge(potencia);
+  };
+
+  updateChart();
+  updateGauge(0);
+});
+</script> -->
+
+
+
+
+{% load static %}
+
+<h2>🔋 Flujo de Energía en Tiempo Real</h2>
+
+<div>
+  <p>⚡ <strong>Tensión:</strong> <span id="tension">--</span> V</p>
+  <p>🔌 <strong>Corriente:</strong> <span id="corriente">--</span> A</p>
+  <p>💡 <strong>Potencia:</strong> <span id="potencia">--</span> W</p>
+</div>
+
+<!-- Gráfico principal -->
+<div id="chartContainer" class="grafico" style="top:50px; left:50px; width:90%; height:400px;">
+  <svg id="energyChart" width="100%" height="100%"></svg>
+</div>
+
+<!-- Gauge de potencia -->
+<div id="gaugeContainer" class="grafico" style="top:500px; left:200px; width:320px; height:320px;">
+  <h3 style="text-align:center;">⚙️ Medidor de Potencia</h3>
+  <svg id="gaugeChart" width="100%" height="100%"></svg>
+</div>
+
+<!-- Librerías locales -->
+<script src="{% static 'js/d3.js' %}"></script>
+<script src="{% static 'js/interact.js' %}"></script>
+
+<style>
+  .grafico {
+    position: absolute;
+    background: #fff;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    padding: 10px;
+    overflow: hidden;
+    cursor: move;
+    resize: both;
+  }
+
+  h3 { margin: 0; padding: 8px; color: #333; }
+
+  .tooltip {
+    position: absolute;
+    background: rgba(0,0,0,0.75);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const ws = new WebSocket("ws://" + window.location.host + "/ws/energia/");
+
+  // === GRÁFICO DE LÍNEAS ===
+  const svg = d3.select("#energyChart");
+  const width = svg.node().clientWidth;
+  const height = svg.node().clientHeight;
+
+  const margin = { top: 40, right: 80, bottom: 50, left: 80 };
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain([0, 50]).range([0, chartWidth]);
+  const y = d3.scaleLinear().domain([0, 1000]).range([chartHeight, 0]);
+
+  const xAxis = g.append("g")
+    .attr("transform", `translate(0,${chartHeight})`)
+    .call(d3.axisBottom(x).ticks(10));
+
+  const yAxis = g.append("g").call(d3.axisLeft(y));
+
+  const colors = {
+    tension: "#2ca02c",
+    corriente: "#1f77b4",
+    potencia: "#ff7f0e"
+  };
+
+  const maxPoints = 50;
+  const data = {
+    tension: Array(maxPoints).fill(0),
+    corriente: Array(maxPoints).fill(0),
+    potencia: Array(maxPoints).fill(0)
+  };
+
+  const line = d3.line()
+    .x((d, i) => x(i))
+    .y(d => y(d))
+    .curve(d3.curveMonotoneX);
+
+  const pathTension = g.append("path").datum(data.tension)
+    .attr("fill", "none").attr("stroke", colors.tension).attr("stroke-width", 2);
+
+  const pathCorriente = g.append("path").datum(data.corriente)
+    .attr("fill", "none").attr("stroke", colors.corriente).attr("stroke-width", 2);
+
+  const pathPotencia = g.append("path").datum(data.potencia)
+    .attr("fill", "none").attr("stroke", colors.potencia).attr("stroke-width", 2);
+
+  const tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip").style("opacity", 0);
+
+  const focusCircle = g.append("circle")
+    .attr("r", 5).attr("fill", "#ff7f0e").style("opacity", 0);
+
+  const overlay = g.append("rect")
+    .attr("width", chartWidth)
+    .attr("height", chartHeight)
+    .attr("fill", "transparent")
+    .on("mousemove", mousemove)
+    .on("mouseout", mouseout);
+
+  const zoom = d3.zoom()
+    .scaleExtent([1, 10])
+    .translateExtent([[0, 0], [chartWidth, chartHeight]])
+    .on("zoom", (event) => {
+      const transform = event.transform;
+      const newX = transform.rescaleX(x);
+      xAxis.call(d3.axisBottom(newX));
+      pathTension.attr("d", line.x((d, i) => newX(i)));
+      pathCorriente.attr("d", line.x((d, i) => newX(i)));
+      pathPotencia.attr("d", line.x((d, i) => newX(i)));
+    });
+
+  svg.call(zoom);
+
+  function mousemove(event) {
+    const [mx] = d3.pointer(event);
+    const i = Math.round(x.invert(mx));
+    const tension = data.tension[i];
+    const corriente = data.corriente[i];
+    const potencia = data.potencia[i];
+
+    if (i >= 0 && i < data.tension.length) {
+      focusCircle
+        .attr("cx", x(i))
+        .attr("cy", y(potencia))
+        .style("opacity", 1);
+
+      tooltip.html(`
+        <strong>Punto ${i}</strong><br>
+        ⚡ Tensión: ${tension?.toFixed(2)} V<br>
+        🔌 Corriente: ${corriente?.toFixed(2)} A<br>
+        💡 Potencia: ${potencia?.toFixed(2)} W
+      `)
+      .style("left", (event.pageX + 10) + "px")
+      .style("top", (event.pageY - 30) + "px")
+      .style("opacity", 1);
+    }
+  }
+
+  function mouseout() {
+    focusCircle.style("opacity", 0);
+    tooltip.style("opacity", 0);
+  }
+
+  function updateChart() {
+    pathTension.attr("d", line(data.tension));
+    pathCorriente.attr("d", line(data.corriente));
+    pathPotencia.attr("d", line(data.potencia));
+  }
+
+  // === GAUGE ===
+  const gaugeSvg = d3.select("#gaugeChart")
+    .attr("viewBox", "0 0 300 300");
+  const radius = 120, cx = 150, cy = 150, maxPotencia = 5000;
+  const scale = d3.scaleLinear().domain([0, maxPotencia]).range([-Math.PI / 2, Math.PI / 2]);
+
+  const arcBg = d3.arc().innerRadius(radius - 30).outerRadius(radius)
+    .startAngle(-Math.PI / 2).endAngle(Math.PI / 2);
+  gaugeSvg.append("path")
+    .attr("d", arcBg).attr("fill", "#ddd").attr("transform", `translate(${cx},${cy})`);
+  const arcValue = d3.arc().innerRadius(radius - 30).outerRadius(radius).startAngle(-Math.PI / 2);
+  const arcPath = gaugeSvg.append("path").attr("fill", "#ff7f0e").attr("transform", `translate(${cx},${cy})`);
+  const needle = gaugeSvg.append("line")
+    .attr("x1", cx).attr("y1", cy)
+    .attr("x2", cx).attr("y2", cy - radius + 20)
+    .attr("stroke", "#222").attr("stroke-width", 3)
+    .attr("transform", `rotate(-90,${cx},${cy})`);
+  const valueText = gaugeSvg.append("text")
+    .attr("x", cx).attr("y", cy + 50)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "22px")
+    .attr("font-weight", "bold").text("-- W");
+
+  function updateGauge(potencia) {
+    const angle = scale(potencia);
+    const arc = arcValue.endAngle(angle);
+    arcPath.attr("d", arc);
+    valueText.text(`${potencia.toFixed(0)} W`);
+    needle.transition().duration(500)
+      .attr("transform", `rotate(${(angle * 180 / Math.PI)},${cx},${cy})`);
+  }
+
+  // === WebSocket ===
+  ws.onmessage = function(event) {
+    const msg = JSON.parse(event.data);
+    const tension = msg.tension;
+    const corriente = msg.corriente;
+    const potencia = msg.potencia;
+
+    document.getElementById("tension").textContent = tension.toFixed(2);
+    document.getElementById("corriente").textContent = corriente.toFixed(2);
+    document.getElementById("potencia").textContent = potencia.toFixed(2);
+
+    data.tension.push(tension); data.tension.shift();
+    data.corriente.push(corriente); data.corriente.shift();
+    data.potencia.push(potencia); data.potencia.shift();
+
+    const maxY = Math.max(
+      d3.max(data.tension),
+      d3.max(data.corriente),
+      d3.max(data.potencia)
+    ) * 1.1;
+
+    y.domain([0, maxY]);
+    yAxis.transition().duration(300).call(d3.axisLeft(y));
+
+    updateChart();
+    updateGauge(potencia);
+  };
+
+  updateChart();
+  updateGauge(0);
+});
+
+// === Guardar y cargar posiciones en localStorage ===
+function savePosition(id, x, y, width, height) {
+  const positions = JSON.parse(localStorage.getItem("chartPositions") || "{}");
+  positions[id] = { x, y, width, height };
+  localStorage.setItem("chartPositions", JSON.stringify(positions));
+}
+
+function loadPosition(id) {
+  const positions = JSON.parse(localStorage.getItem("chartPositions") || "{}");
+  return positions[id] || null;
+}
+
+// Restaurar posiciones guardadas al cargar la página
+document.querySelectorAll(".grafico").forEach(el => {
+  const id = el.id;
+  const saved = loadPosition(id);
+  if (saved) {
+    el.style.transform = `translate(${saved.x}px, ${saved.y}px)`;
+    el.style.width = saved.width + "px";
+    el.style.height = saved.height + "px";
+    el.setAttribute('data-x', saved.x);
+    el.setAttribute('data-y', saved.y);
+  }
+});
+
+// === Movimiento y redimensionado ===
+interact('.grafico')
+  .draggable({
+    onmove(event) {
+      const target = event.target;
+      const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+      const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+      target.style.transform = `translate(${x}px, ${y}px)`;
+      target.setAttribute('data-x', x);
+      target.setAttribute('data-y', y);
+
+      //  Guardar la posición actual
+      savePosition(target.id, x, y, target.offsetWidth, target.offsetHeight);
+    }
+  })
+  .resizable({ edges: { left: true, right: true, bottom: true, top: true } })
+  .on('resizemove', event => {
+    const target = event.target;
+    target.style.width = event.rect.width + 'px';
+    target.style.height = event.rect.height + 'px';
+
+    const x = parseFloat(target.getAttribute('data-x')) || 0;
+    const y = parseFloat(target.getAttribute('data-y')) || 0;
+
+    //  Guardar tamaño y posición actual
+    savePosition(target.id, x, y, event.rect.width, event.rect.height);
+  });
+
+</script>
 
 {% endblock %}

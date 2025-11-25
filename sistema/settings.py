@@ -25,9 +25,14 @@ SECRET_KEY = 'django-insecure-1a+0y=d@mpw3f0mg7k-d7!lv*rrbbgv9^_c$inhfls871wgfu2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.75', 'localhost', '127.0.0.1']
+# ALLOWED_HOSTS = ['192.168.1.75', 'localhost', '127.0.0.1']
+
+ALLOWED_HOSTS = ['*']
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR,'HABUI_APP','static')]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,11 +42,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'HABUI_APP'
+    'HABUI_APP',
+    "rest_framework",
+    "corsheaders",
+    "channels",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -69,6 +79,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sistema.wsgi.application'
 
+# CORS (para pruebas)
+CORS_ALLOW_ALL_ORIGINS = True
+
+# ASGI / Channels
+ASGI_APPLICATION = "sistema.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -115,9 +130,26 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# CHANNEL_LAYERS:
+# - Para desarrollo simple (un solo proceso) usa InMemoryChannelLayer
+# - Para varios procesos/producción usa Redis con channels_redis
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#     },
+# }
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}

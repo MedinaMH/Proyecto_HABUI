@@ -7,37 +7,36 @@
     <title>{% block titulo %}Sistema REMS{% endblock %}</title>
 
     <!-- Bootstrap CSS -->
-    <link 
+    <!-- <link 
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
-      rel="stylesheet" 
-      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" 
-      crossorigin="anonymous"/>
-    <!-- ajusta contenido para navegadores -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      rel="stylesheet"
+    > -->
     <!-- Iconos bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Estilos  personalizados-->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"> -->
+
+    <!-- Bootstrap local -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+
+    <!-- Bootstrap Icons local -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
+
+    <!-- Estilos personalizados -->
     <link rel="stylesheet" href="{% static 'css/estilos_panel_rems.css' %}">
+    
   </head>
 
   <body>
     <!-- Header superior -->
     <header class="navbar navbar-dark bg-primary fixed-top d-flex justify-content-between align-items-center px-3" style="height: 85px;">
-      <!-- Botón volver al panel -->
       <a href="{% url 'panel_principal' %}" class="btn btn-outline-light d-flex align-items-center gap-2">
         <i class="bi bi-arrow-left-circle-fill fs-5"></i>
         <span class="d-none d-sm-inline">Panel principal</span>
       </a>
-      <!-- Título centrado -->
       <div class="text-center flex-grow-1">
-        <span class="encabezado">Sistema de Monitoreo de Recursos  REMS</span>
-        
+        <span class="encabezado">Sistema de Monitoreo de Recursos REMS</span>
       </div>
-
-      <!-- Espaciador para alinear bien -->
       <div style="width: 110px;"></div>
 
-      <!-- Botón de menú en móviles -->
       <button 
         class="navbar-toggler d-md-none" 
         type="button" 
@@ -56,26 +55,91 @@
         <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
           <div class="position-sticky pt-3">
             <ul class="nav flex-column">
+
+              <!-- Todos los recursos -->
               <li class="nav-item">
                 <a class="nav-link {% if request.path == '/todos_los_recursos' %}active{% endif %}" href="{% url 'all_resources' %}">
-                  <i class="bi bi-grid-1x2-fill me-2"></i>Todos los recursos</a>
+                  <i class="bi bi-grid-1x2-fill me-2"></i>Todos los recursos
+                </a>
               </li>
+
+              <!-- Energía -->
               <li class="nav-item">
                 <a class="nav-link {% if request.path == '/energia_rems' %}active{% endif %}" href="{% url 'panel_energia_rems' %}">
-                  <i class="bi bi-lightning-charge-fill me-2"></i>Energía</a>
+                  <i class="bi bi-lightning-charge-fill me-2"></i>Energía
+                </a>
               </li>
+
+              <!-- Agua -->
               <li class="nav-item">
                 <a class="nav-link {% if request.path == '/agua_rems' %}active{% endif %}" href="{% url 'panel_agua_rems' %}">
-                  <i class="bi bi-droplet-fill me-2"></i>Agua</a>
+                  <i class="bi bi-droplet-fill me-2"></i>Agua
+                </a>
               </li>
+
+              <!-- Calidad del aire (submenu) -->
               <li class="nav-item">
-                <a class="nav-link {% if request.path == '/oxigeno_rems' %}active{% endif %}" href="{% url 'panel_oxigeno_rems' %}">
-                  <i class="bi bi-cloud-fog2-fill me-2"></i>Oxígeno</a>
+                <a 
+                  class="nav-link d-flex justify-content-between align-items-center" 
+                  data-bs-toggle="collapse" 
+                  href="#submenuAire" 
+                  role="button" 
+                  aria-expanded="false" 
+                  aria-controls="submenuAire">
+                  <span><i class="bi bi-cloudy-fill me-2"></i>Calidad del aire</span>
+                  <i class="bi bi-caret-down-fill small"></i>
+                </a>
+                <div class="collapse ps-4 {% if '/oxigeno_rems' in request.path or '/co2_rems' in request.path %}show{% endif %}" id="submenuAire">
+                  <ul class="nav flex-column">
+                    <li class="nav-item">
+                      <a class="nav-link {% if request.path == '/oxigeno_rems' %}active{% endif %}" href="{% url 'panel_oxigeno_rems' %}">
+                        <i class="bi bi-cloud-fog2-fill me-2"></i>Oxígeno (O₂)
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link {% if request.path == '/co2_rems' %}active{% endif %}" href="{% url 'panel_co2_rems' %}">
+                        <i class="bi bi-cloud-haze2-fill me-2"></i>Dióxido de carbono (CO₂)
+                      </a>
+                    </li>
+                  </ul>
+                </div>
               </li>
+              
+              <!-- Condiciones ambientales (submenu) -->
+              <li class="nav-item">
+                <a 
+                  class="nav-link d-flex justify-content-between align-items-center" 
+                  data-bs-toggle="collapse" 
+                  href="#submenuAmbiente" 
+                  role="button" 
+                  aria-expanded="false" 
+                  aria-controls="submenuAmbiente">
+                  <span><i class="bi bi-thermometer-snow me-2"></i>Ambiente interno</span>
+                  <i class="bi bi-caret-down-fill small"></i>
+                </a>
+                <div class="collapse ps-4 {% if '/temperatura_rems' in request.path or '/humedad_rems' in request.path %}show{% endif %}" id="submenuAmbiente">
+                  <ul class="nav flex-column">
+                    <li class="nav-item">  <!-- Temperatura -->
+                      <a class="nav-link {% if request.path == '/temperatura_rems' %}active{% endif %}" href="{% url 'temperatura_rems' %}">
+                        <i class="bi bi-thermometer-half me-2"></i>Temperatura
+                      </a>
+                    </li>
+                    <li class="nav-item"> <!-- Humedad -->
+                      <a class="nav-link {% if request.path == '/humedad_rems' %}active{% endif %}" href="{% url 'humedad_rems' %}">
+                        <i class="bi bi-moisture me-2"></i>Humedad
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+
+              <!-- Alimentos -->
               <li class="nav-item">
                 <a class="nav-link {% if request.path == '/alimentos_rems' %}active{% endif %}" href="{% url 'panel_alimentos_rems' %}">
-                  <i class="bi bi-cup-straw me-2"></i>Alimentos</a>
+                  <i class="bi bi-cup-straw me-2"></i>Alimentos
+                </a>
               </li>
+
             </ul>
           </div>
         </nav>
@@ -83,7 +147,6 @@
         <!-- Contenido -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-4">
           {% block contenido %}
-          
           {% endblock %}
         </main>
       </div>
@@ -94,10 +157,12 @@
     </footer>
 
     <!-- Bootstrap JS -->
-    <script 
+    <!-- <script 
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
-      integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" 
-      crossorigin="anonymous"
-    ></script>
+      crossorigin="anonymous">
+    </script> -->
+
+    <!-- Bootstrap JS local (incluye Popper) -->
+    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
   </body>
 </html>
