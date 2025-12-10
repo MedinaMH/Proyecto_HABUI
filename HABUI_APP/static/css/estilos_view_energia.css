@@ -1,0 +1,240 @@
+/* Estilos generales */
+body {
+background-color: #0b0f19;
+color: #fff;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+margin: 0;
+padding: 20px;
+}
+
+.dashboard-container {
+max-width: 1400px;
+margin: 0 auto;
+}
+
+.dashboard-header {
+text-align: center;
+margin-bottom: 30px;
+padding-bottom: 20px;
+border-bottom: 2px solid #00bfff;
+}
+
+.dashboard-title {
+color: #00bfff;
+font-size: 32px;
+font-weight: 700;
+margin: 0 0 10px 0;
+}
+
+.dashboard-subtitle {
+color: #8da9c4;
+font-size: 16px;
+margin: 0;
+}
+
+/* Layout principal - Gráfica a la izquierda, baterías a la derecha */
+.main-grid {
+display: grid;
+grid-template-columns: 1fr 320px;
+gap: 20px;
+margin-bottom: 20px;
+}
+
+/* Gráfico principal - izquierda */
+.main-chart {
+background: linear-gradient(145deg, #111827, #0f172a);
+border: 2px solid #00bfff;
+border-radius: 15px;
+padding: 20px;
+box-shadow: 0 8px 32px rgba(0, 123, 255, 0.1);
+grid-column: 1;
+}
+
+/* Panel de batería - derecha */
+.battery-panel {
+background: linear-gradient(145deg, #111827, #0f172a);
+border: 2px solid #00bfff;
+border-radius: 15px;
+padding: 13px;
+box-shadow: 0 8px 32px rgba(0, 123, 255, 0.1);
+grid-column: 2;
+height: fit-content;
+}
+
+/* Contenedor para gráfica y métricas juntas */
+.chart-and-metrics-container {
+grid-column: 1;
+display: flex;
+flex-direction: column;
+gap: 15px;
+}
+
+/* Panel de métricas en tiempo real - debajo de la gráfica */
+.metrics-panel {
+background: linear-gradient(145deg, #111827, #0f172a);
+border: 2px solid #00bfff;
+border-radius: 15px;
+padding: 15px;
+box-shadow: 0 8px 32px rgba(0, 123, 255, 0.1);
+width: 100%;
+}
+
+/* Contenedor horizontal para métricas - 6 EN UNA SOLA FILA */
+.metrics-horizontal-container {
+display: flex;
+justify-content: space-between;
+gap: 10px;
+}
+
+/* Métricas ultra compactas para caber 6 en fila */
+.metric-ultra-compact {
+background: rgba(30, 41, 59, 0.7);
+border-radius: 8px;
+padding: 10px;
+border-left: 4px solid #00bfff;
+transition: all 0.3s ease;
+flex: 1;
+min-width: 0; /* Importante para que se ajusten */
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+align-items: center;
+text-align: center;
+min-height: 90px;
+}
+
+.metric-ultra-compact:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 8px rgba(0, 123, 255, 0.15);
+}
+
+.metric-title-ultra-compact {
+color: #8da9c4;
+font-size: 10px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+margin-bottom: 5px;
+line-height: 1.2;
+}
+
+.metric-value-ultra-compact {
+color: #fff;
+font-size: 18px;
+font-weight: 700;
+margin: 5px 0;
+line-height: 1.2;
+}
+
+.metric-unit-ultra-compact {
+color: #00bfff;
+font-size: 11px;
+margin-left: 2px;
+}
+
+.metric-status-ultra-compact {
+display: inline-block;
+padding: 2px 6px;
+border-radius: 10px;
+font-size: 9px;
+font-weight: 600;
+margin-top: 4px;
+white-space: nowrap;
+}
+
+.status-charging { background: #10b981; color: white; }
+.status-discharging { background: #f59e0b; color: white; }
+.status-stable { background: #3b82f6; color: white; }
+.status-critical { background: #ef4444; color: white; }
+
+/* Responsive */
+@media (max-width: 1200px) {
+.main-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+}
+
+.chart-and-metrics-container {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.battery-panel {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.metrics-horizontal-container {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.metric-ultra-compact {
+    flex: 0 0 calc(33.333% - 8px); /* 3 por fila en tablets */
+    min-width: 140px;
+}
+}
+
+@media (max-width: 768px) {
+.metric-ultra-compact {
+    flex: 0 0 calc(50% - 8px); /* 2 por fila en móviles */
+    min-width: 120px;
+}
+
+.metric-title-ultra-compact {
+    font-size: 9px;
+}
+
+.metric-value-ultra-compact {
+    font-size: 16px;
+}
+}
+
+/* Controles del gráfico */
+.chart-controls {
+display: flex;
+gap: 10px;
+margin-bottom: 20px;
+}
+
+.chart-btn {
+background: #1e40af;
+color: white;
+border: none;
+padding: 8px 16px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 14px;
+font-weight: 600;
+transition: all 0.2s ease;
+}
+
+.chart-btn:hover {
+background: #1d4ed8;
+transform: translateY(-1px);
+}
+
+.chart-btn:active {
+transform: translateY(0);
+}
+
+.chart-btn.reset {
+background: #374151;
+}
+
+.chart-btn.reset:hover {
+background: #4b5563;
+}
+
+/* Estilo para título de secciones */
+.section-title {
+color: #00bfff;
+margin-top: 0;
+margin-bottom: 15px;
+font-size: 18px;
+}
+
+/* Ajuste altura gráfico */
+#energyChart {
+height: 400px;
+}

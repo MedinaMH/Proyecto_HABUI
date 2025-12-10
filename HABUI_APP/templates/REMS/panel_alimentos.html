@@ -1,9 +1,927 @@
 {% extends "REMS/estructura_base.html" %}
 
-{% block titulo %} Sistema REMS{% endblock %}
+{% block titulo %} Sistema REMS - Alimentos{% endblock %}
 
 {% block contenido %} 
 
-Panel de monitoreo de Alimentos
+{% load static %}
+
+<script src="{% static 'js/d3.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/estilos_view_alimentos.css' %}">
+
+<div class="dashboard-container">
+  <!-- Header --->
+  <div class="dashboard-header" style="padding-top: 5px; padding-bottom: 15px;">
+    <h1 class="dashboard-title">🍽️ Monitoreo de Alimentos</h1>
+  </div>
+  
+  <!-- Grid Principal -->
+  <div class="main-grid">
+    
+    <!-- Panel de Control de Consumo -->
+    <div class="control-panel">
+      <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 20px;">📝 Registro de Consumo</h3>
+      
+      <div class="consumption-form">
+        <div class="form-group">
+          <label class="form-label">Comida del Día</label>
+          <select id="meal-type" class="form-select">
+            <option value="desayuno">🍳 Desayuno</option>
+            <option value="almuerzo">🍲 Almuerzo</option>
+            <option value="comida">🍽️ Comida</option>
+            <option value="cena">🍎 Cena</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Total de Personas que Comieron</label>
+          <input type="number" id="total-people" class="form-input" min="1" max="6" value="1" style="text-align: center;">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Total de Porciones Consumidas</label>
+          <input type="number" id="total-portions-input" class="form-input" min="1" max="6" value="1" style="text-align: center;">
+        </div>
+        
+        <button id="btn-register-consumption" class="btn-primary">
+          📋 Registrar Consumo
+        </button>
+      </div>
+      
+      <!-- Historial de consumo del día -->
+      <div style="margin-top: 25px;">
+        <h4 style="color: #ffa8a8; margin-bottom: 15px;">📊 Consumo del Día</h4>
+        <div id="daily-consumption" style="background: rgba(30, 41, 59, 0.7); border-radius: 8px; padding: 15px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #ffa8a8;">Desayuno:</span>
+            <span id="breakfast-count" style="color: #fff; font-weight: 600;">0 porciones</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #ffa8a8;">Almuerzo:</span>
+            <span id="lunch-count" style="color: #fff; font-weight: 600;">0 porciones</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #ffa8a8;">Comida:</span>
+            <span id="dinner-count" style="color: #fff; font-weight: 600;">0 porciones</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #ffa8a8;">Cena:</span>
+            <span id="snack-count" style="color: #fff; font-weight: 600;">0 porciones</span>
+          </div>
+          <div style="border-top: 1px solid #4b5563; margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between;">
+            <span style="color: #ff6b6b; font-weight: 600;">TOTAL DÍA:</span>
+            <span id="total-day-count" style="color: #ff6b6b; font-weight: 800;">0 porciones</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Panel de Métricas y Visualización -->
+    <div class="metrics-panel">
+      <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 20px;">📦 Suministro de Alimentos</h3>
+      
+      <!-- Gráfico de Porciones animado -->
+      <div style="text-align: center; margin-bottom: 30px;">
+        <svg id="portions-chart" width="100%" height="300"></svg>
+        <div style="margin-top: 10px;">
+          <div id="portions-text" style="font-size: 28px; font-weight: 800; color: #ff6b6b;">-- porciones</div>
+          <div style="color: #ffa8a8; font-size: 14px;">restantes de <span id="total-portions-text" style="color: #fff; font-weight: 600;">--</span> iniciales</div>
+        </div>
+      </div>
+      
+      <!-- Métricas de Suministro -->
+      <div class="metric">
+        <div class="metric-title">Porciones Restantes</div>
+        <p class="metric-value" id="remaining-portions">-- <span class="metric-unit">porciones</span></p>
+        <div class="metric-status status-good" id="portions-status">CARGANDO...</div>
+      </div>
+      
+      <div class="metric">
+        <div class="metric-title">Días de Autonomía</div>
+        <p class="metric-value" id="autonomy-days">-- <span class="metric-unit">días</span></p>
+        <div class="metric-status status-good" id="autonomy-status">CARGANDO...</div>
+      </div>
+    </div>
+    
+    <!-- Panel de Temperatura -->
+    <div class="temp-panel">
+      <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 15px;">🌡️ Temperatura de Almacenamiento</h3>
+      
+    <!-- Termómetro -->
+    <div style="text-align: center; margin-bottom: 20px; margin-top: 15px;">
+      <div style="height: 250px; display: flex; align-items: center; justify-content: center;">
+        <svg id="temperature-gauge" width="200" height="240"></svg>
+      </div>
+      <div style="margin-top: 10px;">
+        <div id="temperature-text" style="font-size: 28px; font-weight: 800; color: #ff6b6b;">--°C</div>
+        <div style="color: #ffa8a8; font-size: 14px;">Temperatura actual</div>
+      </div>
+    </div>
+      
+      <!-- Métricas de Temperatura -->
+      <div class="metric">
+        <div class="metric-title">Temperatura Actual</div>
+        <p class="metric-value" id="current-temp">-- <span class="metric-unit">°C</span></p>
+        <div class="metric-status status-good" id="temp-status">ÓPTIMA</div>
+      </div>
+      
+      <div class="metric">
+        <div class="metric-title">Rango Recomendado</div>
+        <p class="metric-value">2 - 8 <span class="metric-unit">°C</span></p>
+        <div class="metric-status status-good">REFRIGERACIÓN</div>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- Panel de Gráficos de Análisis -->
+  <div class="chart-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h3 style="color: #ff6b6b; margin: 0;">📊 Análisis de Consumo</h3>
+      <div style="display: flex; gap: 10px;">
+        <select id="analysis-period" class="form-select" style="width: auto;">
+          <option value="7">Últimos 7 días</option>
+          <option value="30">Últimos 30 días</option>
+          <option value="all">Todo el histórico</option>
+        </select>
+      </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+      <div>
+        <h4 style="color: #ffa8a8; margin-bottom: 15px;">🍽️ Distribución por Comida</h4>
+        <!-- CONTENEDOR  -->
+        <div style="height: 350px; background: rgba(30, 41, 59, 0.3); border-radius: 10px; padding: 15px;">
+          <svg id="meal-distribution" width="100%" height="100%"></svg>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tabla de Historial -->
+    <div style="margin-top: 30px;">
+      <h4 style="color: #ffa8a8; margin-bottom: 15px;">📋 Historial de Consumo Reciente</h4>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #1f2937;">
+              <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Fecha/Hora</th>
+              <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Comida</th>
+              <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Porciones</th>
+              <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Tripulantes</th>
+            </tr>
+          </thead>
+          <tbody id="consumption-history">
+            <!-- Los registros se agregarán aquí dinámicamente desde la BD -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notificación flotante -->
+<div id="notification" class="notification"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // ============================================
+  // CONFIGURACIÓN INICIAL
+  // ============================================
+  const CONFIG = {
+    totalPeople: 4,
+    mealsPerDay: 4,
+    initialDays: 7,
+    portionsPerMeal: 1,
+  };
+  
+  // ============================================
+  // ESTADO DE LA APLICACIÓN
+  // ============================================
+  let appState = {
+    remainingPortions: 0,
+    initialPortions: 0,
+    dailyConsumption: {
+      desayuno: 0,
+      almuerzo: 0,
+      comida: 0,
+      cena: 0
+    },
+    consumptionHistory: [],
+    temperatureHistory: [],
+    currentTemperature: null,
+    autonomyDays: 0,
+    porcentajeRestante: 0,
+    lastUpdate: null
+  };
+  
+  // ============================================
+  // FUNCIONES PARA INTERACTUAR CON LA API
+  // ============================================
+  
+  // Función para obtener el token CSRF
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  
+  async function obtenerEstadoAlimentos() {
+    try {
+      const response = await fetch('/api/alimentos/estado/');
+      if (!response.ok) throw new Error('Error al obtener estado');
+      
+      const data = await response.json();
+      
+      // Actualizar estado local con datos de la BD
+      appState.remainingPortions = data.porciones_actuales;
+      appState.initialPortions = data.porciones_iniciales;
+      appState.porcentajeRestante = data.porcentaje_restante;
+      appState.autonomyDays = data.dias_autonomia;
+      
+      // Actualizar interfaz
+      updateAllDisplays();
+      
+      console.log('Estado de alimentos cargado desde BD');
+      return { success: true, data: data };
+    } catch (error) {
+      console.error('Error cargando estado:', error);
+      showNotification('Error al cargar datos de alimentos', 'error');
+      return { success: false, error: error.message };
+    }
+  }
+  
+  async function obtenerConsumoDiario() {
+    try {
+      const response = await fetch('/api/alimentos/consumos/diarios/');
+      if (!response.ok) throw new Error('Error al obtener consumo diario');
+      
+      const data = await response.json();
+      
+      // Actualizar consumo diario
+      appState.dailyConsumption = {
+        desayuno: data.resumen.desayuno.porciones,
+        almuerzo: data.resumen.almuerzo.porciones,
+        comida: data.resumen.comida.porciones,
+        cena: data.resumen.cena.porciones
+      };
+      
+      // Actualizar historial local
+      appState.consumptionHistory = data.detalles.map(item => ({
+        id: item.id,
+        tipo_comida: item.tipo_comida,
+        tipo_comida_display: item.tipo_comida_display,
+        personas: item.personas,
+        porciones: item.porciones,
+        fecha_registro: new Date(item.fecha_registro)
+      }));
+      
+      // Actualizar interfaz
+      updateAllDisplays();
+      updateConsumptionHistoryTable();
+      
+      return { success: true, data: data };
+    } catch (error) {
+      console.error('Error cargando consumo diario:', error);
+      return { success: false, error: error.message };
+    }
+  }
+  
+  async function registrarConsumoAPI(tipo_comida, personas, porciones) {
+    try {
+      const btn = document.getElementById('btn-register-consumption');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '⏳ Procesando...';
+      btn.disabled = true;
+      
+      const response = await fetch('/api/alimentos/registrar-consumo/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+          tipo_comida: tipo_comida,
+          personas: parseInt(personas),
+          porciones: parseInt(porciones)
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Actualizar estado local con nuevos datos
+        appState.remainingPortions = data.recurso_alimentos.porciones_actuales;
+        appState.porcentajeRestante = data.recurso_alimentos.porcentaje_restante;
+        appState.autonomyDays = data.recurso_alimentos.dias_autonomia;
+        
+        // Actualizar consumo diario
+        appState.dailyConsumption[tipo_comida] += parseInt(porciones);
+        
+        // Agregar al historial local
+        appState.consumptionHistory.unshift({
+          id: data.consumo.id,
+          tipo_comida: data.consumo.tipo_comida,
+          tipo_comida_display: data.consumo.tipo_comida_display,
+          personas: data.consumo.personas,
+          porciones: data.consumo.porciones,
+          fecha_registro: new Date(data.consumo.fecha_registro)
+        });
+        
+        // Actualizar interfaz
+        updateAllDisplays();
+        updateConsumptionHistoryTable();
+        updatePortionsChart();
+        
+        showNotification(data.message, 'success');
+        return { success: true, data: data };
+      } else {
+        showNotification(data.error || 'Error al registrar consumo', 'error');
+        return { success: false, error: data.error };
+      }
+    } catch (error) {
+      console.error('❌ Error registrando consumo:', error);
+      showNotification('Error de conexión', 'error');
+      return { success: false, error: error.message };
+    } finally {
+      const btn = document.getElementById('btn-register-consumption');
+      btn.innerHTML = '📋 Registrar Consumo';
+      btn.disabled = false;
+    }
+  }
+  
+  async function resetearAlimentosAPI(tipo) {
+    try {
+      const response = await fetch('/api/alimentos/reset/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ tipo: tipo })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Actualizar estado local
+        appState.remainingPortions = data.data.porciones_actuales;
+        appState.initialPortions = data.data.porciones_iniciales;
+        appState.porcentajeRestante = data.data.porcentaje_restante;
+        appState.autonomyDays = data.data.dias_autonomia;
+        
+        if (tipo === 'dia') {
+          // Resetear solo consumo diario
+          appState.dailyConsumption = {
+            desayuno: 0,
+            almuerzo: 0,
+            comida: 0,
+            cena: 0
+          };
+        }
+        
+        // Actualizar interfaz
+        updateAllDisplays();
+        updatePortionsChart();
+        
+        showNotification(data.message, 'success');
+        return { success: true, data: data };
+      } else {
+        showNotification(data.error || 'Error al resetear', 'error');
+        return { success: false, error: data.error };
+      }
+    } catch (error) {
+      console.error('❌ Error resetando alimentos:', error);
+      showNotification('Error de conexión', 'error');
+      return { success: false, error: error.message };
+    }
+  }
+  
+  // ============================================
+  // ACTUALIZACIÓN DE INTERFAZ
+  // ============================================
+  
+  function updateAllDisplays() {
+    // Actualizar métricas principales
+    d3.select("#remaining-portions").text(appState.remainingPortions);
+    d3.select("#total-portions-text").text(appState.initialPortions);
+    d3.select("#portions-text").text(`${appState.remainingPortions} porciones`);
+    d3.select("#autonomy-days").text(appState.autonomyDays);
+    d3.select("#daily-consumption-estimated").text(CONFIG.totalPeople * CONFIG.mealsPerDay);
+    
+    // Actualizar consumo del día
+    d3.select("#breakfast-count").text(appState.dailyConsumption.desayuno + " porciones");
+    d3.select("#lunch-count").text(appState.dailyConsumption.almuerzo + " porciones");
+    d3.select("#dinner-count").text(appState.dailyConsumption.comida + " porciones");
+    d3.select("#snack-count").text(appState.dailyConsumption.cena + " porciones");
+    
+    const totalDay = Object.values(appState.dailyConsumption).reduce((a, b) => a + b, 0);
+    d3.select("#total-day-count").text(totalDay + " porciones");
+    
+    // Actualizar última actualización
+    const now = new Date();
+    d3.select("#last-update").text(now.toLocaleTimeString('es-ES'));
+    
+    // Actualizar estados de alerta
+    updateStatusIndicators();
+    
+    // Actualizar gráficos
+    updateMealDistributionChart();
+  }
+  
+  function updateStatusIndicators() {
+    const portionsStatus = d3.select("#portions-status");
+    const autonomyStatus = d3.select("#autonomy-status");
+    
+    if (appState.porcentajeRestante <= 10) {
+      portionsStatus.text("CRÍTICO").classed("status-critical", true).classed("status-warning", false).classed("status-good", false);
+    } else if (appState.porcentajeRestante <= 30) {
+      portionsStatus.text("ALERTA").classed("status-warning", true).classed("status-critical", false).classed("status-good", false);
+    } else {
+      portionsStatus.text("SUFICIENTE").classed("status-good", true).classed("status-warning", false).classed("status-critical", false);
+    }
+    
+    if (appState.autonomyDays <= 1) {
+      autonomyStatus.text("CRÍTICO").classed("status-critical", true).classed("status-warning", false).classed("status-good", false);
+    } else if (appState.autonomyDays <= 3) {
+      autonomyStatus.text("ALERTA").classed("status-warning", true).classed("status-critical", false).classed("status-good", false);
+    } else {
+      autonomyStatus.text("ÓPTIMO").classed("status-good", true).classed("status-warning", false).classed("status-critical", false);
+    }
+  }
+  
+  function updateConsumptionHistoryTable() {
+    const tbody = d3.select("#consumption-history");
+    tbody.html("");
+    
+    // Mostrar solo últimos 10 registros
+    const recentHistory = appState.consumptionHistory.slice(0, 10);
+    
+    if (recentHistory.length === 0) {
+      tbody.append("tr")
+        .style("background", "rgba(30, 41, 59, 0.5)")
+        .style("border-bottom", "1px solid #374151")
+        .append("td")
+        .attr("colspan", 4)
+        .style("padding", "20px")
+        .style("text-align", "center")
+        .style("color", "#9ca3af")
+        .text("No hay registros de consumo aún");
+      return;
+    }
+    
+    recentHistory.forEach(item => {
+      const row = tbody.append("tr")
+        .style("background", "rgba(30, 41, 59, 0.5)")
+        .style("border-bottom", "1px solid #374151");
+      
+      row.append("td")
+        .style("padding", "12px")
+        .style("color", "#fff")
+        .text(item.fecha_registro.toLocaleString('es-ES'));
+      
+      row.append("td")
+        .style("padding", "12px")
+        .style("color", "#fff")
+        .html(item.tipo_comida_display);
+      
+      row.append("td")
+        .style("padding", "12px")
+        .style("color", "#ff6b6b")
+        .style("font-weight", "600")
+        .text(item.porciones + " porciones");
+      
+      row.append("td")
+        .style("padding", "12px")
+        .style("color", "#fff")
+        .text(item.personas + " persona" + (item.personas !== 1 ? 's' : ''));
+    });
+  }
+  
+  // ============================================
+  // GRÁFICOS
+  // ============================================
+  
+  let updateTemperatureGauge = null;
+  let updateTemperatureHistory = null;
+  
+  // Gráfico de porciones animado
+  function updatePortionsChart() {
+    const svg = d3.select("#portions-chart");
+    const width = svg.node().getBoundingClientRect().width;
+    const height = 300;
+    
+    svg.selectAll("*").remove(); // Limpiar gráfico anterior
+    
+    if (appState.initialPortions === 0) return;
+    
+    const portionSize = Math.min(40, width / 10);
+    const portionsPerRow = Math.floor(width / portionSize);
+    const totalRows = Math.ceil(appState.initialPortions / portionsPerRow);
+    
+    const container = svg.append("g")
+      .attr("transform", `translate(${(width - portionsPerRow * portionSize) / 2}, 20)`);
+    
+    // Calcular porciones consumidas
+    const porcionesConsumidas = appState.initialPortions - appState.remainingPortions;
+    
+    // Crear círculos para cada porción
+    for (let i = 0; i < appState.initialPortions; i++) {
+      const row = Math.floor(i / portionsPerRow);
+      const col = i % portionsPerRow;
+      const consumed = i < porcionesConsumidas;
+      
+      container.append("circle")
+        .attr("cx", col * portionSize + portionSize / 2)
+        .attr("cy", row * portionSize + portionSize / 2)
+        .attr("r", portionSize / 2 - 2)
+        .attr("fill", consumed ? "#ef4444" : "#10b981")
+        .attr("stroke", consumed ? "#dc2626" : "#059669")
+        .attr("stroke-width", 2)
+        .attr("opacity", consumed ? 0.3 : 1)
+        .classed("pulse", !consumed && i === porcionesConsumidas - 1);
+    }
+    
+    // Efecto de animación en el texto
+    d3.select("#portions-text")
+      .classed("pulse", true);
+    
+    setTimeout(() => {
+      d3.select("#portions-text").classed("pulse", false);
+    }, 500);
+  }
+  
+  // Gráfico de distribución por comida
+  function updateMealDistributionChart() {
+    const svg = d3.select("#meal-distribution");
+    const width = svg.node().getBoundingClientRect().width;
+    const height = svg.node().getBoundingClientRect().height;
+    
+    svg.selectAll("*").remove();
+    
+    const margin = { top: 30, right: 30, bottom: 50, left: 60 };
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
+    
+    const g = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+    // Datos actuales del consumo diario
+    const data = [
+      { meal: "Desayuno", value: appState.dailyConsumption.desayuno, color: "#ffd166" },
+      { meal: "Almuerzo", value: appState.dailyConsumption.almuerzo, color: "#06d6a0" },
+      { meal: "Comida", value: appState.dailyConsumption.comida, color: "#118ab2" },
+      { meal: "Cena", value: appState.dailyConsumption.cena, color: "#ff9e6d" }
+    ];
+    
+    const x = d3.scaleBand()
+      .domain(data.map(d => d.meal))
+      .range([0, chartWidth])
+      .padding(0.2);
+    
+    const y = d3.scaleLinear()
+      .domain([0, d3.max(data, d => d.value) * 1.2 || 16])
+      .range([chartHeight, 0]);
+    
+    // Ejes
+    g.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0,${chartHeight})`)
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+      .attr("fill", "#ffa8a8")
+      .attr("font-size", "14px")
+      .attr("font-weight", "600");
+    
+    g.append("g")
+      .attr("class", "y-axis")
+      .call(d3.axisLeft(y).ticks(8))
+      .selectAll("text")
+      .attr("fill", "#ffa8a8")
+      .attr("font-size", "12px");
+    
+    g.selectAll(".meal-bar")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("class", "meal-bar")
+      .attr("x", d => x(d.meal))
+      .attr("y", d => y(d.value))
+      .attr("width", x.bandwidth())
+      .attr("height", d => chartHeight - y(d.value))
+      .attr("fill", d => d.color)
+      .attr("opacity", 0.8);
+    
+    // Etiquetas de valor en las barras
+    g.selectAll(".bar-label")
+      .data(data)
+      .enter()
+      .append("text")
+      .attr("class", "bar-label")
+      .attr("x", d => x(d.meal) + x.bandwidth() / 2)
+      .attr("y", d => y(d.value) - 10)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#fff")
+      .attr("font-weight", "bold")
+      .attr("font-size", "14px")
+      .text(d => d.value);
+  }
+  
+  // ============================================
+  // TEMPERATURA
+  // ============================================
+  
+  // WebSocket para temperatura
+  const socket = new WebSocket("ws://" + window.location.host + "/ws/temperatura_alimentos/");
+  
+  function updateWebSocketStatus(connected) {
+    const indicator = document.querySelector('.ws-indicator');
+    const textElement = document.getElementById('ws-status-text');
+    
+    if (connected) {
+      indicator.className = 'ws-indicator ws-connected';
+      textElement.textContent = 'Conectado';
+    } else {
+      indicator.className = 'ws-indicator ws-disconnected';
+      textElement.textContent = 'Desconectado';
+    }
+  }
+  
+  socket.onmessage = function(e) {
+    try {
+      const data = JSON.parse(e.data);
+      handleTemperatureData(data);
+    } catch (error) {
+      console.error('Error procesando datos:', error);
+    }
+  };
+  
+  socket.onerror = function(error) {
+    console.error('WebSocket error:', error);
+    updateWebSocketStatus(false);
+  };
+  
+  function handleTemperatureData(data) {
+    appState.currentTemperature = data.temperatura || data.valor;
+    
+    const timestamp = data.fecha_hora ? new Date(data.fecha_hora) : new Date();
+    appState.temperatureHistory.push({
+      timestamp: timestamp,
+      temp: appState.currentTemperature
+    });
+    
+    if (appState.temperatureHistory.length > 24) {
+      appState.temperatureHistory = appState.temperatureHistory.slice(-24);
+    }
+    
+    updateTemperatureDisplay();
+  }
+  
+  function initTemperatureGauge() {
+    const svg = d3.select("#temperature-gauge");
+    const width = 180;
+    const height = 250;
+    
+    svg.attr("width", width).attr("height", height);
+    
+    // Limpiar cualquier elemento previo
+    svg.selectAll("*").remove();
+    
+    const thermometer = svg.append("g")
+      .attr("transform", `translate(${width/2}, 60)`); // Más espacio arriba
+    
+    const bulbRadius = 30; // Reducido para dar más espacio
+    thermometer.append("circle")
+      .attr("r", bulbRadius)
+      .attr("fill", "#1f2937")
+      .attr("stroke", "#4b5563")
+      .attr("stroke-width", 2);
+    
+    const tubeWidth = 25;
+    const tubeHeight = 160; // Ajustado
+    thermometer.append("rect")
+      .attr("x", -tubeWidth/2)
+      .attr("y", -bulbRadius)
+      .attr("width", tubeWidth)
+      .attr("height", tubeHeight)
+      .attr("rx", tubeWidth/2)
+      .attr("fill", "#1f2937")
+      .attr("stroke", "#4b5563")
+      .attr("stroke-width", 2);
+    
+    const mercury = thermometer.append("rect")
+      .attr("x", -tubeWidth/2 + 4)
+      .attr("width", tubeWidth - 8)
+      .attr("y", tubeHeight - bulbRadius)
+      .attr("height", 0)
+      .attr("rx", (tubeWidth - 8)/2)
+      .attr("fill", "#ef4444");
+    
+    // AJUSTE CLAVE: Extender la escala un poco más arriba
+    const tempScale = d3.scaleLinear()
+      .domain([-10, 32]) // Extender a 32° para que 30° quede visible
+      .range([tubeHeight - bulbRadius, -bulbRadius - 5]); // -5px extra arriba
+    
+    // Dibujar todas las marcas de la escala
+    for (let temp = -10; temp <= 30; temp += 5) {
+      const y = tempScale(temp);
+      
+      // Solo dibujar marcas que estén dentro del tubo visible
+      if (y >= -bulbRadius && y <= tubeHeight - bulbRadius) {
+        // Línea de la escala izquierda
+        thermometer.append("line")
+          .attr("x1", -tubeWidth/2 - 10)
+          .attr("x2", -tubeWidth/2 - 2)
+          .attr("y1", y)
+          .attr("y2", y)
+          .attr("stroke", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? "#fff" : "#6b7280")
+          .attr("stroke-width", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? 2 : 1.5);
+        
+        // Etiquetas de temperatura
+        thermometer.append("text")
+          .attr("x", -tubeWidth/2 - 15)
+          .attr("y", y + 4)
+          .attr("text-anchor", "end")
+          .attr("fill", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? "#fff" : "#9ca3af")
+          .attr("font-size", "16px")
+          .attr("font-weight", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? "bold" : "normal")
+          .text(temp + "°");
+        
+        // Línea del lado derecho
+        thermometer.append("line")
+          .attr("x1", tubeWidth/2 + 2)
+          .attr("x2", tubeWidth/2 + 10)
+          .attr("y1", y)
+          .attr("y2", y)
+          .attr("stroke", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? "#fff" : "#6b7280")
+          .attr("stroke-width", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? 2 : 1.5);
+      }
+    }
+    
+    // Marca especial para 30° si no está visible
+    const y30 = tempScale(30);
+    if (y30 < -bulbRadius) {
+      // Dibujar 30° justo en el borde superior
+      thermometer.append("line")
+        .attr("x1", -tubeWidth/2 - 10)
+        .attr("x2", -tubeWidth/2 - 2)
+        .attr("y1", -bulbRadius)
+        .attr("y2", -bulbRadius)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2);
+      
+      thermometer.append("text")
+        .attr("x", -tubeWidth/2 - 15)
+        .attr("y", -bulbRadius + 4)
+        .attr("text-anchor", "end")
+        .attr("fill", "#fff")
+        .attr("font-size", "10px")
+        .attr("font-weight", "bold")
+        .text("30°");
+      
+      thermometer.append("line")
+        .attr("x1", tubeWidth/2 + 2)
+        .attr("x2", tubeWidth/2 + 10)
+        .attr("y1", -bulbRadius)
+        .attr("y2", -bulbRadius)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2);
+    }
+    
+    // Línea de mercurio cero para referencia
+    thermometer.append("line")
+      .attr("x1", -tubeWidth/2)
+      .attr("x2", tubeWidth/2)
+      .attr("y1", tempScale(0))
+      .attr("y2", tempScale(0))
+      .attr("stroke", "#6b7280")
+      .attr("stroke-width", 0.5)
+      .attr("stroke-dasharray", "2,2")
+      .attr("opacity", 0.5);
+    
+    return function(temp) {
+      if (temp === null || temp === undefined) return;
+      
+      // Limitar la temperatura visualmente a -10° a 30°
+      const displayTemp = Math.max(-10, Math.min(30, temp));
+      const mercuryHeight = tempScale(0) - tempScale(displayTemp);
+      const mercuryY = tempScale(displayTemp);
+      
+      let color;
+      if (temp < 2) {
+        color = "#60a5fa";
+      } else if (temp <= 8) {
+        color = "#10b981";
+      } else if (temp <= 12) {
+        color = "#f59e0b";
+      } else {
+        color = "#ef4444";
+      }
+      
+      mercury.transition()
+        .duration(800)
+        .attr("y", mercuryY)
+        .attr("height", Math.max(0, mercuryHeight))
+        .attr("fill", color);
+      
+      return color;
+    };
+  }
+
+  function updateTemperatureDisplay() {
+    if (appState.currentTemperature === null) return;
+    
+    const temp = appState.currentTemperature;
+    const tempColor = updateTemperatureGauge(temp);
+    
+    d3.select("#temperature-text")
+      .text(temp.toFixed(1) + "°C")
+      .style("color", tempColor);
+    
+    d3.select("#current-temp").text(temp.toFixed(1));
+    
+    const tempStatus = d3.select("#temp-status");
+    if (temp < 2) {
+      tempStatus.text("CONGELACIÓN").style("background", "#60a5fa");
+    } else if (temp <= 8) {
+      tempStatus.text("ÓPTIMA").style("background", "#10b981");
+    } else if (temp <= 12) {
+      tempStatus.text("ALERTA").style("background", "#f59e0b");
+    } else {
+      tempStatus.text("PELIGRO").style("background", "#ef4444");
+    }
+  }
+  
+  // ============================================
+  // MANEJO DE EVENTOS
+  // ============================================
+  
+  document.getElementById("btn-register-consumption").addEventListener("click", async function() {
+    const totalPeople = parseInt(document.getElementById("total-people").value) || 0;
+    const totalPortions = parseInt(document.getElementById("total-portions-input").value) || 0;
+    const mealType = document.getElementById("meal-type").value;
+    
+    if (totalPeople === 0 || totalPortions === 0) {
+      showNotification("⚠️ Debe registrar al menos una persona y una porción", "warning");
+      return;
+    }
+    
+    await registrarConsumoAPI(mealType, totalPeople, totalPortions);
+    
+    // Resetear formulario
+    document.getElementById("total-people").value = 1;
+    document.getElementById("total-portions-input").value = 1;
+  });
+  
+  function showNotification(message, type = "success") {
+    const notification = document.getElementById("notification");
+    notification.textContent = message;
+    notification.className = "notification " + (type === "error" ? "error" : type === "warning" ? "warning" : "");
+    notification.style.display = "block";
+    
+    setTimeout(() => {
+      notification.style.display = "none";
+    }, 3000);
+  }
+  
+  // ============================================
+  // INICIALIZACIÓN
+  // ============================================
+  
+  async function initializeApp() {
+    console.log('🚀 Inicializando aplicación...');
+    
+    // Inicializar visualizaciones de temperatura
+    updateTemperatureGauge = initTemperatureGauge();
+    
+    // Cargar datos iniciales desde la BD
+    await obtenerEstadoAlimentos();
+    await obtenerConsumoDiario();
+    
+    // Inicializar gráficos
+    updatePortionsChart();
+    updateMealDistributionChart();
+    updateConsumptionHistoryTable();
+    
+    // Programar actualizaciones periódicas
+    setInterval(async () => {
+      await obtenerEstadoAlimentos();
+      await obtenerConsumoDiario();
+    }, 30000); // Actualizar cada 30 segundos
+    
+    console.log('Aplicación inicializada');
+  }
+  
+  initializeApp();
+});
+</script>
 
 {% endblock %}

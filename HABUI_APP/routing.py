@@ -6,4 +6,9 @@ from HABUI_APP.consumers import AguaConsumer
 websocket_urlpatterns = [
     re_path(r"ws/agua/$", AguaConsumer.as_asgi()),
     re_path(r'ws/energia/$', consumers.EnergiaConsumer.as_asgi()),
+    re_path(r"ws/oxigeno/$", consumers.OxigenoConsumer.as_asgi()),
+    re_path(r"ws/co2/$", consumers.CO2Consumer.as_asgi()),
+    re_path(r"ws/temperatura/$", consumers.TemperaturaConsumer.as_asgi()),
+    re_path(r"ws/humedad/$", consumers.HumedadConsumer.as_asgi()),
+    re_path(r"ws/temperatura_alimentos/$", consumers.TemperaturaAlimentosConsumer.as_asgi()),
 ]

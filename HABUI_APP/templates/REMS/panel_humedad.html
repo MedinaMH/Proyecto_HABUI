@@ -1,9 +1,445 @@
 {% extends "REMS/estructura_base.html" %}
 
-{% block titulo %} Sistema REMS{% endblock %}
+{% block titulo %}Sistema REMS - Humedad{% endblock %}
 
-{% block contenido %} 
+{% block contenido %}
+{% load static %}
 
-Panel de monitoreo de Humedad
+<script src="{% static 'js/d3.js' %}"></script>
+
+<h3 style="color: #4dabf7; font-weight:600;">💧 Monitoreo de Humedad (%)</h3>
+
+<div style="display:flex; gap:36px; justify-content:center; align-items:flex-start;">
+  <div id="gauge-humedad" style="width:320px; height:520px;"></div>
+  <div id="serie-humedad" style="width:720px; height:520px; margin-top:10px;"></div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  d3.select("body").style("background-color", "#0b0f19");
+
+  // ===================== GAUGE TIPO HIGRÓMETRO ANALÓGICO =====================
+  function gaugeHumedad(containerId, initial) {
+    const width = 300;
+    const height = 520;
+    const min = 0;
+    const max = 100;
+
+    const svg = d3.select(containerId).html("")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    // Título
+    svg.append("text")
+      .attr("x", width/2)
+      .attr("y", 32)
+      .attr("fill", "#4dabf7")
+      .attr("font-size", "22px")
+      .attr("font-weight", "700")
+      .attr("text-anchor", "middle")
+      .text("Humedad");
+
+    // Centro del gauge - SUBIDO para dar más espacio abajo
+    const centerX = width/2;
+    const centerY = 240;  // SUBIDO de 280 a 240
+    const radius = 140;
+    const startAngle = -Math.PI * 0.78;
+    const endAngle = Math.PI * 0.78;
+
+    // Función para determinar color según humedad
+    function colorFor(v) {
+      if (v < 30) return "#adb5bd";        // Gris (seco)
+      if (v < 40) return "#ffa94d";        // Naranja (poco seco)
+      if (v < 60) return "#4dabf7";        // Azul (ideal)
+      if (v < 70) return "#339af0";        // Azul medio (húmedo)
+      return "#228be6";                    // Azul oscuro (muy húmedo)
+    }
+
+    // Función para texto de nivel
+    function getNivelTexto(v) {
+      if (v < 30) return "MUY SECO";
+      if (v < 40) return "SECO";
+      if (v < 60) return "IDEAL";
+      if (v < 70) return "HÚMEDO";
+      return "MUY HÚMEDO";
+    }
+
+    // Crear arco de fondo con zonas de color
+    const arcGenerator = d3.arc()
+      .innerRadius(radius - 20)
+      .outerRadius(radius)
+      .startAngle(startAngle)
+      .cornerRadius(3);
+
+    // Zonas de humedad
+    const zones = [
+      {min: 0, max: 30, label: "Muy Seco"},
+      {min: 30, max: 40, label: "Seco"},
+      {min: 40, max: 60, label: "Ideal"},
+      {min: 60, max: 70, label: "Húmedo"},
+      {min: 70, max: 100, label: "Muy Húmedo"}
+    ];
+
+    zones.forEach(zone => {
+      const angleMin = startAngle + (zone.min/100) * (endAngle - startAngle);
+      const angleMax = startAngle + (zone.max/100) * (endAngle - startAngle);
+      
+      const zoneColor = colorFor(zone.min + (zone.max - zone.min)/2);
+      
+      svg.append("path")
+        .attr("transform", `translate(${centerX}, ${centerY})`)
+        .attr("fill", zoneColor)
+        .attr("opacity", 0.2)
+        .attr("d", arcGenerator.startAngle(angleMin).endAngle(angleMax)());
+    });
+
+    // Arco exterior decorativo
+    svg.append("path")
+      .attr("transform", `translate(${centerX}, ${centerY})`)
+      .attr("fill", "none")
+      .attr("stroke", "#4dabf7")
+      .attr("stroke-width", 1)
+      .attr("d", arcGenerator
+        .innerRadius(radius - 2)
+        .outerRadius(radius + 5)
+        .startAngle(startAngle)
+        .endAngle(endAngle)());
+
+    // Marcas de escala
+    for (let i = 0; i <= 100; i += 10) {
+      const angle = startAngle + (i/100) * (endAngle - startAngle);
+      const innerRadius = radius - 25;
+      const outerRadius = radius - 8;
+      
+      const x1 = centerX + innerRadius * Math.cos(angle);
+      const y1 = centerY + innerRadius * Math.sin(angle);
+      const x2 = centerX + outerRadius * Math.cos(angle);
+      const y2 = centerY + outerRadius * Math.sin(angle);
+      
+      // Marcas principales cada 20%
+      if (i % 20 === 0) {
+        svg.append("line")
+          .attr("x1", x1)
+          .attr("y1", y1)
+          .attr("x2", x2)
+          .attr("y2", y2)
+          .attr("stroke", "#4dabf7")
+          .attr("stroke-width", 3);
+        
+        // Texto de valor
+        const textRadius = radius - 50;
+        svg.append("text")
+          .attr("x", centerX + textRadius * Math.cos(angle))
+          .attr("y", centerY + textRadius * Math.sin(angle) + 4)
+          .attr("fill", "#4dabf7")
+          .attr("font-size", "13px")
+          .attr("font-weight", "600")
+          .attr("text-anchor", "middle")
+          .text(i + "%");
+      } else {
+        // Marcas menores
+        svg.append("line")
+          .attr("x1", x1)
+          .attr("y1", y1)
+          .attr("x2", x2)
+          .attr("y2", y2)
+          .attr("stroke", "#4dabf7")
+          .attr("stroke-width", 1)
+          .attr("opacity", 0.7);
+      }
+    }
+
+    // Etiquetas de nivel fijas (más pequeñas y mejor posicionadas)
+    const nivelLabels = [
+      {text: "SECO", angle: startAngle + (0.25 * (endAngle - startAngle)), color: "#ffa94d"},
+      {text: "IDEAL", angle: startAngle + (0.50 * (endAngle - startAngle)), color: "#4dabf7"},
+      {text: "HÚMEDO", angle: startAngle + (0.75 * (endAngle - startAngle)), color: "#339af0"}
+    ];
+    
+    nivelLabels.forEach(label => {
+      const labelRadius = radius - 70;  // Ajustado para mejor posición
+      svg.append("text")
+        .attr("x", centerX + labelRadius * Math.cos(label.angle))
+        .attr("y", centerY + labelRadius * Math.sin(label.angle) + 4)
+        .attr("fill", label.color)
+        .attr("font-size", "11px")  // Un poco más grande pero no demasiado
+        .attr("font-weight", "600")
+        .attr("text-anchor", "middle")
+        .attr("opacity", 0.9)
+        .style("letter-spacing", "0.5px")
+        .text(label.text);
+    });
+
+    // Aguja (puntero)
+    const needleGroup = svg.append("g")
+      .attr("class", "needle-group")
+      .attr("transform", `translate(${centerX}, ${centerY})`);
+
+    // Círculo central
+    needleGroup.append("circle")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("r", 10)
+      .attr("fill", "#4dabf7");
+
+    // Aguja principal
+    const needle = needleGroup.append("path")
+      .attr("d", "M-3,0 L0,-120 L3,0 Z")
+      .attr("fill", "#ff6b6b")
+      .attr("stroke", "#ff5252")
+      .attr("stroke-width", 1);
+
+    // VALOR NUMÉRICO - BAJADO SIGNIFICATIVAMENTE
+    const valueText = svg.append("text")
+      .attr("x", centerX)
+      .attr("y", centerY + 160)  // BAJADO de 90 a 140
+      .attr("fill", colorFor(initial))
+      .attr("font-size", "38px")
+      .attr("font-weight", "800")
+      .attr("text-anchor", "middle")
+      .text(initial.toFixed(1) + " %");
+
+    // INDICADOR DE NIVEL - BAJADO
+    const nivelText = svg.append("text")
+      .attr("x", centerX)
+      .attr("y", centerY + 195)  // BAJADO de 125 a 175
+      .attr("fill", colorFor(initial))
+      .attr("font-size", "18px")
+      .attr("font-weight", "700")
+      .attr("text-anchor", "middle")
+      .style("letter-spacing", "1px")
+      .text(getNivelTexto(initial));
+
+    // SÍMBOLO DE HUMEDAD - BAJADO
+    svg.append("text")
+      .attr("x", centerX)
+      .attr("y", centerY + 230)  // BAJADO de 155 a 210
+      .attr("fill", "#4dabf7")
+      .attr("font-size", "24px")
+      .attr("font-weight", "600")
+      .attr("text-anchor", "middle")
+      .text("💧");
+
+    // Rotación inicial de la aguja
+    const initialAngle = startAngle + (initial/100) * (endAngle - startAngle);
+    needleGroup.attr("transform", `translate(${centerX}, ${centerY}) rotate(${(initialAngle * 180/Math.PI)})`);
+
+    return {
+      update: function(newVal) {
+        // Calcular nuevo ángulo
+        const newAngle = startAngle + (newVal/100) * (endAngle - startAngle);
+        const degrees = newAngle * 180 / Math.PI;
+        
+        // Transición suave de la aguja
+        needleGroup.transition()
+          .duration(500)
+          .ease(d3.easeElasticOut.period(0.5))
+          .attr("transform", `translate(${centerX}, ${centerY}) rotate(${degrees})`);
+        
+        // Actualizar color y texto
+        const newColor = colorFor(newVal);
+        valueText
+          .text(newVal.toFixed(1) + " %")
+          .attr("fill", newColor);
+        
+        nivelText
+          .text(getNivelTexto(newVal))
+          .attr("fill", newColor)
+          .style("font-size", "18px")
+          .style("font-weight", "700");
+        
+        // Cambiar color del círculo central
+        needleGroup.select("circle")
+          .transition()
+          .duration(300)
+          .attr("fill", newColor);
+      }
+    };
+  }
+
+  // ===================== SERIE TEMPORAL =====================
+  function lineChartHumedad(containerId) {
+    const outerW = 720, outerH = 480;
+    const margin = {top: 30, right: 20, bottom: 40, left: 60};
+    const width = outerW - margin.left - margin.right;
+    const height = outerH - margin.top - margin.bottom;
+
+    const svg = d3.select(containerId).html("")
+      .append("svg")
+      .attr("width", outerW)
+      .attr("height", outerH)
+      .style("background", "#0f1724")
+      .style("border", "2px solid #4dabf7")
+      .style("border-radius", "8px");
+
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Scales
+    const x = d3.scaleTime().range([0, width]);
+    const y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+
+    const line = d3.line()
+      .x(d => x(new Date(d.t)))
+      .y(d => y(d.v))
+      .curve(d3.curveMonotoneX);
+
+    // Axes
+    const xAxisG = g.append("g").attr("transform", `translate(0,${height})`);
+    const yAxisG = g.append("g");
+
+    // Título
+    svg.append("text")
+      .attr("x", outerW/2)
+      .attr("y", 18)
+      .attr("fill", "#4dabf7")
+      .attr("font-size", "16px")
+      .attr("font-weight", "700")
+      .attr("text-anchor", "middle")
+      .text("Serie Temporal • Humedad (%)");
+
+    // Línea principal
+    const path = g.append("path")
+      .attr("class", "line-hum")
+      .attr("fill", "none")
+      .attr("stroke-width", 2.5)
+      .attr("stroke", "#4dabf7");
+
+    // Área con gradiente
+    const gradient = svg.append("defs")
+      .append("linearGradient")
+      .attr("id", "hum-gradient")
+      .attr("x1", "0%").attr("y1", "0%")
+      .attr("x2", "0%").attr("y2", "100%");
+
+    gradient.append("stop")
+      .attr("offset", "0%")
+      .attr("stop-color", "rgba(77, 171, 247, 0.4)");
+    
+    gradient.append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", "rgba(77, 171, 247, 0.05)");
+
+    const area = d3.area()
+      .x(d => x(new Date(d.t)))
+      .y0(height)
+      .y1(d => y(d.v))
+      .curve(d3.curveMonotoneX);
+
+    const areaPath = g.append("path")
+      .attr("class", "area-hum")
+      .attr("fill", "url(#hum-gradient)")
+      .attr("stroke", "none");
+
+    // Tooltip
+    const tooltip = d3.select(containerId)
+      .append("div")
+      .style("position", "absolute")
+      .style("background", "rgba(0,0,0,0.85)")
+      .style("color", "#fff")
+      .style("padding", "6px 8px")
+      .style("border", "1px solid #4dabf7")
+      .style("border-radius", "6px")
+      .style("font-size", "12px")
+      .style("pointer-events", "none")
+      .style("opacity", 0);
+
+    let data = [];
+
+    function redraw() {
+      if (data.length === 0) return;
+
+      const maxPoints = 120;
+      if (data.length > maxPoints) data = data.slice(data.length - maxPoints);
+
+      x.domain(d3.extent(data, d => new Date(d.t)));
+      
+      // Zonas de humedad en el fondo
+      const humZones = g.selectAll(".hum-zone").data([
+        {min: 0, max: 30, color: "rgba(173, 181, 189, 0.1)", label: "Muy Seco"},
+        {min: 30, max: 40, color: "rgba(255, 169, 77, 0.1)", label: "Seco"},
+        {min: 40, max: 60, color: "rgba(77, 171, 247, 0.1)", label: "Ideal"},
+        {min: 60, max: 70, color: "rgba(51, 154, 240, 0.1)", label: "Húmedo"},
+        {min: 70, max: 100, color: "rgba(34, 139, 230, 0.1)", label: "Muy Húmedo"}
+      ]);
+
+      humZones.enter()
+        .append("rect")
+        .attr("class", "hum-zone")
+        .merge(humZones)
+        .attr("x", 0)
+        .attr("width", width)
+        .attr("y", d => y(d.max))
+        .attr("height", d => y(d.min) - y(d.max))
+        .attr("fill", d => d.color);
+
+      // Adaptar escala Y si es necesario
+      const vmin = Math.min(d3.min(data, d => d.v), 20);
+      const vmax = Math.max(d3.max(data, d => d.v), 80);
+      y.domain([Math.max(0, vmin - 5), Math.min(100, vmax + 5)]);
+
+      // Actualizar ejes
+      xAxisG.call(d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat("%H:%M:%S")).tickSizeOuter(0))
+        .selectAll("text").attr("fill", "#ddd");
+      yAxisG.call(d3.axisLeft(y).ticks(6).tickSizeOuter(0))
+        .selectAll("text").attr("fill", "#ddd");
+
+      // Actualizar línea y área
+      path.datum(data).attr("d", line);
+      areaPath.datum(data).attr("d", area);
+    }
+
+    return {
+      push: function(value, timestampStr) {
+        const t = timestampStr || new Date().toISOString();
+        data.push({ v: value, t: t });
+        redraw();
+      },
+      reset: function() {
+        data = [];
+        path.datum(data).attr("d", line);
+        areaPath.datum(data).attr("d", area);
+      }
+    };
+  }
+
+  // ============== INSTANCIAS ==============
+  const gauge = gaugeHumedad("#gauge-humedad", 50.0);
+  const series = lineChartHumedad("#serie-humedad");
+
+  // ================= WEBSOCKET =================
+  const socket = new WebSocket("ws://" + window.location.host + "/ws/humedad/");
+
+  socket.onmessage = function(e) {
+    const mensaje = JSON.parse(e.data);
+    const valor = mensaje.valor;
+    const fecha = mensaje.fecha_hora;
+
+    gauge.update(valor);
+    series.push(valor, fecha);
+  };
+
+  socket.onopen = function() {
+    console.log("✅ WebSocket Humedad conectado");
+  };
+
+  socket.onerror = function() {
+    console.error("❌ Error en WebSocket Humedad");
+  };
+
+  socket.onclose = function() {
+    console.warn("⚠️  WebSocket Humedad desconectado");
+  };
+});
+</script>
+
+<style>
+  .hum-zone {
+    transition: fill 0.3s ease;
+  }
+  .needle-group {
+    transition: transform 0.3s ease;
+  }
+</style>
 
 {% endblock %}
