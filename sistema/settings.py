@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'HABUI_APP',
+    'PWMS',
     "rest_framework",
     "corsheaders",
     "channels",
