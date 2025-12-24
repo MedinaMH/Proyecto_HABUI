@@ -1,0 +1,343 @@
+/* estilos_view_humedad.css - ADAPTADO A ESTILOS CO₂ */
+
+/* Reutilizar los mismos estilos del monitoreo de CO₂ */
+.monitor-container {
+display: flex;
+flex-direction: column;
+gap: 20px;
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
+}
+
+.monitor-header {
+text-align: center;
+margin-bottom: 20px;
+}
+
+.monitor-header h3 {
+color: #4dabf7;
+font-weight: 600;
+font-size: 24px;
+margin-bottom: 8px;
+}
+
+.monitor-header .subtitle {
+color: #94a3b8;
+font-size: 14px;
+}
+
+.charts-grid {
+display: grid;
+grid-template-columns: 1fr 2fr;
+grid-template-rows: auto auto;
+gap: 30px;
+align-items: stretch;
+}
+
+.gauge-column, .series-column {
+display: flex;
+flex-direction: column;
+}
+
+.gauge-container {
+background: #0f172a;
+border: 2px solid #1e293b;
+border-radius: 16px;
+padding: 20px;
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+transition: transform 0.3s ease;
+flex: 1;
+display: flex;
+flex-direction: column;
+}
+
+.gauge-container:hover {
+transform: translateY(-2px);
+}
+
+.gauge-title {
+text-align: center;
+color: #4dabf7;
+font-weight: 600;
+font-size: 18px;
+margin-bottom: 15px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+}
+
+/* Contenedor específico para el gauge SVG */
+#gauge-humedad {
+flex: 1;
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 520px;
+}
+
+.series-container {
+background: #0f172a;
+border: 2px solid #1e293b;
+border-radius: 16px;
+padding: 20px;
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+transition: transform 0.3s ease;
+flex: 1;
+display: flex;
+flex-direction: column;
+}
+
+.series-container:hover {
+transform: translateY(-2px);
+}
+
+.series-title {
+color: #4dabf7;
+font-weight: 600;
+font-size: 18px;
+margin-bottom: 15px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+/* Contenedor específico para la serie SVG */
+#serie-humedad {
+flex: 1;
+min-height: 520px;
+}
+
+/* Sección de niveles de referencia para humedad */
+.reference-section-humedad {
+grid-column: 1 / -1;
+grid-row: 2;
+margin-top: 10px;
+background: #0f172a;
+border: 2px solid #1e293b;
+border-radius: 16px;
+padding: 25px;
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.reference-title-humedad {
+color: #4dabf7;
+font-weight: 600;
+font-size: 18px;
+margin-bottom: 20px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.reference-grid-humedad {
+display: grid;
+grid-template-columns: repeat(5, 1fr);
+gap: 20px;
+}
+
+.reference-item-humedad {
+background: rgba(30, 41, 59, 0.5);
+border-radius: 12px;
+padding: 20px;
+border-left: 4px solid;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.reference-item-humedad:hover {
+transform: translateY(-3px);
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.reference-item-humedad.very-dry {
+border-left-color: #adb5bd;
+}
+
+.reference-item-humedad.dry {
+border-left-color: #ffa94d;
+}
+
+.reference-item-humedad.ideal {
+border-left-color: #4dabf7;
+}
+
+.reference-item-humedad.humid {
+border-left-color: #339af0;
+}
+
+.reference-item-humedad.very-humid {
+border-left-color: #228be6;
+}
+
+.reference-header-humedad {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 12px;
+}
+
+.reference-icon-humedad {
+width: 40px;
+height: 40px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+font-weight: 600;
+}
+
+.reference-item-humedad.very-dry .reference-icon-humedad {
+background: rgba(173, 181, 189, 0.2);
+color: #adb5bd;
+}
+
+.reference-item-humedad.dry .reference-icon-humedad {
+background: rgba(255, 169, 77, 0.2);
+color: #ffa94d;
+}
+
+.reference-item-humedad.ideal .reference-icon-humedad {
+background: rgba(77, 171, 247, 0.2);
+color: #4dabf7;
+}
+
+.reference-item-humedad.humid .reference-icon-humedad {
+background: rgba(51, 154, 240, 0.2);
+color: #339af0;
+}
+
+.reference-item-humedad.very-humid .reference-icon-humedad {
+background: rgba(34, 139, 230, 0.2);
+color: #228be6;
+}
+
+.reference-range-humedad {
+font-size: 22px;
+font-weight: 700;
+color: #e2e8f0;
+margin-bottom: 6px;
+}
+
+.reference-label-humedad {
+font-size: 16px;
+font-weight: 600;
+margin-bottom: 8px;
+}
+
+.reference-item-humedad.very-dry .reference-label-humedad {
+color: #adb5bd;
+}
+
+.reference-item-humedad.dry .reference-label-humedad {
+color: #ffa94d;
+}
+
+.reference-item-humedad.ideal .reference-label-humedad {
+color: #4dabf7;
+}
+
+.reference-item-humedad.humid .reference-label-humedad {
+color: #339af0;
+}
+
+.reference-item-humedad.very-humid .reference-label-humedad {
+color: #228be6;
+}
+
+.reference-description-humedad {
+font-size: 13px;
+color: #94a3b8;
+line-height: 1.5;
+}
+
+.reference-recommendation-humedad {
+margin-top: 10px;
+padding: 8px 12px;
+background: rgba(255, 255, 255, 0.05);
+border-radius: 8px;
+font-size: 12px;
+color: #cbd5e1;
+border-left: 3px solid;
+}
+
+.reference-item-humedad.very-dry .reference-recommendation-humedad {
+border-left-color: #adb5bd;
+}
+
+.reference-item-humedad.dry .reference-recommendation-humedad {
+border-left-color: #ffa94d;
+}
+
+.reference-item-humedad.ideal .reference-recommendation-humedad {
+border-left-color: #4dabf7;
+}
+
+.reference-item-humedad.humid .reference-recommendation-humedad {
+border-left-color: #339af0;
+}
+
+.reference-item-humedad.very-humid .reference-recommendation-humedad {
+border-left-color: #228be6;
+}
+
+/* Asegurar que los tooltips estén por encima de todo */
+.tooltip-humedad {
+position: absolute !important;
+z-index: 9999 !important;
+pointer-events: none !important;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+.charts-grid {
+grid-template-columns: 1fr;
+gap: 20px;
+}
+
+.reference-grid-humedad {
+grid-template-columns: repeat(3, 1fr);
+}
+
+.monitor-container {
+padding: 15px;
+}
+
+#gauge-humedad, #serie-humedad {
+min-height: 480px;
+}
+}
+
+@media (max-width: 768px) {
+.reference-grid-humedad {
+grid-template-columns: repeat(2, 1fr);
+}
+
+.reference-section-humedad {
+padding: 15px;
+}
+
+.monitor-header h3 {
+font-size: 20px;
+}
+}
+
+@media (max-width: 576px) {
+.reference-grid-humedad {
+grid-template-columns: 1fr;
+}
+
+.reference-range-humedad {
+font-size: 18px;
+}
+
+.reference-label-humedad {
+font-size: 14px;
+}
+}
+
+/* Animaciones para zonas */
+.hum-zone {
+transition: fill 0.3s ease;
+}

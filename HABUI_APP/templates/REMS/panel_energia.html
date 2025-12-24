@@ -12,11 +12,11 @@
 <div class="dashboard-container">
   <!-- Header -->
   <div class="dashboard-header" style="padding-top: 10px; padding-bottom: 15px;">
-    <h1 class="dashboard-title">🔋 Monitoreo de Sistema de Energía</h1>
+    <h1 class="dashboard-title">Monitoreo de Sistema de Energía</h1>
     <p class="dashboard-subtitle">Sistema Fotovoltaico con Banco de Baterías <span id="header-capacity">--</span> Wh - Tiempo Real</p>
   </div>
   
-  <!-- Grid Principal reorganizado -->
+  <!-- Grid Principal -->
   <div class="main-grid">
     
     <!-- Contenedor para gráfica y métricas (izquierda) -->
@@ -126,7 +126,6 @@
 </div>
 
 <script>
-// El código JavaScript permanece igual
 document.addEventListener("DOMContentLoaded", function() {
   // Establecer conexión WebSocket
   const ws = new WebSocket("ws://" + window.location.host + "/ws/energia/");
@@ -404,7 +403,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const updateMainChart = initMainChart();
   
   // ============================================
-  // 2. VISUALIZACIÓN DE BATERÍAS MEJORADA
+  // VISUALIZACIÓN DE BATERÍAS
   // ============================================
   function initBatteryVisualization() {
     const svg = d3.select("#battery-main");
@@ -604,7 +603,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const updateBattery = initBatteryVisualization();
   
   // ============================================
-  // 3. BATERÍAS EN SERIE
+  // BATERÍAS EN SERIE
   // ============================================
   function updateBatterySeries(socPercent) {
     const container = d3.select("#battery-series");
@@ -725,7 +724,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
   
   // ============================================
-  // 6. MANEJO DE WEBSOCKET
+  // MANEJO DE WEBSOCKET
   // ============================================
   ws.onopen = function() {
     console.log("WebSocket Energía conectado");
@@ -795,7 +794,7 @@ document.addEventListener("DOMContentLoaded", function() {
       updateFlowStatus(data.solar_estimated_w, data.potencia, data.battery);
       
     } catch (error) {
-      console.error("❌ Error procesando datos:", error);
+      console.error("Error procesando datos:", error);
     }
   };
   

@@ -87,7 +87,7 @@ class Command(BaseCommand):
                         {"type": "enviar_dato", "data": data}
                     )
 
-                    self.stdout.write(f"[{i+1}] 🔌 Dato enviado: {data}")
+                    self.stdout.write(f"[{i+1}] Dato enviado: {data}")
                     i += 1
                     time.sleep(intervalo)
         except KeyboardInterrupt:

@@ -4,226 +4,96 @@
 
 {% block contenido %}
 {% load static %}
-
+<!-- oxygen_monitor.html -->
 <script src="{% static 'js/d3.js' %}"></script>
+<script src="{% static 'js/o2.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/estilos_view_O2.css' %}">
 
-<h3 style="color: #00ff88; font-weight:600;">📈 Monitoreo de Oxígeno (O₂ %)</h3>
-
-<div style="display:flex; gap:36px; justify-content:center; align-items:flex-start;">
-  <div id="gauge-o2" style="width:320px; height:520px;"></div>
-  <div id="serie-o2" style="width:720px; height:520px; margin-top:10px;"></div>
+<div class="monitor-container">
+  <!-- Encabezado -->
+  <div class="monitor-header">
+    <h3>Monitoreo de Oxígeno (O₂ %)</h3>
+    <div class="subtitle">Sistema de monitoreo en tiempo real de niveles de oxígeno atmosférico</div>
+  </div>
+  
+  <!-- Grid principal de gráficos -->
+  <div class="charts-grid">
+    <!-- Columna izquierda: Gauge -->
+    <div class="gauge-column">
+      <div class="gauge-container">
+        <div class="gauge-title">
+          <span>📊 Indicador Actual</span>
+        </div>
+        <div id="gauge-o2"></div>
+      </div>
+    </div>
+    
+    <!-- Columna derecha: Serie temporal -->
+    <div class="series-column">
+      <div class="series-container">
+        <div class="series-title">
+          <span>📈 Histórico de Concentración</span>
+        </div>
+        <div id="serie-o2"></div>
+      </div>
+    </div>
+    
+    <!-- Sección de niveles de referencia para oxígeno -->
+    <div class="reference-section-o2">
+      <div class="reference-title-o2">
+        <span>📋 Niveles de Referencia de Oxígeno</span>
+      </div>
+      <div class="reference-grid-o2">
+        <div class="reference-item-o2 low">
+          <div class="reference-header-o2">
+            <div class="reference-icon-o2">⚠️</div>
+            <div>
+              <div class="reference-range-o2">&lt; 19.5 %</div>
+              <div class="reference-label-o2">NIVEL BAJO</div>
+            </div>
+          </div>
+          <!-- <div class="reference-description-o2">
+            Concentración de oxígeno por debajo del nivel normal. Puede causar dificultades respiratorias, fatiga y disminución del rendimiento cognitivo.
+          </div>
+          <div class="reference-recommendation-o2">
+            Se recomienda ventilación inmediata y verificar la calidad del aire en el espacio.
+          </div> -->
+        </div>
+        
+        <div class="reference-item-o2 normal">
+          <div class="reference-header-o2">
+            <div class="reference-icon-o2">✅</div>
+            <div>
+              <div class="reference-range-o2">19.5 - 21.5 %</div>
+              <div class="reference-label-o2">NIVEL NORMAL</div>
+            </div>
+          </div>
+          <!-- <div class="reference-description-o2">
+            Concentración normal de oxígeno para interiores. Aire respirable adecuado para actividades cotidianas sin efectos adversos significativos.
+          </div>
+          <div class="reference-recommendation-o2">
+            Mantener ventilación adecuada. Nivel aceptable para la mayoría de las actividades.
+          </div> -->
+        </div>
+        
+        <div class="reference-item-o2 optimal">
+          <div class="reference-header-o2">
+            <div class="reference-icon-o2">⭐</div>
+            <div>
+              <div class="reference-range-o2">&gt; 21.5 %</div>
+              <div class="reference-label-o2">NIVEL ÓPTIMO</div>
+            </div>
+          </div>
+          <!-- <div class="reference-description-o2">
+            Concentración excelente de oxígeno. Ideal para productividad, concentración y bienestar general. Condiciones atmosféricas óptimas.
+          </div>
+          <div class="reference-recommendation-o2">
+            Condiciones ideales mantenidas. Excelente para actividades que requieren alta concentración.
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  d3.select("body").style("background-color", "#0b0f19");
-
-  // ===================== GAUGE VERTICAL (Oxígeno %) =====================
-  function gaugeO2(containerId, initial) {
-    const width = 300;
-    const height = 520;
-    const min = 18.0;    // visual min
-    const max = 23.0;    // visual max
-
-    const svg = d3.select(containerId).html("")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height);
-
-    svg.append("text")
-      .attr("x", width/2)
-      .attr("y", 32)
-      .attr("fill", "#00ff88")
-      .attr("font-size", "22px")
-      .attr("font-weight", "700")
-      .attr("text-anchor", "middle")
-      .text("Oxígeno (%)");
-
-    // outer frame
-    const frameX = 60;
-    const frameY = 70;
-    const frameW = 180;
-    const frameH = 360;
-
-    svg.append("rect")
-      .attr("x", frameX)
-      .attr("y", frameY)
-      .attr("width", frameW)
-      .attr("height", frameH)
-      .attr("rx", 14)
-      .attr("fill", "#0f1724")
-      .attr("stroke", "#00ff88")
-      .attr("stroke-width", 3);
-
-    // fill rect
-    const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
-
-    const fillRect = svg.append("rect")
-      .attr("x", frameX)
-      .attr("width", frameW)
-      .attr("y", scale(initial))
-      .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
-      .attr("fill", "#00ff88")
-      .attr("rx", 12);
-
-    const valueText = svg.append("text")
-      .attr("x", width/2)
-      .attr("y", frameY + frameH + 50)
-      .attr("fill", "#00ff88")
-      .attr("font-size", "28px")
-      .attr("font-weight", "700")
-      .attr("text-anchor", "middle")
-      .text(initial + " %");
-
-    // color overlay depending on ranges
-    function colorFor(v) {
-      if (v >= 21.0) return "#00ff88";       // excellent (green)
-      if (v >= 19.5) return "#ffd86b";       // acceptable (amber)
-      return "#ff7a7a";                      // critical (red)
-    }
-
-    return {
-      update: function(newVal) {
-        const y = scale(newVal);
-        const h = Math.max(2, (frameY + frameH) - y);
-
-        fillRect
-          .transition().duration(300)
-          .attr("y", y)
-          .attr("height", h)
-          .attr("fill", colorFor(newVal));
-
-        valueText.text(newVal.toFixed(2) + " %");
-      }
-    };
-  }
-
-  // ===================== SERIE TEMPORAL (LINE) =====================
-  function lineChartO2(containerId) {
-    const outerW = 720, outerH = 480;
-    const margin = {top: 30, right: 20, bottom: 40, left: 60};
-    const width = outerW - margin.left - margin.right;
-    const height = outerH - margin.top - margin.bottom;
-
-    const svg = d3.select(containerId).html("")
-      .append("svg")
-      .attr("width", outerW)
-      .attr("height", outerH)
-      .style("background", "#0f1724")
-      .style("border", "2px solid #00ff88")
-      .style("border-radius", "8px");
-
-    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-    // Scales
-    const x = d3.scaleTime().range([0, width]);
-    const y = d3.scaleLinear().domain([18.0, 23.0]).range([height, 0]);
-
-    const line = d3.line()
-      .x(d => x(new Date(d.t)))
-      .y(d => y(d.v))
-      .curve(d3.curveMonotoneX);
-
-    // axes groups
-    const xAxisG = g.append("g").attr("transform", `translate(0,${height})`);
-    const yAxisG = g.append("g");
-
-    // axis labels
-    svg.append("text")
-      .attr("x", outerW/2)
-      .attr("y", 18)
-      .attr("fill", "#00ff88")
-      .attr("font-size", "16px")
-      .attr("font-weight", "700")
-      .attr("text-anchor", "middle")
-      .text("Serie Temporal • Oxígeno (%)");
-
-    // path
-    const path = g.append("path")
-      .attr("class", "line-o2")
-      .attr("fill", "none")
-      .attr("stroke-width", 2.5)
-      .attr("stroke", "#00ff88");
-
-    // tooltip
-    const tooltip = d3.select(containerId)
-      .append("div")
-      .style("position", "absolute")
-      .style("background", "rgba(0,0,0,0.85)")
-      .style("color", "#fff")
-      .style("padding", "6px 8px")
-      .style("border", "1px solid #00ff88")
-      .style("border-radius", "6px")
-      .style("font-size", "12px")
-      .style("pointer-events", "none")
-      .style("opacity", 0);
-
-    let data = [];
-
-    function redraw() {
-      if (data.length === 0) return;
-
-      // keep last N points
-      const maxPoints = 120;
-      if (data.length > maxPoints) data = data.slice(data.length - maxPoints);
-
-      x.domain(d3.extent(data, d => new Date(d.t)));
-      // adapt y domain to recent data but keep min/max sensible
-      const vmin = Math.min(d3.min(data, d => d.v), 18.0);
-      const vmax = Math.max(d3.max(data, d => d.v), 21.0);
-      y.domain([Math.max(17.5, vmin - 0.5), Math.min(23.5, vmax + 0.5)]);
-
-      xAxisG.call(d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat("%H:%M:%S")).tickSizeOuter(0))
-        .selectAll("text").attr("fill", "#ddd");
-      yAxisG.call(d3.axisLeft(y).ticks(6).tickSizeOuter(0))
-        .selectAll("text").attr("fill", "#ddd");
-
-      path.datum(data).attr("d", line);
-    }
-
-    return {
-      push: function(value, timestampStr) {
-        const t = (timestampStr) ? timestampStr : new Date().toISOString();
-        data.push({ v: value, t: t });
-        redraw();
-      },
-      reset: function() {
-        data = [];
-        path.datum(data).attr("d", line);
-      }
-    };
-  }
-
-  // ============== INSTANCIAS ==============
-  const gauge = gaugeO2("#gauge-o2", 20.5);
-  const series = lineChartO2("#serie-o2");
-
-  // ================= WEBSOCKET =================
-  const socket = new WebSocket("ws://" + window.location.host + "/ws/oxigeno/");
-
-  socket.onmessage = function(e) {
-      const mensaje = JSON.parse(e.data);
-
-      const valor = mensaje.nivel;
-      const fecha = mensaje.fecha_hora;
-
-      gauge.update(valor);
-      series.push(valor, fecha);
-  };
-
-  socket.onopen = function(e) {
-    console.log("WebSocket O₂ conectado");
-  };
-
-  socket.onerror = function(e) {
-    console.error("Error en WebSocket O₂");
-  };
-
-  socket.onclose = function(e) {
-    console.warn("WebSocket O₂ desconectado");
-  };
-
-});
-</script>
 
 {% endblock %}

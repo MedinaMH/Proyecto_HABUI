@@ -4,313 +4,97 @@
 
 {% block contenido %}
 {% load static %}
-
 <script src="{% static 'js/d3.js' %}"></script>
+<script src="{% static 'js/temperatura.js' %}"></script>
 
-<h3 style="color: #ff6b6b; font-weight:600;">🌡️ Monitoreo de Temperatura (°C)</h3>
+<link rel="stylesheet" href="{% static 'css/estilos_view_temperatura.css' %}">
 
-<div style="display:flex; gap:36px; justify-content:center; align-items:flex-start;">
-  <div id="gauge-temperatura" style="width:320px; height:520px;"></div>
-  <div id="serie-temperatura" style="width:720px; height:520px; margin-top:10px;"></div>
+<div class="monitor-container">
+  <!-- Encabezado -->
+  <div class="monitor-header">
+    <h3>Monitoreo de Temperatura (°C)</h3>
+    <div class="subtitle">Sistema de monitoreo en tiempo real de temperatura ambiental</div>
+  </div>
+  
+  <!-- Grid principal de gráficos -->
+  <div class="charts-grid">
+    <!-- Columna izquierda: Gauge -->
+    <div class="gauge-column">
+      <div class="gauge-container">
+        <div class="gauge-title">
+          <span>📊 Indicador Actual</span>
+        </div>
+        <div id="gauge-temperatura"></div>
+      </div>
+    </div>
+    
+    <!-- Columna derecha: Serie temporal -->
+    <div class="series-column">
+      <div class="series-container">
+        <div class="series-title">
+          <span>📈 Histórico de Temperatura</span>
+        </div>
+        <div id="serie-temperatura"></div>
+      </div>
+    </div>
+    
+    <!-- Sección de niveles de referencia para temperatura -->
+    <div class="reference-section-temperatura">
+      <div class="reference-title-temperatura">
+        <span>📋 Niveles de Referencia de Temperatura</span>
+      </div>
+      <div class="reference-grid-temperatura">
+        <div class="reference-item-temperatura cold">
+          <div class="reference-header-temperatura">
+            <div class="reference-icon-temperatura">❄️</div>
+            <div>
+              <div class="reference-range-temperatura">&lt; 16 °C</div>
+              <div class="reference-label-temperatura">FRÍO</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="reference-item-temperatura fresh">
+          <div class="reference-header-temperatura">
+            <div class="reference-icon-temperatura">🌿</div>
+            <div>
+              <div class="reference-range-temperatura">16 - 22 °C</div>
+              <div class="reference-label-temperatura">FRESCO</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="reference-item-temperatura warm">
+          <div class="reference-header-temperatura">
+            <div class="reference-icon-temperatura">☀️</div>
+            <div>
+              <div class="reference-range-temperatura">22 - 28 °C</div>
+              <div class="reference-label-temperatura">CÁLIDO</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="reference-item-temperatura hot">
+          <div class="reference-header-temperatura">
+            <div class="reference-icon-temperatura">🔥</div>
+            <div>
+              <div class="reference-range-temperatura">28 - 32 °C</div>
+              <div class="reference-label-temperatura">CALIENTE</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="reference-item-temperatura very-hot">
+          <div class="reference-header-temperatura">
+            <div class="reference-icon-temperatura">🥵</div>
+            <div>
+              <div class="reference-range-temperatura">&gt; 32 °C</div>
+              <div class="reference-label-temperatura">MUY CALIENTE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  d3.select("body").style("background-color", "#0b0f19");
-
-  // ===================== GAUGE TERMÓMETRO =====================
-  function gaugeTemperatura(containerId, initial) {
-    const width = 300;
-    const height = 520;
-    const min = 0;      // °C mínimo visual
-    const max = 45;     // °C máximo visual
-
-    const svg = d3.select(containerId).html("")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height);
-
-    // Título
-    svg.append("text")
-      .attr("x", width/2)
-      .attr("y", 32)
-      .attr("fill", "#ff6b6b")
-      .attr("font-size", "22px")
-      .attr("font-weight", "700")
-      .attr("text-anchor", "middle")
-      .text("Temperatura");
-
-    // Diseño tipo termómetro
-    const termometroX = width/2 - 15;
-    const termometroY = 70;
-    const termometroH = 360;
-    const bulboRadio = 35;
-    
-    // Bulbo inferior
-    svg.append("circle")
-      .attr("cx", width/2)
-      .attr("cy", termometroY + termometroH + bulboRadio)
-      .attr("r", bulboRadio)
-      .attr("fill", "#0f1724")
-      .attr("stroke", "#ff6b6b")
-      .attr("stroke-width", 3);
-    
-    // Tubo del termómetro
-    svg.append("rect")
-      .attr("x", termometroX)
-      .attr("y", termometroY)
-      .attr("width", 30)
-      .attr("height", termometroH)
-      .attr("rx", 15)
-      .attr("fill", "#0f1724")
-      .attr("stroke", "#ff6b6b")
-      .attr("stroke-width", 3);
-
-    // Escala para el mercurio
-    const scale = d3.scaleLinear()
-      .domain([min, max])
-      .range([termometroY + termometroH, termometroY]);
-
-    // Mercurio (líquido del termómetro)
-    const mercurio = svg.append("rect")
-      .attr("x", termometroX + 4)
-      .attr("width", 22)
-      .attr("y", scale(initial))
-      .attr("height", Math.max(2, (termometroY + termometroH) - scale(initial)))
-      .attr("fill", "#ff6b6b")
-      .attr("rx", 11);
-
-    // Mercurio en el bulbo
-    const mercurioBulbo = svg.append("circle")
-      .attr("cx", width/2)
-      .attr("cy", termometroY + termometroH + bulboRadio)
-      .attr("r", bulboRadio - 5)
-      .attr("fill", "#ff6b6b");
-
-    // Valor numérico
-    const valueText = svg.append("text")
-      .attr("x", width/2)
-      .attr("y", termometroY + termometroH + bulboRadio + 120)
-      .attr("fill", "#ff6b6b")
-      .attr("font-size", "28px")
-      .attr("font-weight", "700")
-      .attr("text-anchor", "middle")
-      .text(initial.toFixed(1) + " °C");
-
-    // Función para determinar color según temperatura
-    function colorFor(v) {
-      if (v < 16) return "#4dabf7";        // Azul frío
-      if (v < 22) return "#69db7c";        // Verde fresco
-      if (v < 28) return "#ffd43b";        // Amarillo cálido
-      if (v < 32) return "#ff922b";        // Naranja caliente
-      return "#ff6b6b";                    // Rojo muy caliente
-    }
-
-    // Marcas de escala
-    for (let temp = min; temp <= max; temp += 5) {
-      const y = scale(temp);
-      svg.append("line")
-        .attr("x1", termometroX - 10)
-        .attr("x2", termometroX)
-        .attr("y1", y)
-        .attr("y2", y)
-        .attr("stroke", "#ff6b6b")
-        .attr("stroke-width", 1.5);
-      
-      svg.append("text")
-        .attr("x", termometroX - 15)
-        .attr("y", y + 4)
-        .attr("fill", "#ff6b6b")
-        .attr("font-size", "12px")
-        .attr("text-anchor", "end")
-        .text(temp + "°");
-    }
-
-    return {
-      update: function(newVal) {
-        const y = scale(newVal);
-        const h = Math.max(2, (termometroY + termometroH) - y);
-
-        mercurio
-          .transition().duration(300)
-          .attr("y", y)
-          .attr("height", h)
-          .attr("fill", colorFor(newVal));
-
-        mercurioBulbo
-          .transition().duration(300)
-          .attr("fill", colorFor(newVal));
-
-        valueText.text(newVal.toFixed(1) + " °C");
-      }
-    };
-  }
-
-  // ===================== SERIE TEMPORAL =====================
-  function lineChartTemperatura(containerId) {
-    const outerW = 720, outerH = 480;
-    const margin = {top: 30, right: 20, bottom: 40, left: 60};
-    const width = outerW - margin.left - margin.right;
-    const height = outerH - margin.top - margin.bottom;
-
-    const svg = d3.select(containerId).html("")
-      .append("svg")
-      .attr("width", outerW)
-      .attr("height", outerH)
-      .style("background", "#0f1724")
-      .style("border", "2px solid #ff6b6b")
-      .style("border-radius", "8px");
-
-    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-    // Scales
-    const x = d3.scaleTime().range([0, width]);
-    const y = d3.scaleLinear().domain([0, 45]).range([height, 0]);
-
-    const line = d3.line()
-      .x(d => x(new Date(d.t)))
-      .y(d => y(d.v))
-      .curve(d3.curveMonotoneX);
-
-    // Axes
-    const xAxisG = g.append("g").attr("transform", `translate(0,${height})`);
-    const yAxisG = g.append("g");
-
-    // Título
-    svg.append("text")
-      .attr("x", outerW/2)
-      .attr("y", 18)
-      .attr("fill", "#ff6b6b")
-      .attr("font-size", "16px")
-      .attr("font-weight", "700")
-      .attr("text-anchor", "middle")
-      .text("Serie Temporal • Temperatura (°C)");
-
-    // Línea de gráfico
-    const path = g.append("path")
-      .attr("class", "line-temp")
-      .attr("fill", "none")
-      .attr("stroke-width", 2.5)
-      .attr("stroke", "#ff6b6b");
-
-    // Área bajo la curva
-    const area = d3.area()
-      .x(d => x(new Date(d.t)))
-      .y0(height)
-      .y1(d => y(d.v))
-      .curve(d3.curveMonotoneX);
-
-    const areaPath = g.append("path")
-      .attr("class", "area-temp")
-      .attr("fill", "rgba(255, 107, 107, 0.2)")
-      .attr("stroke", "none");
-
-    // Tooltip
-    const tooltip = d3.select(containerId)
-      .append("div")
-      .style("position", "absolute")
-      .style("background", "rgba(0,0,0,0.85)")
-      .style("color", "#fff")
-      .style("padding", "6px 8px")
-      .style("border", "1px solid #ff6b6b")
-      .style("border-radius", "6px")
-      .style("font-size", "12px")
-      .style("pointer-events", "none")
-      .style("opacity", 0);
-
-    let data = [];
-
-    function redraw() {
-      if (data.length === 0) return;
-
-      const maxPoints = 120;
-      if (data.length > maxPoints) data = data.slice(data.length - maxPoints);
-
-      x.domain(d3.extent(data, d => new Date(d.t)));
-      
-      // Zonas de temperatura en el fondo
-      const tempZones = g.selectAll(".temp-zone").data([
-        {min: 0, max: 16, color: "rgba(77, 171, 247, 0.1)", label: "Frío"},
-        {min: 16, max: 22, color: "rgba(105, 219, 124, 0.1)", label: "Fresco"},
-        {min: 22, max: 28, color: "rgba(255, 212, 59, 0.1)", label: "Cálido"},
-        {min: 28, max: 32, color: "rgba(255, 146, 43, 0.1)", label: "Caliente"},
-        {min: 32, max: 45, color: "rgba(255, 107, 107, 0.1)", label: "Muy Caliente"}
-      ]);
-
-      tempZones.enter()
-        .append("rect")
-        .attr("class", "temp-zone")
-        .merge(tempZones)
-        .attr("x", 0)
-        .attr("width", width)
-        .attr("y", d => y(d.max))
-        .attr("height", d => y(d.min) - y(d.max))
-        .attr("fill", d => d.color);
-
-      // Adaptar escala Y
-      const vmin = Math.min(d3.min(data, d => d.v), 10);
-      const vmax = Math.max(d3.max(data, d => d.v), 30);
-      y.domain([Math.max(0, vmin - 5), Math.min(45, vmax + 5)]);
-
-      // Actualizar ejes
-      xAxisG.call(d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat("%H:%M:%S")).tickSizeOuter(0))
-        .selectAll("text").attr("fill", "#ddd");
-      yAxisG.call(d3.axisLeft(y).ticks(6).tickSizeOuter(0))
-        .selectAll("text").attr("fill", "#ddd");
-
-      // Actualizar línea y área
-      path.datum(data).attr("d", line);
-      areaPath.datum(data).attr("d", area);
-    }
-
-    return {
-      push: function(value, timestampStr) {
-        const t = timestampStr || new Date().toISOString();
-        data.push({ v: value, t: t });
-        redraw();
-      },
-      reset: function() {
-        data = [];
-        path.datum(data).attr("d", line);
-        areaPath.datum(data).attr("d", area);
-      }
-    };
-  }
-
-  // ============== INSTANCIAS ==============
-  const gauge = gaugeTemperatura("#gauge-temperatura", 22.0);
-  const series = lineChartTemperatura("#serie-temperatura");
-
-  // ================= WEBSOCKET =================
-  const socket = new WebSocket("ws://" + window.location.host + "/ws/temperatura/");
-
-  socket.onmessage = function(e) {
-    const mensaje = JSON.parse(e.data);
-    const valor = mensaje.valor;
-    const fecha = mensaje.fecha_hora;
-
-    gauge.update(valor);
-    series.push(valor, fecha);
-  };
-
-  socket.onopen = function() {
-    console.log("✅ WebSocket Temperatura conectado");
-  };
-
-  socket.onerror = function() {
-    console.error("❌ Error en WebSocket Temperatura");
-  };
-
-  socket.onclose = function() {
-    console.warn("⚠️  WebSocket Temperatura desconectado");
-  };
-});
-</script>
-
-<style>
-  .temp-zone {
-    transition: fill 0.3s ease;
-  }
-</style>
-
 {% endblock %}

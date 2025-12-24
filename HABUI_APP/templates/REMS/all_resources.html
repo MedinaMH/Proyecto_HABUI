@@ -1,10 +1,138 @@
 {% extends "REMS/estructura_base.html" %}
 
 {% block titulo %} Sistema REMS{% endblock %}
-
 {% block contenido %} 
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/estilos_view_all.css' %}">
+<script src="{% static 'js/d3.js' %}"></script>
+<script src="{% static 'js/allrems.js' %}"></script>
+<!-- Aplicamos la clase monitoreo-container directamente al bloque principal -->
+<!-- <div class="dashboard-header">
+    <h1><i class="fas fa-tachometer-alt"></i> Sistema REMS - Monitoreo en Tiempo Real</h1>
+    <div class="status-indicators">
+        <span class="status online"><i class="fas fa-circle"></i> Conectado</span>
+        <span id="last-update">Última actualización: --:--:--</span>
+    </div>
+</div> -->
 
-Panel general
+<!-- PANEL DE ALERTAS -->
+<!-- <div class="alerts-panel">
+    <h3><i class="fas fa-exclamation-triangle"></i> Alertas Recientes</h3>
+    <div id="alerts-container">
+        <div class="alert-item info">
+            <i class="fas fa-info-circle"></i>
+            <span>Sistema REMS iniciado. Esperando datos de sensores...</span>
+            <span class="alert-time">00:00:00</span>
+        </div>
+    </div>
+</div> -->
 
+<div class="grid-layout">
+    <!-- RECURSO 1: AGUA -->
+    <div class="resource-card agua">
+        <div class="card-header">
+            <h2><i class="fas fa-tint"></i> Nivel de Agua</h2>
+        </div>
+        <div class="agua-gauge-container">
+            <div id="tanque-agua"></div>
+        </div>
+        <div class="card-footer">
+            <div class="stat">
+                <span class="stat-label">Estado:</span>
+                <span id="agua-status" class="stat-value">Normal</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Actualizado:</span>
+                <span id="agua-time" class="stat-value">--:--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECURSO 2: OXÍGENO - CONTENEDOR INDEPENDIENTE -->
+    <div class="resource-card oxigeno">
+        <div class="card-header">
+            <h2><i class="fas fa-lungs"></i> Oxígeno</h2>
+        </div>
+        <div class="oxigeno-gauge-container">
+            <div id="oxigeno-gauge"></div>
+        </div>
+        <div class="card-footer">
+            <div class="stat">
+                <span class="stat-label">Calidad:</span>
+                <span id="oxigeno-quality" class="stat-value">Óptimo</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Actualizado:</span>
+                <span id="oxigeno-time" class="stat-value">--:--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECURSO 3: CO₂ - CONTENEDOR INDEPENDIENTE -->
+    <div class="resource-card co2">
+        <div class="card-header">
+            <h2><i class="fas fa-smog"></i> CO₂</h2>
+        </div>
+        <div class="co2-gauge-container">
+            <div id="co2-gauge"></div>
+        </div>
+        <div class="card-footer">
+            <div class="stat">
+                <span class="stat-label">Concentración:</span>
+                <span id="co2-concentration" class="stat-value">Normal</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Actualizado:</span>
+                <span id="co2-time" class="stat-value">--:--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECURSO 4: TEMPERATURA -->
+    <div class="resource-card temperatura">
+        <div class="card-header">
+            <h2><i class="fas fa-thermometer-half"></i> Temperatura</h2>
+        </div>
+        <div class="temp-gauge-container">
+            <div id="temperatura-gauge"></div>
+        </div>
+        <div class="card-footer">
+            <div class="stat">
+                <span class="stat-label">Sensación:</span>
+                <span id="temp-feeling" class="stat-value">Agradable</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Actualizado:</span>
+                <span id="temp-time" class="stat-value">--:--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECURSO 5: HUMEDAD -->
+    <div class="resource-card humedad">
+        <div class="card-header">
+            <h2><i class="fas fa-cloud-rain"></i> Humedad</h2>
+        </div>
+        <div class="hum-gauge-container">
+            <div id="humedad-gauge"></div>
+        </div>
+        <div class="card-footer">
+            <div class="stat">
+                <span class="stat-label">Condición:</span>
+                <span id="humidity-condition" class="stat-value">Ideal</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Actualizado:</span>
+                <span id="humidity-time" class="stat-value">--:--:--</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Indicador de conexión -->
+<div id="connection-status" class="connection-status connected" style="display: none;">
+    <i class="fas fa-circle"></i>
+    <span>Conectando...</span>
+</div>
 
 {% endblock %}

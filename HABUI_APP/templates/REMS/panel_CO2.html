@@ -5,216 +5,111 @@
 {% block contenido %} 
 
 {% load static %}
-
 <!-- co2_monitor.html -->
 <script src="{% static 'js/d3.js' %}"></script>
+<script src="{% static 'js/co2.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/estilos_view_co2.css' %}">
 
-<h3 style="color: #ffb74d; font-weight:600;">📈 Monitoreo CO₂ (ppm)</h3>
-
-<div style="display:flex; gap:36px; justify-content:center; align-items:flex-start;">
-  <div id="gauge-co2" style="width:320px; height:520px;"></div>
-  <div id="serie-co2" style="width:720px; height:520px; margin-top:10px;"></div>
+<div class="monitor-container">
+  <!-- Encabezado -->
+  <div class="monitor-header">
+    <h3>Monitoreo de CO₂ (ppm)</h3>
+    <!-- <div class="subtitle">Sistema de monitoreo en tiempo real de concentración de dióxido de carbono</div> -->
+  </div>
+  
+  <!-- Grid principal de gráficos -->
+  <div class="charts-grid">
+    <!-- Columna izquierda: Gauge -->
+    <div class="gauge-column">
+      <div class="gauge-container">
+        <div class="gauge-title">
+          <span>📊 Indicador Actual</span>
+        </div>
+        <div id="gauge-co2"></div>
+      </div>
+    </div>
+    
+    <!-- Columna derecha: Serie temporal -->
+    <div class="series-column">
+      <div class="series-container">
+        <div class="series-title">
+          <span>📈 Histórico de Concentración</span>
+        </div>
+        <div id="serie-co2"></div>
+      </div>
+    </div>
+    
+    <!-- Sección de niveles de referencia - DEBAJO DE AMBOS -->
+    <div class="reference-section">
+      <div class="reference-title">
+        <span>📋 Niveles de Referencia de CO₂</span>
+      </div>
+      <div class="reference-grid">
+        <div class="reference-item good">
+          <div class="reference-header">
+            <div class="reference-icon">✅</div>
+            <div>
+              <div class="reference-range">300 - 800 ppm</div>
+              <div class="reference-label">CALIDAD ÓPTIMA</div>
+            </div>
+          </div>
+          <!-- <div class="reference-description">
+            Nivel de CO₂ ideal para interiores. Calidad de aire excelente, adecuada para concentración y productividad.
+          </div>
+          <div class="reference-recommendation">
+            Mantener ventilación normal. Condiciones óptimas para actividades prolongadas.
+          </div> -->
+        </div>
+        
+        <div class="reference-item moderate">
+          <div class="reference-header">
+            <div class="reference-icon">⚠️</div>
+            <div>
+              <div class="reference-range">800 - 1200 ppm</div>
+              <div class="reference-label">NIVEL MODERADO</div>
+            </div>
+          </div>
+          <!-- <div class="reference-description">
+            Concentración elevada. Puede causar somnolencia, falta de concentración y disminución del rendimiento cognitivo.
+          </div>
+          <div class="reference-recommendation">
+            Se recomienda ventilación. Considerar pausas para aire fresco.
+          </div> -->
+        </div>
+        
+        <div class="reference-item high">
+          <div class="reference-header">
+            <div class="reference-icon">🔴</div>
+            <div>
+              <div class="reference-range">1200 - 2000 ppm</div>
+              <div class="reference-label">NIVEL ALTO</div>
+            </div>
+          </div>
+          <!-- <div class="reference-description">
+            Concentración alta de CO₂. Puede causar dolores de cabeza, mareos, fatiga y disminución significativa del rendimiento.
+          </div>
+          <div class="reference-recommendation">
+            Ventilación inmediata necesaria. Considerar reducir el número de personas en el espacio.
+          </div> -->
+        </div>
+        
+        <div class="reference-item very-high">
+          <div class="reference-header">
+            <div class="reference-icon">🚨</div>
+            <div>
+              <div class="reference-range">> 2000 ppm</div>
+              <div class="reference-label">NIVEL PELIGROSO</div>
+            </div>
+          </div>
+          <!-- <div class="reference-description">
+            Concentración muy alta. Riesgo para la salud con exposición prolongada. Puede causar problemas respiratorios y malestar general.
+          </div>
+          <div class="reference-recommendation">
+            ¡EVACUACIÓN RECOMENDADA! Ventilación urgente y evaluación del espacio.
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  d3.select("body").style("background-color", "#0b0f19");
-
-  // ===================== GAUGE VERTICAL (CO2 ppm) =====================
-  function gaugeCO2(containerId, initial) {
-    const width = 300;
-    const height = 520;
-    const min = 300;    // visual min
-    const max = 2500;   // visual max
-
-    const svg = d3.select(containerId).html("")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height);
-
-    svg.append("text")
-      .attr("x", width/2)
-      .attr("y", 32)
-      .attr("fill", "#ffb74d")
-      .attr("font-size", "22px")
-      .attr("font-weight", "700")
-      .attr("text-anchor", "middle")
-      .text("CO₂ (ppm)");
-
-    // outer frame
-    const frameX = 60;
-    const frameY = 70;
-    const frameW = 180;
-    const frameH = 360;
-
-    svg.append("rect")
-      .attr("x", frameX)
-      .attr("y", frameY)
-      .attr("width", frameW)
-      .attr("height", frameH)
-      .attr("rx", 14)
-      .attr("fill", "#0f1724")
-      .attr("stroke", "#ffb74d")
-      .attr("stroke-width", 3);
-
-    // fill rect
-    const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
-
-    const fillRect = svg.append("rect")
-      .attr("x", frameX)
-      .attr("width", frameW)
-      .attr("y", scale(initial))
-      .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
-      .attr("fill", "#ffb74d")
-      .attr("rx", 12);
-
-    const valueText = svg.append("text")
-      .attr("x", width/2)
-      .attr("y", frameY + frameH + 50)
-      .attr("fill", "#ffb74d")
-      .attr("font-size", "28px")
-      .attr("font-weight", "700")
-      .attr("text-anchor", "middle")
-      .text(initial + " ppm");
-
-    // color overlay depending on ranges (good/moderate/high)
-    function colorFor(v) {
-      if (v < 800) return "#7ef9a3";        // good (greenish)
-      if (v < 1200) return "#ffd86b";       // moderate (amber)
-      return "#ff7a7a";                     // high (red)
-    }
-
-    return {
-      update: function(newVal) {
-        const y = scale(newVal);
-        const h = Math.max(2, (frameY + frameH) - y);
-
-        fillRect
-          .transition().duration(300)
-          .attr("y", y)
-          .attr("height", h)
-          .attr("fill", colorFor(newVal));
-
-        valueText.text(Math.round(newVal) + " ppm");
-      }
-    };
-  }
-
-  // ===================== SERIE TEMPORAL (LINE) =====================
-  function lineChartCO2(containerId) {
-    const outerW = 720, outerH = 480;
-    const margin = {top: 30, right: 20, bottom: 40, left: 60};
-    const width = outerW - margin.left - margin.right;
-    const height = outerH - margin.top - margin.bottom;
-
-    const svg = d3.select(containerId).html("")
-      .append("svg")
-      .attr("width", outerW)
-      .attr("height", outerH)
-      .style("background", "#0f1724")
-      .style("border", "2px solid #ffb74d")
-      .style("border-radius", "8px");
-
-    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-    // Scales
-    const x = d3.scaleTime().range([0, width]);
-    const y = d3.scaleLinear().domain([300, 2500]).range([height, 0]);
-
-    const line = d3.line()
-      .x(d => x(new Date(d.t)))
-      .y(d => y(d.v))
-      .curve(d3.curveMonotoneX);
-
-    // axes groups
-    const xAxisG = g.append("g").attr("transform", `translate(0,${height})`);
-    const yAxisG = g.append("g");
-
-    // axis labels
-    svg.append("text")
-      .attr("x", outerW/2)
-      .attr("y", 18)
-      .attr("fill", "#ffb74d")
-      .attr("font-size", "16px")
-      .attr("font-weight", "700")
-      .attr("text-anchor", "middle")
-      .text("Serie Temporal • CO₂ (ppm)");
-
-    // path
-    const path = g.append("path")
-      .attr("class", "line-co2")
-      .attr("fill", "none")
-      .attr("stroke-width", 2.5)
-      .attr("stroke", "#ffb74d");
-
-    // tooltip
-    const tooltip = d3.select(containerId)
-      .append("div")
-      .style("position", "absolute")
-      .style("background", "rgba(0,0,0,0.85)")
-      .style("color", "#fff")
-      .style("padding", "6px 8px")
-      .style("border", "1px solid #ffb74d")
-      .style("border-radius", "6px")
-      .style("font-size", "12px")
-      .style("pointer-events", "none")
-      .style("opacity", 0);
-
-    let data = [];
-
-    function redraw() {
-      if (data.length === 0) return;
-
-      // keep last N points
-      const maxPoints = 120;
-      if (data.length > maxPoints) data = data.slice(data.length - maxPoints);
-
-      x.domain(d3.extent(data, d => new Date(d.t)));
-      // adapt y domain to recent data but keep min/max sensible
-      const vmin = Math.min(d3.min(data, d => d.v), 300);
-      const vmax = Math.max(d3.max(data, d => d.v), 800);
-      y.domain([Math.max(300, vmin - 50), Math.min(3000, vmax + 50)]);
-
-      xAxisG.call(d3.axisBottom(x).ticks(6).tickFormat(d3.timeFormat("%H:%M:%S")).tickSizeOuter(0))
-        .selectAll("text").attr("fill", "#ddd");
-      yAxisG.call(d3.axisLeft(y).ticks(6).tickSizeOuter(0))
-        .selectAll("text").attr("fill", "#ddd");
-
-      path.datum(data).attr("d", line);
-    }
-
-    return {
-      push: function(value, timestampStr) {
-        const t = (timestampStr) ? timestampStr : new Date().toISOString();
-        data.push({ v: value, t: t });
-        redraw();
-      },
-      reset: function() {
-        data = [];
-        path.datum(data).attr("d", line);
-      }
-    };
-  }
-
-  // ============== INSTANCIAS ==============
-  const gauge = gaugeCO2("#gauge-co2", 600);
-  const series = lineChartCO2("#serie-co2");
-
-// ================= WEBSOCKET =================
- const socket = new WebSocket("ws://" + window.location.host + "/ws/co2/");
-
-  socket.onmessage = function(e) {
-      const mensaje = JSON.parse(e.data);
-
-      const valor = mensaje.valor;
-      const fecha = mensaje.fecha_hora;
-
-      gauge.update(valor);
-      series.push(valor, fecha);
-  };
-
-});
-</script>
-
-
 {% endblock %}
