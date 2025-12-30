@@ -1,0 +1,71 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-30 10:51-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\HABUI_APP\templates\panel_principal.html:10
+msgid "Inicio"
+msgstr "Main"
+
+#: .\HABUI_APP\templates\panel_principal.html:10
+msgid "Proyecto HABUI"
+msgstr "HABUI Proyect"
+
+#: .\HABUI_APP\templates\panel_principal.html:22
+msgid "Idioma"
+msgstr "Language"
+
+#: .\HABUI_APP\templates\panel_principal.html:34
+msgid "PROYECTO HABUI"
+msgstr "HABUI PROJECT"
+
+#: .\HABUI_APP\templates\panel_principal.html:41
+msgid "Módulo REMS"
+msgstr "REMS Module"
+
+#: .\HABUI_APP\templates\panel_principal.html:43
+msgid "GIF del sistema REMS"
+msgstr ""
+
+#: .\HABUI_APP\templates\panel_principal.html:45
+msgid "Supervisa el estado de los recursos esenciales"
+msgstr "Monitor the status of essential resources"
+
+#: .\HABUI_APP\templates\panel_principal.html:49
+msgid "Módulo PWMS"
+msgstr "PWMS Module"
+
+#: .\HABUI_APP\templates\panel_principal.html:51
+msgid "GIF del sistema PWMS"
+msgstr ""
+
+#: .\HABUI_APP\templates\panel_principal.html:53
+msgid "Supervisa el bienestar psicológico de la tripulación"
+msgstr "Monitors the psychological well-being of the crew"
+
+#: .\HABUI_APP\templates\panel_principal.html:57
+msgid "Módulo de Control"
+msgstr "Control Module"
+
+#: .\HABUI_APP\templates\panel_principal.html:59
+msgid "GIF del panel de control"
+msgstr ""
+
+#: .\HABUI_APP\templates\panel_principal.html:61
+msgid "Simula escenarios de riesgo, supervisa actividades y comunicación"
+msgstr "It simulates risk scenarios, monitors activities and communication"

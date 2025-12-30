@@ -29,10 +29,40 @@
     align-items: center;
     justify-content: center;
     font-family: var(--fuente);
-    font-size: 2rem;
-    font-weight: 700;
     box-shadow: 0 2px 8px var(--sombra);
     z-index: 1000;
+}
+
+.encabezado h1 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* Contenedor interno del header */
+.header-top {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* Selector de idioma */
+.language-switcher {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 22px;
+}
+
+.language-switcher select {
+    padding: 4px 6px;
+    font-size: 20px;
 }
 
 /* Contenido principal */
@@ -64,7 +94,6 @@
 }
 
 .seccion h2 {
-    text-decoration: none;
     color: inherit;
     margin-bottom: 30px;
     margin-top: 50px;

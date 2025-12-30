@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('HABUI_APP.urls')),
     path('PWMS/', include('PWMS.urls')),
+    path('i18n/', include('django.conf.urls.i18n')),
 ]
