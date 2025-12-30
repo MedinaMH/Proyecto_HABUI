@@ -16,9 +16,9 @@ margin-bottom: 20px;
 }
 
 .monitor-header h3 {
-color: #4dabf7;
+color: #34495e;
 font-weight: 600;
-font-size: 24px;
+font-size: 35px;
 margin-bottom: 8px;
 }
 
@@ -58,9 +58,9 @@ transform: translateY(-2px);
 
 .gauge-title {
 text-align: center;
-color: #4dabf7;
+color: #ffffff;
 font-weight: 600;
-font-size: 18px;
+font-size: 22px;
 margin-bottom: 15px;
 display: flex;
 align-items: center;
@@ -94,9 +94,9 @@ transform: translateY(-2px);
 }
 
 .series-title {
-color: #4dabf7;
+color: #ffffff;
 font-weight: 600;
-font-size: 18px;
+font-size: 22px;
 margin-bottom: 15px;
 display: flex;
 align-items: center;
@@ -122,9 +122,9 @@ box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .reference-title-humedad {
-color: #4dabf7;
+color: #ffffff;
 font-weight: 600;
-font-size: 18px;
+font-size: 20px;
 margin-bottom: 20px;
 display: flex;
 align-items: center;

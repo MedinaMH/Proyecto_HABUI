@@ -10,10 +10,41 @@
 <link rel="stylesheet" href="{% static 'css/estilos_view_energia.css' %}">
 
 <div class="dashboard-container">
-  <!-- Header -->
-  <div class="dashboard-header" style="padding-top: 10px; padding-bottom: 15px;">
-    <h1 class="dashboard-title">Monitoreo de Sistema de Energía</h1>
-    <p class="dashboard-subtitle">Sistema Fotovoltaico con Banco de Baterías <span id="header-capacity">--</span> Wh - Tiempo Real</p>
+  <!-- Header con estado de emergencia -->
+  <div class="dashboard-header" style="padding-top: 10px; padding-bottom: 15px;" id="energy-header">
+    <h1 class="dashboard-title">Monitoreo de la Calidad y Niveles de Energía</h1>
+    <!-- <p class="dashboard-subtitle">Sistema Fotovoltaico con Banco de Baterías <span id="header-capacity">--</span> Wh - Tiempo Real</p> -->
+    <!-- Indicador modo energía baja -->
+    <div id="low-energy-indicator" class="low-energy-indicator" style="display: none;">
+      ⚠ MODO ENERGÍA BAJA ACTIVADO - Protocolo de Emergencia
+    </div>
+  </div>
+  
+  <!-- Sistema de Alertas de Emergencia -->
+  <div id="energy-alert-container" class="energy-alert-container" style="display: none;">
+    <div class="alert-header">
+      <span class="alert-icon" id="alert-icon">⚠</span>
+      <div class="alert-content">
+        <h3 id="alert-title">ALERTA DE ENERGÍA</h3>
+        <p id="alert-message">Sistema energético operativo.</p>
+        <div id="alert-suggestions" class="alert-suggestions"></div>
+      </div>
+      <button id="close-alert-btn" class="close-alert-btn">×</button>
+    </div>
+  </div>
+  
+  <!-- Cartel de Sugerencias (Siempre visible en modo crítico) -->
+  <div id="suggestions-banner" class="suggestions-banner" style="display: none;">
+    <div class="suggestions-header">
+      <span class="suggestions-icon">💡</span>
+      <h3>Recomendaciones para Atención de Fallas</h3>
+    </div>
+    <div class="suggestions-list" id="suggestions-list">
+      <!-- Las sugerencias se cargarán aquí -->
+    </div>
+    <div class="suggestions-footer">
+      <small>Protocolo de mantenimiento energético - Hábitat Análogo</small>
+    </div>
   </div>
   
   <!-- Grid Principal -->
@@ -27,7 +58,7 @@
         <svg id="energyChart" width="100%" height="400"></svg>
       </div>
       
-      <!-- Panel de Métricas en Tiempo Real (debajo de la gráfica) - 6 EN UNA FILA -->
+      <!-- Panel de Métricas en Tiempo Real -->
       <div class="metrics-panel">
         <h3 class="section-title">⚡ Métricas en Tiempo Real</h3>
         <div class="metrics-horizontal-container">
@@ -70,11 +101,49 @@
           
         </div>
       </div>
+      
+      <!-- Panel de Áreas del Hábitat -->
+      <div class="habitat-areas-panel">
+        <h3 class="section-title">🏠 Áreas del Hábitat - Estado de Energía</h3>
+        <div class="areas-status-summary">
+          <div class="status-item">
+            <span class="status-label">Área Crítica:</span>
+            <span class="status-value" id="critical-area-name">Sala de monitoreo</span>
+            <span class="status-badge priority-badge">PRIORIDAD</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">Áreas Apagadas:</span>
+            <span class="status-value" id="shutdown-count">0</span>
+            <span class="status-badge warning-badge">CORTE PROGRAMADO</span>
+          </div>
+        </div>
+        
+        <div class="areas-grid" id="habitat-areas-grid">
+          <!-- Las áreas se generarán dinámicamente -->
+          <div class="loading-areas">Cargando estado de áreas...</div>
+        </div>
+        
+        <div class="areas-instructions">
+          <div class="instruction-item">
+            <span class="instruction-icon">⚠</span>
+            <span class="instruction-text">En modo crítico, solo el área PRIORITARIA mantiene energía</span>
+          </div>
+          <div class="instruction-item">
+            <span class="instruction-icon">⏻</span>
+            <span class="instruction-text">Las áreas NO CRÍTICAS se apagarán automáticamente</span>
+          </div>
+        </div>
+      </div>
     </div>
     
     <!-- Panel de Batería (Derecha) -->
     <div class="battery-panel">
       <h3 class="section-title" style="text-align: center; margin-top: 0; font-size: 20px;">🔋 Banco de Baterías</h3>
+      
+      <!-- Indicador de Estado -->
+      <div id="battery-status-badge" class="battery-status-badge status-normal">
+        <span id="battery-status-text">NORMAL</span>
+      </div>
       
       <!-- Indicador Principal -->
       <div style="text-align: center; margin-bottom: 20px;">
@@ -89,7 +158,7 @@
       </div>
       
       <!-- Visualización de Baterías en Serie -->
-    <div style="display: flex; justify-content: center; gap: 6px; margin-top: -45px; margin-bottom: 5px; flex-wrap: wrap;" id="battery-series"></div>
+      <div style="display: flex; justify-content: center; gap: 6px; margin-top: -45px; margin-bottom: 5px; flex-wrap: wrap;" id="battery-series"></div>
       
       <!-- Información de Batería -->
       <div style="background: rgba(30, 41, 59, 0.7); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
@@ -110,8 +179,8 @@
           <span id="battery-time" style="color: #fff; font-weight: 600; font-size: 13px;">--:--</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
-          <span style="color: #8da9c4; font-size: 13px;">Eficiencia:</span>
-          <span id="battery-efficiency" style="color: #fff; font-weight: 600; font-size: 13px;">95%</span>
+          <span style="color: #8da9c4; font-size: 13px;">Estado Sistema:</span>
+          <span id="system-status" style="color: #10b981; font-weight: 600; font-size: 13px;">OPERATIVO</span>
         </div>
       </div>
       
@@ -121,7 +190,34 @@
         <div id="flow-indicator" style="display: inline-block; padding: 8px 20px; border-radius: 20px; background: #3b82f6; color: white; font-weight: 600; font-size: 14px;">EQUILIBRADO</div>
       </div>
     </div>
-    
+  </div>
+  
+  <!-- Panel de Protocolo de Emergencia -->
+  <div id="emergency-protocol" class="emergency-protocol" style="display: none;">
+    <h3 class="section-title">🚨 Protocolo de Emergencia Energética</h3>
+    <div class="protocol-steps">
+      <div class="protocol-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Verificación Inmediata</h4>
+          <p>Verificar estado del banco de baterías y paneles solares</p>
+        </div>
+      </div>
+      <div class="protocol-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Protección de Área Crítica</h4>
+          <p>Garantizar energía en Sala de Monitoreo (prioridad)</p>
+        </div>
+      </div>
+      <div class="protocol-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Corte de Áreas No Esenciales</h4>
+          <p>Apagado automático de dormitorios, baño, pasillo, exteriores</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -144,9 +240,589 @@ document.addEventListener("DOMContentLoaded", function() {
   let zoomLevel = 1;
   let lastDataTime = new Date();
   let batteryCapacity = 12000; // Valor por defecto
+  let currentEnergyStatus = "normal";
+  let isLowEnergyMode = false;
+  let alertSound = null;
+  let criticalAreaName = "Sala de monitoreo"; // Valor por defecto
+  
+  // Crear sonido de alerta
+  function createAlertSound() {
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      
+      return { audioContext, oscillator, gainNode };
+    } catch (e) {
+      console.log("Audio no soportado");
+      return null;
+    }
+  }
   
   // ============================================
-  // 1. GRÁFICO PRINCIPAL
+  // SISTEMA DE ALERTAS Y NOTIFICACIONES
+  // ============================================
+  function showEnergyAlert(data) {
+    const alertContainer = document.getElementById('energy-alert-container');
+    const alertIcon = document.getElementById('alert-icon');
+    const alertTitle = document.getElementById('alert-title');
+    const alertMessage = document.getElementById('alert-message');
+    const suggestionsContainer = document.getElementById('alert-suggestions');
+    const lowEnergyIndicator = document.getElementById('low-energy-indicator');
+    const suggestionsBanner = document.getElementById('suggestions-banner');
+    const suggestionsList = document.getElementById('suggestions-list');
+    
+    // Mostrar indicador modo baja energía
+    if (data.low_energy_mode) {
+      lowEnergyIndicator.style.display = 'block';
+      lowEnergyIndicator.className = 'low-energy-indicator active';
+      isLowEnergyMode = true;
+    } else {
+      lowEnergyIndicator.style.display = 'none';
+      isLowEnergyMode = false;
+    }
+    
+    // Configurar alerta según estado
+    switch(data.energy_status) {
+      case 'critical':
+        alertContainer.style.display = 'block';
+        alertContainer.className = 'energy-alert-container critical-alert';
+        alertIcon.textContent = '🔴';
+        alertTitle.textContent = 'ALERTA CRÍTICA DE ENERGÍA';
+        alertMessage.textContent = data.alerts.message || 'Nivel crítico de energía. Apagando áreas no esenciales.';
+        
+        // Mostrar sugerencias en el cartel
+        if (data.alerts.suggestions && data.alerts.suggestions.length > 0) {
+          suggestionsBanner.style.display = 'block';
+          suggestionsList.innerHTML = '<ul>' + 
+            data.alerts.suggestions.map(s => `<li>${s}</li>`).join('') + '</ul>';
+          
+          // También en el contenedor de alertas
+          suggestionsContainer.innerHTML = '<strong>Acciones inmediatas:</strong><ul>' + 
+            data.alerts.suggestions.map(s => `<li>${s}</li>`).join('') + '</ul>';
+        } else {
+          // Sugerencias por defecto si no vienen del servidor
+          const defaultSuggestions = [
+            "Revisar estado del banco de baterías",
+            "Verificar conexión y rendimiento de paneles solares",
+            "Reducir consumo en sistemas no esenciales",
+            "Comprobar inversor y regulador de carga",
+            "Evaluar posible sobreconsumo inesperado"
+          ];
+          
+          suggestionsBanner.style.display = 'block';
+          suggestionsList.innerHTML = '<ul>' + 
+            defaultSuggestions.map(s => `<li>${s}</li>`).join('') + '</ul>';
+            
+          suggestionsContainer.innerHTML = '<strong>Acciones inmediatas:</strong><ul>' + 
+            defaultSuggestions.map(s => `<li>${s}</li>`).join('') + '</ul>';
+        }
+        
+        // Sonido de alerta
+        if (!alertSound) {
+          alertSound = createAlertSound();
+          if (alertSound) {
+            alertSound.oscillator.start();
+            alertSound.oscillator.stop(alertSound.audioContext.currentTime + 1);
+          }
+        }
+        
+        // Parpadear título
+        document.title = '🚨 ALERTA ENERGÉTICA - ' + Math.round(data.battery * 100) + '%';
+        startTitleBlink();
+        break;
+        
+      case 'warning':
+        alertContainer.style.display = 'block';
+        alertContainer.className = 'energy-alert-container warning-alert';
+        alertIcon.textContent = '⚠';
+        alertTitle.textContent = 'ADVERTENCIA DE ENERGÍA';
+        alertMessage.textContent = 'Nivel de energía bajo. Preparar medidas de contingencia.';
+        
+        // Mostrar cartel de sugerencias para warning también
+        suggestionsBanner.style.display = 'block';
+        suggestionsList.innerHTML = '<ul>' + 
+          '<li>Reducir consumo en áreas no esenciales</li>' +
+          '<li>Verificar generación solar</li>' +
+          '<li>Preparar sistemas de respaldo</li>' +
+          '<li>Monitorear nivel de baterías</li>' +
+          '<li>Revisar posibles fugas de energía</li></ul>';
+          
+        suggestionsContainer.innerHTML = '<strong>Recomendaciones:</strong><ul>' + 
+          '<li>Reducir consumo en áreas no esenciales</li>' +
+          '<li>Verificar generación solar</li>' +
+          '<li>Preparar sistemas de respaldo</li></ul>';
+        document.title = '⚠ Energía Baja - ' + Math.round(data.battery * 100) + '%';
+        break;
+        
+      default:
+        alertContainer.style.display = 'none';
+        suggestionsBanner.style.display = 'none';
+        document.title = '⚡ Energía - ' + Math.round(data.battery * 100) + '%';
+        break;
+    }
+    
+    // Actualizar estado del sistema
+    document.getElementById('system-status').textContent = 
+      data.energy_status === 'critical' ? 'EMERGENCIA' : 
+      data.energy_status === 'warning' ? 'ADVERTENCIA' : 'OPERATIVO';
+    
+    currentEnergyStatus = data.energy_status;
+  }
+  
+  function startTitleBlink() {
+    let blink = true;
+    const interval = setInterval(() => {
+      if (currentEnergyStatus !== 'critical') {
+        clearInterval(interval);
+        document.title = '⚡ Energía';
+        return;
+      }
+      document.title = blink ? 
+        '🚨 ALERTA CRÍTICA - REVISIÓN INMEDIATA' : 
+        '⚠ SISTEMA ENERGÉTICO EN FALLA';
+      blink = !blink;
+    }, 1000);
+  }
+  
+  // ============================================
+  // VISUALIZACIÓN DE ÁREAS DEL HÁBITAT (CORREGIDO)
+  // ============================================
+  function updateHabitatAreas(areasData) {
+    const areasGrid = document.getElementById('habitat-areas-grid');
+    const shutdownCountElement = document.getElementById('shutdown-count');
+    const criticalAreaNameElement = document.getElementById('critical-area-name');
+    const emergencyProtocol = document.getElementById('emergency-protocol');
+    
+    if (!areasData) return;
+    
+    // Actualizar nombre del área crítica
+    if (areasData.critical && areasData.critical.length > 0) {
+      criticalAreaName = areasData.critical[0];
+      criticalAreaNameElement.textContent = criticalAreaName;
+    }
+    
+    let shutdownCount = 0;
+    
+    // Crear HTML para áreas críticas (SIEMPRE OPERATIVAS)
+    let areasHTML = '';
+    
+    // 1. Mostrar área crítica PRIMERO con indicador de prioridad
+    if (areasData.critical && areasData.critical.length > 0) {
+      areasData.critical.forEach(area => {
+        areasHTML += `
+          <div class="area-card critical-priority-area">
+            <div class="area-icon">🚨</div>
+            <div class="area-info">
+              <div class="area-name">${area}</div>
+              <div class="area-status">CRÍTICA - PRIORIDAD</div>
+            </div>
+            <div class="area-notice">
+              ⚡ ENERGÍA GARANTIZADA
+            </div>
+            <div class="area-description">
+              Sistema esencial - No se apaga
+            </div>
+          </div>
+        `;
+      });
+    }
+    
+    // 2. Mostrar áreas no críticas (se apagan en modo crítico)
+    if (areasData.non_critical && areasData.non_critical.length > 0) {
+      areasData.non_critical.forEach(area => {
+        const isShutdown = areasData.shutdown && areasData.shutdown.includes(area);
+        const isOperational = !isShutdown;
+        
+        if (isShutdown) shutdownCount++;
+        
+        areasHTML += `
+          <div class="area-card ${isShutdown ? 'shutdown-area' : 'operational-area'}">
+            <div class="area-icon">${isShutdown ? '⏻' : '🏠'}</div>
+            <div class="area-info">
+              <div class="area-name">${area}</div>
+              <div class="area-status">${isShutdown ? 'APAGADA' : 'OPERATIVA'}</div>
+            </div>
+            ${isShutdown ? 
+              '<div class="area-warning">⚡ CORTE DE ENERGÍA</div>' : 
+              '<div class="area-note">Sistema no esencial</div>'
+            }
+          </div>
+        `;
+      });
+    }
+    
+    // Actualizar grid
+    areasGrid.innerHTML = areasHTML || '<div class="no-areas">No hay áreas configuradas</div>';
+    
+    // Actualizar contador de áreas apagadas
+    shutdownCountElement.textContent = shutdownCount;
+    
+    // Mostrar protocolo de emergencia si hay áreas apagadas
+    if (shutdownCount > 0) {
+      emergencyProtocol.style.display = 'block';
+    } else {
+      emergencyProtocol.style.display = 'none';
+    }
+  }
+  
+  // ============================================
+  // ACTUALIZACIÓN DE BATERÍA CON ESTADO
+  // ============================================
+  function initBatteryVisualization() {
+    const svg = d3.select("#battery-main");
+    const width = 180;
+    const height = 280;
+    
+    svg.attr("width", width).attr("height", height);
+    
+    // Crear batería principal
+    const batteryGroup = svg.append("g")
+      .attr("transform", `translate(${width/2}, 20)`);
+    
+    // Cuerpo de la batería
+    const batteryWidth = 100;
+    const batteryHeight = 200;
+    
+    // Marco exterior
+    batteryGroup.append("rect")
+      .attr("x", -batteryWidth/2)
+      .attr("y", 0)
+      .attr("width", batteryWidth)
+      .attr("height", batteryHeight)
+      .attr("rx", 10)
+      .attr("ry", 10)
+      .attr("fill", "none")
+      .attr("stroke", "#4b5563")
+      .attr("stroke-width", 4);
+    
+    // Terminal positivo
+    batteryGroup.append("rect")
+      .attr("x", -15)
+      .attr("y", -15)
+      .attr("width", 30)
+      .attr("height", 15)
+      .attr("rx", 4)
+      .attr("fill", "#fbbf24")
+      .attr("stroke", "#d97706")
+      .attr("stroke-width", 2);
+    
+    // Nivel de carga
+    const chargeLevel = batteryGroup.append("rect")
+      .attr("x", -batteryWidth/2 + 8)
+      .attr("y", batteryHeight)
+      .attr("width", batteryWidth - 16)
+      .attr("height", 0)
+      .attr("rx", 6)
+      .attr("fill", "#10b981");
+    
+    // Marcas de nivel
+    for (let i = 0; i <= 100; i += 20) {
+      const yPos = batteryHeight - (i/100) * batteryHeight;
+      batteryGroup.append("line")
+        .attr("x1", -batteryWidth/2 - 10)
+        .attr("x2", -batteryWidth/2 - 2)
+        .attr("y1", yPos)
+        .attr("y2", yPos)
+        .attr("stroke", "#6b7280")
+        .attr("stroke-width", 1.5);
+      
+      batteryGroup.append("text")
+        .attr("x", -batteryWidth/2 - 15)
+        .attr("y", yPos + 4)
+        .attr("text-anchor", "end")
+        .attr("fill", "#9ca3af")
+        .attr("font-size", "10px")
+        .text(i + "%");
+    }
+    
+    // Función para actualizar batería
+    function updateBattery(soc, batteryWh, capacity, energyStatus) {
+      // Actualizar capacidad global
+      if (capacity && capacity > 0) {
+        batteryCapacity = capacity;
+      }
+      
+      const socPercent = soc * 100;
+      const fillHeight = (socPercent / 100) * batteryHeight;
+      const yPos = batteryHeight - fillHeight;
+      
+      // Determinar color según estado energético
+      let color, statusColor, statusText;
+      const statusBadge = document.getElementById('battery-status-badge');
+      
+      switch(energyStatus) {
+        case 'critical':
+          color = "#ef4444";
+          statusColor = "#ef4444";
+          statusText = "CRÍTICO";
+          statusBadge.className = "battery-status-badge status-critical";
+          break;
+        case 'warning':
+          color = "#f59e0b";
+          statusColor = "#f59e0b";
+          statusText = "BAJO";
+          statusBadge.className = "battery-status-badge status-warning";
+          break;
+        default:
+          if (socPercent < 70) {
+            color = "#3b82f6";
+            statusColor = "#3b82f6";
+            statusText = "NORMAL";
+          } else {
+            color = "#10b981";
+            statusColor = "#10b981";
+            statusText = "ÓPTIMO";
+          }
+          statusBadge.className = "battery-status-badge status-normal";
+          break;
+      }
+      
+      // Actualizar badge
+      document.getElementById('battery-status-text').textContent = statusText;
+      statusBadge.style.backgroundColor = statusColor;
+      
+      // Animación de nivel
+      chargeLevel.transition()
+        .duration(800)
+        .attr("y", yPos)
+        .attr("height", fillHeight)
+        .attr("fill", color);
+      
+      // Actualizar información textual
+      const batteryPercent = document.getElementById('battery-percent');
+      batteryPercent.textContent = Math.round(socPercent) + '%';
+      batteryPercent.style.color = statusColor;
+      
+      d3.select("#battery-wh").text(Math.round(batteryWh) + " Wh");
+      d3.select("#battery-ratio").text(`${Math.round(batteryWh)} / ${Math.round(batteryCapacity)} Wh`);
+      d3.select("#battery-capacity").text(formatNumber(batteryCapacity) + " Wh");
+      d3.select("#battery-remaining").text(Math.round(batteryWh) + " Wh");
+      
+      // Actualizar estado con color
+      const batteryState = document.getElementById('battery-state');
+      batteryState.textContent = statusText;
+      batteryState.style.color = statusColor;
+      
+      // Calcular tiempo restante
+      if (chartData.potencia.length > 1) {
+        const avgPower = d3.mean(chartData.potencia.slice(-10));
+        if (avgPower > 0) {
+          const hoursRemaining = (batteryWh / avgPower);
+          const hours = Math.floor(hoursRemaining);
+          const minutes = Math.floor((hoursRemaining - hours) * 60);
+          const timeText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+          document.getElementById('battery-time').textContent = timeText;
+          
+          // Color según tiempo restante
+          const timeElement = document.getElementById('battery-time');
+          if (hoursRemaining < 2) {
+            timeElement.style.color = "#ef4444";
+          } else if (hoursRemaining < 5) {
+            timeElement.style.color = "#f59e0b";
+          } else {
+            timeElement.style.color = "#10b981";
+          }
+        }
+      }
+      
+      // Actualizar baterías en serie
+      updateBatterySeries(socPercent, energyStatus);
+    }
+    
+    return updateBattery;
+  }
+  
+  const updateBattery = initBatteryVisualization();
+  
+  // ============================================
+  // MANEJO DE WEBSOCKET (CORREGIDO)
+  // ============================================
+  ws.onopen = function() {
+    console.log("WebSocket Energía conectado");
+  };
+  
+  ws.onerror = function(error) {
+    console.error("Error en WebSocket:", error);
+  };
+  
+  ws.onclose = function() {
+    console.warn("WebSocket cerrado. Intentando reconectar...");
+    setTimeout(() => {
+      location.reload();
+    }, 5000);
+  };
+  
+  ws.onmessage = function(event) {
+    try {
+      const data = JSON.parse(event.data);
+      const now = new Date();
+      lastDataTime = now;
+      
+      console.log("Datos WebSocket recibidos:", data); // Para depuración
+      
+      // 1. Actualizar métricas principales
+      updateMetrics(data);
+      
+      // 2. Actualizar datos del gráfico
+      updateChartData(data, now);
+      
+      // 3. Mostrar alertas si corresponde
+      if (data.energy_status || data.alerts) {
+        showEnergyAlert(data);
+      }
+      
+      // 4. Actualizar áreas del hábitat (con la estructura correcta)
+      if (data.areas) {
+        console.log("Datos de áreas recibidos:", data.areas);
+        updateHabitatAreas(data.areas);
+      }
+      
+      // 5. Actualizar visualizaciones
+      updateMainChart();
+      updateBattery(
+        data.battery, 
+        data.battery_wh, 
+        data.capacity_wh || batteryCapacity,
+        data.energy_status
+      );
+      
+      // 6. Actualizar estado de flujo
+      updateFlowStatus(data.solar_estimated_w, data.potencia, data.battery);
+      
+    } catch (error) {
+      console.error("Error procesando datos:", error);
+    }
+  };
+  
+  function updateMetrics(data) {
+    // Métricas principales
+    d3.select("#metric-tension").text(data.tension.toFixed(2));
+    d3.select("#metric-corriente").text(data.corriente.toFixed(2));
+    d3.select("#metric-potencia").text(data.potencia.toFixed(0));
+    d3.select("#metric-solar").text(data.solar_estimated_w.toFixed(0));
+    
+    // Capacidad
+    if (data.capacity_wh) {
+      batteryCapacity = data.capacity_wh;
+      d3.select("#header-capacity").text(formatNumber(batteryCapacity));
+      d3.select("#metric-capacity").text(formatNumber(batteryCapacity));
+    }
+    
+    // Flujo neto
+    const netFlow = data.solar_estimated_w - data.potencia;
+    d3.select("#metric-flujo").text(netFlow.toFixed(0));
+    
+    // Estado de flujo
+    const statusFlujo = d3.select("#status-flujo");
+    if (netFlow > 50) {
+      statusFlujo.text("CARGANDO").style("background", "#10b981");
+    } else if (netFlow < -50) {
+      statusFlujo.text("DESCARGANDO").style("background", "#f59e0b");
+    } else {
+      statusFlujo.text("STABLE").style("background", "#3b82f6");
+    }
+  }
+  
+  function updateChartData(data, now) {
+    chartData.tiempo.push(now);
+    chartData.tension.push(data.tension);
+    chartData.corriente.push(data.corriente);
+    chartData.potencia.push(data.potencia);
+    chartData.solar.push(data.solar_estimated_w);
+    chartData.soc.push(data.battery * 100);
+    
+    // Mantener límite de puntos
+    if (chartData.tiempo.length > maxDataPoints) {
+      chartData.tiempo.shift();
+      chartData.tension.shift();
+      chartData.corriente.shift();
+      chartData.potencia.shift();
+      chartData.solar.shift();
+      chartData.soc.shift();
+    }
+  }
+  
+  function updateBatterySeries(socPercent, energyStatus) {
+    const container = d3.select("#battery-series");
+    container.html("");
+    
+    const numBatteries = 6;
+    const batteryWidth = 40;
+    const batteryHeight = 60;
+    
+    for (let i = 0; i < numBatteries; i++) {
+      const individualSOC = Math.max(0, Math.min(100, socPercent + (Math.random() * 10 - 5)));
+      let color;
+      
+      // Color según estado energético
+      if (energyStatus === 'critical') {
+        color = "#ef4444";
+      } else if (energyStatus === 'warning') {
+        color = "#f59e0b";
+      } else if (individualSOC < 70) {
+        color = "#3b82f6";
+      } else {
+        color = "#10b981";
+      }
+      
+      const batteryGroup = container.append("svg")
+        .attr("width", batteryWidth)
+        .attr("height", batteryHeight + 20)
+        .append("g")
+        .attr("transform", "translate(20, 10)");
+      
+      // Cuerpo de batería individual
+      batteryGroup.append("rect")
+        .attr("x", -15)
+        .attr("y", 0)
+        .attr("width", 30)
+        .attr("height", batteryHeight)
+        .attr("rx", 4)
+        .attr("fill", "none")
+        .attr("stroke", "#4b5563")
+        .attr("stroke-width", 2);
+      
+      // Terminal
+      batteryGroup.append("rect")
+        .attr("x", -5)
+        .attr("y", -8)
+        .attr("width", 10)
+        .attr("height", 8)
+        .attr("rx", 2)
+        .attr("fill", "#fbbf24");
+      
+      // Nivel de carga
+      const fillHeight = (individualSOC / 100) * batteryHeight;
+      batteryGroup.append("rect")
+        .attr("x", -13)
+        .attr("y", batteryHeight - fillHeight)
+        .attr("width", 26)
+        .attr("height", fillHeight)
+        .attr("rx", 3)
+        .attr("fill", color);
+      
+      // Indicador de número
+      batteryGroup.append("text")
+        .attr("x", 0)
+        .attr("y", batteryHeight + 15)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#9ca3af")
+        .attr("font-size", "10px")
+        .text(`B${i+1}`);
+    }
+  }
+  
+  // ============================================
+  // GRÁFICO PRINCIPAL (tu código original)
   // ============================================
   function initMainChart() {
     const svg = d3.select("#energyChart");
@@ -402,277 +1078,6 @@ document.addEventListener("DOMContentLoaded", function() {
   
   const updateMainChart = initMainChart();
   
-  // ============================================
-  // VISUALIZACIÓN DE BATERÍAS
-  // ============================================
-  function initBatteryVisualization() {
-    const svg = d3.select("#battery-main");
-    const width = 180;
-    const height = 280;
-    
-    svg.attr("width", width).attr("height", height);
-    
-    // Crear batería principal tipo industrial
-    const batteryGroup = svg.append("g")
-      .attr("transform", `translate(${width/2}, 20)`);
-    
-    // Cuerpo de la batería
-    const batteryWidth = 100;
-    const batteryHeight = 200;
-    
-    // Marco exterior con efecto 3D
-    batteryGroup.append("rect")
-      .attr("x", -batteryWidth/2)
-      .attr("y", 0)
-      .attr("width", batteryWidth)
-      .attr("height", batteryHeight)
-      .attr("rx", 10)
-      .attr("ry", 10)
-      .attr("fill", "none")
-      .attr("stroke", "#4b5563")
-      .attr("stroke-width", 4);
-    
-    // Terminal positivo
-    batteryGroup.append("rect")
-      .attr("x", -15)
-      .attr("y", -15)
-      .attr("width", 30)
-      .attr("height", 15)
-      .attr("rx", 4)
-      .attr("fill", "#fbbf24")
-      .attr("stroke", "#d97706")
-      .attr("stroke-width", 2);
-    
-    // Nivel de carga (se actualiza dinámicamente)
-    const chargeLevel = batteryGroup.append("rect")
-      .attr("x", -batteryWidth/2 + 8)
-      .attr("y", batteryHeight)
-      .attr("width", batteryWidth - 16)
-      .attr("height", 0)
-      .attr("rx", 6)
-      .attr("fill", "#10b981");
-    
-    // Efecto de líquido (ondas)
-    const liquidEffect = batteryGroup.append("path")
-      .attr("fill", "rgba(16, 185, 129, 0.3)")
-      .attr("opacity", 0);
-    
-    // Marcas de nivel
-    for (let i = 0; i <= 100; i += 20) {
-      const yPos = batteryHeight - (i/100) * batteryHeight;
-      batteryGroup.append("line")
-        .attr("x1", -batteryWidth/2 - 10)
-        .attr("x2", -batteryWidth/2 - 2)
-        .attr("y1", yPos)
-        .attr("y2", yPos)
-        .attr("stroke", "#6b7280")
-        .attr("stroke-width", 1.5);
-      
-      batteryGroup.append("text")
-        .attr("x", -batteryWidth/2 - 15)
-        .attr("y", yPos + 4)
-        .attr("text-anchor", "end")
-        .attr("fill", "#9ca3af")
-        .attr("font-size", "10px")
-        .text(i + "%");
-    }
-    
-    // Función para actualizar batería
-    function updateBattery(soc, batteryWh, capacity) {
-      // Actualizar capacidad global si se proporciona
-      if (capacity && capacity > 0) {
-        batteryCapacity = capacity;
-      }
-      
-      const socPercent = soc * 100;
-      const fillHeight = (socPercent / 100) * batteryHeight;
-      const yPos = batteryHeight - fillHeight;
-      
-      // Actualizar color según SoC
-      let color;
-      if (socPercent < 20) {
-        color = "#ef4444"; // Rojo (crítico)
-      } else if (socPercent < 40) {
-        color = "#f59e0b"; // Ámbar (bajo)
-      } else if (socPercent < 70) {
-        color = "#3b82f6"; // Azul (normal)
-      } else {
-        color = "#10b981"; // Verde (óptimo)
-      }
-      
-      // Animación de nivel
-      chargeLevel.transition()
-        .duration(800)
-        .attr("y", yPos)
-        .attr("height", fillHeight)
-        .attr("fill", color);
-      
-      // Actualizar porcentaje y Wh
-      d3.select("#battery-percent")
-        .text(Math.round(socPercent) + "%")
-        .style("color", color);
-      
-      d3.select("#battery-wh")
-        .text(Math.round(batteryWh) + " Wh");
-      
-      // Actualizar ratio batería (actual / total)
-      d3.select("#battery-ratio")
-        .text(`${Math.round(batteryWh)} / ${Math.round(batteryCapacity)} Wh`);
-      
-      // Actualizar capacidad en el panel
-      d3.select("#battery-capacity")
-        .text(formatNumber(batteryCapacity) + " Wh");
-      
-      d3.select("#battery-remaining")
-        .text(Math.round(batteryWh) + " Wh");
-      
-      // Actualizar estado
-      const stateText = d3.select("#battery-state");
-      let state, stateColor;
-      
-      if (socPercent < 15) {
-        state = "CRÍTICO";
-        stateColor = "#ef4444";
-      } else if (socPercent < 30) {
-        state = "BAJO";
-        stateColor = "#f59e0b";
-      } else if (socPercent < 80) {
-        state = "NORMAL";
-        stateColor = "#3b82f6";
-      } else {
-        state = "ÓPTIMO";
-        stateColor = "#10b981";
-      }
-      
-      stateText.text(state).style("color", stateColor);
-      
-      // Calcular tiempo restante aproximado
-      if (chartData.potencia.length > 1) {
-        const avgPower = d3.mean(chartData.potencia.slice(-10));
-        if (avgPower > 0) {
-          const hoursRemaining = (batteryWh / avgPower);
-          const hours = Math.floor(hoursRemaining);
-          const minutes = Math.floor((hoursRemaining - hours) * 60);
-          d3.select("#battery-time")
-            .text(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`);
-        }
-      }
-      
-      // Crear baterías en serie (simulación de banco)
-      updateBatterySeries(socPercent);
-      
-      // Efecto de ondas si está cargando
-      if (chartData.potencia.length > 0 && chartData.solar.length > 0) {
-        const lastPower = chartData.potencia[chartData.potencia.length - 1];
-        const lastSolar = chartData.solar[chartData.solar.length - 1];
-        const isCharging = lastSolar > lastPower * 1.1;
-        
-        if (isCharging && socPercent < 95) {
-          createLiquidEffect(yPos, fillHeight, batteryWidth - 16, color);
-        }
-      }
-    }
-    
-    // Crear efecto de líquido (ondas)
-    function createLiquidEffect(yPos, height, width, color) {
-      liquidEffect
-        .attr("d", `
-          M ${-width/2} ${yPos + height}
-          L ${width/2} ${yPos + height}
-          L ${width/2} ${yPos + height * 0.8}
-          C ${width/4} ${yPos + height * 0.7}, ${-width/4} ${yPos + height * 0.9}, ${-width/2} ${yPos + height * 0.8}
-          Z
-        `)
-        .attr("fill", color)
-        .attr("opacity", 0.3)
-        .transition()
-        .duration(1000)
-        .attr("opacity", 0)
-        .attr("d", `
-          M ${-width/2} ${yPos + height}
-          L ${width/2} ${yPos + height}
-          L ${width/2} ${yPos + height * 0.6}
-          C ${width/4} ${yPos + height * 0.5}, ${-width/4} ${yPos + height * 0.7}, ${-width/2} ${yPos + height * 0.6}
-          Z
-        `);
-    }
-    
-    return updateBattery;
-  }
-  
-  const updateBattery = initBatteryVisualization();
-  
-  // ============================================
-  // BATERÍAS EN SERIE
-  // ============================================
-  function updateBatterySeries(socPercent) {
-    const container = d3.select("#battery-series");
-    container.html("");
-    
-    const numBatteries = 6; // Simulando 6 baterías en serie
-    const batteryWidth = 40;
-    const batteryHeight = 60;
-    
-    for (let i = 0; i < numBatteries; i++) {
-      // Variación individual del SoC (±5%)
-      const individualSOC = Math.max(0, Math.min(100, socPercent + (Math.random() * 10 - 5)));
-      
-      const batteryGroup = container.append("svg")
-        .attr("width", batteryWidth)
-        .attr("height", batteryHeight + 20)
-        .append("g")
-        .attr("transform", "translate(20, 10)");
-      
-      // Cuerpo de batería individual
-      batteryGroup.append("rect")
-        .attr("x", -15)
-        .attr("y", 0)
-        .attr("width", 30)
-        .attr("height", batteryHeight)
-        .attr("rx", 4)
-        .attr("fill", "none")
-        .attr("stroke", "#4b5563")
-        .attr("stroke-width", 2);
-      
-      // Terminal
-      batteryGroup.append("rect")
-        .attr("x", -5)
-        .attr("y", -8)
-        .attr("width", 10)
-        .attr("height", 8)
-        .attr("rx", 2)
-        .attr("fill", "#fbbf24");
-      
-      // Nivel de carga individual
-      const fillHeight = (individualSOC / 100) * batteryHeight;
-      let color;
-      if (individualSOC < 20) color = "#ef4444";
-      else if (individualSOC < 40) color = "#f59e0b";
-      else if (individualSOC < 70) color = "#3b82f6";
-      else color = "#10b981";
-      
-      batteryGroup.append("rect")
-        .attr("x", -13)
-        .attr("y", batteryHeight - fillHeight)
-        .attr("width", 26)
-        .attr("height", fillHeight)
-        .attr("rx", 3)
-        .attr("fill", color);
-      
-      // Indicador de número
-      batteryGroup.append("text")
-        .attr("x", 0)
-        .attr("y", batteryHeight + 15)
-        .attr("text-anchor", "middle")
-        .attr("fill", "#9ca3af")
-        .attr("font-size", "10px")
-        .text(`B${i+1}`);
-    }
-  }
-  
-  // ============================================
-  // 4. ACTUALIZACIÓN DE ESTADO DE FLUJO
-  // ============================================
   function updateFlowStatus(solarPower, loadPower, batterySOC) {
     const netFlow = solarPower - loadPower;
     const indicator = d3.select("#flow-indicator");
@@ -680,23 +1085,18 @@ document.addEventListener("DOMContentLoaded", function() {
     let status, color;
     
     if (netFlow > 100) {
-      // Cargando batería
       status = "CARGANDO BATERÍA";
       color = "#10b981";
     } else if (netFlow < -100 && batterySOC > 0.1) {
-      // Descargando batería
       status = "DESCARGANDO BATERÍA";
       color = "#f59e0b";
     } else if (solarPower > loadPower * 0.9 && solarPower < loadPower * 1.1) {
-      // Equilibrado
       status = "EQUILIBRADO";
       color = "#3b82f6";
     } else if (solarPower > loadPower) {
-      // Exceso solar
       status = "EXCESO SOLAR";
       color = "#fbbf24";
     } else {
-      // Déficit
       status = "DÉFICIT ENERGÉTICO";
       color = "#ef4444";
     }
@@ -705,130 +1105,17 @@ document.addEventListener("DOMContentLoaded", function() {
       .text(status)
       .style("background", color)
       .style("box-shadow", `0 0 10px ${color}40`);
-    
-    // Efecto de pulso si hay cambios importantes
-    indicator
-      .transition()
-      .duration(200)
-      .style("transform", "scale(1.05)")
-      .transition()
-      .duration(200)
-      .style("transform", "scale(1)");
   }
   
-  // ============================================
-  // 5. FUNCIONES UTILITARIAS
-  // ============================================
   function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
   
-  // ============================================
-  // MANEJO DE WEBSOCKET
-  // ============================================
-  ws.onopen = function() {
-    console.log("WebSocket Energía conectado");
-  };
-  
-  ws.onerror = function(error) {
-    console.error("Error en WebSocket:", error);
-  };
-  
-  ws.onclose = function() {
-    console.warn("WebSocket cerrado");
-  };
-  
-  ws.onmessage = function(event) {
-    try {
-      const data = JSON.parse(event.data);
-      const now = new Date();
-      lastDataTime = now;
-      
-      // Actualizar métricas principales
-      d3.select("#metric-tension").text(data.tension.toFixed(2));
-      d3.select("#metric-corriente").text(data.corriente.toFixed(2));
-      d3.select("#metric-potencia").text(data.potencia.toFixed(0));
-      d3.select("#metric-solar").text(data.solar_estimated_w.toFixed(0));
-      
-      // Si el simulador envía la capacidad, actualizarla
-      if (data.capacity) {
-        batteryCapacity = data.capacity;
-        d3.select("#header-capacity").text(formatNumber(batteryCapacity));
-        d3.select("#metric-capacity").text(formatNumber(batteryCapacity));
-      }
-      
-      // Calcular flujo neto
-      const netFlow = data.solar_estimated_w - data.potencia;
-      d3.select("#metric-flujo").text(netFlow.toFixed(0));
-      
-      // Actualizar estado de flujo
-      if (netFlow > 50) {
-        d3.select("#status-flujo").text("CARGANDO").style("background", "#10b981");
-      } else if (netFlow < -50) {
-        d3.select("#status-flujo").text("DESCARGANDO").style("background", "#f59e0b");
-      } else {
-        d3.select("#status-flujo").text("STABLE").style("background", "#3b82f6");
-      }
-      
-      // Actualizar datos del gráfico
-      chartData.tiempo.push(now);
-      chartData.tension.push(data.tension);
-      chartData.corriente.push(data.corriente);
-      chartData.potencia.push(data.potencia);
-      chartData.solar.push(data.solar_estimated_w);
-      chartData.soc.push(data.battery * 100);
-      
-      // Mantener límite de puntos
-      if (chartData.tiempo.length > maxDataPoints) {
-        chartData.tiempo.shift();
-        chartData.tension.shift();
-        chartData.corriente.shift();
-        chartData.potencia.shift();
-        chartData.solar.shift();
-        chartData.soc.shift();
-      }
-      
-      // Actualizar visualizaciones
-      updateMainChart();
-      updateBattery(data.battery, data.battery_wh, batteryCapacity);
-      updateFlowStatus(data.solar_estimated_w, data.potencia, data.battery);
-      
-    } catch (error) {
-      console.error("Error procesando datos:", error);
-    }
-  };
-  
-  // ============================================
-  // 7. CONTROLES DE INTERFAZ
-  // ============================================
-  d3.select("#btn-zoom-in").on("click", function() {
-    if (zoomLevel < 5) {
-      zoomLevel += 0.5;
-      maxDataPoints = Math.floor(100 / zoomLevel);
-      updateMainChart();
-      this.blur(); 
-    }
+  // Botón para cerrar alerta
+  document.getElementById('close-alert-btn').addEventListener('click', function() {
+    document.getElementById('energy-alert-container').style.display = 'none';
   });
   
-  d3.select("#btn-zoom-out").on("click", function() {
-    if (zoomLevel > 0.5) {
-      zoomLevel -= 0.5;
-      maxDataPoints = Math.floor(100 / zoomLevel);
-      updateMainChart();
-      this.blur();
-    }
-  });
-  
-  d3.select("#btn-reset").on("click", function() {
-    zoomLevel = 1;
-    maxDataPoints = 100;
-    updateMainChart();
-    this.blur();
-  });
-  
-  // ============================================
-  // 8. SIMULACIÓN INICIAL
-  // ============================================
   // Inicializar con datos de ejemplo
   for (let i = 0; i < 50; i++) {
     const time = new Date(Date.now() - (50 - i) * 3000);
@@ -841,7 +1128,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
   
   updateMainChart();
-  updateBattery(0.6, 3000, 5000); // 60% de 5000Wh = 3000Wh
+  updateBattery(0.6, 3000, 5000, 'normal');
   updateFlowStatus(1000, 1200, 0.6);
   
   // Inicializar valores por defecto

@@ -20,7 +20,7 @@ const svg = container.append("svg")
 svg.append("text")
     .attr("x", width / 2)
     .attr("y", 35)
-    .attr("fill", "#00bfff")
+    .attr("fill", "#ffffffff")
     .attr("font-size", "24px")
     .attr("font-weight", "bold")
     .attr("text-anchor", "middle")
@@ -185,58 +185,58 @@ for (let i = 0; i <= 100; i += 25) {
     .attr("y1", y)
     .attr("y2", y)
     .attr("stroke", "#00bfff")
-    .attr("stroke-width", 2);
+    .attr("stroke-width", 4);
     
     // Texto de porcentaje
     svg.append("text")
     .attr("x", tanqueX - 20)
     .attr("y", y + 4)
-    .attr("fill", "#00bfff")
-    .attr("font-size", "12px")
+    .attr("fill", "#ffffffff")
+    .attr("font-size", "20px")
     .attr("text-anchor", "end")
     .text(i + "%");
 }
 
 // Líneas pequeñas cada 10%
-for (let i = 10; i < 100; i += 10) {
-    if (i % 25 !== 0) {
-    const y = tanqueY + tanqueHeight - (i / 100) * tanqueHeight;
-    svg.append("line")
-        .attr("x1", tanqueX - 10)
-        .attr("x2", tanqueX - 5)
-        .attr("y1", y)
-        .attr("y2", y)
-        .attr("stroke", "#4a6572")
-        .attr("stroke-width", 1);
-    }
-}
+// for (let i = 10; i < 100; i += 10) {
+//     if (i % 25 !== 0) {
+//     const y = tanqueY + tanqueHeight - (i / 100) * tanqueHeight;
+//     svg.append("line")
+//         .attr("x1", tanqueX - 10)
+//         .attr("x2", tanqueX - 5)
+//         .attr("y1", y)
+//         .attr("y2", y)
+//         .attr("stroke", "#00bfff")
+//         .attr("stroke-width", 2);
+//     }
+// }
 
 // --- DISPLAY NUMÉRICO ---
 const display = svg.append("rect")
-    .attr("x", tanqueX + tanqueWidth - 100)
+    .attr("x", tanqueX + tanqueWidth - 180)
     .attr("y", tanqueY + tanqueHeight + 25)
-    .attr("width", 100)
-    .attr("height", 40)
+    .attr("width", 150)
+    .attr("height", 50)
     .attr("rx", 8)
     .attr("fill", "#1a252f")
     .attr("stroke", "#00bfff")
     .attr("stroke-width", 2);
 
 const textoNivel = svg.append("text")
-    .attr("x", tanqueX + tanqueWidth - 50)
-    .attr("y", tanqueY + tanqueHeight + 52)
+    .attr("x", tanqueX + tanqueWidth - 100)
+    .attr("y", tanqueY + tanqueHeight + 60)
     .attr("fill", "#00ffcc")
-    .attr("font-size", "24px")
+    .attr("font-size", "35px")
     .attr("font-weight", "bold")
     .attr("text-anchor", "middle")
     .style("font-family", "'Courier New', monospace")
     .text("00.0%");
 
 const textoLabel = svg.append("text")
-    .attr("x", tanqueX + tanqueWidth - 50)
-    .attr("y", tanqueY + tanqueHeight + 75)
-    .attr("fill", "#00bfff")
-    .attr("font-size", "12px")
+    .attr("x", tanqueX + tanqueWidth - 100)
+    .attr("y", tanqueY + tanqueHeight + 100)
+    .attr("fill", "#ffffffff")
+    .attr("font-size", "25px")
     .attr("text-anchor", "middle")
     .text("NIVEL ACTUAL");
 
@@ -433,7 +433,7 @@ svg.append("g")
 svg.append("text")
     .attr("x", width / 2)
     .attr("y", -15)
-    .attr("fill", "#00bfff")
+    .attr("fill", "#ffffffff")
     .attr("font-size", "18px")
     .attr("font-weight", "bold")
     .attr("text-anchor", "middle")
@@ -595,6 +595,7 @@ console.error("Error en conexión WebSocket:", error);
 
 socket.onclose = function() {
 console.warn("Conexión WebSocket cerrada");
+location.reload()
 };
 
 // Simulación inicial para demostración

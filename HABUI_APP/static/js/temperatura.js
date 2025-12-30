@@ -32,18 +32,18 @@ const bulboRadio = 35;
 
 // Bulbo inferior
 svg.append("circle")
-    .attr("cx", width/2)
+    .attr("cx", width/2 + 15)
     .attr("cy", termometroY + termometroH + bulboRadio)
     .attr("r", bulboRadio)
     .attr("fill", "#0f1724")
     .attr("stroke", tempPalette.veryHot)
-    .attr("stroke-width", 3);
+    .attr("stroke-width", 4);
 
 // Tubo del termómetro
 svg.append("rect")
     .attr("x", termometroX)
     .attr("y", termometroY)
-    .attr("width", 30)
+    .attr("width", 60)
     .attr("height", termometroH)
     .attr("rx", 15)
     .attr("fill", "#0f1724")
@@ -58,7 +58,7 @@ const scale = d3.scaleLinear()
 // Mercurio (líquido del termómetro)
 const mercurio = svg.append("rect")
     .attr("x", termometroX + 4)
-    .attr("width", 22)
+    .attr("width", 52)
     .attr("y", scale(initial))
     .attr("height", Math.max(2, (termometroY + termometroH) - scale(initial)))
     .attr("fill", tempPalette.veryHot)
@@ -66,7 +66,7 @@ const mercurio = svg.append("rect")
 
 // Mercurio en el bulbo
 const mercurioBulbo = svg.append("circle")
-    .attr("cx", width/2)
+    .attr("cx", width/2 + 15)
     .attr("cy", termometroY + termometroH + bulboRadio)
     .attr("r", bulboRadio - 5)
     .attr("fill", tempPalette.veryHot);
@@ -113,18 +113,18 @@ function getTempLevel(v) {
 for (let temp = min; temp <= max; temp += 5) {
     const y = scale(temp);
     svg.append("line")
-    .attr("x1", termometroX - 10)
+    .attr("x1", termometroX - 20)
     .attr("x2", termometroX)
     .attr("y1", y)
     .attr("y2", y)
     .attr("stroke", tempPalette.veryHot)
-    .attr("stroke-width", 1.5);
+    .attr("stroke-width", 2);
     
     svg.append("text")
-    .attr("x", termometroX - 15)
+    .attr("x", termometroX - 18)
     .attr("y", y + 4)
     .attr("fill", tempPalette.veryHot)
-    .attr("font-size", "12px")
+    .attr("font-size", "25px")
     .attr("text-anchor", "end")
     .text(temp + "°");
 }
@@ -578,5 +578,8 @@ console.error("Error en WebSocket Temperatura");
 
 socket.onclose = function() {
 console.warn("WebSocket Temperatura desconectado");
+setTimeout(() => {
+    location.reload();
+    }, 5000);
 };
 });

@@ -1,0 +1,853 @@
+{% extends "REMS/estructura_base.html" %}
+
+{% block titulo %} Sistema REMS - Energía{% endblock %}
+
+{% block contenido %} 
+
+{% load static %}
+
+<script src="{% static 'js/d3.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/estilos_view_energia.css' %}">
+
+<div class="dashboard-container">
+<!-- Header -->
+<div class="dashboard-header" style="padding-top: 10px; padding-bottom: 15px;">
+<h1 class="dashboard-title">Monitoreo de Sistema de Energía</h1>
+<p class="dashboard-subtitle">Sistema Fotovoltaico con Banco de Baterías <span id="header-capacity">--</span> Wh - Tiempo Real</p>
+</div>
+
+<!-- Grid Principal -->
+<div class="main-grid">
+
+<!-- Contenedor para gráfica y métricas (izquierda) -->
+<div class="chart-and-metrics-container">
+    <!-- Gráfico Principal -->
+    <div class="main-chart">
+    <h3 class="section-title" style="margin-top: 0; margin-bottom: 20px;">📈 Evolución Temporal de Parámetros</h3>
+    <svg id="energyChart" width="100%" height="400"></svg>
+    </div>
+    
+    <!-- Panel de Métricas en Tiempo Real (debajo de la gráfica) - 6 EN UNA FILA -->
+    <div class="metrics-panel">
+    <h3 class="section-title">⚡ Métricas en Tiempo Real</h3>
+    <div class="metrics-horizontal-container">
+        
+        <div class="metric-ultra-compact">
+        <div class="metric-title-ultra-compact">TENSIÓN (L1)</div>
+        <p class="metric-value-ultra-compact" id="metric-tension">-- <span class="metric-unit-ultra-compact">V</span></p>
+        <div class="metric-status-ultra-compact status-stable" id="status-tension">STABLE</div>
+        </div>
+        
+        <div class="metric-ultra-compact">
+        <div class="metric-title-ultra-compact">CORRIENTE (L1)</div>
+        <p class="metric-value-ultra-compact" id="metric-corriente">-- <span class="metric-unit-ultra-compact">A</span></p>
+        <div class="metric-status-ultra-compact status-stable" id="status-corriente">NORMAL</div>
+        </div>
+        
+        <div class="metric-ultra-compact">
+        <div class="metric-title-ultra-compact">POTENCIA ACTIVA</div>
+        <p class="metric-value-ultra-compact" id="metric-potencia">-- <span class="metric-unit-ultra-compact">W</span></p>
+        <div class="metric-status-ultra-compact status-stable" id="status-potencia">CONSUMIENDO</div>
+        </div>
+        
+        <div class="metric-ultra-compact">
+        <div class="metric-title-ultra-compact">GENERACIÓN SOLAR</div>
+        <p class="metric-value-ultra-compact" id="metric-solar">-- <span class="metric-unit-ultra-compact">W</span></p>
+        <div class="metric-status-ultra-compact status-stable" id="status-solar">ACTIVO</div>
+        </div>
+        
+        <div class="metric-ultra-compact">
+        <div class="metric-title-ultra-compact">FLUJO NETO</div>
+        <p class="metric-value-ultra-compact" id="metric-flujo">-- <span class="metric-unit-ultra-compact">W</span></p>
+        <div class="metric-status-ultra-compact status-stable" id="status-flujo">STABLE</div>
+        </div>
+        
+        <div class="metric-ultra-compact">
+        <div class="metric-title-ultra-compact">CAPACIDAD BANCO</div>
+        <p class="metric-value-ultra-compact" id="metric-capacity">-- <span class="metric-unit-ultra-compact">Wh</span></p>
+        <div id="capacity-status" class="metric-status-ultra-compact status-stable">CONFIGURADO</div>
+        </div>
+        
+    </div>
+    </div>
+</div>
+
+<!-- Panel de Batería (Derecha) -->
+<div class="battery-panel">
+    <h3 class="section-title" style="text-align: center; margin-top: 0; font-size: 20px;">🔋 Banco de Baterías</h3>
+    
+    <!-- Indicador Principal -->
+    <div style="text-align: center; margin-bottom: 20px;">
+    <div style="position: relative; display: inline-block;">
+        <svg id="battery-main" width="180" height="220"></svg>
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+        <div id="battery-percent" style="font-size: 36px; font-weight: 800; color: #fff;">--%</div>
+        <div id="battery-wh" style="font-size: 14px; color: #8da9c4;">-- Wh</div>
+        <div id="battery-ratio" style="font-size: 12px; color: #6b7280; margin-top: 5px;">-- / -- Wh</div>
+        </div>
+    </div>
+    </div>
+    
+    <!-- Visualización de Baterías en Serie -->
+<div style="display: flex; justify-content: center; gap: 6px; margin-top: -45px; margin-bottom: 5px; flex-wrap: wrap;" id="battery-series"></div>
+    
+    <!-- Información de Batería -->
+    <div style="background: rgba(30, 41, 59, 0.7); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span style="color: #8da9c4; font-size: 13px;">Capacidad Total:</span>
+        <span id="battery-capacity" style="color: #fff; font-weight: 600; font-size: 13px;">-- Wh</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span style="color: #8da9c4; font-size: 13px;">Energía Restante:</span>
+        <span id="battery-remaining" style="color: #fff; font-weight: 600; font-size: 13px;">-- Wh</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span style="color: #8da9c4; font-size: 13px;">Estado SoC:</span>
+        <span id="battery-state" style="color: #fff; font-weight: 600; font-size: 13px;">DESCONOCIDO</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span style="color: #8da9c4; font-size: 13px;">Tiempo Restante:</span>
+        <span id="battery-time" style="color: #fff; font-weight: 600; font-size: 13px;">--:--</span>
+    </div>
+    <div style="display: flex; justify-content: space-between;">
+        <span style="color: #8da9c4; font-size: 13px;">Eficiencia:</span>
+        <span id="battery-efficiency" style="color: #fff; font-weight: 600; font-size: 13px;">95%</span>
+    </div>
+    </div>
+    
+    <!-- Indicador de Flujo -->
+    <div style="text-align: center;">
+    <div style="color: #8da9c4; font-size: 12px; margin-bottom: 5px;">ESTADO DEL FLUJO</div>
+    <div id="flow-indicator" style="display: inline-block; padding: 8px 20px; border-radius: 20px; background: #3b82f6; color: white; font-weight: 600; font-size: 14px;">EQUILIBRADO</div>
+    </div>
+</div>
+
+</div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+// Establecer conexión WebSocket
+const ws = new WebSocket("ws://" + window.location.host + "/ws/energia/");
+
+// Variables globales
+let chartData = {
+tiempo: [],
+tension: [],
+corriente: [],
+potencia: [],
+solar: [],
+soc: []
+};
+
+let maxDataPoints = 100;
+let zoomLevel = 1;
+let lastDataTime = new Date();
+let batteryCapacity = 12000; // Valor por defecto
+
+// ============================================
+// 1. GRÁFICO PRINCIPAL
+// ============================================
+function initMainChart() {
+const svg = d3.select("#energyChart");
+const width = svg.node().getBoundingClientRect().width;
+const height = 400;
+
+svg.attr("width", width).attr("height", height);
+
+const margin = { top: 20, right: 80, bottom: 50, left: 80 };
+const chartWidth = width - margin.left - margin.right;
+const chartHeight = height - margin.top - margin.bottom;
+
+const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// Escalas
+const x = d3.scaleTime().range([0, chartWidth]);
+const y = d3.scaleLinear().range([chartHeight, 0]);
+
+// Ejes
+const xAxis = g.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", `translate(0,${chartHeight})`);
+
+const yAxis = g.append("g")
+    .attr("class", "y-axis");
+
+// Grid
+g.append("g")
+    .attr("class", "grid")
+    .attr("transform", `translate(0,${chartHeight})`)
+    .call(d3.axisBottom(x).tickSize(-chartHeight).tickFormat(""))
+    .style("opacity", 0.1)
+    .style("stroke", "#4b5563");
+
+g.append("g")
+    .attr("class", "grid")
+    .call(d3.axisLeft(y).tickSize(-chartWidth).tickFormat(""))
+    .style("opacity", 0.1)
+    .style("stroke", "#4b5563");
+
+// Líneas
+const lines = {
+    tension: g.append("path").attr("class", "line line-tension"),
+    corriente: g.append("path").attr("class", "line line-corriente"),
+    potencia: g.append("path").attr("class", "line line-potencia"),
+    solar: g.append("path").attr("class", "line line-solar")
+};
+
+// Área de sombra para potencia
+const area = d3.area()
+    .x(d => x(d.time))
+    .y0(chartHeight)
+    .y1(d => y(d.value));
+
+const areaPath = g.append("path")
+    .attr("class", "area")
+    .attr("fill", "url(#power-gradient)")
+    .style("opacity", 0.3);
+
+// Gradiente para área
+const defs = svg.append("defs");
+const gradient = defs.append("linearGradient")
+    .attr("id", "power-gradient")
+    .attr("x1", "0%").attr("y1", "0%")
+    .attr("x2", "0%").attr("y2", "100%");
+
+gradient.append("stop")
+    .attr("offset", "0%")
+    .attr("stop-color", "#ff7f0e")
+    .attr("stop-opacity", 0.6);
+
+gradient.append("stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "#ff7f0e")
+    .attr("stop-opacity", 0);
+
+// Leyenda
+const legend = svg.append("g")
+    .attr("class", "legend")
+    .attr("transform", `translate(${width - 200}, 20)`);
+
+const legendItems = [
+    { id: "tension", label: "Tensión (V)", color: "#2ca02c" },
+    { id: "corriente", label: "Corriente (A)", color: "#1f77b4" },
+    { id: "potencia", label: "Potencia (W)", color: "#ff7f0e" },
+    { id: "solar", label: "Solar (W)", color: "#ffd700" }
+];
+
+legendItems.forEach((item, i) => {
+    const itemGroup = legend.append("g")
+    .attr("transform", `translate(0, ${i * 25})`);
+    
+    itemGroup.append("rect")
+    .attr("width", 15)
+    .attr("height", 3)
+    .attr("y", 9)
+    .attr("fill", item.color);
+    
+    itemGroup.append("text")
+    .attr("x", 20)
+    .attr("y", 15)
+    .attr("fill", "#fff")
+    .attr("font-size", "12px")
+    .text(item.label);
+});
+
+// Tooltip
+const tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("position", "absolute")
+    .style("background", "rgba(15, 23, 42, 0.95)")
+    .style("color", "#fff")
+    .style("padding", "10px")
+    .style("border-radius", "8px")
+    .style("border", "1px solid #00bfff")
+    .style("pointer-events", "none")
+    .style("opacity", 0)
+    .style("box-shadow", "0 4px 12px rgba(0,0,0,0.3)")
+    .style("z-index", 1000);
+
+// Punto de enfoque para tooltip
+const focusCircle = g.append("circle")
+    .attr("r", 5)
+    .attr("fill", "#ff7f0e")
+    .style("opacity", 0);
+
+// Rectángulo para interacción
+const overlay = g.append("rect")
+    .attr("width", chartWidth)
+    .attr("height", chartHeight)
+    .attr("fill", "transparent")
+    .on("mousemove", mousemove)
+    .on("mouseout", mouseout);
+
+// Función para tooltip
+function mousemove(event) {
+    const [mx] = d3.pointer(event);
+    const time = x.invert(mx);
+    
+    // Encontrar el punto más cercano en el tiempo
+    let closestIndex = 0;
+    let minDiff = Infinity;
+    
+    chartData.tiempo.forEach((t, i) => {
+    const diff = Math.abs(t - time);
+    if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = i;
+    }
+    });
+    
+    if (closestIndex >= 0 && closestIndex < chartData.tension.length) {
+    const tension = chartData.tension[closestIndex];
+    const corriente = chartData.corriente[closestIndex];
+    const potencia = chartData.potencia[closestIndex];
+    const solar = chartData.solar[closestIndex];
+    const timeStr = chartData.tiempo[closestIndex].toLocaleTimeString();
+    
+    focusCircle
+        .attr("cx", x(chartData.tiempo[closestIndex]))
+        .attr("cy", y(potencia))
+        .style("opacity", 1);
+    
+    tooltip.html(`
+        <div style="margin-bottom: 5px;"><strong>${timeStr}</strong></div>
+        <div>⚡ Tensión: <strong>${tension.toFixed(2)} V</strong></div>
+        <div>🔌 Corriente: <strong>${corriente.toFixed(2)} A</strong></div>
+        <div>💡 Potencia: <strong>${potencia.toFixed(0)} W</strong></div>
+        <div>☀️ Solar: <strong>${solar.toFixed(0)} W</strong></div>
+    `)
+    .style("left", (event.pageX + 10) + "px")
+    .style("top", (event.pageY - 30) + "px")
+    .style("opacity", 1);
+    }
+}
+
+function mouseout() {
+    focusCircle.style("opacity", 0);
+    tooltip.style("opacity", 0);
+}
+
+// Función para actualizar gráfico
+function updateChart() {
+    if (chartData.tiempo.length === 0) return;
+    
+    // Actualizar escalas
+    const timeExtent = d3.extent(chartData.tiempo);
+    x.domain([timeExtent[0], timeExtent[1]]);
+    
+    // Encontrar valor máximo para escalar Y
+    const maxValues = [
+    d3.max(chartData.tension),
+    d3.max(chartData.corriente),
+    d3.max(chartData.potencia),
+    d3.max(chartData.solar)
+    ].filter(v => !isNaN(v));
+    
+    const maxY = d3.max(maxValues) * 1.1;
+    y.domain([0, maxY]);
+    
+    // Actualizar ejes
+    xAxis.call(d3.axisBottom(x)
+    .ticks(6)
+    .tickFormat(d3.timeFormat("%H:%M:%S")))
+    .selectAll("text")
+    .attr("fill", "#8da9c4")
+    .attr("font-size", "12px");
+    
+    yAxis.call(d3.axisLeft(y).ticks(6))
+    .selectAll("text")
+    .attr("fill", "#8da9c4")
+    .attr("font-size", "12px");
+    
+    // Actualizar líneas
+    const line = d3.line()
+    .x(d => x(d.time))
+    .y(d => y(d.value))
+    .curve(d3.curveMonotoneX);
+    
+    lines.tension.datum(chartData.tension.map((v, i) => ({ time: chartData.tiempo[i], value: v })))
+    .attr("d", line)
+    .attr("fill", "none")
+    .attr("stroke", "#2ca02c")
+    .attr("stroke-width", 2.5);
+    
+    lines.corriente.datum(chartData.corriente.map((v, i) => ({ time: chartData.tiempo[i], value: v })))
+    .attr("d", line)
+    .attr("fill", "none")
+    .attr("stroke", "#1f77b4")
+    .attr("stroke-width", 2.5);
+    
+    lines.potencia.datum(chartData.potencia.map((v, i) => ({ time: chartData.tiempo[i], value: v })))
+    .attr("d", line)
+    .attr("fill", "none")
+    .attr("stroke", "#ff7f0e")
+    .attr("stroke-width", 3);
+    
+    lines.solar.datum(chartData.solar.map((v, i) => ({ time: chartData.tiempo[i], value: v })))
+    .attr("d", line)
+    .attr("fill", "none")
+    .attr("stroke", "#ffd700")
+    .attr("stroke-width", 2.5)
+    .attr("stroke-dasharray", "5,5");
+    
+    // Actualizar área
+    areaPath.datum(chartData.potencia.map((v, i) => ({ time: chartData.tiempo[i], value: v })))
+    .attr("d", area);
+}
+
+return updateChart;
+}
+
+const updateMainChart = initMainChart();
+
+// ============================================
+// VISUALIZACIÓN DE BATERÍAS
+// ============================================
+function initBatteryVisualization() {
+const svg = d3.select("#battery-main");
+const width = 180;
+const height = 280;
+
+svg.attr("width", width).attr("height", height);
+
+// Crear batería principal tipo industrial
+const batteryGroup = svg.append("g")
+    .attr("transform", `translate(${width/2}, 20)`);
+
+// Cuerpo de la batería
+const batteryWidth = 100;
+const batteryHeight = 200;
+
+// Marco exterior con efecto 3D
+batteryGroup.append("rect")
+    .attr("x", -batteryWidth/2)
+    .attr("y", 0)
+    .attr("width", batteryWidth)
+    .attr("height", batteryHeight)
+    .attr("rx", 10)
+    .attr("ry", 10)
+    .attr("fill", "none")
+    .attr("stroke", "#4b5563")
+    .attr("stroke-width", 4);
+
+// Terminal positivo
+batteryGroup.append("rect")
+    .attr("x", -15)
+    .attr("y", -15)
+    .attr("width", 30)
+    .attr("height", 15)
+    .attr("rx", 4)
+    .attr("fill", "#fbbf24")
+    .attr("stroke", "#d97706")
+    .attr("stroke-width", 2);
+
+// Nivel de carga (se actualiza dinámicamente)
+const chargeLevel = batteryGroup.append("rect")
+    .attr("x", -batteryWidth/2 + 8)
+    .attr("y", batteryHeight)
+    .attr("width", batteryWidth - 16)
+    .attr("height", 0)
+    .attr("rx", 6)
+    .attr("fill", "#10b981");
+
+// Efecto de líquido (ondas)
+const liquidEffect = batteryGroup.append("path")
+    .attr("fill", "rgba(16, 185, 129, 0.3)")
+    .attr("opacity", 0);
+
+// Marcas de nivel
+for (let i = 0; i <= 100; i += 20) {
+    const yPos = batteryHeight - (i/100) * batteryHeight;
+    batteryGroup.append("line")
+    .attr("x1", -batteryWidth/2 - 10)
+    .attr("x2", -batteryWidth/2 - 2)
+    .attr("y1", yPos)
+    .attr("y2", yPos)
+    .attr("stroke", "#6b7280")
+    .attr("stroke-width", 1.5);
+    
+    batteryGroup.append("text")
+    .attr("x", -batteryWidth/2 - 15)
+    .attr("y", yPos + 4)
+    .attr("text-anchor", "end")
+    .attr("fill", "#9ca3af")
+    .attr("font-size", "10px")
+    .text(i + "%");
+}
+
+// Función para actualizar batería
+function updateBattery(soc, batteryWh, capacity) {
+    // Actualizar capacidad global si se proporciona
+    if (capacity && capacity > 0) {
+    batteryCapacity = capacity;
+    }
+    
+    const socPercent = soc * 100;
+    const fillHeight = (socPercent / 100) * batteryHeight;
+    const yPos = batteryHeight - fillHeight;
+    
+    // Actualizar color según SoC
+    let color;
+    if (socPercent < 20) {
+    color = "#ef4444"; // Rojo (crítico)
+    } else if (socPercent < 40) {
+    color = "#f59e0b"; // Ámbar (bajo)
+    } else if (socPercent < 70) {
+    color = "#3b82f6"; // Azul (normal)
+    } else {
+    color = "#10b981"; // Verde (óptimo)
+    }
+    
+    // Animación de nivel
+    chargeLevel.transition()
+    .duration(800)
+    .attr("y", yPos)
+    .attr("height", fillHeight)
+    .attr("fill", color);
+    
+    // Actualizar porcentaje y Wh
+    d3.select("#battery-percent")
+    .text(Math.round(socPercent) + "%")
+    .style("color", color);
+    
+    d3.select("#battery-wh")
+    .text(Math.round(batteryWh) + " Wh");
+    
+    // Actualizar ratio batería (actual / total)
+    d3.select("#battery-ratio")
+    .text(`${Math.round(batteryWh)} / ${Math.round(batteryCapacity)} Wh`);
+    
+    // Actualizar capacidad en el panel
+    d3.select("#battery-capacity")
+    .text(formatNumber(batteryCapacity) + " Wh");
+    
+    d3.select("#battery-remaining")
+    .text(Math.round(batteryWh) + " Wh");
+    
+    // Actualizar estado
+    const stateText = d3.select("#battery-state");
+    let state, stateColor;
+    
+    if (socPercent < 15) {
+    state = "CRÍTICO";
+    stateColor = "#ef4444";
+    } else if (socPercent < 30) {
+    state = "BAJO";
+    stateColor = "#f59e0b";
+    } else if (socPercent < 80) {
+    state = "NORMAL";
+    stateColor = "#3b82f6";
+    } else {
+    state = "ÓPTIMO";
+    stateColor = "#10b981";
+    }
+    
+    stateText.text(state).style("color", stateColor);
+    
+    // Calcular tiempo restante aproximado
+    if (chartData.potencia.length > 1) {
+    const avgPower = d3.mean(chartData.potencia.slice(-10));
+    if (avgPower > 0) {
+        const hoursRemaining = (batteryWh / avgPower);
+        const hours = Math.floor(hoursRemaining);
+        const minutes = Math.floor((hoursRemaining - hours) * 60);
+        d3.select("#battery-time")
+        .text(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`);
+    }
+    }
+    
+    // Crear baterías en serie (simulación de banco)
+    updateBatterySeries(socPercent);
+    
+    // Efecto de ondas si está cargando
+    if (chartData.potencia.length > 0 && chartData.solar.length > 0) {
+    const lastPower = chartData.potencia[chartData.potencia.length - 1];
+    const lastSolar = chartData.solar[chartData.solar.length - 1];
+    const isCharging = lastSolar > lastPower * 1.1;
+    
+    if (isCharging && socPercent < 95) {
+        createLiquidEffect(yPos, fillHeight, batteryWidth - 16, color);
+    }
+    }
+}
+
+// Crear efecto de líquido (ondas)
+function createLiquidEffect(yPos, height, width, color) {
+    liquidEffect
+    .attr("d", `
+        M ${-width/2} ${yPos + height}
+        L ${width/2} ${yPos + height}
+        L ${width/2} ${yPos + height * 0.8}
+        C ${width/4} ${yPos + height * 0.7}, ${-width/4} ${yPos + height * 0.9}, ${-width/2} ${yPos + height * 0.8}
+        Z
+    `)
+    .attr("fill", color)
+    .attr("opacity", 0.3)
+    .transition()
+    .duration(1000)
+    .attr("opacity", 0)
+    .attr("d", `
+        M ${-width/2} ${yPos + height}
+        L ${width/2} ${yPos + height}
+        L ${width/2} ${yPos + height * 0.6}
+        C ${width/4} ${yPos + height * 0.5}, ${-width/4} ${yPos + height * 0.7}, ${-width/2} ${yPos + height * 0.6}
+        Z
+    `);
+}
+
+return updateBattery;
+}
+
+const updateBattery = initBatteryVisualization();
+
+// ============================================
+// BATERÍAS EN SERIE
+// ============================================
+function updateBatterySeries(socPercent) {
+const container = d3.select("#battery-series");
+container.html("");
+
+const numBatteries = 6; // Simulando 6 baterías en serie
+const batteryWidth = 40;
+const batteryHeight = 60;
+
+for (let i = 0; i < numBatteries; i++) {
+    // Variación individual del SoC (±5%)
+    const individualSOC = Math.max(0, Math.min(100, socPercent + (Math.random() * 10 - 5)));
+    
+    const batteryGroup = container.append("svg")
+    .attr("width", batteryWidth)
+    .attr("height", batteryHeight + 20)
+    .append("g")
+    .attr("transform", "translate(20, 10)");
+    
+    // Cuerpo de batería individual
+    batteryGroup.append("rect")
+    .attr("x", -15)
+    .attr("y", 0)
+    .attr("width", 30)
+    .attr("height", batteryHeight)
+    .attr("rx", 4)
+    .attr("fill", "none")
+    .attr("stroke", "#4b5563")
+    .attr("stroke-width", 2);
+    
+    // Terminal
+    batteryGroup.append("rect")
+    .attr("x", -5)
+    .attr("y", -8)
+    .attr("width", 10)
+    .attr("height", 8)
+    .attr("rx", 2)
+    .attr("fill", "#fbbf24");
+    
+    // Nivel de carga individual
+    const fillHeight = (individualSOC / 100) * batteryHeight;
+    let color;
+    if (individualSOC < 20) color = "#ef4444";
+    else if (individualSOC < 40) color = "#f59e0b";
+    else if (individualSOC < 70) color = "#3b82f6";
+    else color = "#10b981";
+    
+    batteryGroup.append("rect")
+    .attr("x", -13)
+    .attr("y", batteryHeight - fillHeight)
+    .attr("width", 26)
+    .attr("height", fillHeight)
+    .attr("rx", 3)
+    .attr("fill", color);
+    
+    // Indicador de número
+    batteryGroup.append("text")
+    .attr("x", 0)
+    .attr("y", batteryHeight + 15)
+    .attr("text-anchor", "middle")
+    .attr("fill", "#9ca3af")
+    .attr("font-size", "10px")
+    .text(`B${i+1}`);
+}
+}
+
+// ============================================
+// 4. ACTUALIZACIÓN DE ESTADO DE FLUJO
+// ============================================
+function updateFlowStatus(solarPower, loadPower, batterySOC) {
+const netFlow = solarPower - loadPower;
+const indicator = d3.select("#flow-indicator");
+
+let status, color;
+
+if (netFlow > 100) {
+    // Cargando batería
+    status = "CARGANDO BATERÍA";
+    color = "#10b981";
+} else if (netFlow < -100 && batterySOC > 0.1) {
+    // Descargando batería
+    status = "DESCARGANDO BATERÍA";
+    color = "#f59e0b";
+} else if (solarPower > loadPower * 0.9 && solarPower < loadPower * 1.1) {
+    // Equilibrado
+    status = "EQUILIBRADO";
+    color = "#3b82f6";
+} else if (solarPower > loadPower) {
+    // Exceso solar
+    status = "EXCESO SOLAR";
+    color = "#fbbf24";
+} else {
+    // Déficit
+    status = "DÉFICIT ENERGÉTICO";
+    color = "#ef4444";
+}
+
+indicator
+    .text(status)
+    .style("background", color)
+    .style("box-shadow", `0 0 10px ${color}40`);
+
+// Efecto de pulso si hay cambios importantes
+indicator
+    .transition()
+    .duration(200)
+    .style("transform", "scale(1.05)")
+    .transition()
+    .duration(200)
+    .style("transform", "scale(1)");
+}
+
+// ============================================
+// 5. FUNCIONES UTILITARIAS
+// ============================================
+function formatNumber(num) {
+return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// ============================================
+// MANEJO DE WEBSOCKET
+// ============================================
+ws.onopen = function() {
+console.log("WebSocket Energía conectado");
+};
+
+ws.onerror = function(error) {
+console.error("Error en WebSocket:", error);
+};
+
+ws.onclose = function() {
+console.warn("WebSocket cerrado");
+};
+
+ws.onmessage = function(event) {
+try {
+    const data = JSON.parse(event.data);
+    const now = new Date();
+    lastDataTime = now;
+    
+    // Actualizar métricas principales
+    d3.select("#metric-tension").text(data.tension.toFixed(2));
+    d3.select("#metric-corriente").text(data.corriente.toFixed(2));
+    d3.select("#metric-potencia").text(data.potencia.toFixed(0));
+    d3.select("#metric-solar").text(data.solar_estimated_w.toFixed(0));
+    
+    // Si el simulador envía la capacidad, actualizarla
+    if (data.capacity) {
+    batteryCapacity = data.capacity;
+    d3.select("#header-capacity").text(formatNumber(batteryCapacity));
+    d3.select("#metric-capacity").text(formatNumber(batteryCapacity));
+    }
+    
+    // Calcular flujo neto
+    const netFlow = data.solar_estimated_w - data.potencia;
+    d3.select("#metric-flujo").text(netFlow.toFixed(0));
+    
+    // Actualizar estado de flujo
+    if (netFlow > 50) {
+    d3.select("#status-flujo").text("CARGANDO").style("background", "#10b981");
+    } else if (netFlow < -50) {
+    d3.select("#status-flujo").text("DESCARGANDO").style("background", "#f59e0b");
+    } else {
+    d3.select("#status-flujo").text("STABLE").style("background", "#3b82f6");
+    }
+    
+    // Actualizar datos del gráfico
+    chartData.tiempo.push(now);
+    chartData.tension.push(data.tension);
+    chartData.corriente.push(data.corriente);
+    chartData.potencia.push(data.potencia);
+    chartData.solar.push(data.solar_estimated_w);
+    chartData.soc.push(data.battery * 100);
+    
+    // Mantener límite de puntos
+    if (chartData.tiempo.length > maxDataPoints) {
+    chartData.tiempo.shift();
+    chartData.tension.shift();
+    chartData.corriente.shift();
+    chartData.potencia.shift();
+    chartData.solar.shift();
+    chartData.soc.shift();
+    }
+    
+    // Actualizar visualizaciones
+    updateMainChart();
+    updateBattery(data.battery, data.battery_wh, batteryCapacity);
+    updateFlowStatus(data.solar_estimated_w, data.potencia, data.battery);
+    
+} catch (error) {
+    console.error("Error procesando datos:", error);
+}
+};
+
+// ============================================
+// 7. CONTROLES DE INTERFAZ
+// ============================================
+d3.select("#btn-zoom-in").on("click", function() {
+if (zoomLevel < 5) {
+    zoomLevel += 0.5;
+    maxDataPoints = Math.floor(100 / zoomLevel);
+    updateMainChart();
+    this.blur(); 
+}
+});
+
+d3.select("#btn-zoom-out").on("click", function() {
+if (zoomLevel > 0.5) {
+    zoomLevel -= 0.5;
+    maxDataPoints = Math.floor(100 / zoomLevel);
+    updateMainChart();
+    this.blur();
+}
+});
+
+d3.select("#btn-reset").on("click", function() {
+zoomLevel = 1;
+maxDataPoints = 100;
+updateMainChart();
+this.blur();
+});
+
+// ============================================
+// 8. SIMULACIÓN INICIAL
+// ============================================
+// Inicializar con datos de ejemplo
+for (let i = 0; i < 50; i++) {
+const time = new Date(Date.now() - (50 - i) * 3000);
+chartData.tiempo.push(time);
+chartData.tension.push(230 + Math.random() * 10);
+chartData.corriente.push(5 + Math.random() * 3);
+chartData.potencia.push(1200 + Math.random() * 400);
+chartData.solar.push(800 + Math.random() * 600);
+chartData.soc.push(60 + Math.random() * 10);
+}
+
+updateMainChart();
+updateBattery(0.6, 3000, 5000); // 60% de 5000Wh = 3000Wh
+updateFlowStatus(1000, 1200, 0.6);
+
+// Inicializar valores por defecto
+d3.select("#header-capacity").text("5,000");
+d3.select("#metric-capacity").text("5,000");
+});
+</script>
+
+{% endblock %}

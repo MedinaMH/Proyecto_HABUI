@@ -6,21 +6,29 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from pathlib import Path
 
+
 class Command(BaseCommand):
-    help = "Lee datos del CSV de energía y los envía por WebSocket al grupo 'energia', modelando SoC en Wh."
+    help = (
+        "Lee datos del CSV de energía y los envía por WebSocket al grupo 'energia'. "
+        "Incluye simulación de energía baja y gestión de áreas."
+    )
 
     def add_arguments(self, parser):
         parser.add_argument('--interval', type=float, default=3.0,
                             help="Intervalo en segundos entre envíos")
         parser.add_argument('--capacity', type=float, default=12000.0,
-                            help="Capacidad del banco en Wh (por defecto 12000 = 12 kWh)")
+                            help="Capacidad del banco en Wh")
         parser.add_argument('--initial_soc', type=float, default=0.6,
-                            help="SoC inicial (0..1), por defecto 0.6")
+                            help="SoC inicial (0..1)")
+        parser.add_argument('--low_energy_mode', action='store_true',
+                            help="Activa simulación forzada de energía baja")
 
     def handle(self, *args, **options):
         intervalo = options['interval']
-        CAPACIDAD_BATERIA_WH = options['capacity']  # ← Esto viene del parámetro
+        CAPACIDAD_BATERIA_WH = options['capacity']
         SOC_INICIAL = options['initial_soc']
+        LOW_ENERGY_MODE = options['low_energy_mode']
+
         channel_layer = get_channel_layer()
         data_file = Path(__file__).resolve().parent.parent.parent / "data" / "energia.csv"
 
@@ -28,20 +36,20 @@ class Command(BaseCommand):
             self.stderr.write(f"No se encontró el archivo: {data_file}")
             return
 
-        # Estado de energía en Wh
+        # =========================
+        # Estado inicial de batería
+        # =========================
         bateria_wh = CAPACIDAD_BATERIA_WH * SOC_INICIAL
 
-        # Parámetros de simulación
-        P_SOLAR_MAX = 3000.0
-        eficiencia_bateria = 0.95
-        ruido_wh = 5.0
-
-# PARA PROTOCOLO DE ENERGÍA BAJA
+        # =========================
         # Umbrales de energía
+        # =========================
         SOC_WARNING = 0.30
         SOC_CRITICAL = 0.15
 
+        # =========================
         # Áreas del hábitat
+        # =========================
         AREAS_NO_CRITICAS = [
             "Dormitorios",
             "Baño",
@@ -53,7 +61,9 @@ class Command(BaseCommand):
             "Sala de monitoreo"
         ]
 
-        # Sugerencias ante falla crítica
+        # =========================
+        # Sugerencias ante falla
+        # =========================
         SUGERENCIAS_CRITICAS = [
             "Revisar estado del banco de baterías",
             "Verificar conexión y rendimiento de paneles solares",
@@ -61,114 +71,133 @@ class Command(BaseCommand):
             "Comprobar inversor y regulador de carga",
             "Evaluar posible sobreconsumo inesperado"
         ]
-# ----------------------------------------------
+
+        # =========================
+        # Parámetros base simulación
+        # =========================
+        P_SOLAR_MAX_NORMAL = 3000.0
+        eficiencia_bateria = 0.95
+        ruido_wh = 5.0
+
+        # =========================
+        # Ajustes modo energía baja
+        # =========================
+        if LOW_ENERGY_MODE:
+            self.stdout.write(self.style.WARNING(
+                "⚠ MODO ENERGÍA BAJA ACTIVADO"
+            ))
+            P_SOLAR_MAX = 800.0          # Muy baja generación
+            FACTOR_CONSUMO = 1.4         # Mayor demanda
+        else:
+            P_SOLAR_MAX = P_SOLAR_MAX_NORMAL
+            FACTOR_CONSUMO = 1.0
+
         try:
             with open(data_file, newline='', encoding='utf-8') as csvfile:
                 reader = csv.DictReader(csvfile)
                 i = 0
+
                 for row in reader:
                     try:
                         tension = float(row.get("Tensión/L1", 0))
                         corriente = float(row.get("Corriente/L1", 0))
-                        potencia = float(row.get("P. Activa/L1 +", 0))
+                        potencia = float(row.get("P. Activa/L1 +", 0)) * FACTOR_CONSUMO
                     except ValueError:
-                        self.stderr.write(f"Fila {i+1}: valor numérico inválido, se omite.")
+                        self.stderr.write(f"Fila {i+1}: valor inválido, se omite.")
                         continue
 
-                    # Estimación de generación solar
+                    # =========================
+                    # Generación solar estimada
+                    # =========================
                     potencia_norm = max(0.0, min(1.0, potencia / (P_SOLAR_MAX + 1e-6)))
-                    potencia_solar_estim = potencia_norm * P_SOLAR_MAX * random.uniform(0.6, 1.0)
+                    potencia_solar_estim = (
+                        potencia_norm * P_SOLAR_MAX * random.uniform(0.4, 0.8)
+                        if LOW_ENERGY_MODE
+                        else potencia_norm * P_SOLAR_MAX * random.uniform(0.6, 1.0)
+                    )
 
-                    # Cálculo de flujo neto
+                    # =========================
+                    # Flujo energético
+                    # =========================
                     p_bateria = potencia_solar_estim - potencia
                     delta_wh = (p_bateria * intervalo) / 3600.0
 
                     if delta_wh >= 0:
                         delta_wh *= eficiencia_bateria
                     else:
-                        delta_wh /= eficiencia_bateria if eficiencia_bateria > 0 else 1
+                        delta_wh /= eficiencia_bateria
 
                     delta_wh += random.uniform(-ruido_wh, ruido_wh)
 
-                    # Actualizar la bateria
+                    # =========================
+                    # Actualizar batería
+                    # =========================
                     bateria_wh = max(0.0, min(CAPACIDAD_BATERIA_WH, bateria_wh + delta_wh))
                     soc = bateria_wh / CAPACIDAD_BATERIA_WH
-                    
-                    # PARA PROTOCOLO DE ENERGÍA BAJA
-                    # Determinar estado energético
+
+                    # =========================
+                    # Estado energético
+                    # =========================
                     if soc <= SOC_CRITICAL:
                         energy_status = "critical"
                     elif soc <= SOC_WARNING:
                         energy_status = "warning"
                     else:
                         energy_status = "normal"
-                    #----------------------------------
 
+                    # =========================
+                    # Paquete de datos WS
+                    # =========================
                     data = {
-                        # =========================
-                        # Datos eléctricos actuales
-                        # =========================
                         "tension": round(tension, 4),
                         "corriente": round(corriente, 4),
                         "potencia": round(potencia, 4),
 
-                        # =========================
-                        # Estado de batería
-                        # =========================
                         "battery": round(soc, 4),
                         "battery_wh": round(bateria_wh, 2),
                         "capacity_wh": CAPACIDAD_BATERIA_WH,
-                        "initial_soc": SOC_INICIAL,
 
-                        # =========================
-                        # Generación solar simulada
-                        # =========================
                         "solar_estimated_w": round(potencia_solar_estim, 2),
 
-                        # =========================
-                        # Estado energético global
-                        # =========================
                         "energy_status": energy_status,
+                        "low_energy_mode": LOW_ENERGY_MODE,
                         "timestamp": time.time(),
 
-                        # =========================
-                        # Gestión de áreas
-                        # =========================
                         "areas": {
                             "critical": AREAS_CRITICAS,
                             "non_critical": AREAS_NO_CRITICAS,
                             "shutdown": AREAS_NO_CRITICAS if energy_status == "critical" else []
                         },
 
-                        # =========================
-                        # Alertas y acciones
-                        # =========================
                         "alerts": {
                             "show_alert": energy_status == "critical",
                             "level": energy_status,
                             "message": (
-                                "Nivel crítico de energía. Se realizará apagado de áreas no esenciales."
+                                "Nivel crítico de energía. Apagando áreas no esenciales."
                                 if energy_status == "critical"
-                                else "Nivel de energía estable."
+                                else "Sistema energético operativo."
                             ),
-                            "suggestions": SUGERENCIAS_CRITICAS if energy_status == "critical" else []
+                            "suggestions": (
+                                SUGERENCIAS_CRITICAS
+                                if energy_status == "critical"
+                                else []
+                            )
                         },
 
-                        # =========================
-                        # Parámetros de simulación
-                        # =========================
                         "interval": intervalo
                     }
 
-
-                    # Enviar al grupo WebSocket
                     async_to_sync(channel_layer.group_send)(
                         "energia",
                         {"type": "enviar_dato", "data": data}
                     )
 
-                    self.stdout.write(f"[{i+1}] Dato enviado: {data}")
+                    self.stdout.write(
+                        f"[{i+1}] SoC={soc:.2f} | Estado={energy_status} | LowMode={LOW_ENERGY_MODE}"
+                    )
+
                     i += 1
                     time.sleep(intervalo)
+
         except KeyboardInterrupt:
-            self.stdout.write("⏹ Lectura interrumpida por el usuario.")
+            self.stdout.write(self.style.SUCCESS("⏹ Simulación detenida por el usuario."))

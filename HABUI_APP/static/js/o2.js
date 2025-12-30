@@ -28,7 +28,7 @@ const greenPalette = {
 svg.append("text")
     .attr("x", width/2)
     .attr("y", 32)
-    .attr("fill", greenPalette.medium)
+    .attr("fill", "#ffffffff")
     .attr("font-size", "22px")
     .attr("font-weight", "700")
     .attr("text-anchor", "middle")
@@ -65,7 +65,7 @@ const valueText = svg.append("text")
     .attr("x", width/2)
     .attr("y", frameY + frameH + 50)
     .attr("fill", greenPalette.light)
-    .attr("font-size", "28px")
+    .attr("font-size", "40px")
     .attr("font-weight", "700")
     .attr("text-anchor", "middle")
     .text(initial.toFixed(2) + " %");
@@ -75,7 +75,7 @@ const qualityText = svg.append("text")
     .attr("x", width/2)
     .attr("y", frameY + frameH + 85)
     .attr("fill", greenPalette.medium)
-    .attr("font-size", "16px")
+    .attr("font-size", "25px")
     .attr("font-weight", "600")
     .attr("text-anchor", "middle")
     .text(getQualityText(initial));
@@ -138,11 +138,11 @@ const svg = container.append("svg")
 
 const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-// Título mejorado
+// Título
 svg.append("text")
     .attr("x", outerW/2)
     .attr("y", 28)
-    .attr("fill", "#00ff88")
+    .attr("fill", "#ffffffff")
     .attr("font-size", "20px")
     .attr("font-weight", "700")
     .attr("text-anchor", "middle")
@@ -150,14 +150,14 @@ svg.append("text")
     .text("HISTÓRICO DE OXÍGENO (%)");
 
 // Subtítulo
-svg.append("text")
-    .attr("x", outerW/2)
-    .attr("y", 50)
-    .attr("fill", "#94a3b8")
-    .attr("font-size", "12px")
-    .attr("font-weight", "500")
-    .attr("text-anchor", "middle")
-    .text("Niveles atmosféricos en tiempo real");
+// svg.append("text")
+//     .attr("x", outerW/2)
+//     .attr("y", 50)
+//     .attr("fill", "#94a3b8")
+//     .attr("font-size", "12px")
+//     .attr("font-weight", "500")
+//     .attr("text-anchor", "middle")
+//     .text("Niveles atmosféricos en tiempo real");
 
 // Scales
 const x = d3.scaleTime().range([0, width]);
@@ -256,7 +256,7 @@ const o2ZonesData = [
     {min: 21.5, max: 23.0, color: "rgba(0, 255, 136, 0.08)", label: "ÓPTIMO"}
 ];
 
-// Tooltip mejorado - con clase específica
+// Tooltip - con clase específica
 const tooltip = container.append("div")
     .attr("class", "tooltip-o2")
     .style("position", "absolute")
@@ -295,7 +295,7 @@ const verticalLine = g.append("line")
 const referenceLine = g.append("line")
     .attr("class", "reference-line")
     .attr("stroke", "rgba(255, 255, 255, 0.5)")
-    .attr("stroke-width", 1)
+    .attr("stroke-width", 3)
     .attr("stroke-dasharray", "8,4")
     .style("opacity", 0.6);
 
@@ -303,7 +303,7 @@ const referenceLine = g.append("line")
 g.append("text")
     .attr("class", "reference-label")
     .attr("fill", "#94a3b8")
-    .attr("font-size", "10px")
+    .attr("font-size", "20px")
     .attr("font-weight", "500")
     .style("opacity", 0.7);
 
@@ -580,5 +580,8 @@ console.error("Error en WebSocket O₂");
 
 socket.onclose = function(e) {
 console.warn("WebSocket O₂ desconectado");
+setTimeout(() => {
+    location.reload();
+    }, 5000);
 };
 });

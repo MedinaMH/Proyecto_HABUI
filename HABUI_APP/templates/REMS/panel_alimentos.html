@@ -20,7 +20,7 @@
     
     <!-- Panel de Control de Consumo -->
     <div class="control-panel">
-      <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 20px;">📝 Registro de Consumo</h3>
+      <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 20px;">📝 Registro de Consumo</h3>
       
       <div class="consumption-form">
         <div class="form-group">
@@ -50,7 +50,7 @@
       
       <!-- Historial de consumo del día -->
       <div style="margin-top: 25px;">
-        <h4 style="color: #ffa8a8; margin-bottom: 15px;">📊 Consumo del Día</h4>
+        <h4 style="color: #ffffff; margin-bottom: 15px;">📊 Consumo del Día</h4>
         <div id="daily-consumption" style="background: rgba(30, 41, 59, 0.7); border-radius: 8px; padding: 15px;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
             <span style="color: #ffa8a8;">Desayuno:</span>
@@ -69,8 +69,8 @@
             <span id="snack-count" style="color: #fff; font-weight: 600;">0 porciones</span>
           </div>
           <div style="border-top: 1px solid #4b5563; margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between;">
-            <span style="color: #ff6b6b; font-weight: 600;">TOTAL DÍA:</span>
-            <span id="total-day-count" style="color: #ff6b6b; font-weight: 800;">0 porciones</span>
+            <span style="color: #1ad0f9; font-weight: 700;">TOTAL DÍA:</span>
+            <span id="total-day-count" style="color: #1ad0f9; font-weight: 800;">0 porciones</span>
           </div>
         </div>
       </div>
@@ -78,34 +78,44 @@
     
     <!-- Panel de Métricas y Visualización -->
     <div class="metrics-panel">
-      <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 20px;">📦 Suministro de Alimentos</h3>
+      <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 20px;">📦 Suministro de Alimentos</h3>
       
       <!-- Gráfico de Porciones animado -->
       <div style="text-align: center; margin-bottom: 30px;">
         <svg id="portions-chart" width="100%" height="300"></svg>
         <div style="margin-top: 10px;">
-          <div id="portions-text" style="font-size: 28px; font-weight: 800; color: #ff6b6b;">-- porciones</div>
-          <div style="color: #ffa8a8; font-size: 14px;">restantes de <span id="total-portions-text" style="color: #fff; font-weight: 600;">--</span> iniciales</div>
+          <div id="portions-text" style="font-size: 35px; font-weight: 800; color: #ffffff;">-- porciones</div>
+          <div style="color: #ffa8a8; font-size: 25px;">restantes de <span id="total-portions-text" style="color: #fff; font-weight: 600;">--</span> iniciales</div>
         </div>
       </div>
       
       <!-- Métricas de Suministro -->
       <div class="metric">
         <div class="metric-title">Porciones Restantes</div>
-        <p class="metric-value" id="remaining-portions">-- <span class="metric-unit">porciones</span></p>
-        <div class="metric-status status-good" id="portions-status">CARGANDO...</div>
+        <div class="metric-value-container">
+          <p class="metric-value" id="remaining-portions">--</p>
+          <div class="metric-status-container">
+            <div class="metric-status-large status-good" id="portions-status">CARGANDO...</div>
+            <!-- <span class="metric-unit">porciones</span> -->
+          </div>
+        </div>
       </div>
-      
+
       <div class="metric">
         <div class="metric-title">Días de Autonomía</div>
-        <p class="metric-value" id="autonomy-days">-- <span class="metric-unit">días</span></p>
-        <div class="metric-status status-good" id="autonomy-status">CARGANDO...</div>
+        <div class="metric-value-container">
+          <p class="metric-value" id="autonomy-days">--</p>
+          <div class="metric-status-container">
+            <div class="metric-status-large status-good" id="autonomy-status">CARGANDO...</div>
+            <!-- <span class="metric-unit">días</span> -->
+          </div>
+        </div>
       </div>
     </div>
     
     <!-- Panel de Temperatura -->
     <div class="temp-panel">
-      <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 15px;">🌡️ Temperatura de Almacenamiento</h3>
+      <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 15px;">🌡️ Temperatura de Almacenamiento</h3>
       
     <!-- Termómetro -->
     <div style="text-align: center; margin-bottom: 20px; margin-top: 15px;">
@@ -121,14 +131,24 @@
       <!-- Métricas de Temperatura -->
       <div class="metric">
         <div class="metric-title">Temperatura Actual</div>
-        <p class="metric-value" id="current-temp">-- <span class="metric-unit">°C</span></p>
-        <div class="metric-status status-good" id="temp-status">ÓPTIMA</div>
+        <div class="metric-value-container">
+          <p class="metric-value" id="current-temp">--</p>
+          <div class="metric-status-container">
+            <div class="metric-status-large status-good" id="temp-status">ÓPTIMA</div>
+            <!-- <span class="metric-unit">°C</span> -->
+          </div>
+        </div>
       </div>
-      
+
       <div class="metric">
         <div class="metric-title">Rango Recomendado</div>
-        <p class="metric-value">2 - 8 <span class="metric-unit">°C</span></p>
-        <div class="metric-status status-good">REFRIGERACIÓN</div>
+        <div class="metric-value-container">
+          <p class="metric-value">2 - 8</p>
+          <div class="metric-status-container">
+            <div class="metric-status-large status-good">REFRIGERACIÓN</div>
+            <!-- <span class="metric-unit">°C</span> -->
+          </div>
+        </div>
       </div>
     </div>
     
@@ -137,7 +157,7 @@
   <!-- Panel de Gráficos de Análisis -->
   <div class="chart-panel">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h3 style="color: #ff6b6b; margin: 0;">📊 Análisis de Consumo</h3>
+      <h3 style="color: #ffffff; margin: 0;">📊 Análisis de Consumo</h3>
       <div style="display: flex; gap: 10px;">
         <select id="analysis-period" class="form-select" style="width: auto;">
           <option value="7">Últimos 7 días</option>
@@ -667,6 +687,13 @@ document.addEventListener("DOMContentLoaded", function() {
   socket.onerror = function(error) {
     console.error('WebSocket error:', error);
     updateWebSocketStatus(false);
+  };
+
+  socket.onclose = function(e) {
+  console.warn("WebSocket Alimentos desconectado");
+  setTimeout(() => {
+      location.reload();
+      }, 3000);
   };
   
   function handleTemperatureData(data) {

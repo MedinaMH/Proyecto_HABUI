@@ -20,7 +20,7 @@ border-bottom: 2px solid #00bfff;
 }
 
 .dashboard-title {
-color: #00bfff;
+color: #34495e;
 font-size: 32px;
 font-weight: 700;
 margin: 0 0 10px 0;
@@ -147,47 +147,610 @@ white-space: nowrap;
 .status-stable { background: #3b82f6; color: white; }
 .status-critical { background: #ef4444; color: white; }
 
-/* Responsive */
+/* =========================================== */
+/* SISTEMA DE ALERTAS DE ENERGÍA */
+/* =========================================== */
+
+/* Indicador modo energía baja */
+.low-energy-indicator {
+  background: linear-gradient(90deg, #fa0202, #f2352f);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-top: 15px;
+  font-weight: 600;
+  text-align: center;
+  border: 2px solid #a78bfa;
+  animation: pulse-purple 2s infinite;
+  display: none;
+}
+
+.low-energy-indicator.active {
+  display: block;
+}
+
+@keyframes pulse-purple {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Contenedor de alertas */
+.energy-alert-container {
+  background: linear-gradient(145deg, #1e1b4b, #312e81);
+  border-radius: 12px;
+  margin-bottom: 25px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 2px solid;
+  transition: all 0.3s ease;
+  display: none;
+}
+
+.critical-alert {
+  border-color: #ef4444;
+  animation: critical-pulse 1.5s infinite;
+  background: linear-gradient(145deg, #450a0a, #7f1d1d);
+}
+
+.warning-alert {
+  border-color: #f59e0b;
+  background: linear-gradient(145deg, #451a03, #7c2d12);
+}
+
+@keyframes critical-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+  50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.8); }
+}
+
+.alert-header {
+  display: flex;
+  align-items: flex-start;
+  padding: 20px;
+  gap: 20px;
+}
+
+.alert-icon {
+  font-size: 36px;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-content h3 {
+  margin: 0 0 10px 0;
+  color: white;
+  font-size: 22px;
+}
+
+.alert-content p {
+  margin: 0 0 15px 0;
+  color: #e2e8f0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.alert-suggestions {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #f59e0b;
+}
+
+.alert-suggestions strong {
+  color: #fbbf24;
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.alert-suggestions ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #e2e8f0;
+}
+
+.alert-suggestions li {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.close-alert-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-alert-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* =========================================== */
+/* CARTEL DE SUGERENCIAS */
+/* =========================================== */
+
+.suggestions-banner {
+  background: linear-gradient(145deg, #0c4a6e, #0369a1);
+  border: 2px solid #0ea5e9;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.2);
+  display: none;
+}
+
+.suggestions-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.suggestions-icon {
+  font-size: 32px;
+  color: #fbbf24;
+}
+
+.suggestions-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 22px;
+}
+
+.suggestions-list {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 20px;
+  border-left: 4px solid #fbbf24;
+}
+
+.suggestions-list ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #e2e8f0;
+}
+
+.suggestions-list li {
+  margin-bottom: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+  padding-left: 5px;
+}
+
+.suggestions-list li:before {
+  content: "•";
+  color: #fbbf24;
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+.suggestions-footer {
+  margin-top: 15px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* =========================================== */
+/* PANEL DE ÁREAS DEL HÁBITAT */
+/* =========================================== */
+
+.habitat-areas-panel {
+  background: linear-gradient(145deg, #111827, #0f172a);
+  border: 2px solid #00bfff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 123, 255, 0.1);
+  margin-top: 15px;
+}
+
+.areas-status-summary {
+  background: rgba(30, 41, 59, 0.7);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #334155;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.status-item:last-child {
+  margin-bottom: 0;
+}
+
+.status-label {
+  color: #8da9c4;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.status-value {
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.priority-badge {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
+}
+
+.warning-badge {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.areas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.area-card {
+  background: rgba(30, 41, 59, 0.7);
+  border-radius: 10px;
+  padding: 20px;
+  border: 2px solid;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.area-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Estados de áreas */
+.critical-priority-area {
+  border-color: #3b82f6;
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.15), rgba(30, 41, 59, 0.7));
+  border-width: 3px;
+}
+
+.operational-area {
+  border-color: #10b981;
+}
+
+.shutdown-area {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.area-icon {
+  font-size: 32px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.area-info {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.area-name {
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.area-status {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.critical-priority-area .area-status {
+  background: #3b82f6;
+  color: white;
+}
+
+.operational-area .area-status {
+  background: #10b981;
+  color: white;
+}
+
+.shutdown-area .area-status {
+  background: #ef4444;
+  color: white;
+}
+
+.area-notice {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+  font-size: 12px;
+  padding: 8px;
+  text-align: center;
+  border-radius: 6px;
+  margin-top: 10px;
+  font-weight: 600;
+  border: 1px dashed #3b82f6;
+}
+
+.area-warning {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  font-size: 12px;
+  padding: 8px;
+  text-align: center;
+  border-radius: 6px;
+  margin-top: 10px;
+  font-weight: 600;
+  border: 1px dashed #ef4444;
+}
+
+.area-note {
+  color: #8da9c4;
+  font-size: 11px;
+  text-align: center;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+.area-description {
+  color: #94a3b8;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.areas-instructions {
+  background: rgba(30, 41, 59, 0.7);
+  border-radius: 10px;
+  padding: 15px;
+  border-top: 1px solid #334155;
+  margin-top: 20px;
+}
+
+.instruction-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.instruction-item:last-child {
+  margin-bottom: 0;
+}
+
+.instruction-icon {
+  color: #f59e0b;
+  font-size: 18px;
+}
+
+.instruction-text {
+  color: #e2e8f0;
+  font-size: 14px;
+  flex: 1;
+}
+
+/* =========================================== */
+/* BADGE DE ESTADO DE BATERÍA */
+/* =========================================== */
+
+.battery-status-badge {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+  text-align: center;
+  width: 100%;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.status-critical {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  animation: critical-pulse 2s infinite;
+}
+
+.status-warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.status-normal {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+/* =========================================== */
+/* PROTOCOLO DE EMERGENCIA */
+/* =========================================== */
+
+.emergency-protocol {
+  background: linear-gradient(145deg, #1e1b4b, #312e81);
+  border: 2px solid #8b5cf6;
+  border-radius: 15px;
+  padding: 25px;
+  margin-top: 25px;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+}
+
+.protocol-steps {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.protocol-step {
+  flex: 1;
+  min-width: 250px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 25px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.step-number {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+}
+
+.step-content h4 {
+  margin: 0 0 12px 0;
+  color: #e2e8f0;
+  font-size: 18px;
+}
+
+.step-content p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* =========================================== */
+/* RESPONSIVE */
+/* =========================================== */
+
 @media (max-width: 1200px) {
-.main-grid {
+  .main-grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
-}
+  }
 
-.chart-and-metrics-container {
+  .chart-and-metrics-container {
     grid-column: 1;
     grid-row: 1;
-}
+  }
 
-.battery-panel {
+  .battery-panel {
     grid-column: 1;
     grid-row: 2;
-}
+  }
 
-.metrics-horizontal-container {
+  .metrics-horizontal-container {
     flex-wrap: wrap;
     gap: 8px;
-}
+  }
 
-.metric-ultra-compact {
+  .metric-ultra-compact {
     flex: 0 0 calc(33.333% - 8px); /* 3 por fila en tablets */
     min-width: 140px;
-}
+  }
+  
+  .areas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  .protocol-steps {
+    flex-direction: column;
+  }
+  
+  .protocol-step {
+    width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
-.metric-ultra-compact {
+  .metric-ultra-compact {
     flex: 0 0 calc(50% - 8px); /* 2 por fila en móviles */
     min-width: 120px;
-}
+  }
 
-.metric-title-ultra-compact {
+  .metric-title-ultra-compact {
     font-size: 9px;
+  }
+
+  .metric-value-ultra-compact {
+    font-size: 16px;
+  }
+  
+  .alert-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .alert-icon {
+    align-self: center;
+  }
+  
+  .areas-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .areas-status-summary {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .status-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
 }
 
-.metric-value-ultra-compact {
-    font-size: 16px;
-}
+@media (max-width: 480px) {
+  .areas-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .metric-ultra-compact {
+    flex: 0 0 calc(50% - 8px);
+  }
+  
+  .suggestions-header {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 /* Controles del gráfico */
@@ -228,7 +791,7 @@ background: #4b5563;
 
 /* Estilo para título de secciones */
 .section-title {
-color: #00bfff;
+color: #ffffff;
 margin-top: 0;
 margin-bottom: 15px;
 font-size: 18px;

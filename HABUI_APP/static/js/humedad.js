@@ -16,7 +16,7 @@ const svg = container.append("svg")
     .attr("height", height);
 
 // Marco exterior vertical
-const frameX = 60;
+const frameX = 85;
 const frameY = 70;
 const frameW = 180;
 const frameH = 360;
@@ -89,7 +89,7 @@ const fillRect = svg.append("rect")
     .attr("fill", colorFor(initial))
     .attr("rx", 12);
 
-// Marcas de escala en el lado
+// Marcas de escala
 for (let i = 0; i <= 100; i += 10) {
     const y = scale(i);
     
@@ -109,7 +109,7 @@ for (let i = 0; i <= 100; i += 10) {
         .attr("x", frameX - 20)
         .attr("y", y + 4)
         .attr("fill", "#4dabf7")
-        .attr("font-size", "11px")
+        .attr("font-size", "28px")
         .attr("font-weight", "500")
         .attr("text-anchor", "end")
         .text(i + "%");
@@ -127,33 +127,33 @@ for (let i = 0; i <= 100; i += 10) {
 }
 
 // Marcas en el lado derecho
-for (let i = 0; i <= 100; i += 20) {
-    const y = scale(i);
-    svg.append("line")
-    .attr("x1", frameX + frameW)
-    .attr("y1", y)
-    .attr("x2", frameX + frameW + 10)
-    .attr("y2", y)
-    .attr("stroke", "#4dabf7")
-    .attr("stroke-width", 1.5);
-}
+// for (let i = 0; i <= 100; i += 20) {
+//     const y = scale(i);
+//     svg.append("line")
+//     .attr("x1", frameX + frameW)
+//     .attr("y1", y)
+//     .attr("x2", frameX + frameW + 10)
+//     .attr("y2", y)
+//     .attr("stroke", "#4dabf7")
+//     .attr("stroke-width", 1.5);
+// }
 
 // VALOR NUMÉRICO
 const valueText = svg.append("text")
-    .attr("x", width/2)
+    .attr("x", width/2 + 30)
     .attr("y", frameY + frameH + 50)
     .attr("fill", colorFor(initial))
-    .attr("font-size", "28px")
+    .attr("font-size", "40px")
     .attr("font-weight", "700")
     .attr("text-anchor", "middle")
     .text(initial.toFixed(1) + " %");
 
 // INDICADOR DE NIVEL
 const nivelText = svg.append("text")
-    .attr("x", width/2)
+    .attr("x", width/2 + 25)
     .attr("y", frameY + frameH + 85)
     .attr("fill", colorFor(initial))
-    .attr("font-size", "16px")
+    .attr("font-size", "28px")
     .attr("font-weight", "600")
     .attr("text-anchor", "middle")
     .style("letter-spacing", "0.5px")

@@ -25,7 +25,7 @@ body {
 }
 
 .dashboard-title {
-  color: #ff6b6b;
+  color: #34495e;
   font-size: 32px;
   font-weight: 700;
   margin: 0 0 5px 0;
@@ -118,8 +118,8 @@ body {
 }
 
 .metric-title {
-  color: #ffa8a8;
-  font-size: 12px;
+  color: #ffffff;
+  font-size: 20px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -166,8 +166,8 @@ body {
 
 .form-label {
   display: block;
-  color: #ffa8a8;
-  font-size: 14px;
+  color: #ffffff;
+  font-size: 16px;
   font-weight: 600;
   margin-bottom: 5px;
 }
@@ -189,7 +189,7 @@ body {
 }
 
 .btn-primary {
-  background: #ff6b6b;
+  background: hsl(211, 73%, 44%);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -202,7 +202,7 @@ body {
 }
 
 .btn-primary:hover {
-  background: #ff5252;
+  background: #2760ef;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
 }
@@ -406,4 +406,163 @@ body {
 .consumption-table td:nth-child(3) {
   color: #ff6b6b;
   font-weight: 600;
+}
+
+/* ============================================
+   NUEVOS ESTILOS PARA MÉTRICAS CON ESTADO LATERAL
+   ============================================ */
+
+/* Contenedor principal para valor y estado */
+.metric-value-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin: 10px 0;
+}
+
+/* Valor numérico (más grande) */
+.metric-value {
+  color: #fff;
+  font-size: 42px !important; /* Aumentado considerablemente */
+  font-weight: 800 !important;
+  margin: 0 !important;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  flex: 1;
+}
+
+/* Contenedor para estado y unidad */
+.metric-status-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  min-width: 120px;
+}
+
+/* Estado grande (lado derecho) */
+.metric-status-large {
+  display: inline-block;
+  padding: 8px 16px !important;
+  border-radius: 12px !important;
+  font-size: 14px !important; /* Tamaño aumentado */
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  min-width: 120px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* Ajustar colores existentes para el nuevo tamaño */
+.metric-status-large.status-good { 
+  background: linear-gradient(135deg, #10b981, #0da271) !important; 
+  color: white !important; 
+}
+
+.metric-status-large.status-warning { 
+  background: linear-gradient(135deg, #f59e0b, #d5890a) !important; 
+  color: white !important; 
+}
+
+.metric-status-large.status-critical { 
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important; 
+  color: white !important; 
+}
+
+/* Unidad más pequeña debajo del estado */
+.metric-status-container .metric-unit {
+  color: #ff6b6b;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* ============================================
+   AJUSTES PARA RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1400px) {
+  .metric-value {
+    font-size: 36px !important;
+  }
+  
+  .metric-status-large {
+    font-size: 13px !important;
+    padding: 7px 14px !important;
+    min-width: 110px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .metric-value-container {
+    gap: 10px;
+  }
+  
+  .metric-value {
+    font-size: 32px !important;
+  }
+  
+  .metric-status-large {
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .metric-value-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .metric-status-container {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .metric-value {
+    font-size: 36px !important;
+  }
+  
+  .metric-status-large {
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+    min-width: auto;
+    flex: 1;
+  }
+  
+  .metric-status-container .metric-unit {
+    margin-top: 0;
+    font-size: 14px;
+  }
+}
+
+/* ============================================
+  ANIMACIONES PARA LOS NUEVOS ESTADOS
+   ============================================ */
+
+@keyframes statusPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.metric-status-large.status-critical {
+  animation: statusPulse 2s infinite;
+}
+
+.metric-status-large.status-warning {
+  animation: statusPulse 3s infinite;
+}
+
+.metric:hover .metric-status-large {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 }
