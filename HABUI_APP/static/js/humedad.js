@@ -39,8 +39,8 @@ const scale = d3.scaleLinear()
 
 // Función para determinar color según humedad
 function colorFor(v) {
-    if (v < 30) return "#adb5bd";        // Gris (seco)
-    if (v < 40) return "#ffa94d";        // Naranja (poco seco)
+    if (v < 30) return "#adb5bd";        // Gris (muy seco)
+    if (v < 40) return "#ffa94d";        // Naranja (seco)
     if (v < 60) return "#4dabf7";        // Azul (ideal)
     if (v < 70) return "#339af0";        // Azul medio (húmedo)
     return "#228be6";                    // Azul oscuro (muy húmedo)

@@ -21,7 +21,7 @@ const greenPalette = {
     medium: "#10b981",   // Verde esmeralda
     dark: "#059669",     // Verde bosque
     veryDark: "#047857", // Verde muy oscuro
-    amber: "#f59e0b",    // Ámbar cálido
+    amber: "#4dabf7",    // Ámbar cálido
     red: "#dc2626"       // Rojo intenso
 };
 

@@ -136,58 +136,66 @@
       </div>
     </div>
     
-    <!-- Panel de Batería (Derecha) -->
+    <!-- Panel de Batería MEJORADO (Derecha) -->
     <div class="battery-panel">
-      <h3 class="section-title" style="text-align: center; margin-top: 0; font-size: 20px;">🔋 Banco de Baterías</h3>
+      <h3 class="section-title" style="text-align: center; margin-top: 0; font-size: 20px; margin-bottom: 15px;">🔋 Banco de Baterías</h3>
       
       <!-- Indicador de Estado -->
       <div id="battery-status-badge" class="battery-status-badge status-normal">
         <span id="battery-status-text">NORMAL</span>
       </div>
       
-      <!-- Indicador Principal -->
-      <div style="text-align: center; margin-bottom: 20px;">
-        <div style="position: relative; display: inline-block;">
-          <svg id="battery-main" width="180" height="220"></svg>
-          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-            <div id="battery-percent" style="font-size: 36px; font-weight: 800; color: #fff;">--%</div>
-            <div id="battery-wh" style="font-size: 14px; color: #8da9c4;">-- Wh</div>
-            <div id="battery-ratio" style="font-size: 12px; color: #6b7280; margin-top: 5px;">-- / -- Wh</div>
+      <!-- Contenedor de Batería Mejorada -->
+      <div class="battery-container">
+        <!-- Gráfico SVG de Batería (ahora más grande) -->
+        <div id="battery-svg-container">
+          <svg id="battery-main-svg" width="280" height="400"></svg>
+        </div>
+        
+        <!-- Porcentaje debajo de la batería (nueva posición) -->
+        <div id="battery-percentage-large" class="battery-percentage-large">--%</div>
+        
+        <!-- Panel de información de batería -->
+        <div class="battery-info-panel">
+          <div class="battery-info-item">
+            <div class="battery-info-label">Capacidad Total</div>
+            <div id="battery-capacity-value" class="battery-info-value">-- Wh</div>
+          </div>
+          
+          <div class="battery-info-item">
+            <div class="battery-info-label">Energía Restante</div>
+            <div id="battery-remaining-value" class="battery-info-value">-- Wh</div>
+          </div>
+          
+          <div class="battery-info-item">
+            <div class="battery-info-label">Estado SoC</div>
+            <div id="battery-state-value" class="battery-info-value">NORMAL</div>
+          </div>
+          
+          <div class="battery-info-item">
+            <div class="battery-info-label">Tiempo Restante</div>
+            <div id="battery-time-value" class="battery-info-value">--:--</div>
           </div>
         </div>
-      </div>
-      
-      <!-- Visualización de Baterías en Serie -->
-      <div style="display: flex; justify-content: center; gap: 6px; margin-top: -45px; margin-bottom: 5px; flex-wrap: wrap;" id="battery-series"></div>
-      
-      <!-- Información de Batería -->
-      <div style="background: rgba(30, 41, 59, 0.7); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span style="color: #8da9c4; font-size: 13px;">Capacidad Total:</span>
-          <span id="battery-capacity" style="color: #fff; font-weight: 600; font-size: 13px;">-- Wh</span>
+        
+        <!-- Información adicional compacta -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 10px;">
+          <div style="text-align: center; background: rgba(30, 41, 59, 0.7); border-radius: 8px; padding: 8px;">
+            <div style="color: #8da9c4; font-size: 11px; margin-bottom: 3px;">RATIO</div>
+            <div id="battery-ratio" style="color: #fff; font-weight: 600; font-size: 12px;">-- / -- Wh</div>
+          </div>
+          
+          <div style="text-align: center; background: rgba(30, 41, 59, 0.7); border-radius: 8px; padding: 8px;">
+            <div style="color: #8da9c4; font-size: 11px; margin-bottom: 3px;">SISTEMA</div>
+            <div id="system-status" style="color: #10b981; font-weight: 600; font-size: 12px;">OPERATIVO</div>
+          </div>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span style="color: #8da9c4; font-size: 13px;">Energía Restante:</span>
-          <span id="battery-remaining" style="color: #fff; font-weight: 600; font-size: 13px;">-- Wh</span>
+        
+        <!-- Indicador de Flujo -->
+        <div style="text-align: center; margin-top: 15px;">
+          <div style="color: #8da9c4; font-size: 11px; margin-bottom: 5px;">ESTADO DEL FLUJO</div>
+          <div id="flow-indicator" style="display: inline-block; padding: 8px 20px; border-radius: 20px; background: #3b82f6; color: white; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">EQUILIBRADO</div>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span style="color: #8da9c4; font-size: 13px;">Estado SoC:</span>
-          <span id="battery-state" style="color: #fff; font-weight: 600; font-size: 13px;">DESCONOCIDO</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-          <span style="color: #8da9c4; font-size: 13px;">Tiempo Restante:</span>
-          <span id="battery-time" style="color: #fff; font-weight: 600; font-size: 13px;">--:--</span>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span style="color: #8da9c4; font-size: 13px;">Estado Sistema:</span>
-          <span id="system-status" style="color: #10b981; font-weight: 600; font-size: 13px;">OPERATIVO</span>
-        </div>
-      </div>
-      
-      <!-- Indicador de Flujo -->
-      <div style="text-align: center;">
-        <div style="color: #8da9c4; font-size: 12px; margin-bottom: 5px;">ESTADO DEL FLUJO</div>
-        <div id="flow-indicator" style="display: inline-block; padding: 8px 20px; border-radius: 20px; background: #3b82f6; color: white; font-weight: 600; font-size: 14px;">EQUILIBRADO</div>
       </div>
     </div>
   </div>
@@ -297,11 +305,11 @@ document.addEventListener("DOMContentLoaded", function() {
         alertContainer.className = 'energy-alert-container critical-alert';
         alertIcon.textContent = '🔴';
         alertTitle.textContent = 'ALERTA CRÍTICA DE ENERGÍA';
-        alertMessage.textContent = data.alerts.message || 'Nivel crítico de energía. Apagando áreas no esenciales.';
+        alertMessage.textContent = data.alerts.message || 'Protocolo de mantenimiento energético - Hábitat Análogo';
         
         // Mostrar sugerencias en el cartel
         if (data.alerts.suggestions && data.alerts.suggestions.length > 0) {
-          suggestionsBanner.style.display = 'block';
+          // suggestionsBanner.style.display = 'block'; 
           suggestionsList.innerHTML = '<ul>' + 
             data.alerts.suggestions.map(s => `<li>${s}</li>`).join('') + '</ul>';
           
@@ -318,7 +326,7 @@ document.addEventListener("DOMContentLoaded", function() {
             "Evaluar posible sobreconsumo inesperado"
           ];
           
-          suggestionsBanner.style.display = 'block';
+          // suggestionsBanner.style.display = 'block';
           suggestionsList.innerHTML = '<ul>' + 
             defaultSuggestions.map(s => `<li>${s}</li>`).join('') + '</ul>';
             
@@ -348,7 +356,7 @@ document.addEventListener("DOMContentLoaded", function() {
         alertMessage.textContent = 'Nivel de energía bajo. Preparar medidas de contingencia.';
         
         // Mostrar cartel de sugerencias para warning también
-        suggestionsBanner.style.display = 'block';
+        // suggestionsBanner.style.display = 'block';
         suggestionsList.innerHTML = '<ul>' + 
           '<li>Reducir consumo en áreas no esenciales</li>' +
           '<li>Verificar generación solar</li>' +
@@ -365,7 +373,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
       default:
         alertContainer.style.display = 'none';
-        suggestionsBanner.style.display = 'none';
+        // suggestionsBanner.style.display = 'none';
         document.title = '⚡ Energía - ' + Math.round(data.battery * 100) + '%';
         break;
     }
@@ -474,23 +482,23 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
   
-  // ============================================
-  // ACTUALIZACIÓN DE BATERÍA CON ESTADO
-  // ============================================
-  function initBatteryVisualization() {
-    const svg = d3.select("#battery-main");
-    const width = 180;
-    const height = 280;
+ // ============================================
+// ACTUALIZACIÓN DE BATERÍA CON ESTADO - VERSIÓN MEJORADA
+// ============================================
+function initBatteryVisualization() {
+    const svg = d3.select("#battery-main-svg"); // Cambiado a battery-main-svg
+    const width = 280;
+    const height = 400;
     
     svg.attr("width", width).attr("height", height);
     
     // Crear batería principal
     const batteryGroup = svg.append("g")
-      .attr("transform", `translate(${width/2}, 20)`);
+      .attr("transform", `translate(${width/2}, 40)`);
     
     // Cuerpo de la batería
-    const batteryWidth = 100;
-    const batteryHeight = 200;
+    const batteryWidth = 160;
+    const batteryHeight = 280;
     
     // Marco exterior
     batteryGroup.append("rect")
@@ -498,49 +506,54 @@ document.addEventListener("DOMContentLoaded", function() {
       .attr("y", 0)
       .attr("width", batteryWidth)
       .attr("height", batteryHeight)
-      .attr("rx", 10)
-      .attr("ry", 10)
+      .attr("rx", 12)
+      .attr("ry", 12)
       .attr("fill", "none")
       .attr("stroke", "#4b5563")
-      .attr("stroke-width", 4);
+      .attr("stroke-width", 5);
     
     // Terminal positivo
     batteryGroup.append("rect")
-      .attr("x", -15)
-      .attr("y", -15)
-      .attr("width", 30)
-      .attr("height", 15)
-      .attr("rx", 4)
+      .attr("x", -20)
+      .attr("y", -18)
+      .attr("width", 40)
+      .attr("height", 18)
+      .attr("rx", 5)
       .attr("fill", "#fbbf24")
       .attr("stroke", "#d97706")
-      .attr("stroke-width", 2);
+      .attr("stroke-width", 2.5);
     
     // Nivel de carga
     const chargeLevel = batteryGroup.append("rect")
-      .attr("x", -batteryWidth/2 + 8)
+      .attr("x", -batteryWidth/2 + 10)
       .attr("y", batteryHeight)
-      .attr("width", batteryWidth - 16)
+      .attr("width", batteryWidth - 20)
       .attr("height", 0)
-      .attr("rx", 6)
+      .attr("rx", 8)
       .attr("fill", "#10b981");
     
     // Marcas de nivel
     for (let i = 0; i <= 100; i += 20) {
       const yPos = batteryHeight - (i/100) * batteryHeight;
+      
+      // Líneas de indicador
       batteryGroup.append("line")
-        .attr("x1", -batteryWidth/2 - 10)
-        .attr("x2", -batteryWidth/2 - 2)
+        .attr("x1", -batteryWidth/2 - 15)
+        .attr("x2", -batteryWidth/2 - 5)
         .attr("y1", yPos)
         .attr("y2", yPos)
         .attr("stroke", "#6b7280")
-        .attr("stroke-width", 1.5);
+        .attr("stroke-width", 2.5);
       
+      // Texto de porcentaje
       batteryGroup.append("text")
-        .attr("x", -batteryWidth/2 - 15)
-        .attr("y", yPos + 4)
+        .attr("class", "level-indicator-text")
+        .attr("x", -batteryWidth/2 - 20)
+        .attr("y", yPos + 5)
         .attr("text-anchor", "end")
-        .attr("fill", "#9ca3af")
-        .attr("font-size", "10px")
+        .attr("fill", "#cbd5e1")
+        .attr("font-size", "17px")
+        .attr("font-weight", "600")
         .text(i + "%");
     }
     
@@ -597,50 +610,82 @@ document.addEventListener("DOMContentLoaded", function() {
         .attr("height", fillHeight)
         .attr("fill", color);
       
+      // Actualizar porcentaje GRANDE debajo de la batería
+      const percentageLarge = document.getElementById('battery-percentage-large');
+      if (percentageLarge) {
+        percentageLarge.textContent = Math.round(socPercent) + '%';
+        percentageLarge.style.color = statusColor;
+
+        percentageLarge.style.fontSize = '42px';
+        percentageLarge.style.fontWeight = '800';
+        percentageLarge.style.margin = '5px 0';
+      }
+      
       // Actualizar información textual
-      const batteryPercent = document.getElementById('battery-percent');
-      batteryPercent.textContent = Math.round(socPercent) + '%';
-      batteryPercent.style.color = statusColor;
+      document.getElementById('battery-capacity-value').textContent = formatNumber(batteryCapacity) + " Wh";
+      document.getElementById('battery-remaining-value').textContent = Math.round(batteryWh) + " Wh";
+      document.getElementById('battery-state-value').textContent = statusText;
+      document.getElementById('battery-state-value').style.color = statusColor;
       
-      d3.select("#battery-wh").text(Math.round(batteryWh) + " Wh");
-      d3.select("#battery-ratio").text(`${Math.round(batteryWh)} / ${Math.round(batteryCapacity)} Wh`);
-      d3.select("#battery-capacity").text(formatNumber(batteryCapacity) + " Wh");
-      d3.select("#battery-remaining").text(Math.round(batteryWh) + " Wh");
-      
-      // Actualizar estado con color
-      const batteryState = document.getElementById('battery-state');
-      batteryState.textContent = statusText;
-      batteryState.style.color = statusColor;
+      // Actualizar ratio
+      const batteryRatio = document.getElementById('battery-ratio');
+      if (batteryRatio) {
+        batteryRatio.textContent = `${Math.round(batteryWh)} / ${Math.round(batteryCapacity)} Wh`;
+      }
       
       // Calcular tiempo restante
-      if (chartData.potencia.length > 1) {
+      if (chartData && chartData.potencia && chartData.potencia.length > 1) {
         const avgPower = d3.mean(chartData.potencia.slice(-10));
         if (avgPower > 0) {
           const hoursRemaining = (batteryWh / avgPower);
           const hours = Math.floor(hoursRemaining);
           const minutes = Math.floor((hoursRemaining - hours) * 60);
           const timeText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-          document.getElementById('battery-time').textContent = timeText;
+          const timeElement = document.getElementById('battery-time-value');
           
-          // Color según tiempo restante
-          const timeElement = document.getElementById('battery-time');
-          if (hoursRemaining < 2) {
-            timeElement.style.color = "#ef4444";
-          } else if (hoursRemaining < 5) {
-            timeElement.style.color = "#f59e0b";
-          } else {
-            timeElement.style.color = "#10b981";
+          if (timeElement) {
+            timeElement.textContent = timeText;
+            
+            // Color según tiempo restante
+            if (hoursRemaining < 2) {
+              timeElement.style.color = "#ef4444";
+            } else if (hoursRemaining < 5) {
+              timeElement.style.color = "#f59e0b";
+            } else {
+              timeElement.style.color = "#10b981";
+            }
           }
         }
       }
       
-      // Actualizar baterías en serie
-      updateBatterySeries(socPercent, energyStatus);
+      // Actualizar indicador de flujo según estado
+      const flowIndicator = document.getElementById('flow-indicator');
+      if (flowIndicator) {
+        if (energyStatus === 'critical') {
+          flowIndicator.textContent = "CRÍTICO";
+          flowIndicator.style.background = "#ef4444";
+        } else if (energyStatus === 'warning') {
+          flowIndicator.textContent = "INESTABLE";
+          flowIndicator.style.background = "#f59e0b";
+        } else {
+          flowIndicator.textContent = "EQUILIBRADO";
+          flowIndicator.style.background = "#10b981";
+        }
+      }
     }
     
+    // Inicializar con valores por defecto
+    updateBattery(0.5, 0, 0, 'normal');
+    
     return updateBattery;
-  }
-  
+}
+
+// Función auxiliar para formatear números
+function formatNumber(num) {
+    if (!num) return "0";
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
   const updateBattery = initBatteryVisualization();
   
   // ============================================

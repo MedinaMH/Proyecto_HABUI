@@ -53,6 +53,7 @@ def panel_co2(request):
     return render(request, 'REMS/panel_CO2.html')
 
 # ----------recurso alimentos-----------------
+
 def panel_alimentos_rems(request, recurso_id=None):
     contexto = {'recurso_id': recurso_id or ''}
     return render(request, 'REMS/panel_alimentos.html', contexto)
@@ -102,6 +103,9 @@ def api_alimentos_consumos_diarios(request):
         hoy = timezone.now().date()
         consumos_hoy = ConsumoAlimentos.objects.filter(fecha_registro__date=hoy)
         
+        # Obtener recurso de alimentos para configuración
+        recurso_alimentos = RecursoAlimentos.objects.first()
+        
         # Calcular resumen por tipo de comida
         resumen = {
             'desayuno': {'porciones': 0, 'personas': 0},
@@ -120,8 +124,16 @@ def api_alimentos_consumos_diarios(request):
                 resumen['total_porciones'] += consumo.porciones
                 resumen['total_personas'] += consumo.personas
         
+        # Configuración actual
+        configuracion = {
+            'tripulantes': recurso_alimentos.num_tripulantes if recurso_alimentos else 4,
+            'porciones_por_persona_dia': recurso_alimentos.porciones_por_persona_dia if recurso_alimentos else 4,
+            'consumo_esperado_diario': (recurso_alimentos.num_tripulantes * recurso_alimentos.porciones_por_persona_dia) if recurso_alimentos else 16
+        }
+        
         return Response({
             'fecha': hoy.isoformat(),
+            'configuracion': configuracion,  # Agregar configuración
             'resumen': resumen,
             'detalles': ConsumoAlimentosSerializer(consumos_hoy, many=True).data
         })
@@ -243,6 +255,352 @@ def api_alimentos_reset(request):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+    
+# ---------- Funciones de Administración para Alimentos ----------
+
+@api_view(['POST'])
+def api_alimentos_configurar_tripulacion(request):
+    """
+    Configura el número de tripulantes para la misión
+    """
+    try:
+        data = request.data
+        tripulantes = data.get('tripulantes')
+        
+        if not tripulantes:
+            return Response(
+                {'error': 'Se requiere el número de tripulantes'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        tripulantes = int(tripulantes)
+        
+        if tripulantes < 1 or tripulantes > 6:
+            return Response(
+                {'error': 'El número de tripulantes debe estar entre 1 y 6'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Obtener el recurso de alimentos
+        recurso_alimentos = RecursoAlimentos.objects.first()
+        
+        if not recurso_alimentos:
+            return Response(
+                {'error': 'No se encontró recurso de alimentos'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        with transaction.atomic():
+            # Actualizar número de tripulantes
+            recurso_alimentos.num_tripulantes = tripulantes
+            recurso_alimentos.save()
+        
+        serializer = RecursoAlimentosSerializer(recurso_alimentos)
+        
+        return Response({
+            'success': True,
+            'message': f'Tripulación configurada a {tripulantes} personas',
+            'tripulantes': tripulantes,
+            'recurso_alimentos': serializer.data
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+def api_alimentos_configurar_suministros(request):
+    """
+    Configura las porciones iniciales totales
+    """
+    try:
+        data = request.data
+        porciones_iniciales = data.get('porciones_iniciales')
+        
+        if not porciones_iniciales:
+            return Response(
+                {'error': 'Se requiere el número de porciones iniciales'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        porciones_iniciales = int(porciones_iniciales)
+        
+        if porciones_iniciales <= 0:
+            return Response(
+                {'error': 'Las porciones iniciales deben ser mayores a 0'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Obtener el recurso de alimentos
+        recurso_alimentos = RecursoAlimentos.objects.first()
+        
+        if not recurso_alimentos:
+            return Response(
+                {'error': 'No se encontró recurso de alimentos'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Calcular la diferencia para ajustar las porciones actuales
+        diferencia = porciones_iniciales - recurso_alimentos.porciones_iniciales
+        
+        with transaction.atomic():
+            # Actualizar porciones iniciales
+            recurso_alimentos.porciones_iniciales = porciones_iniciales
+            
+            # Ajustar porciones actuales manteniendo la misma proporción de consumo
+            recurso_alimentos.porciones_actuales += diferencia
+            
+            # Asegurarse de que no haya valores negativos
+            if recurso_alimentos.porciones_actuales < 0:
+                recurso_alimentos.porciones_actuales = 0
+            
+            recurso_alimentos.save()
+        
+        serializer = RecursoAlimentosSerializer(recurso_alimentos)
+        
+        return Response({
+            'success': True,
+            'message': f'Suministros configurados: {porciones_iniciales} porciones iniciales',
+            'recurso_alimentos': serializer.data
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+def api_alimentos_configurar_mision(request):
+    """
+    Configura todos los parámetros de la misión
+    """
+    try:
+        data = request.data
+        
+        # Obtener el recurso de alimentos
+        recurso_alimentos = RecursoAlimentos.objects.first()
+        
+        if not recurso_alimentos:
+            return Response(
+                {'error': 'No se encontró recurso de alimentos'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        with transaction.atomic():
+            # Actualizar tripulantes si se proporciona
+            if 'tripulantes' in data:
+                tripulantes = int(data['tripulantes'])
+                if 1 <= tripulantes <= 6:
+                    recurso_alimentos.num_tripulantes = tripulantes
+            
+            # Actualizar porciones por persona si se proporciona
+            if 'porciones_por_persona_dia' in data:
+                porciones_pp = int(data['porciones_por_persona_dia'])
+                if porciones_pp > 0:
+                    recurso_alimentos.porciones_por_persona_dia = porciones_pp
+            
+            # Actualizar duración de misión si se proporciona
+            if 'duracion_mision_dias' in data:
+                duracion = int(data['duracion_mision_dias'])
+                if duracion > 0:
+                    recurso_alimentos.duracion_mision_dias = duracion
+            
+            # Actualizar porciones iniciales si se proporciona
+            if 'porciones_iniciales' in data:
+                porciones_iniciales = int(data['porciones_iniciales'])
+                if porciones_iniciales > 0:
+                    # Calcular diferencia para ajustar porciones actuales
+                    diferencia = porciones_iniciales - recurso_alimentos.porciones_iniciales
+                    recurso_alimentos.porciones_iniciales = porciones_iniciales
+                    recurso_alimentos.porciones_actuales += diferencia
+                    
+                    # Asegurarse de que no haya valores negativos
+                    if recurso_alimentos.porciones_actuales < 0:
+                        recurso_alimentos.porciones_actuales = 0
+            
+            recurso_alimentos.save()
+        
+        serializer = RecursoAlimentosSerializer(recurso_alimentos)
+        
+        return Response({
+            'success': True,
+            'message': 'Configuración de misión actualizada',
+            'recurso_alimentos': serializer.data
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+def api_alimentos_borrar_registros(request):
+    """
+    Borra todos los registros de consumo
+    """
+    try:
+        # Obtener el recurso de alimentos
+        recurso_alimentos = RecursoAlimentos.objects.first()
+        
+        if not recurso_alimentos:
+            return Response(
+                {'error': 'No se encontró recurso de alimentos'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Contar registros antes de borrar
+        total_registros = ConsumoAlimentos.objects.count()
+        
+        with transaction.atomic():
+            # Borrar todos los registros
+            ConsumoAlimentos.objects.all().delete()
+        
+        return Response({
+            'success': True,
+            'message': f'{total_registros} registros de consumo han sido eliminados',
+            'registros_eliminados': total_registros
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['DELETE'])
+def api_alimentos_eliminar_registro(request, registro_id):
+    """
+    Elimina un registro específico de consumo y restaura las porciones
+    """
+    try:
+        # Buscar el registro
+        try:
+            registro = ConsumoAlimentos.objects.get(id=registro_id)
+        except ConsumoAlimentos.DoesNotExist:
+            return Response(
+                {'error': 'Registro no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        with transaction.atomic():
+            # Obtener el recurso de alimentos
+            recurso_alimentos = registro.recurso_alimentos
+            
+            # Restaurar las porciones consumidas
+            recurso_alimentos.porciones_actuales += registro.porciones
+            
+            # Asegurarse de que no exceda las porciones iniciales
+            if recurso_alimentos.porciones_actuales > recurso_alimentos.porciones_iniciales:
+                recurso_alimentos.porciones_actuales = recurso_alimentos.porciones_iniciales
+            
+            recurso_alimentos.save()
+            
+            # Eliminar el registro
+            registro.delete()
+        
+        return Response({
+            'success': True,
+            'message': f'Registro eliminado y {registro.porciones} porciones restauradas'
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+def api_alimentos_reiniciar_completo(request):
+    """
+    Reinicia completamente el sistema: suministros, registros y configuración
+    """
+    try:
+        data = request.data
+        
+        # Obtener el recurso de alimentos
+        recurso_alimentos = RecursoAlimentos.objects.first()
+        
+        if not recurso_alimentos:
+            # Crear uno nuevo si no existe
+            recurso_alimentos = RecursoAlimentos.objects.create(
+                nombre='Alimentos Misión Espacial',
+                porciones_iniciales=112,
+                porciones_actuales=112,
+                num_tripulantes=4,
+                porciones_por_persona_dia=4,
+                duracion_mision_dias=7
+            )
+        
+        with transaction.atomic():
+            # 1. Borrar todos los registros de consumo
+            ConsumoAlimentos.objects.all().delete()
+            
+            # 2. Resetear valores por defecto o usar los proporcionados
+            recurso_alimentos.num_tripulantes = int(data.get('tripulantes', 4))
+            recurso_alimentos.porciones_por_persona_dia = int(data.get('porciones_por_persona_dia', 4))
+            recurso_alimentos.duracion_mision_dias = int(data.get('duracion_mision_dias', 7))
+            
+            # 3. Configurar porciones
+            porciones_iniciales = int(data.get('porciones_iniciales', 112))
+            recurso_alimentos.porciones_iniciales = porciones_iniciales
+            recurso_alimentos.porciones_actuales = porciones_iniciales
+            
+            # 4. Guardar
+            recurso_alimentos.save()
+        
+        serializer = RecursoAlimentosSerializer(recurso_alimentos)
+        
+        return Response({
+            'success': True,
+            'message': 'Sistema reiniciado completamente',
+            'recurso_alimentos': serializer.data
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['GET'])
+def api_alimentos_obtener_configuracion(request):
+    """
+    Obtiene la configuración actual del sistema
+    """
+    try:
+        # Obtener recurso de alimentos
+        recurso_alimentos = RecursoAlimentos.objects.first()
+        
+        if not recurso_alimentos:
+            return Response({
+                'success': True,
+                'configuracion': {
+                    'tripulantes': 4,
+                    'porciones_por_persona_dia': 4,
+                    'duracion_mision_dias': 7,
+                    'porciones_iniciales': 112,
+                    'porciones_actuales': 112,
+                    'consumo_diario_estimado': 16,  # 4×4
+                    'dias_autonomia': 7  # 112÷16
+                }
+            })
+        
+        serializer = RecursoAlimentosSerializer(recurso_alimentos)
+        
+        return Response({
+            'success': True,
+            'configuracion': serializer.data
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 #----------------Fin recurso alimentos----------------------------
 
 def panel_temperatura_rems(request):
@@ -250,3 +608,12 @@ def panel_temperatura_rems(request):
 
 def panel_humedad_rems(request):
     return render(request, 'REMS/panel_humedad.html')
+
+
+
+#-------------VISTAS DEL MODULO DE CONTROL------------------------
+def control_inicial(request):
+    return render(request, 'modulo_control/control_inicial.html')
+
+def control_alimentos(request):
+    return render(request, 'modulo_control/control_alimentos.html')

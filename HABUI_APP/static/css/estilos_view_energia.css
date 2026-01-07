@@ -801,3 +801,72 @@ font-size: 18px;
 #energyChart {
 height: 400px;
 }
+
+/* =========================================== */
+/* BATERÍA CSS ESTRA*/
+/* =========================================== */
+
+#battery-svg-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.battery-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.battery-percentage-large {
+    font-size: 50px !important; 
+    font-weight: 800 !important; /* Más grueso */
+    text-align: center;
+    margin-top: -85px !important; /* Reducir espacio arriba */
+    margin-bottom: 5px !important; /* Reducir espacio abajo */
+    color: #10b981 !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); /* Sombra más pronunciada */
+    letter-spacing: -1px; /* Menos espacio entre letras */
+    line-height: 1; /* Sin altura extra */
+}
+
+.battery-info-panel {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.battery-info-item {
+    background: rgba(30, 41, 59, 0.7);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    border-left: 3px solid #00bfff;
+    transition: all 0.3s ease;
+}
+
+.battery-info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.15);
+}
+
+.battery-info-label {
+    color: #8da9c4;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.battery-info-value {
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+}

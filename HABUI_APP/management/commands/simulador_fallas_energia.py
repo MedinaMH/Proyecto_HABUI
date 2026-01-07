@@ -173,7 +173,7 @@ class Command(BaseCommand):
                             "show_alert": energy_status == "critical",
                             "level": energy_status,
                             "message": (
-                                "Nivel crítico de energía. Apagando áreas no esenciales."
+                                "Protocolo de mantenimiento energético - Hábitat Análogo"
                                 if energy_status == "critical"
                                 else "Sistema energético operativo."
                             ),

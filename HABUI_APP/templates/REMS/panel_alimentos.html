@@ -72,6 +72,10 @@
             <span style="color: #1ad0f9; font-weight: 700;">TOTAL DÍA:</span>
             <span id="total-day-count" style="color: #1ad0f9; font-weight: 800;">0 porciones</span>
           </div>
+          <div style="border-top: 1px solid #4b5563; margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between;">
+            <span style="color: #ffa8a8; font-weight: 600;">Consumo Esperado:</span>
+            <span id="expected-day-count" style="color: #10b981; font-weight: 800;">0 porciones</span>
+          </div>
         </div>
       </div>
     </div>
@@ -96,7 +100,6 @@
           <p class="metric-value" id="remaining-portions">--</p>
           <div class="metric-status-container">
             <div class="metric-status-large status-good" id="portions-status">CARGANDO...</div>
-            <!-- <span class="metric-unit">porciones</span> -->
           </div>
         </div>
       </div>
@@ -107,93 +110,206 @@
           <p class="metric-value" id="autonomy-days">--</p>
           <div class="metric-status-container">
             <div class="metric-status-large status-good" id="autonomy-status">CARGANDO...</div>
-            <!-- <span class="metric-unit">días</span> -->
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Panel de Temperatura -->
-    <div class="temp-panel">
-      <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 15px;">🌡️ Temperatura de Almacenamiento</h3>
+    <!-- Panel de Alertas y Sugerencias -->
+    <div class="control-panel">
+      <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 20px;">⚠️ Alertas y Sugerencias</h3>
       
-    <!-- Termómetro -->
-    <div style="text-align: center; margin-bottom: 20px; margin-top: 15px;">
-      <div style="height: 250px; display: flex; align-items: center; justify-content: center;">
-        <svg id="temperature-gauge" width="200" height="240"></svg>
-      </div>
-      <div style="margin-top: 10px;">
-        <div id="temperature-text" style="font-size: 28px; font-weight: 800; color: #ff6b6b;">--°C</div>
-        <div style="color: #ffa8a8; font-size: 14px;">Temperatura actual</div>
-      </div>
-    </div>
-      
-      <!-- Métricas de Temperatura -->
-      <div class="metric">
-        <div class="metric-title">Temperatura Actual</div>
-        <div class="metric-value-container">
-          <p class="metric-value" id="current-temp">--</p>
-          <div class="metric-status-container">
-            <div class="metric-status-large status-good" id="temp-status">ÓPTIMA</div>
-            <!-- <span class="metric-unit">°C</span> -->
+      <!-- Sección de Alertas -->
+      <div style="margin-bottom: 25px;">
+        <h4 style="color: #ffa8a8; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+          <span>🔔 Alertas de Consumo</span>
+        </h4>
+        <div id="consumption-alerts" style="background: rgba(30, 41, 59, 0.7); border-radius: 8px; padding: 15px; min-height: 120px;">
+          <div class="alert-message" style="color: #9ca3af; text-align: center; padding: 20px;">
+            <span>Calculando alertas de consumo...</span>
           </div>
         </div>
       </div>
-
-      <div class="metric">
-        <div class="metric-title">Rango Recomendado</div>
-        <div class="metric-value-container">
-          <p class="metric-value">2 - 8</p>
-          <div class="metric-status-container">
-            <div class="metric-status-large status-good">REFRIGERACIÓN</div>
-            <!-- <span class="metric-unit">°C</span> -->
+      
+      <!-- Sección de Sugerencias -->
+      <div>
+        <h4 style="color: #ffa8a8; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+          <span>💡 Sugerencias de Racionamiento</span>
+        </h4>
+        <div id="rationing-suggestions" style="background: rgba(30, 41, 59, 0.7); border-radius: 8px; padding: 15px; min-height: 150px;">
+          <div class="suggestion-message" style="color: #9ca3af; text-align: center; padding: 20px;">
+            <span>Generando sugerencias...</span>
           </div>
         </div>
       </div>
+      
+      <!-- Info de misión -->
+      <div style="margin-top: 20px; background: rgba(30, 41, 59, 0.5); border-radius: 8px; padding: 12px; border-left: 4px solid #ff6b6b;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span style="color: #ffa8a8; font-size: 14px;">Tripulantes Actuales:</span>
+          <span style="color: #fff; font-weight: 600; font-size: 14px;" id="mission-crew">--</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span style="color: #ffa8a8; font-size: 14px;">Comidas por día (por tripulante):</span>
+          <span style="color: #fff; font-weight: 600; font-size: 14px;">4</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+          <span style="color: #ffa8a8; font-size: 14px;">Duración total misión:</span>
+          <span style="color: #fff; font-weight: 600; font-size: 14px;">7 días</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #ffa8a8; font-size: 14px;">Días restantes:</span>
+          <span style="color: #fff; font-weight: 600; font-size: 14px;" id="mission-days-remaining">--</span>
+        </div>
+      </div>
     </div>
-    
   </div>
   
-  <!-- Panel de Gráficos de Análisis -->
-  <div class="chart-panel">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h3 style="color: #ffffff; margin: 0;">📊 Análisis de Consumo</h3>
-      <div style="display: flex; gap: 10px;">
-        <select id="analysis-period" class="form-select" style="width: auto;">
-          <option value="7">Últimos 7 días</option>
-          <option value="30">Últimos 30 días</option>
-          <option value="all">Todo el histórico</option>
-        </select>
-      </div>
-    </div>
+  <!-- NUEVO: Panel de Administración -->
+  <div class="chart-panel" style="margin-top: 20px;">
+    <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 20px;">⚙️ Administración del Sistema</h3>
     
-    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
-      <div>
-        <h4 style="color: #ffa8a8; margin-bottom: 15px;">🍽️ Distribución por Comida</h4>
-        <!-- CONTENEDOR  -->
-        <div style="height: 350px; background: rgba(30, 41, 59, 0.3); border-radius: 10px; padding: 15px;">
-          <svg id="meal-distribution" width="100%" height="100%"></svg>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+      <!-- Configuración de Tripulación -->
+      <div style="background: rgba(30, 41, 59, 0.7); border-radius: 10px; padding: 20px;">
+        <h4 style="color: #ffa8a8; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+          <span>👥 Configurar Tripulación</span>
+        </h4>
+        
+        <div class="form-group">
+          <label class="form-label">Número de Tripulantes</label>
+          <input type="number" id="configure-crew-size" class="form-input" min="1" max="6" value="4" style="text-align: center;">
+          <div style="color: #9ca3af; font-size: 12px; margin-top: 5px;">
+            Rango permitido: 1 a 6 tripulantes
+          </div>
+        </div>
+        
+        <button id="btn-configure-crew" class="btn-primary" style="background: #3b82f6; margin-top: 10px;">
+          👥 Actualizar Tripulación
+        </button>
+        
+        <div style="margin-top: 15px; padding: 10px; background: rgba(59, 130, 246, 0.1); border-radius: 6px; border-left: 4px solid #3b82f6;">
+          <div style="color: #fff; font-size: 12px;">
+            <strong>Nota:</strong> Esto actualizará el número de tripulantes en el sistema.
+            El consumo esperado se recalculará automáticamente.
+          </div>
+        </div>
+      </div>
+      
+      <!-- Configuración de Suministros -->
+      <div style="background: rgba(30, 41, 59, 0.7); border-radius: 10px; padding: 20px;">
+        <h4 style="color: #ffa8a8; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+          <span>📦 Configurar Suministros</span>
+        </h4>
+        
+        <div class="form-group">
+          <label class="form-label">Porciones Iniciales Totales</label>
+          <input type="number" id="configure-initial-portions" class="form-input" min="1" max="1000" value="112" style="text-align: center;">
+          <div style="color: #9ca3af; font-size: 12px; margin-top: 5px;">
+            Ejemplo: 4 tripulantes × 4 comidas × 7 días = 112 porciones
+          </div>
+        </div>
+        
+        <button id="btn-configure-portions" class="btn-primary" style="background: #10b981; margin-top: 10px;">
+          📦 Actualizar Suministros
+        </button>
+        
+        <div style="margin-top: 15px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; border-left: 4px solid #10b981;">
+          <div style="color: #fff; font-size: 12px;">
+            <strong>Nota:</strong> Esto actualizará el total de porciones iniciales en la base de datos.
+          </div>
         </div>
       </div>
     </div>
     
-    <!-- Tabla de Historial -->
+    <!-- Panel de Administración de Datos -->
+    <div style="background: rgba(30, 41, 59, 0.7); border-radius: 10px; padding: 20px; margin-top: 20px;">
+      <h4 style="color: #ffa8a8; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+        <span>🗑️ Administración de Datos</span>
+      </h4>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <!-- Botón para borrar registros -->
+        <div style="text-align: center;">
+          <button id="btn-clear-records" class="btn-primary" style="background: #f59e0b;">
+            🗑️ Borrar Registros de Consumo
+          </button>
+          <div style="color: #9ca3af; font-size: 12px; margin-top: 8px;">
+            Elimina todos los registros de consumo pero mantiene los suministros
+          </div>
+        </div>
+        
+        <!-- Botón para reiniciar completamente -->
+        <div style="text-align: center;">
+          <button id="btn-reset-all" class="btn-primary" style="background: #ef4444;">
+            🔄 Reiniciar Sistema Completo
+          </button>
+          <div style="color: #9ca3af; font-size: 12px; margin-top: 8px;">
+            Reinicia suministros, registros y tripulación (restaura valores por defecto)
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal de confirmación para operaciones críticas -->
+      <div id="confirmation-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: #1f2937; border-radius: 10px; padding: 30px; max-width: 500px; width: 90%; border: 2px solid #ff6b6b;">
+          <h3 style="color: #fff; margin-top: 0; margin-bottom: 15px;" id="modal-title">Confirmar Operación</h3>
+          <p style="color: #ffa8a8; margin-bottom: 20px;" id="modal-message">
+            ¿Está seguro de que desea realizar esta operación?
+          </p>
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button id="modal-cancel" style="padding: 10px 20px; background: #4b5563; color: #fff; border: none; border-radius: 6px; cursor: pointer;">
+              Cancelar
+            </button>
+            <button id="modal-confirm" style="padding: 10px 20px; background: #ef4444; color: #fff; border: none; border-radius: 6px; cursor: pointer;">
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Panel de Gráficos de Análisis -->
     <div style="margin-top: 30px;">
-      <h4 style="color: #ffa8a8; margin-bottom: 15px;">📋 Historial de Consumo Reciente</h4>
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background: #1f2937;">
-              <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Fecha/Hora</th>
-              <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Comida</th>
-              <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Porciones</th>
-              <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Tripulantes</th>
-            </tr>
-          </thead>
-          <tbody id="consumption-history">
-            <!-- Los registros se agregarán aquí dinámicamente desde la BD -->
-          </tbody>
-        </table>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: #ffffff; margin: 0;">📊 Análisis de Consumo</h3>
+        <div style="display: flex; gap: 10px;">
+          <select id="analysis-period" class="form-select" style="width: auto;">
+            <option value="7">Últimos 7 días</option>
+            <option value="30">Últimos 30 días</option>
+            <option value="all">Todo el histórico</option>
+          </select>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+        <div>
+          <h4 style="color: #ffa8a8; margin-bottom: 15px;">🍽️ Distribución por Comida</h4>
+          <div style="height: 350px; background: rgba(30, 41, 59, 0.3); border-radius: 10px; padding: 15px;">
+            <svg id="meal-distribution" width="100%" height="100%"></svg>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tabla de Historial -->
+      <div style="margin-top: 30px;">
+        <h4 style="color: #ffa8a8; margin-bottom: 15px;">📋 Historial de Consumo Reciente</h4>
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: #1f2937;">
+                <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Fecha/Hora</th>
+                <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Comida</th>
+                <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Porciones</th>
+                <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Tripulantes</th>
+                <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="consumption-history">
+              <!-- Los registros se agregarán aquí dinámicamente desde la BD -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -208,10 +324,12 @@ document.addEventListener("DOMContentLoaded", function() {
   // CONFIGURACIÓN INICIAL
   // ============================================
   const CONFIG = {
-    totalPeople: 4,
-    mealsPerDay: 4,
-    initialDays: 7,
-    portionsPerMeal: 1,
+    mealsPerDayPerPerson: 4,
+    totalMissionDays: 7,
+    maxCrew: 6,
+    minCrew: 1,
+    defaultCrewSize: 4,
+    defaultInitialPortions: 112 // 4 tripulantes × 4 comidas × 7 días
   };
   
   // ============================================
@@ -231,309 +349,19 @@ document.addEventListener("DOMContentLoaded", function() {
     currentTemperature: null,
     autonomyDays: 0,
     porcentajeRestante: 0,
-    lastUpdate: null
+    lastUpdate: null,
+    currentCrewSize: CONFIG.defaultCrewSize,
+    missionStartDate: new Date(),
+    daysElapsed: 0,
+    totalConsumedToday: 0,
+    pendingAction: null // Para manejar acciones pendientes en el modal
   };
   
   // ============================================
-  // FUNCIONES PARA INTERACTUAR CON LA API
+  // FUNCIONES FALTANTES QUE NECESITAN SER DEFINIDAS
   // ============================================
   
-  // Función para obtener el token CSRF
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
-  
-  async function obtenerEstadoAlimentos() {
-    try {
-      const response = await fetch('/api/alimentos/estado/');
-      if (!response.ok) throw new Error('Error al obtener estado');
-      
-      const data = await response.json();
-      
-      // Actualizar estado local con datos de la BD
-      appState.remainingPortions = data.porciones_actuales;
-      appState.initialPortions = data.porciones_iniciales;
-      appState.porcentajeRestante = data.porcentaje_restante;
-      appState.autonomyDays = data.dias_autonomia;
-      
-      // Actualizar interfaz
-      updateAllDisplays();
-      
-      console.log('Estado de alimentos cargado desde BD');
-      return { success: true, data: data };
-    } catch (error) {
-      console.error('Error cargando estado:', error);
-      showNotification('Error al cargar datos de alimentos', 'error');
-      return { success: false, error: error.message };
-    }
-  }
-  
-  async function obtenerConsumoDiario() {
-    try {
-      const response = await fetch('/api/alimentos/consumos/diarios/');
-      if (!response.ok) throw new Error('Error al obtener consumo diario');
-      
-      const data = await response.json();
-      
-      // Actualizar consumo diario
-      appState.dailyConsumption = {
-        desayuno: data.resumen.desayuno.porciones,
-        almuerzo: data.resumen.almuerzo.porciones,
-        comida: data.resumen.comida.porciones,
-        cena: data.resumen.cena.porciones
-      };
-      
-      // Actualizar historial local
-      appState.consumptionHistory = data.detalles.map(item => ({
-        id: item.id,
-        tipo_comida: item.tipo_comida,
-        tipo_comida_display: item.tipo_comida_display,
-        personas: item.personas,
-        porciones: item.porciones,
-        fecha_registro: new Date(item.fecha_registro)
-      }));
-      
-      // Actualizar interfaz
-      updateAllDisplays();
-      updateConsumptionHistoryTable();
-      
-      return { success: true, data: data };
-    } catch (error) {
-      console.error('Error cargando consumo diario:', error);
-      return { success: false, error: error.message };
-    }
-  }
-  
-  async function registrarConsumoAPI(tipo_comida, personas, porciones) {
-    try {
-      const btn = document.getElementById('btn-register-consumption');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '⏳ Procesando...';
-      btn.disabled = true;
-      
-      const response = await fetch('/api/alimentos/registrar-consumo/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({
-          tipo_comida: tipo_comida,
-          personas: parseInt(personas),
-          porciones: parseInt(porciones)
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        // Actualizar estado local con nuevos datos
-        appState.remainingPortions = data.recurso_alimentos.porciones_actuales;
-        appState.porcentajeRestante = data.recurso_alimentos.porcentaje_restante;
-        appState.autonomyDays = data.recurso_alimentos.dias_autonomia;
-        
-        // Actualizar consumo diario
-        appState.dailyConsumption[tipo_comida] += parseInt(porciones);
-        
-        // Agregar al historial local
-        appState.consumptionHistory.unshift({
-          id: data.consumo.id,
-          tipo_comida: data.consumo.tipo_comida,
-          tipo_comida_display: data.consumo.tipo_comida_display,
-          personas: data.consumo.personas,
-          porciones: data.consumo.porciones,
-          fecha_registro: new Date(data.consumo.fecha_registro)
-        });
-        
-        // Actualizar interfaz
-        updateAllDisplays();
-        updateConsumptionHistoryTable();
-        updatePortionsChart();
-        
-        showNotification(data.message, 'success');
-        return { success: true, data: data };
-      } else {
-        showNotification(data.error || 'Error al registrar consumo', 'error');
-        return { success: false, error: data.error };
-      }
-    } catch (error) {
-      console.error('❌ Error registrando consumo:', error);
-      showNotification('Error de conexión', 'error');
-      return { success: false, error: error.message };
-    } finally {
-      const btn = document.getElementById('btn-register-consumption');
-      btn.innerHTML = '📋 Registrar Consumo';
-      btn.disabled = false;
-    }
-  }
-  
-  async function resetearAlimentosAPI(tipo) {
-    try {
-      const response = await fetch('/api/alimentos/reset/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({ tipo: tipo })
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        // Actualizar estado local
-        appState.remainingPortions = data.data.porciones_actuales;
-        appState.initialPortions = data.data.porciones_iniciales;
-        appState.porcentajeRestante = data.data.porcentaje_restante;
-        appState.autonomyDays = data.data.dias_autonomia;
-        
-        if (tipo === 'dia') {
-          // Resetear solo consumo diario
-          appState.dailyConsumption = {
-            desayuno: 0,
-            almuerzo: 0,
-            comida: 0,
-            cena: 0
-          };
-        }
-        
-        // Actualizar interfaz
-        updateAllDisplays();
-        updatePortionsChart();
-        
-        showNotification(data.message, 'success');
-        return { success: true, data: data };
-      } else {
-        showNotification(data.error || 'Error al resetear', 'error');
-        return { success: false, error: data.error };
-      }
-    } catch (error) {
-      console.error('❌ Error resetando alimentos:', error);
-      showNotification('Error de conexión', 'error');
-      return { success: false, error: error.message };
-    }
-  }
-  
-  // ============================================
-  // ACTUALIZACIÓN DE INTERFAZ
-  // ============================================
-  
-  function updateAllDisplays() {
-    // Actualizar métricas principales
-    d3.select("#remaining-portions").text(appState.remainingPortions);
-    d3.select("#total-portions-text").text(appState.initialPortions);
-    d3.select("#portions-text").text(`${appState.remainingPortions} porciones`);
-    d3.select("#autonomy-days").text(appState.autonomyDays);
-    d3.select("#daily-consumption-estimated").text(CONFIG.totalPeople * CONFIG.mealsPerDay);
-    
-    // Actualizar consumo del día
-    d3.select("#breakfast-count").text(appState.dailyConsumption.desayuno + " porciones");
-    d3.select("#lunch-count").text(appState.dailyConsumption.almuerzo + " porciones");
-    d3.select("#dinner-count").text(appState.dailyConsumption.comida + " porciones");
-    d3.select("#snack-count").text(appState.dailyConsumption.cena + " porciones");
-    
-    const totalDay = Object.values(appState.dailyConsumption).reduce((a, b) => a + b, 0);
-    d3.select("#total-day-count").text(totalDay + " porciones");
-    
-    // Actualizar última actualización
-    const now = new Date();
-    d3.select("#last-update").text(now.toLocaleTimeString('es-ES'));
-    
-    // Actualizar estados de alerta
-    updateStatusIndicators();
-    
-    // Actualizar gráficos
-    updateMealDistributionChart();
-  }
-  
-  function updateStatusIndicators() {
-    const portionsStatus = d3.select("#portions-status");
-    const autonomyStatus = d3.select("#autonomy-status");
-    
-    if (appState.porcentajeRestante <= 10) {
-      portionsStatus.text("CRÍTICO").classed("status-critical", true).classed("status-warning", false).classed("status-good", false);
-    } else if (appState.porcentajeRestante <= 30) {
-      portionsStatus.text("ALERTA").classed("status-warning", true).classed("status-critical", false).classed("status-good", false);
-    } else {
-      portionsStatus.text("SUFICIENTE").classed("status-good", true).classed("status-warning", false).classed("status-critical", false);
-    }
-    
-    if (appState.autonomyDays <= 1) {
-      autonomyStatus.text("CRÍTICO").classed("status-critical", true).classed("status-warning", false).classed("status-good", false);
-    } else if (appState.autonomyDays <= 3) {
-      autonomyStatus.text("ALERTA").classed("status-warning", true).classed("status-critical", false).classed("status-good", false);
-    } else {
-      autonomyStatus.text("ÓPTIMO").classed("status-good", true).classed("status-warning", false).classed("status-critical", false);
-    }
-  }
-  
-  function updateConsumptionHistoryTable() {
-    const tbody = d3.select("#consumption-history");
-    tbody.html("");
-    
-    // Mostrar solo últimos 10 registros
-    const recentHistory = appState.consumptionHistory.slice(0, 10);
-    
-    if (recentHistory.length === 0) {
-      tbody.append("tr")
-        .style("background", "rgba(30, 41, 59, 0.5)")
-        .style("border-bottom", "1px solid #374151")
-        .append("td")
-        .attr("colspan", 4)
-        .style("padding", "20px")
-        .style("text-align", "center")
-        .style("color", "#9ca3af")
-        .text("No hay registros de consumo aún");
-      return;
-    }
-    
-    recentHistory.forEach(item => {
-      const row = tbody.append("tr")
-        .style("background", "rgba(30, 41, 59, 0.5)")
-        .style("border-bottom", "1px solid #374151");
-      
-      row.append("td")
-        .style("padding", "12px")
-        .style("color", "#fff")
-        .text(item.fecha_registro.toLocaleString('es-ES'));
-      
-      row.append("td")
-        .style("padding", "12px")
-        .style("color", "#fff")
-        .html(item.tipo_comida_display);
-      
-      row.append("td")
-        .style("padding", "12px")
-        .style("color", "#ff6b6b")
-        .style("font-weight", "600")
-        .text(item.porciones + " porciones");
-      
-      row.append("td")
-        .style("padding", "12px")
-        .style("color", "#fff")
-        .text(item.personas + " persona" + (item.personas !== 1 ? 's' : ''));
-    });
-  }
-  
-  // ============================================
-  // GRÁFICOS
-  // ============================================
-  
-  let updateTemperatureGauge = null;
-  let updateTemperatureHistory = null;
-  
-  // Gráfico de porciones animado
+  // Función para actualizar el gráfico de porciones
   function updatePortionsChart() {
     const svg = d3.select("#portions-chart");
     const width = svg.node().getBoundingClientRect().width;
@@ -579,7 +407,29 @@ document.addEventListener("DOMContentLoaded", function() {
     }, 500);
   }
   
-  // Gráfico de distribución por comida
+  // Función para actualizar estados de alerta
+  function updateStatusIndicators() {
+    const portionsStatus = d3.select("#portions-status");
+    const autonomyStatus = d3.select("#autonomy-status");
+    
+    if (appState.porcentajeRestante <= 10) {
+      portionsStatus.text("CRÍTICO").classed("status-critical", true).classed("status-warning", false).classed("status-good", false);
+    } else if (appState.porcentajeRestante <= 30) {
+      portionsStatus.text("ALERTA").classed("status-warning", true).classed("status-critical", false).classed("status-good", false);
+    } else {
+      portionsStatus.text("SUFICIENTE").classed("status-good", true).classed("status-warning", false).classed("status-critical", false);
+    }
+    
+    if (appState.autonomyDays <= 1) {
+      autonomyStatus.text("CRÍTICO").classed("status-critical", true).classed("status-warning", false).classed("status-good", false);
+    } else if (appState.autonomyDays <= 3) {
+      autonomyStatus.text("ALERTA").classed("status-warning", true).classed("status-critical", false).classed("status-good", false);
+    } else {
+      autonomyStatus.text("ÓPTIMO").classed("status-good", true).classed("status-warning", false).classed("status-critical", false);
+    }
+  }
+  
+  // Función para actualizar el gráfico de distribución de comidas
   function updateMealDistributionChart() {
     const svg = d3.select("#meal-distribution");
     const width = svg.node().getBoundingClientRect().width;
@@ -656,241 +506,857 @@ document.addEventListener("DOMContentLoaded", function() {
   }
   
   // ============================================
-  // TEMPERATURA
+  // NUEVAS FUNCIONES PARA ADMINISTRACIÓN
   // ============================================
   
-  // WebSocket para temperatura
-  const socket = new WebSocket("ws://" + window.location.host + "/ws/temperatura_alimentos/");
-  
-  function updateWebSocketStatus(connected) {
-    const indicator = document.querySelector('.ws-indicator');
-    const textElement = document.getElementById('ws-status-text');
+  // Función para mostrar/ocultar modal de confirmación
+  function showConfirmationModal(title, message, confirmCallback) {
+    const modal = document.getElementById('confirmation-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
     
-    if (connected) {
-      indicator.className = 'ws-indicator ws-connected';
-      textElement.textContent = 'Conectado';
-    } else {
-      indicator.className = 'ws-indicator ws-disconnected';
-      textElement.textContent = 'Desconectado';
-    }
+    modalTitle.textContent = title;
+    modalMessage.textContent = message;
+    modal.style.display = 'flex';
+    
+    // Guardar la acción pendiente
+    appState.pendingAction = confirmCallback;
   }
   
-  socket.onmessage = function(e) {
+  function hideConfirmationModal() {
+    const modal = document.getElementById('confirmation-modal');
+    modal.style.display = 'none';
+    appState.pendingAction = null;
+  }
+  
+  // Función para configurar tripulación
+  async function configureCrewSize(newCrewSize) {
     try {
-      const data = JSON.parse(e.data);
-      handleTemperatureData(data);
+      const response = await fetch('/api/alimentos/configurar-tripulacion/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+          tripulantes: parseInt(newCrewSize)
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Actualizar estado local
+        appState.currentCrewSize = newCrewSize;
+        
+        // Recargar datos del estado para actualizar cálculos
+        await obtenerEstadoAlimentos();
+        
+        showNotification(`✅ Tripulación actualizada a ${newCrewSize} personas`, 'success');
+        return { success: true, data: data };
+      } else {
+        showNotification(data.error || 'Error al actualizar tripulación', 'error');
+        return { success: false, error: data.error };
+      }
     } catch (error) {
-      console.error('Error procesando datos:', error);
+      console.error('❌ Error configurando tripulación:', error);
+      showNotification('Error de conexión', 'error');
+      return { success: false, error: error.message };
     }
-  };
-  
-  socket.onerror = function(error) {
-    console.error('WebSocket error:', error);
-    updateWebSocketStatus(false);
-  };
-
-  socket.onclose = function(e) {
-  console.warn("WebSocket Alimentos desconectado");
-  setTimeout(() => {
-      location.reload();
-      }, 3000);
-  };
-  
-  function handleTemperatureData(data) {
-    appState.currentTemperature = data.temperatura || data.valor;
-    
-    const timestamp = data.fecha_hora ? new Date(data.fecha_hora) : new Date();
-    appState.temperatureHistory.push({
-      timestamp: timestamp,
-      temp: appState.currentTemperature
-    });
-    
-    if (appState.temperatureHistory.length > 24) {
-      appState.temperatureHistory = appState.temperatureHistory.slice(-24);
-    }
-    
-    updateTemperatureDisplay();
   }
   
-  function initTemperatureGauge() {
-    const svg = d3.select("#temperature-gauge");
-    const width = 180;
-    const height = 250;
-    
-    svg.attr("width", width).attr("height", height);
-    
-    // Limpiar cualquier elemento previo
-    svg.selectAll("*").remove();
-    
-    const thermometer = svg.append("g")
-      .attr("transform", `translate(${width/2}, 60)`); // Más espacio arriba
-    
-    const bulbRadius = 30; // Reducido para dar más espacio
-    thermometer.append("circle")
-      .attr("r", bulbRadius)
-      .attr("fill", "#1f2937")
-      .attr("stroke", "#4b5563")
-      .attr("stroke-width", 2);
-    
-    const tubeWidth = 25;
-    const tubeHeight = 160; // Ajustado
-    thermometer.append("rect")
-      .attr("x", -tubeWidth/2)
-      .attr("y", -bulbRadius)
-      .attr("width", tubeWidth)
-      .attr("height", tubeHeight)
-      .attr("rx", tubeWidth/2)
-      .attr("fill", "#1f2937")
-      .attr("stroke", "#4b5563")
-      .attr("stroke-width", 2);
-    
-    const mercury = thermometer.append("rect")
-      .attr("x", -tubeWidth/2 + 4)
-      .attr("width", tubeWidth - 8)
-      .attr("y", tubeHeight - bulbRadius)
-      .attr("height", 0)
-      .attr("rx", (tubeWidth - 8)/2)
-      .attr("fill", "#ef4444");
-    
-    // AJUSTE CLAVE: Extender la escala un poco más arriba
-    const tempScale = d3.scaleLinear()
-      .domain([-10, 32]) // Extender a 32° para que 30° quede visible
-      .range([tubeHeight - bulbRadius, -bulbRadius - 5]); // -5px extra arriba
-    
-    // Dibujar todas las marcas de la escala
-    for (let temp = -10; temp <= 30; temp += 5) {
-      const y = tempScale(temp);
+  // Función para configurar porciones iniciales
+  async function configureInitialPortions(newInitialPortions) {
+    try {
+      const response = await fetch('/api/alimentos/configurar-suministros/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+          porciones_iniciales: parseInt(newInitialPortions)
+        })
+      });
       
-      // Solo dibujar marcas que estén dentro del tubo visible
-      if (y >= -bulbRadius && y <= tubeHeight - bulbRadius) {
-        // Línea de la escala izquierda
-        thermometer.append("line")
-          .attr("x1", -tubeWidth/2 - 10)
-          .attr("x2", -tubeWidth/2 - 2)
-          .attr("y1", y)
-          .attr("y2", y)
-          .attr("stroke", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? "#fff" : "#6b7280")
-          .attr("stroke-width", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? 2 : 1.5);
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Recargar datos del estado
+        await obtenerEstadoAlimentos();
         
-        // Etiquetas de temperatura
-        thermometer.append("text")
-          .attr("x", -tubeWidth/2 - 15)
-          .attr("y", y + 4)
-          .attr("text-anchor", "end")
-          .attr("fill", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? "#fff" : "#9ca3af")
-          .attr("font-size", "16px")
-          .attr("font-weight", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? "bold" : "normal")
-          .text(temp + "°");
-        
-        // Línea del lado derecho
-        thermometer.append("line")
-          .attr("x1", tubeWidth/2 + 2)
-          .attr("x2", tubeWidth/2 + 10)
-          .attr("y1", y)
-          .attr("y2", y)
-          .attr("stroke", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? "#fff" : "#6b7280")
-          .attr("stroke-width", temp === 0 || temp === 10 || temp === -10 || temp === 30 ? 2 : 1.5);
-      }
-    }
-    
-    // Marca especial para 30° si no está visible
-    const y30 = tempScale(30);
-    if (y30 < -bulbRadius) {
-      // Dibujar 30° justo en el borde superior
-      thermometer.append("line")
-        .attr("x1", -tubeWidth/2 - 10)
-        .attr("x2", -tubeWidth/2 - 2)
-        .attr("y1", -bulbRadius)
-        .attr("y2", -bulbRadius)
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 2);
-      
-      thermometer.append("text")
-        .attr("x", -tubeWidth/2 - 15)
-        .attr("y", -bulbRadius + 4)
-        .attr("text-anchor", "end")
-        .attr("fill", "#fff")
-        .attr("font-size", "10px")
-        .attr("font-weight", "bold")
-        .text("30°");
-      
-      thermometer.append("line")
-        .attr("x1", tubeWidth/2 + 2)
-        .attr("x2", tubeWidth/2 + 10)
-        .attr("y1", -bulbRadius)
-        .attr("y2", -bulbRadius)
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 2);
-    }
-    
-    // Línea de mercurio cero para referencia
-    thermometer.append("line")
-      .attr("x1", -tubeWidth/2)
-      .attr("x2", tubeWidth/2)
-      .attr("y1", tempScale(0))
-      .attr("y2", tempScale(0))
-      .attr("stroke", "#6b7280")
-      .attr("stroke-width", 0.5)
-      .attr("stroke-dasharray", "2,2")
-      .attr("opacity", 0.5);
-    
-    return function(temp) {
-      if (temp === null || temp === undefined) return;
-      
-      // Limitar la temperatura visualmente a -10° a 30°
-      const displayTemp = Math.max(-10, Math.min(30, temp));
-      const mercuryHeight = tempScale(0) - tempScale(displayTemp);
-      const mercuryY = tempScale(displayTemp);
-      
-      let color;
-      if (temp < 2) {
-        color = "#60a5fa";
-      } else if (temp <= 8) {
-        color = "#10b981";
-      } else if (temp <= 12) {
-        color = "#f59e0b";
+        showNotification(`✅ Suministros actualizados a ${newInitialPortions} porciones iniciales`, 'success');
+        return { success: true, data: data };
       } else {
-        color = "#ef4444";
+        showNotification(data.error || 'Error al actualizar suministros', 'error');
+        return { success: false, error: data.error };
+      }
+    } catch (error) {
+      console.error('❌ Error configurando suministros:', error);
+      showNotification('Error de conexión', 'error');
+      return { success: false, error: error.message };
+    }
+  }
+  
+  // Función para borrar registros de consumo
+  async function clearConsumptionRecords() {
+    try {
+      const response = await fetch('/api/alimentos/borrar-registros/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Resetear consumo diario local
+        appState.dailyConsumption = {
+          desayuno: 0,
+          almuerzo: 0,
+          comida: 0,
+          cena: 0
+        };
+        appState.totalConsumedToday = 0;
+        appState.consumptionHistory = [];
+        
+        showNotification('✅ Todos los registros de consumo han sido eliminados', 'success');
+        updateAllDisplays();
+        updateConsumptionHistoryTable();
+        return { success: true, data: data };
+      } else {
+        showNotification(data.error || 'Error al borrar registros', 'error');
+        return { success: false, error: data.error };
+      }
+    } catch (error) {
+      console.error('❌ Error borrando registros:', error);
+      showNotification('Error de conexión', 'error');
+      return { success: false, error: error.message };
+    }
+  }
+  
+  // Función para reiniciar completamente el sistema
+  async function resetCompleteSystem() {
+    try {
+      const response = await fetch('/api/alimentos/reiniciar-completo/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+          tripulantes: CONFIG.defaultCrewSize,
+          porciones_iniciales: CONFIG.defaultInitialPortions
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Resetear todo el estado local
+        appState.currentCrewSize = CONFIG.defaultCrewSize;
+        appState.initialPortions = data.recurso_alimentos.porciones_iniciales;
+        appState.remainingPortions = data.recurso_alimentos.porciones_actuales;
+        appState.porcentajeRestante = data.recurso_alimentos.porcentaje_restante;
+        appState.autonomyDays = data.recurso_alimentos.dias_autonomia;
+        appState.dailyConsumption = {
+          desayuno: 0,
+          almuerzo: 0,
+          comida: 0,
+          cena: 0
+        };
+        appState.totalConsumedToday = 0;
+        appState.consumptionHistory = [];
+        appState.missionStartDate = new Date();
+        appState.daysElapsed = 0;
+        
+        // Actualizar campos de formulario
+        document.getElementById('configure-crew-size').value = CONFIG.defaultCrewSize;
+        document.getElementById('configure-initial-portions').value = CONFIG.defaultInitialPortions;
+        
+        showNotification('✅ Sistema reiniciado completamente. Valores restaurados por defecto.', 'success');
+        updateAllDisplays();
+        updateConsumptionHistoryTable();
+        return { success: true, data: data };
+      } else {
+        showNotification(data.error || 'Error al reiniciar sistema', 'error');
+        return { success: false, error: data.error };
+      }
+    } catch (error) {
+      console.error('❌ Error reiniciando sistema:', error);
+      showNotification('Error de conexión', 'error');
+      return { success: false, error: error.message };
+    }
+  }
+  
+  // ============================================
+  // FUNCIONES EXISTENTES
+  // ============================================
+  
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  
+  async function obtenerEstadoAlimentos() {
+    try {
+      const response = await fetch('/api/alimentos/estado/');
+      if (!response.ok) throw new Error('Error al obtener estado');
+      
+      const data = await response.json();
+      
+      appState.remainingPortions = data.porciones_actuales;
+      appState.initialPortions = data.porciones_iniciales;
+      appState.porcentajeRestante = data.porcentaje_restante;
+      appState.autonomyDays = data.dias_autonomia;
+      
+      // Obtener el número de tripulantes del recurso de alimentos
+      if (data.num_tripulantes) {
+        appState.currentCrewSize = data.num_tripulantes;
       }
       
-      mercury.transition()
-        .duration(800)
-        .attr("y", mercuryY)
-        .attr("height", Math.max(0, mercuryHeight))
-        .attr("fill", color);
+      updateAllDisplays();
       
-      return color;
+      return { success: true, data: data };
+    } catch (error) {
+      console.error('Error cargando estado:', error);
+      showNotification('Error al cargar datos de alimentos', 'error');
+      return { success: false, error: error.message };
+    }
+  }
+  
+  async function obtenerConsumoDiario() {
+    try {
+      const response = await fetch('/api/alimentos/consumos/diarios/');
+      if (!response.ok) throw new Error('Error al obtener consumo diario');
+      
+      const data = await response.json();
+      
+      // Verificar la estructura de los datos
+      if (data.resumen) {
+        appState.dailyConsumption = {
+          desayuno: data.resumen.desayuno?.porciones || 0,
+          almuerzo: data.resumen.almuerzo?.porciones || 0,
+          comida: data.resumen.comida?.porciones || 0,
+          cena: data.resumen.cena?.porciones || 0
+        };
+        
+        appState.totalConsumedToday = Object.values(appState.dailyConsumption).reduce((a, b) => a + b, 0);
+      }
+      
+      if (data.detalles) {
+        appState.consumptionHistory = data.detalles.map(item => ({
+          id: item.id,
+          tipo_comida: item.tipo_comida,
+          tipo_comida_display: item.tipo_comida_display,
+          personas: item.personas,
+          porciones: item.porciones,
+          fecha_registro: new Date(item.fecha_registro)
+        }));
+        
+        // Actualizar tamaño de tripulación basado en el último registro
+        if (appState.consumptionHistory.length > 0) {
+          const lastConsumption = appState.consumptionHistory[0];
+          appState.currentCrewSize = lastConsumption.personas;
+        }
+      }
+      
+      updateAllDisplays();
+      updateConsumptionHistoryTable();
+      
+      return { success: true, data: data };
+    } catch (error) {
+      console.error('Error cargando consumo diario:', error);
+      return { success: false, error: error.message };
+    }
+  }
+  
+  async function registrarConsumoAPI(tipo_comida, personas, porciones) {
+    try {
+      const btn = document.getElementById('btn-register-consumption');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '⏳ Procesando...';
+      btn.disabled = true;
+      
+      const response = await fetch('/api/alimentos/registrar-consumo/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+          tipo_comida: tipo_comida,
+          personas: parseInt(personas),
+          porciones: parseInt(porciones)
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Actualizar estado local con nuevos datos
+        if (data.recurso_alimentos) {
+          appState.remainingPortions = data.recurso_alimentos.porciones_actuales;
+          appState.porcentajeRestante = data.recurso_alimentos.porcentaje_restante;
+          appState.autonomyDays = data.recurso_alimentos.dias_autonomia;
+        }
+        
+        // Actualizar consumo diario
+        appState.currentCrewSize = personas;
+        appState.dailyConsumption[tipo_comida] += parseInt(porciones);
+        appState.totalConsumedToday = Object.values(appState.dailyConsumption).reduce((a, b) => a + b, 0);
+        
+        // Agregar al historial local
+        if (data.consumo) {
+          appState.consumptionHistory.unshift({
+            id: data.consumo.id,
+            tipo_comida: data.consumo.tipo_comida,
+            tipo_comida_display: data.consumo.tipo_comida_display,
+            personas: data.consumo.personas,
+            porciones: data.consumo.porciones,
+            fecha_registro: new Date(data.consumo.fecha_registro)
+          });
+        }
+        
+        updateAllDisplays();
+        updateConsumptionHistoryTable();
+        updatePortionsChart();
+        generateConsumptionAlerts();
+        generateRationingSuggestions();
+        
+        showNotification(data.message || 'Consumo registrado exitosamente', 'success');
+        return { success: true, data: data };
+      } else {
+        showNotification(data.error || 'Error al registrar consumo', 'error');
+        return { success: false, error: data.error };
+      }
+    } catch (error) {
+      console.error('❌ Error registrando consumo:', error);
+      showNotification('Error de conexión', 'error');
+      return { success: false, error: error.message };
+    } finally {
+      const btn = document.getElementById('btn-register-consumption');
+      btn.innerHTML = '📋 Registrar Consumo';
+      btn.disabled = false;
+    }
+  }
+  
+  function updateConsumptionHistoryTable() {
+    const tbody = d3.select("#consumption-history");
+    tbody.html("");
+    
+    const recentHistory = appState.consumptionHistory.slice(0, 10);
+    
+    if (recentHistory.length === 0) {
+      tbody.append("tr")
+        .style("background", "rgba(30, 41, 59, 0.5)")
+        .style("border-bottom", "1px solid #374151")
+        .append("td")
+        .attr("colspan", 5)
+        .style("padding", "20px")
+        .style("text-align", "center")
+        .style("color", "#9ca3af")
+        .text("No hay registros de consumo aún");
+      return;
+    }
+    
+    recentHistory.forEach((item, index) => {
+      const row = tbody.append("tr")
+        .style("background", "rgba(30, 41, 59, 0.5)")
+        .style("border-bottom", "1px solid #374151")
+        .attr("data-id", item.id);
+      
+      row.append("td")
+        .style("padding", "12px")
+        .style("color", "#fff")
+        .text(item.fecha_registro.toLocaleString('es-ES'));
+      
+      row.append("td")
+        .style("padding", "12px")
+        .style("color", "#fff")
+        .html(item.tipo_comida_display || item.tipo_comida);
+      
+      row.append("td")
+        .style("padding", "12px")
+        .style("color", "#ff6b6b")
+        .style("font-weight", "600")
+        .text(item.porciones + " porciones");
+      
+      row.append("td")
+        .style("padding", "12px")
+        .style("color", "#fff")
+        .text(item.personas + " persona" + (item.personas !== 1 ? 's' : ''));
+      
+      // Celda de acciones con botón para eliminar registro individual
+      const actionsCell = row.append("td")
+        .style("padding", "12px");
+      
+      actionsCell.append("button")
+        .style("padding", "5px 10px")
+        .style("background", "rgba(239, 68, 68, 0.2)")
+        .style("color", "#ef4444")
+        .style("border", "1px solid #ef4444")
+        .style("border-radius", "4px")
+        .style("cursor", "pointer")
+        .style("font-size", "12px")
+        .text("Eliminar")
+        .on("click", function() {
+          deleteConsumptionRecord(item.id, index);
+        });
+    });
+  }
+  
+  // Función para eliminar un registro individual
+  async function deleteConsumptionRecord(recordId, index) {
+    showConfirmationModal(
+      "Eliminar Registro",
+      "¿Está seguro de que desea eliminar este registro de consumo? Esta acción no se puede deshacer.",
+      async () => {
+        try {
+          const response = await fetch(`/api/alimentos/eliminar-registro/${recordId}/`, {
+            method: 'DELETE',
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken')
+            }
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok && data.success) {
+            // Eliminar del estado local
+            appState.consumptionHistory = appState.consumptionHistory.filter(record => record.id !== recordId);
+            
+            // Recalcular consumo diario
+            await obtenerConsumoDiario();
+            
+            showNotification('✅ Registro eliminado correctamente', 'success');
+          } else {
+            showNotification(data.error || 'Error al eliminar registro', 'error');
+          }
+        } catch (error) {
+          console.error('❌ Error eliminando registro:', error);
+          showNotification('Error de conexión', 'error');
+        }
+      }
+    );
+  }
+  
+  // ============================================
+  // FUNCIONES DE CALCULO DE MISIÓN
+  // ============================================
+  
+  function calculateMissionInfo() {
+    const now = new Date();
+    const timeDiff = now.getTime() - appState.missionStartDate.getTime();
+    appState.daysElapsed = Math.floor(timeDiff / (1000 * 3600 * 24));
+    appState.daysElapsed = Math.min(appState.daysElapsed, CONFIG.totalMissionDays);
+    
+    const daysRemaining = Math.max(0, CONFIG.totalMissionDays - appState.daysElapsed);
+    const expectedDailyConsumption = appState.currentCrewSize * CONFIG.mealsPerDayPerPerson;
+    
+    return {
+      daysElapsed: appState.daysElapsed,
+      daysRemaining: daysRemaining,
+      expectedDaily: expectedDailyConsumption
     };
   }
-
-  function updateTemperatureDisplay() {
-    if (appState.currentTemperature === null) return;
+  
+  function updateMissionInfo() {
+    const missionInfo = calculateMissionInfo();
     
-    const temp = appState.currentTemperature;
-    const tempColor = updateTemperatureGauge(temp);
+    d3.select("#mission-crew").text(appState.currentCrewSize);
+    d3.select("#mission-days-remaining").text(missionInfo.daysRemaining);
+    d3.select("#expected-day-count").text(`${missionInfo.expectedDaily} porciones`);
+  }
+  
+  function generateConsumptionAlerts() {
+    const alertsContainer = document.getElementById("consumption-alerts");
+    const missionInfo = calculateMissionInfo();
     
-    d3.select("#temperature-text")
-      .text(temp.toFixed(1) + "°C")
-      .style("color", tempColor);
+    const expectedDailyConsumption = missionInfo.expectedDaily;
+    const actualDailyConsumption = appState.totalConsumedToday;
+    const consumptionDeviation = actualDailyConsumption - expectedDailyConsumption;
     
-    d3.select("#current-temp").text(temp.toFixed(1));
+    const portionsNeededForRemainingMission = missionInfo.daysRemaining * expectedDailyConsumption;
+    const supplyDeficit = portionsNeededForRemainingMission - appState.remainingPortions;
     
-    const tempStatus = d3.select("#temp-status");
-    if (temp < 2) {
-      tempStatus.text("CONGELACIÓN").style("background", "#60a5fa");
-    } else if (temp <= 8) {
-      tempStatus.text("ÓPTIMA").style("background", "#10b981");
-    } else if (temp <= 12) {
-      tempStatus.text("ALERTA").style("background", "#f59e0b");
+    let alertsHTML = "";
+    
+    if (consumptionDeviation > 0) {
+      const severity = consumptionDeviation > (expectedDailyConsumption * 0.5) ? "critical" : "warning";
+      const icon = severity === "critical" ? "🚨" : "⚠️";
+      const excessPercentage = Math.round((consumptionDeviation / expectedDailyConsumption) * 100);
+      
+      alertsHTML += `
+        <div class="alert-item ${severity}" style="background: ${severity === 'critical' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)'}; 
+                border-left: 4px solid ${severity === 'critical' ? '#ef4444' : '#f59e0b'}; 
+                padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+            <span style="font-size: 16px;">${icon}</span>
+            <span style="font-weight: 600; color: ${severity === 'critical' ? '#ef4444' : '#f59e0b'};">Consumo Excesivo</span>
+          </div>
+          <div style="color: #fff; font-size: 14px;">
+            Hoy se consumieron <span style="color: #ff6b6b; font-weight: 600;">${consumptionDeviation}</span> porciones más 
+            de lo esperado (${excessPercentage}% de exceso).
+          </div>
+          <div style="color: #ffa8a8; font-size: 12px; margin-top: 5px;">
+            Consumo esperado: ${expectedDailyConsumption} porciones | Consumo real: ${actualDailyConsumption} porciones
+          </div>
+        </div>
+      `;
+    } else if (consumptionDeviation === 0) {
+      alertsHTML += `
+        <div class="alert-item success" style="background: rgba(16, 185, 129, 0.2); 
+                border-left: 4px solid #10b981; 
+                padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+            <span style="font-size: 16px;">✅</span>
+            <span style="font-weight: 600; color: #10b981;">Consumo Normal</span>
+          </div>
+          <div style="color: #fff; font-size: 14px;">
+            El consumo de hoy está dentro del rango esperado.
+          </div>
+          <div style="color: #ffa8a8; font-size: 12px; margin-top: 5px;">
+            ${expectedDailyConsumption} porciones consumidas correctamente.
+          </div>
+        </div>
+      `;
     } else {
-      tempStatus.text("PELIGRO").style("background", "#ef4444");
+      alertsHTML += `
+        <div class="alert-item info" style="background: rgba(59, 130, 246, 0.2); 
+                border-left: 4px solid #3b82f6; 
+                padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+            <span style="font-size: 16px;">📉</span>
+            <span style="font-weight: 600; color: #3b82f6;">Consumo Inferior</span>
+          </div>
+          <div style="color: #fff; font-size: 14px;">
+            Hoy se consumieron <span style="color: #10b981; font-weight: 600;">${Math.abs(consumptionDeviation)}</span> 
+            porciones menos de lo esperado.
+          </div>
+        </div>
+      `;
     }
+    
+    if (supplyDeficit > 0) {
+      const severity = supplyDeficit > (portionsNeededForRemainingMission * 0.3) ? "critical" : "warning";
+      const icon = severity === "critical" ? "🚨" : "⚠️";
+      const daysCovered = Math.floor(appState.remainingPortions / expectedDailyConsumption);
+      
+      alertsHTML += `
+        <div class="alert-item ${severity}" style="background: ${severity === 'critical' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)'}; 
+                border-left: 4px solid ${severity === 'critical' ? '#ef4444' : '#f59e0b'}; 
+                padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+            <span style="font-size: 16px;">${icon}</span>
+            <span style="font-weight: 600; color: ${severity === 'critical' ? '#ef4444' : '#f59e0b'};">Déficit de Suministros</span>
+          </div>
+          <div style="color: #fff; font-size: 14px;">
+            Con el consumo actual, los suministros solo alcanzarán para 
+            <span style="color: #ff6b6b; font-weight: 600;">${daysCovered}</span> días 
+            de los <span style="color: #ff6b6b; font-weight: 600;">${missionInfo.daysRemaining}</span> días restantes.
+          </div>
+          <div style="color: #ffa8a8; font-size: 12px; margin-top: 5px;">
+            Faltan ${supplyDeficit} porciones para completar la misión.
+          </div>
+        </div>
+      `;
+    } else if (supplyDeficit <= 0 && missionInfo.daysRemaining > 0) {
+      alertsHTML += `
+        <div class="alert-item success" style="background: rgba(16, 185, 129, 0.2); 
+                border-left: 4px solid #10b981; 
+                padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+            <span style="font-size: 16px;">✅</span>
+            <span style="font-weight: 600; color: #10b981;">Suministros Suficientes</span>
+          </div>
+          <div style="color: #fff; font-size: 14px;">
+            Hay suficientes suministros para los ${missionInfo.daysRemaining} días restantes de misión.
+          </div>
+        </div>
+      `;
+    }
+    
+    if (appState.porcentajeRestante <= 30) {
+      const severity = appState.porcentajeRestante <= 10 ? "critical" : "warning";
+      const icon = severity === "critical" ? "🚨" : "⚠️";
+      alertsHTML += `
+        <div class="alert-item ${severity}" style="background: ${severity === 'critical' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)'}; 
+                border-left: 4px solid ${severity === 'critical' ? '#ef4444' : '#f59e0b'}; 
+                padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+            <span style="font-size: 16px;">${icon}</span>
+            <span style="font-weight: 600; color: ${severity === 'critical' ? '#ef4444' : '#f59e0b'};">Suministro Bajo</span>
+          </div>
+          <div style="color: #fff; font-size: 14px;">
+            Solo queda el <span style="color: #ff6b6b; font-weight: 600;">${Math.round(appState.porcentajeRestante)}%</span> 
+            del suministro inicial.
+          </div>
+        </div>
+      `;
+    }
+    
+    if (missionInfo.daysRemaining <= 0) {
+      alertsHTML += `
+        <div class="alert-item info" style="background: rgba(139, 92, 246, 0.2); 
+                border-left: 4px solid #8b5cf6; 
+                padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+            <span style="font-size: 16px;">🎉</span>
+            <span style="font-weight: 600; color: #8b5cf6;">Misión Completada</span>
+          </div>
+          <div style="color: #fff; font-size: 14px;">
+            ¡La misión de 7 días ha sido completada!
+          </div>
+        </div>
+      `;
+    }
+    
+    alertsContainer.innerHTML = alertsHTML || `
+      <div class="alert-item info" style="background: rgba(30, 41, 59, 0.5); padding: 15px; text-align: center; border-radius: 4px;">
+        <div style="color: #9ca3af;">
+          No hay alertas en este momento.
+        </div>
+      </div>
+    `;
+  }
+  
+  function generateRationingSuggestions() {
+    const suggestionsContainer = document.getElementById("rationing-suggestions");
+    const missionInfo = calculateMissionInfo();
+    
+    const expectedDailyConsumption = missionInfo.expectedDaily;
+    const daysRemaining = missionInfo.daysRemaining;
+    const remainingPortions = appState.remainingPortions;
+    
+    const totalNeededForRemainingMission = daysRemaining * expectedDailyConsumption;
+    const portionsDeficit = totalNeededForRemainingMission - remainingPortions;
+    const actualDailyConsumption = appState.totalConsumedToday;
+    const consumptionDeviation = actualDailyConsumption - expectedDailyConsumption;
+    
+    let suggestionsHTML = "";
+    
+    if (portionsDeficit > 0 || consumptionDeviation > 0) {
+      const halfPortionDailyNeed = appState.currentCrewSize * CONFIG.mealsPerDayPerPerson * 0.5;
+      const daysWithHalfPortions = remainingPortions / halfPortionDailyNeed;
+      
+      suggestionsHTML += `
+        <div class="suggestion-item" style="background: rgba(59, 130, 246, 0.2); 
+                border-left: 4px solid #3b82f6; 
+                padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+            <span style="font-size: 16px;">🍽️</span>
+            <span style="font-weight: 600; color: #3b82f6;">Opción 1: Media Porción</span>
+          </div>
+          <div style="color: #fff; font-size: 14px;">
+            Si cada tripulante consume <span style="color: #1ad0f9; font-weight: 600;">media porción</span> en cada comida:
+            <ul style="margin: 5px 0 5px 20px; color: #fff;">
+              <li>Suministros alcanzarían para <span style="color: #1ad0f9; font-weight: 600;">${Math.floor(daysWithHalfPortions)}</span> días</li>
+              <li>Consumo diario: <span style="color: #1ad0f9; font-weight: 600;">${halfPortionDailyNeed}</span> porciones/día</li>
+              <li>Ahorro: <span style="color: #10b981; font-weight: 600;">${expectedDailyConsumption - halfPortionDailyNeed}</span> porciones/día</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      const threeMealsDailyNeed = appState.currentCrewSize * 3;
+      const daysWithThreeMeals = remainingPortions / threeMealsDailyNeed;
+      
+      suggestionsHTML += `
+        <div class="suggestion-item" style="background: rgba(139, 92, 246, 0.2); 
+                border-left: 4px solid #8b5cf6; 
+                padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+            <span style="font-size: 16px;">⏰</span>
+            <span style="font-weight: 600; color: #8b5cf6;">Opción 2: 3 Comidas</span>
+          </div>
+          <div style="color: #fff; font-size: 14px;">
+            Reducir a <span style="color: #1ad0f9; font-weight: 600;">3 comidas</span> diarias en lugar de 4:
+            <ul style="margin: 5px 0 5px 20px; color: #fff;">
+              <li>Suministros alcanzarían para <span style="color: #1ad0f9; font-weight: 600;">${Math.floor(daysWithThreeMeals)}</span> días</li>
+              <li>Consumo diario: <span style="color: #1ad0f9; font-weight: 600;">${threeMealsDailyNeed}</span> porciones/día</li>
+              <li>Ahorro: <span style="color: #10b981; font-weight: 600;">${expectedDailyConsumption - threeMealsDailyNeed}</span> porciones/día</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      if (consumptionDeviation > 0) {
+        suggestionsHTML += `
+          <div class="suggestion-item" style="background: rgba(16, 185, 129, 0.2); 
+                  border-left: 4px solid #10b981; 
+                  padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+              <span style="font-size: 16px;">🎯</span>
+              <span style="font-weight: 600; color: #10b981;">Recomendación Principal</span>
+            </div>
+            <div style="color: #fff; font-size: 14px;">
+              <span style="color: #1ad0f9; font-weight: 600;">Reducir el consumo</span> a 
+              ${expectedDailyConsumption} porciones/día (${CONFIG.mealsPerDayPerPerson} por tripulante).
+              <div style="margin-top: 5px; font-size: 12px; color: #ffa8a8;">
+                Actualmente hay un exceso de ${consumptionDeviation} porciones/día.
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    } else {
+      suggestionsHTML = `
+        <div class="suggestion-item" style="background: rgba(16, 185, 129, 0.2); 
+                border-left: 4px solid #10b981; 
+                padding: 15px; text-align: center; border-radius: 4px;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
+            <span style="font-size: 20px;">✅</span>
+            <span style="font-weight: 600; color: #10b981;">Consumo Óptimo</span>
+          </div>
+          <div style="color: #fff; font-size: 14px;">
+            El consumo actual es el adecuado para la misión.
+            No se requieren ajustes en este momento.
+          </div>
+        </div>
+      `;
+    }
+    
+    suggestionsHTML += `
+      <div style="background: rgba(30, 41, 59, 0.5); padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 12px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color: #fff;">
+          <div>
+            <span style="color: #ffa8a8;">Consumo esperado/día:</span>
+            <span style="color: #1ad0f9; font-weight: 600; margin-left: 5px;">${expectedDailyConsumption}</span>
+          </div>
+          <div>
+            <span style="color: #ffa8a8;">Consumo real hoy:</span>
+            <span style="color: ${actualDailyConsumption > expectedDailyConsumption ? '#ff6b6b' : '#10b981'}; font-weight: 600; margin-left: 5px;">
+              ${actualDailyConsumption}
+            </span>
+          </div>
+          <div>
+            <span style="color: #ffa8a8;">Días cubiertos:</span>
+            <span style="color: #1ad0f9; font-weight: 600; margin-left: 5px;">${Math.floor(appState.remainingPortions / expectedDailyConsumption)}</span>
+          </div>
+          <div>
+            <span style="color: #ffa8a8;">Días restantes:</span>
+            <span style="color: #fff; font-weight: 600; margin-left: 5px;">${daysRemaining}</span>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    suggestionsContainer.innerHTML = suggestionsHTML;
+  }
+  
+  function updateAllDisplays() {
+    // Actualizar métricas principales
+    d3.select("#remaining-portions").text(appState.remainingPortions);
+    d3.select("#total-portions-text").text(appState.initialPortions);
+    d3.select("#portions-text").text(`${appState.remainingPortions} porciones`);
+    d3.select("#autonomy-days").text(appState.autonomyDays);
+    
+    // Actualizar consumo del día
+    d3.select("#breakfast-count").text(appState.dailyConsumption.desayuno + " porciones");
+    d3.select("#lunch-count").text(appState.dailyConsumption.almuerzo + " porciones");
+    d3.select("#dinner-count").text(appState.dailyConsumption.comida + " porciones");
+    d3.select("#snack-count").text(appState.dailyConsumption.cena + " porciones");
+    
+    const totalDay = appState.totalConsumedToday;
+    d3.select("#total-day-count").text(totalDay + " porciones");
+    
+    // Actualizar estados de alerta
+    updateStatusIndicators();
+    
+    // Actualizar gráficos
+    updateMealDistributionChart();
+    updatePortionsChart();
+    
+    // Actualizar información de misión
+    updateMissionInfo();
+    
+    // Generar alertas y sugerencias
+    generateConsumptionAlerts();
+    generateRationingSuggestions();
   }
   
   // ============================================
   // MANEJO DE EVENTOS
   // ============================================
   
+  // Configurar tripulación
+  document.getElementById("btn-configure-crew").addEventListener("click", async function() {
+    const newCrewSize = parseInt(document.getElementById("configure-crew-size").value) || 0;
+    
+    if (newCrewSize < 1 || newCrewSize > 6) {
+      showNotification("⚠️ El número de tripulantes debe estar entre 1 y 6", "warning");
+      return;
+    }
+    
+    await configureCrewSize(newCrewSize);
+  });
+  
+  // Configurar suministros
+  document.getElementById("btn-configure-portions").addEventListener("click", async function() {
+    const newInitialPortions = parseInt(document.getElementById("configure-initial-portions").value) || 0;
+    
+    if (newInitialPortions <= 0) {
+      showNotification("⚠️ Las porciones iniciales deben ser mayores a 0", "warning");
+      return;
+    }
+    
+    await configureInitialPortions(newInitialPortions);
+  });
+  
+  // Borrar registros
+  document.getElementById("btn-clear-records").addEventListener("click", function() {
+    showConfirmationModal(
+      "Borrar Registros de Consumo",
+      "¿Está seguro de que desea eliminar TODOS los registros de consumo? Esta acción no se puede deshacer. Los suministros se mantendrán igual.",
+      async () => {
+        await clearConsumptionRecords();
+        hideConfirmationModal();
+      }
+    );
+  });
+  
+  // Reiniciar completamente
+  document.getElementById("btn-reset-all").addEventListener("click", function() {
+    showConfirmationModal(
+      "Reiniciar Sistema Completo",
+      "¿Está seguro de que desea reiniciar COMPLETAMENTE el sistema? Esto eliminará todos los registros, restaurará los valores por defecto y reiniciará la misión. Esta acción no se puede deshacer.",
+      async () => {
+        await resetCompleteSystem();
+        hideConfirmationModal();
+      }
+    );
+  });
+  
+  // Manejo del modal de confirmación
+  document.getElementById("modal-cancel").addEventListener("click", hideConfirmationModal);
+  document.getElementById("modal-confirm").addEventListener("click", function() {
+    if (appState.pendingAction) {
+      appState.pendingAction();
+      hideConfirmationModal();
+    }
+  });
+  
+  // Cerrar modal haciendo clic fuera de él
+  document.getElementById("confirmation-modal").addEventListener("click", function(event) {
+    if (event.target.id === "confirmation-modal") {
+      hideConfirmationModal();
+    }
+  });
+  
+  // Registrar consumo
   document.getElementById("btn-register-consumption").addEventListener("click", async function() {
     const totalPeople = parseInt(document.getElementById("total-people").value) || 0;
     const totalPortions = parseInt(document.getElementById("total-portions-input").value) || 0;
@@ -901,9 +1367,13 @@ document.addEventListener("DOMContentLoaded", function() {
       return;
     }
     
+    if (totalPeople < 1 || totalPeople > 6) {
+      showNotification("⚠️ El número de tripulantes debe estar entre 1 y 6", "warning");
+      return;
+    }
+    
     await registrarConsumoAPI(mealType, totalPeople, totalPortions);
     
-    // Resetear formulario
     document.getElementById("total-people").value = 1;
     document.getElementById("total-portions-input").value = 1;
   });
@@ -926,25 +1396,41 @@ document.addEventListener("DOMContentLoaded", function() {
   async function initializeApp() {
     console.log('🚀 Inicializando aplicación...');
     
-    // Inicializar visualizaciones de temperatura
-    updateTemperatureGauge = initTemperatureGauge();
-    
-    // Cargar datos iniciales desde la BD
-    await obtenerEstadoAlimentos();
-    await obtenerConsumoDiario();
-    
-    // Inicializar gráficos
-    updatePortionsChart();
-    updateMealDistributionChart();
-    updateConsumptionHistoryTable();
-    
-    // Programar actualizaciones periódicas
-    setInterval(async () => {
+    try {
+      // Cargar datos iniciales
       await obtenerEstadoAlimentos();
       await obtenerConsumoDiario();
-    }, 30000); // Actualizar cada 30 segundos
-    
-    console.log('Aplicación inicializada');
+      
+      // Configurar valores por defecto en los formularios
+      document.getElementById('configure-crew-size').value = appState.currentCrewSize;
+      document.getElementById('configure-initial-portions').value = appState.initialPortions;
+      
+      // Inicializar gráficos y funciones
+      updatePortionsChart();
+      updateMealDistributionChart();
+      updateConsumptionHistoryTable();
+      updateMissionInfo();
+      
+      generateConsumptionAlerts();
+      generateRationingSuggestions();
+      
+      // Actualizar cada 30 segundos
+      setInterval(async () => {
+        try {
+          await obtenerEstadoAlimentos();
+          await obtenerConsumoDiario();
+          generateConsumptionAlerts();
+          generateRationingSuggestions();
+        } catch (error) {
+          console.error('Error en actualización periódica:', error);
+        }
+      }, 30000);
+      
+      console.log('Aplicación inicializada');
+    } catch (error) {
+      console.error('Error inicializando aplicación:', error);
+      showNotification('Error al cargar datos iniciales', 'error');
+    }
   }
   
   initializeApp();

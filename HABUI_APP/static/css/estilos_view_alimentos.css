@@ -566,3 +566,105 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 }
+
+/* ============================================
+   ESTILOS PARA ALERTAS Y SUGERENCIAS
+   ============================================ */
+
+.alert-item {
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid;
+  animation: fadeIn 0.3s ease;
+}
+
+.alert-item.critical {
+  border-left-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.alert-item.warning {
+  border-left-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.alert-item.info {
+  border-left-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.alert-item.success {
+  border-left-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.suggestion-item {
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid;
+  animation: fadeIn 0.3s ease;
+}
+
+.suggestion-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* Animaciones para alertas */
+@keyframes alertPulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.alert-item.critical {
+  animation: alertPulse 2s infinite;
+}
+
+/* Responsive para el nuevo panel */
+@media (max-width: 1400px) {
+  .main-grid {
+    grid-template-columns: 350px 1fr;
+  }
+  
+  .control-panel:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1200px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Estilos adicionales para los estados de alerta */
+.status-good {
+  background-color: #10b981 !important;
+  color: white !important;
+}
+
+.status-warning {
+  background-color: #f59e0b !important;
+  color: white !important;
+}
+
+.status-critical {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+.metric-status-large {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  min-width: 100px;
+  transition: all 0.3s ease;
+}

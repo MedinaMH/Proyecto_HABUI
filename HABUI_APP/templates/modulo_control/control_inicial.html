@@ -36,29 +36,13 @@
 </header>
 
 <main class="contenido">
-    <a href="{% url 'all_resources' %}" class="seccion">
-        <h2>{% trans "Módulo REMS" %}</h2> 
-        <img src="{% static 'iconos/icono_rems.gif' %}"
-            alt="{% trans 'GIF del sistema REMS' %}"
-            class="icon-gif">
-        <h3>{% trans "Supervisa el estado de los recursos esenciales" %}</h3>
-    </a>
-
-    <a href="{% url 'pwms_login' %}" class="seccion">
-        <h2>{% trans "Módulo PWMS" %}</h2>
-        <img src="{% static 'iconos/icono_pwms.gif' %}"
-            alt="{% trans 'GIF del sistema PWMS' %}"
-            class="icon-gif">
-        <h3>{% trans "Supervisa el bienestar psicológico de la tripulación" %}</h3>
-    </a>
-
-    <!-- <a class="seccion">
+        <a href="{% url 'control_alimentos' %}" class="seccion">
         <h2>{% trans "Módulo de Control" %}</h2>
         <img src="{% static 'iconos/icono_pc.gif' %}"
             alt="{% trans 'GIF del panel de control' %}"
             class="icon-gif">
         <h3>{% trans "Simula escenarios de riesgo, supervisa actividades y comunicación" %}</h3>
-    </a> -->
+    </a>
 </main>
 
 <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
