@@ -396,3 +396,40 @@ body, html {
 ::-webkit-scrollbar-thumb:hover {
     background: #64748b;
 }
+
+/* ===== ESTILOS PARA BATERÍA ===== */
+.bateria .card-header h2 { 
+    color: #10b981; 
+}
+
+.bateria-gauge-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 480px;
+    width: 100%;
+    position: relative;
+}
+
+.bateria-gauge-container svg {
+    max-width: 100%;
+    max-height: 400px;
+}
+
+.battery-percentage-large {
+    font-size: 42px;
+    font-weight: 800;
+    color: #10b981;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    padding-top: 20px;
+}
+
+/* Colores para estados de batería */
+.battery-status-normal { color: #10b981; }
+.battery-status-warning { color: #f59e0b; }
+.battery-status-critical { color: #ef4444; }

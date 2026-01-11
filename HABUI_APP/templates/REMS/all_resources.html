@@ -28,6 +28,26 @@
 </div> -->
 
 <div class="grid-layout">
+    <!-- BATERÍA  -->
+    <div class="resource-card bateria">
+        <div class="card-header">
+            <h2><i class="fas fa-battery-full"></i> Batería</h2>
+        </div>
+        <div class="bateria-gauge-container">
+            <svg id="battery-svg" width="280" height="400"></svg>
+            <div id="battery-percentage-large" class="battery-percentage-large">--%</div>
+        </div>
+        <div class="card-footer">
+            <div class="stat">
+                <span class="stat-label">Estado:</span>
+                <span id="battery-status" class="stat-value">Normal</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Actualizado:</span>
+                <span id="battery-time" class="stat-value">--:--:--</span>
+            </div>
+        </div>
+    </div>
     <!-- RECURSO 1: AGUA -->
     <div class="resource-card agua">
         <div class="card-header">
