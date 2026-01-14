@@ -83,16 +83,16 @@ function updateBattery(soc) {
     
     if (socPercent < 15) {
     color = "#ef4444";
-    statusText = "CRÍTICO";
+    statusText = TRANSLATIONS.critical || "CRÍTICO";
     } else if (socPercent < 30) {
     color = "#f59e0b";
-    statusText = "BAJO";
+    statusText = TRANSLATIONS.low || "BAJO";
     } else if (socPercent < 70) {
     color = "#3b82f6";
-    statusText = "NORMAL";
+    statusText = TRANSLATIONS.normal || "NORMAL";
     } else {
     color = "#10b981";
-    statusText = "ÓPTIMO";
+    statusText = TRANSLATIONS.optimal || "ÓPTIMO";
     }
     
     // Animación de nivel
@@ -516,16 +516,16 @@ function gaugeO2(containerId, initial) {
     }
 
     function getQualityText(v) {
-        if (v >= 21.0) return "NIVEL ÓPTIMO";
-        if (v >= 19.5) return "NIVEL ACEPTABLE";
-        return "¡NIVEL BAJO!";
+        if (v >= 21.0) return TRANSLATIONS.optimal_level || "NIVEL ÓPTIMO";
+        if (v >= 19.5) return TRANSLATIONS.acceptable_level || "NIVEL ACEPTABLE";
+        return TRANSLATIONS.low_level || "¡NIVEL BAJO!";
     }
 
     // Función para obtener texto corto para el footer
     function getFooterQualityText(v) {
-        if (v >= 21.0) return "ÓPTIMO";
-        if (v >= 19.5) return "ACEPTABLE";
-        return "BAJO";
+        if (v >= 21.0) return TRANSLATIONS.optimal_o2 || "ÓPTIMO";
+        if (v >= 19.5) return TRANSLATIONS.acceptable_o2 || "ACEPTABLE";
+        return TRANSLATIONS.low_o2 || "BAJO";
     }
 
     return {
@@ -647,16 +647,16 @@ function gaugeCO2(containerId, initial) {
 
     // Función para obtener texto de concentración para SVG
     function getConcentrationText(v) {
-        if (v < 800) return "NIVEL NORMAL";
-        if (v < 1200) return "NIVEL MODERADO";
-        return "¡NIVEL ALTO!";
+        if (v < 800) return TRANSLATIONS.normal_level || "NIVEL NORMAL";
+        if (v < 1200) return TRANSLATIONS.moderate_level || "NIVEL MODERADO";
+        return TRANSLATIONS.high_level || "¡NIVEL ALTO!";
     }
 
     // Función para obtener texto corto para el footer
     function getFooterConcentrationText(v) {
-        if (v < 800) return "NORMAL";
-        if (v < 1200) return "MODERADO";
-        return "ALTO";
+        if (v < 800) return TRANSLATIONS.normal_co2 || "NORMAL";
+        if (v < 1200) return TRANSLATIONS.moderate_co2 || "MODERADO";
+        return TRANSLATIONS.high_co2 || "ALTO";
     }
 
     // Actualizar estadísticas (aunque no se muestren)
@@ -823,20 +823,20 @@ function gaugeTemperatura(containerId, initial) {
 
     // Función para obtener texto para el indicador grande
     function getTempLevelText(v) {
-        if (v < 16) return "FRÍO";
-        if (v < 22) return "FRESCO";
-        if (v < 28) return "CÁLIDO";
-        if (v < 32) return "CALIENTE";
-        return "MUY CALIENTE";
+        if (v < 16) return TRANSLATIONS.cold || "FRÍO";
+        if (v < 22) return TRANSLATIONS.fresh || "FRESCO";
+        if (v < 28) return TRANSLATIONS.warm || "CÁLIDO";
+        if (v < 32) return TRANSLATIONS.hot || "CALIENTE";
+        return TRANSLATIONS.very_hot || "MUY CALIENTE";
     }
 
     // Función para obtener texto corto para el footer
     function getFooterTempText(v) {
-        if (v < 16) return "FRÍO";
-        if (v < 22) return "FRESCO";
-        if (v < 28) return "CÁLIDO";
-        if (v < 32) return "CALIENTE";
-        return "MUY CALIENTE";
+        if (v < 16) return TRANSLATIONS.cold || "FRÍO";
+        if (v < 22) return TRANSLATIONS.fresh || "FRESCO";
+        if (v < 28) return TRANSLATIONS.warm || "CÁLIDO";
+        if (v < 32) return TRANSLATIONS.hot || "CALIENTE";
+        return TRANSLATIONS.very_hot || "MUY CALIENTE";
     }
 
     // Marcas de escala
@@ -962,11 +962,11 @@ function colorFor(v) {
 
 // Función para texto de nivel
 function getNivelTexto(v) {
-    if (v < 30) return "MUY SECO";
-    if (v < 40) return "SECO";
-    if (v < 60) return "IDEAL";
-    if (v < 70) return "HÚMEDO";
-    return "MUY HÚMEDO";
+    if (v < 30) return TRANSLATIONS.very_dry || "MUY SECO";
+    if (v < 40) return TRANSLATIONS.dry || "SECO";
+    if (v < 60) return TRANSLATIONS.ideal || "IDEAL";
+    if (v < 70) return TRANSLATIONS.humid || "HÚMEDO";
+    return TRANSLATIONS.very_humid || "MUY HÚMEDO";
 }
 
 // Crear zonas de color con degradado
@@ -1195,18 +1195,18 @@ function inicializarWebSockets() {
                 
                 if (statusElement) {
                     if (soc < 0.15) {
-                        statusElement.textContent = "CRÍTICO";
+                        statusElement.textContent = TRANSLATIONS.critical || "CRÍTICO";
                         statusElement.style.color = "#ef4444";
-                        agregarAlerta("Nivel de batería crítico", "critical");
+                        agregarAlerta(TRANSLATIONS.critical_battery || "Nivel de batería crítico", "critical");
                     } else if (soc < 0.3) {
-                        statusElement.textContent = "BAJO";
+                        statusElement.textContent = TRANSLATIONS.low || "BAJO";
                         statusElement.style.color = "#f59e0b";
-                        agregarAlerta("Nivel de batería bajo", "warning");
+                        agregarAlerta(TRANSLATIONS.low_battery || "Nivel de batería bajo", "warning");
                     } else if (soc < 0.7) {
-                        statusElement.textContent = "NORMAL";
+                        statusElement.textContent = TRANSLATIONS.normal || "NORMAL";
                         statusElement.style.color = "#3b82f6";
                     } else {
-                        statusElement.textContent = "ÓPTIMO";
+                        statusElement.textContent = TRANSLATIONS.optimal || "ÓPTIMO";
                         statusElement.style.color = "#10b981";
                     }
                 }
@@ -1267,14 +1267,14 @@ function inicializarWebSockets() {
                 
                 if (statusElement) {
                     if (valor < 20) {
-                        statusElement.textContent = "CRÍTICO";
+                        statusElement.textContent = TRANSLATIONS.agua_critical || "CRÍTICO";
                         statusElement.style.color = "#ef4444";
-                        agregarAlerta("Nivel de agua crítico", "critical");
+                        agregarAlerta(TRANSLATIONS.critical_water || "Nivel de agua crítico", "critical");
                     } else if (valor < 40) {
-                        statusElement.textContent = "BAJO";
+                        statusElement.textContent = TRANSLATIONS.agua_low || "BAJO";
                         statusElement.style.color = "#f59e0b";
                     } else {
-                        statusElement.textContent = "NORMAL";
+                        statusElement.textContent = TRANSLATIONS.agua_normal || "NORMAL";
                         statusElement.style.color = "#22c55e";
                     }
                 }
@@ -1421,22 +1421,22 @@ function inicializarWebSockets() {
                 const feelingElement = document.getElementById('temp-feeling');
                 if (feelingElement) {
                     if (valor < 16) {
-                        feelingElement.textContent = "FRÍO";
+                        feelingElement.textContent = TRANSLATIONS.cold || "FRÍO";
                         feelingElement.style.color = "#38bdf8";
                     } else if (valor < 22) {
-                        feelingElement.textContent = "FRESCO";
+                        feelingElement.textContent = TRANSLATIONS.fresh || "FRESCO";
                         feelingElement.style.color = "#22d3ee";
                     } else if (valor < 28) {
-                        feelingElement.textContent = "AGRADABLE";
+                        feelingElement.textContent = TRANSLATIONS.warm || "AGRADABLE";
                         feelingElement.style.color = "#22c55e";
                     } else if (valor < 32) {
-                        feelingElement.textContent = "CALIENTE";
+                        feelingElement.textContent = TRANSLATIONS.hot || "CALIENTE";
                         feelingElement.style.color = "#f97316";
-                        agregarAlerta("Temperatura alta", "warning");
+                        agregarAlerta(TRANSLATIONS.high_temp || "Temperatura alta", "warning");
                     } else {
-                        feelingElement.textContent = "MUY CALIENTE";
+                        feelingElement.textContent = TRANSLATIONS.very_hot || "MUY CALIENTE";
                         feelingElement.style.color = "#ef4444";
-                        agregarAlerta("Temperatura muy alta", "critical");
+                        agregarAlerta(TRANSLATIONS.very_high_temp || "Temperatura muy alta", "critical");
                     }
                 }
                 
@@ -1489,22 +1489,22 @@ function inicializarWebSockets() {
                 const conditionElement = document.getElementById('humidity-condition');
                 if (conditionElement) {
                     if (valor < 30) {
-                        conditionElement.textContent = "MUY SECO";
+                        conditionElement.textContent = TRANSLATIONS.very_dry || "MUY SECO";
                         conditionElement.style.color = "#94a3b8";
-                        agregarAlerta("Humedad muy baja", "warning");
+                        agregarAlerta(TRANSLATIONS.low_humidity || "Humedad muy baja", "warning");
                     } else if (valor < 40) {
-                        conditionElement.textContent = "SECO";
+                        conditionElement.textContent = TRANSLATIONS.dry || "SECO";
                         conditionElement.style.color = "#f59e0b";
                     } else if (valor < 60) {
-                        conditionElement.textContent = "IDEAL";
+                        conditionElement.textContent = TRANSLATIONS.ideal || "IDEAL";
                         conditionElement.style.color = "#22c55e";
                     } else if (valor < 70) {
-                        conditionElement.textContent = "HÚMEDO";
+                        conditionElement.textContent = TRANSLATIONS.humid || "HÚMEDO";
                         conditionElement.style.color = "#0ea5e9";
                     } else {
-                        conditionElement.textContent = "MUY HÚMEDO";
+                        conditionElement.textContent = TRANSLATIONS.very_humid || "MUY HÚMEDO";
                         conditionElement.style.color = "#3b82f6";
-                        agregarAlerta("Humedad muy alta", "warning");
+                        agregarAlerta(TRANSLATIONS.high_humidity || "Humedad muy alta", "warning");
                     }
                 }
                 
@@ -1559,7 +1559,7 @@ function actualizarEstadoConexion() {
         if (!connectionStatus.humedad) sensoresDesconectados.push("Humedad");
         
         if (sensoresDesconectados.length > 0) {
-            agregarAlerta(`Sensores desconectados: ${sensoresDesconectados.join(", ")}`, "warning");
+            agregarAlerta(`${TRANSLATIONS.disconnected_sensors || "Sensores desconectados"}: ${sensoresDesconectados.join(", ")}`, "warning");
         }
     } else {
         connectionElement.className = 'connection-status disconnected';
@@ -1592,7 +1592,7 @@ function actualizarCalidadAire() {
     if (o2 < 19.5 || co2 > 1200) {
         calidad = "CRÍTICA";
         color = "#ef4444";
-        agregarAlerta("Calidad del aire crítica", "critical");
+        agregarAlerta(TRANSLATIONS.critical_air || "Calidad del aire crítica", "critical");
     } else if (o2 < 21.0 || co2 > 800) {
         calidad = "MODERADA";
         color = "#f59e0b";

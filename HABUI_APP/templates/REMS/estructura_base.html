@@ -1,10 +1,11 @@
+{% load i18n %}
 {% load static %}
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block titulo %}Sistema REMS{% endblock %}</title>
+    <title>{% block titulo %}REMS{% endblock %}</title>
 
     <!-- Bootstrap local -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
@@ -22,10 +23,10 @@
     <header class="navbar navbar-dark bg-primary fixed-top d-flex justify-content-between align-items-center px-3" style="height: 85px;">
       <a href="{% url 'panel_principal' %}" class="btn btn-outline-light d-flex align-items-center gap-2">
         <i class="bi bi-arrow-left-circle-fill fs-5"></i>
-        <span class="d-none d-sm-inline">Panel principal</span>
+        <span class="d-none d-sm-inline">{% trans "Panel principal" %}</span>
       </a>
       <div class="text-center flex-grow-1">
-        <span class="encabezado">Sistema de Monitoreo de Recursos REMS</span>
+        <span class="encabezado">{% trans "Sistema de Monitoreo de Recursos REMS" %}</span>
       </div>
       <div style="width: 110px;"></div>
 
@@ -51,21 +52,21 @@
               <!-- Todos los recursos -->
               <li class="nav-item">
                 <a class="nav-link {% if request.path == '/todos_los_recursos' %}active{% endif %}" href="{% url 'all_resources' %}">
-                  <i class="bi bi-grid-1x2-fill me-2"></i>Todos los recursos
+                  <i class="bi bi-grid-1x2-fill me-2"></i>{% trans "Todos los recursos" %}
                 </a>
               </li>
 
               <!-- Energía -->
               <li class="nav-item">
                 <a class="nav-link {% if request.path == '/energia_rems' %}active{% endif %}" href="{% url 'panel_energia_rems' %}">
-                  <i class="bi bi-lightning-charge-fill me-2"></i>Energía
+                  <i class="bi bi-lightning-charge-fill me-2"></i>{% trans "Energía" %}
                 </a>
               </li>
 
               <!-- Agua -->
               <li class="nav-item">
                 <a class="nav-link {% if request.path == '/agua_rems' %}active{% endif %}" href="{% url 'panel_agua_rems' %}">
-                  <i class="bi bi-droplet-fill me-2"></i>Agua
+                  <i class="bi bi-droplet-fill me-2"></i>{% trans "Agua" %}
                 </a>
               </li>
 
@@ -78,19 +79,19 @@
                   role="button" 
                   aria-expanded="false" 
                   aria-controls="submenuAire">
-                  <span><i class="bi bi-cloudy-fill me-2"></i>Calidad del aire</span>
+                  <span><i class="bi bi-cloudy-fill me-2"></i>{% trans "Calidad del aire" %}</span>
                   <i class="bi bi-caret-down-fill small"></i>
                 </a>
                 <div class="collapse ps-4 {% if '/oxigeno_rems' in request.path or '/co2_rems' in request.path %}show{% endif %}" id="submenuAire">
                   <ul class="nav flex-column">
                     <li class="nav-item">
                       <a class="nav-link {% if request.path == '/oxigeno_rems' %}active{% endif %}" href="{% url 'panel_oxigeno_rems' %}">
-                        <i class="bi bi-cloud-fog2-fill me-2"></i>Oxígeno (O₂)
+                        <i class="bi bi-cloud-fog2-fill me-2"></i>{% trans "Oxígeno (O₂)" %}
                       </a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link {% if request.path == '/co2_rems' %}active{% endif %}" href="{% url 'panel_co2_rems' %}">
-                        <i class="bi bi-cloud-haze2-fill me-2"></i>Dióxido de carbono (CO₂)
+                        <i class="bi bi-cloud-haze2-fill me-2"></i>{% trans "Dióxido de carbono (CO₂)" %}
                       </a>
                     </li>
                   </ul>
@@ -106,19 +107,19 @@
                   role="button" 
                   aria-expanded="false" 
                   aria-controls="submenuAmbiente">
-                  <span><i class="bi bi-thermometer-snow me-2"></i>Ambiente interno</span>
+                  <span><i class="bi bi-thermometer-snow me-2"></i>{% trans "Ambiente interno" %}</span>
                   <i class="bi bi-caret-down-fill small"></i>
                 </a>
                 <div class="collapse ps-4 {% if '/temperatura_rems' in request.path or '/humedad_rems' in request.path %}show{% endif %}" id="submenuAmbiente">
                   <ul class="nav flex-column">
                     <li class="nav-item">  <!-- Temperatura -->
                       <a class="nav-link {% if request.path == '/temperatura_rems' %}active{% endif %}" href="{% url 'temperatura_rems' %}">
-                        <i class="bi bi-thermometer-half me-2"></i>Temperatura
+                        <i class="bi bi-thermometer-half me-2"></i>{% trans "Temperatura" %}
                       </a>
                     </li>
                     <li class="nav-item"> <!-- Humedad -->
                       <a class="nav-link {% if request.path == '/humedad_rems' %}active{% endif %}" href="{% url 'humedad_rems' %}">
-                        <i class="bi bi-moisture me-2"></i>Humedad
+                        <i class="bi bi-moisture me-2"></i>{% trans "Humedad" %}
                       </a>
                     </li>
                   </ul>
@@ -128,7 +129,7 @@
               <!-- Alimentos -->
               <li class="nav-item">
                 <a class="nav-link {% if request.path == '/alimentos_rems' %}active{% endif %}" href="{% url 'panel_alimentos_rems' %}">
-                  <i class="bi bi-cup-straw me-2"></i>Alimentos
+                  <i class="bi bi-cup-straw me-2"></i>{% trans "Alimentos" %}
                 </a>
               </li>
 
@@ -145,7 +146,7 @@
     </div>
 
     <footer class="text-center py-3 bg-light border-top mt-auto">
-      <small>&copy; 2025 MACII CREDES</small>
+      <small>&copy; 2026 MACII CREDES</small>
     </footer>
 
     <!-- Bootstrap JS local (incluye Popper) -->

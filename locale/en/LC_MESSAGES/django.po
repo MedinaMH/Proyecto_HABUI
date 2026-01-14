@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 10:51-0600\n"
+"POT-Creation-Date: 2026-01-14 16:44-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,54 +18,335 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: .\HABUI_APP\templates\REMS\all_resources.html:14
+#: .\HABUI_APP\templates\REMS\all_resources.html:51
+msgid "CRÍTICO"
+msgstr "CRITICAL"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:15
+#: .\HABUI_APP\templates\REMS\all_resources.html:25
+#: .\HABUI_APP\templates\REMS\all_resources.html:52
+msgid "BAJO"
+msgstr "LOW"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:16
+#: .\HABUI_APP\templates\REMS\all_resources.html:31
+#: .\HABUI_APP\templates\REMS\all_resources.html:53
+msgid "NORMAL"
+msgstr "NORMAL"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:17
+#: .\HABUI_APP\templates\REMS\all_resources.html:23
+msgid "ÓPTIMO"
+msgstr "OPTIMUM"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:20
+msgid "NIVEL ÓPTIMO"
+msgstr "OPTIMAL LEVEL"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:21
+msgid "NIVEL ACEPTABLE"
+msgstr "ACCEPTABLE LEVEL"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:22
+msgid "NIVEL BAJO"
+msgstr "LOW LEVEL"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:24
+msgid "ACEPTABLE"
+msgstr "ACCEPTABLE"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:28
+msgid "NIVEL NORMAL"
+msgstr "NORMAL LEVEL"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:29
+msgid "NIVEL MODERADO"
+msgstr "MODERATE LEVEL"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:30
+msgid "NIVEL ALTO"
+msgstr "HIGH LEVEL"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:32
+msgid "MODERADO"
+msgstr "MODERATE"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:33
+msgid "ALTO"
+msgstr "HIGH"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:36
+msgid "FRÍO"
+msgstr "COLD"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:37
+msgid "FRESCO"
+msgstr "COOL"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:38
+msgid "CÁLIDO"
+msgstr "WARM"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:39
+msgid "CALIENTE"
+msgstr "HOT"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:40
+msgid "MUY CALIENTE"
+msgstr "VERY HOT"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:41
+msgid "AGRADABLE"
+msgstr "PLEASANT"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:44
+msgid "MUY SECO"
+msgstr "VERY DRY"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:45
+msgid "SECO"
+msgstr "DRY"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:46
+msgid "IDEAL"
+msgstr "IDEAL"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:47
+msgid "HÚMEDO"
+msgstr "DAMP"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:48
+msgid "MUY HÚMEDO"
+msgstr "VERY HUMID"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:56
+#, fuzzy
+#| msgid "Nivel de Batería"
+msgid "Nivel de batería crítico"
+msgstr "Battery Level"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:57
+#, fuzzy
+#| msgid "Nivel de Batería"
+msgid "Nivel de batería bajo"
+msgstr "Battery Level"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:58
+#, fuzzy
+#| msgid "Nivel de Agua"
+msgid "Nivel de agua crítico"
+msgstr "Water Level"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:59
+#, fuzzy
+#| msgid "Temperatura"
+msgid "Temperatura alta"
+msgstr "Temperature"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:60
+#, fuzzy
+#| msgid "Temperatura"
+msgid "Temperatura muy alta"
+msgstr "Temperature"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:61
+#, fuzzy
+#| msgid "Humedad"
+msgid "Humedad muy baja"
+msgstr "Humidity"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:62
+#, fuzzy
+#| msgid "Humedad"
+msgid "Humedad muy alta"
+msgstr "Humidity"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:63
+#, fuzzy
+#| msgid "Calidad del aire"
+msgid "Calidad del aire crítica"
+msgstr "Air quality"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:64
+msgid "Sensores desconectados"
+msgstr ""
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:94
+msgid "Nivel de Batería"
+msgstr "Battery Level"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:102
+#: .\HABUI_APP\templates\REMS\all_resources.html:121
+#: .\HABUI_APP\templates\REMS\all_resources.html:141
+#: .\HABUI_APP\templates\REMS\all_resources.html:201
+msgid "Estado:"
+msgstr "State:"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:103
+#: .\HABUI_APP\templates\REMS\all_resources.html:122
+msgid "Normal"
+msgstr "Normal"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:106
+#: .\HABUI_APP\templates\REMS\all_resources.html:125
+#: .\HABUI_APP\templates\REMS\all_resources.html:145
+#: .\HABUI_APP\templates\REMS\all_resources.html:165
+#: .\HABUI_APP\templates\REMS\all_resources.html:185
+#: .\HABUI_APP\templates\REMS\all_resources.html:205
+msgid "Actualizado:"
+msgstr "Updated:"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:114
+msgid "Nivel de Agua"
+msgstr "Water Level"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:134
+msgid "Niveles de Oxígeno"
+msgstr "Oxygen Levels"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:142
+msgid "Óptimo"
+msgstr "Optimum"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:154
+msgid "Concentración de CO₂"
+msgstr "CO₂ concentration"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:161
+msgid "Concentración:"
+msgstr "Concentration"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:174
+msgid "Nivel de Temperatura"
+msgstr "Temperature Level"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:181
+msgid "Sensación:"
+msgstr "Sensation:"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:182
+msgid "Agradable"
+msgstr "Pleasant"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:194
+msgid "%% de Humedad"
+msgstr "% Humidity"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:202
+msgid "Ideal"
+msgstr "Ideal"
+
+#: .\HABUI_APP\templates\REMS\all_resources.html:215
+msgid "Conectando..."
+msgstr "Connecting..."
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:26
+msgid "Panel principal"
+msgstr "Main panel"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:29
+msgid "Sistema de Monitoreo de Recursos REMS"
+msgstr "REMS Resource Monitoring System"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:55
+msgid "Todos los recursos"
+msgstr "All resources"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:62
+msgid "Energía"
+msgstr "Energy"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:69
+msgid "Agua"
+msgstr "Water"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:82
+msgid "Calidad del aire"
+msgstr "Air quality"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:89
+msgid "Oxígeno (O₂)"
+msgstr "Oxygen (O₂)"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:94
+msgid "Dióxido de carbono (CO₂)"
+msgstr "Carbon dioxide (CO₂)"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:110
+msgid "Ambiente interno"
+msgstr "Internal environment"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:117
+msgid "Temperatura"
+msgstr "Temperature"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:122
+msgid "Humedad"
+msgstr "Humidity"
+
+#: .\HABUI_APP\templates\REMS\estructura_base.html:132
+msgid "Alimentos"
+msgstr "Food"
+
+#: .\HABUI_APP\templates\modulo_control\control_inicial.html:10
 #: .\HABUI_APP\templates\panel_principal.html:10
 msgid "Inicio"
 msgstr "Main"
 
+#: .\HABUI_APP\templates\modulo_control\control_inicial.html:10
 #: .\HABUI_APP\templates\panel_principal.html:10
 msgid "Proyecto HABUI"
 msgstr "HABUI Proyect"
 
-#: .\HABUI_APP\templates\panel_principal.html:22
+#: .\HABUI_APP\templates\modulo_control\control_inicial.html:21
+#: .\HABUI_APP\templates\panel_principal.html:21
 msgid "Idioma"
 msgstr "Language"
 
-#: .\HABUI_APP\templates\panel_principal.html:34
+#: .\HABUI_APP\templates\modulo_control\control_inicial.html:33
+#: .\HABUI_APP\templates\panel_principal.html:33
 msgid "PROYECTO HABUI"
 msgstr "HABUI PROJECT"
 
-#: .\HABUI_APP\templates\panel_principal.html:41
-msgid "Módulo REMS"
-msgstr "REMS Module"
-
-#: .\HABUI_APP\templates\panel_principal.html:43
-msgid "GIF del sistema REMS"
-msgstr ""
-
-#: .\HABUI_APP\templates\panel_principal.html:45
-msgid "Supervisa el estado de los recursos esenciales"
-msgstr "Monitor the status of essential resources"
-
-#: .\HABUI_APP\templates\panel_principal.html:49
-msgid "Módulo PWMS"
-msgstr "PWMS Module"
-
-#: .\HABUI_APP\templates\panel_principal.html:51
-msgid "GIF del sistema PWMS"
-msgstr ""
-
-#: .\HABUI_APP\templates\panel_principal.html:53
-msgid "Supervisa el bienestar psicológico de la tripulación"
-msgstr "Monitors the psychological well-being of the crew"
-
-#: .\HABUI_APP\templates\panel_principal.html:57
+#: .\HABUI_APP\templates\modulo_control\control_inicial.html:40
+#: .\HABUI_APP\templates\panel_principal.html:56
 msgid "Módulo de Control"
 msgstr "Control Module"
 
-#: .\HABUI_APP\templates\panel_principal.html:59
+#: .\HABUI_APP\templates\modulo_control\control_inicial.html:42
+#: .\HABUI_APP\templates\panel_principal.html:58
 msgid "GIF del panel de control"
 msgstr ""
 
-#: .\HABUI_APP\templates\panel_principal.html:61
+#: .\HABUI_APP\templates\modulo_control\control_inicial.html:44
+#: .\HABUI_APP\templates\panel_principal.html:60
 msgid "Simula escenarios de riesgo, supervisa actividades y comunicación"
 msgstr "It simulates risk scenarios, monitors activities and communication"
+
+#: .\HABUI_APP\templates\panel_principal.html:40
+msgid "Módulo REMS"
+msgstr "REMS Module"
+
+#: .\HABUI_APP\templates\panel_principal.html:42
+msgid "GIF del sistema REMS"
+msgstr ""
+
+#: .\HABUI_APP\templates\panel_principal.html:44
+msgid "Supervisa el estado de los recursos esenciales"
+msgstr "Monitor the status of essential resources"
+
+#: .\HABUI_APP\templates\panel_principal.html:48
+msgid "Módulo PWMS"
+msgstr "PWMS Module"
+
+#: .\HABUI_APP\templates\panel_principal.html:50
+msgid "GIF del sistema PWMS"
+msgstr ""
+
+#: .\HABUI_APP\templates\panel_principal.html:52
+msgid "Supervisa el bienestar psicológico de la tripulación"
+msgstr "Monitors the psychological well-being of the crew"
+
+#~ msgid "Sistema REMS"
+#~ msgstr "REMS System"
