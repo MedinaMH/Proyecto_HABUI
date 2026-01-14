@@ -3,18 +3,18 @@
 // ============================================================
 function initBatteryVisualization(containerId, initialSOC) {
 const svg = d3.select(containerId);
-const width = 320;  // Aumentado de 280 a 320
-const height = 460; // Aumentado de 400 a 460
+const width = 320;
+const height = 460;
 
 svg.attr("width", width).attr("height", height);
 
 // Crear batería principal
 const batteryGroup = svg.append("g")
-    .attr("transform", `translate(${width/2 + 25}, 55)`); // Aumentado de 40 a 50
+    .attr("transform", `translate(${width/2 + 25}, 55)`);
 
-// Cuerpo de la batería - MÁS GRANDE
-const batteryWidth = 180;  // Aumentado de 160 a 200
-const batteryHeight = 340; // Aumentado de 280 a 340
+// Cuerpo de la batería 
+const batteryWidth = 180; 
+const batteryHeight = 340;
 
 // Marco exterior
 batteryGroup.append("rect")
@@ -22,52 +22,52 @@ batteryGroup.append("rect")
     .attr("y", 0)
     .attr("width", batteryWidth)
     .attr("height", batteryHeight)
-    .attr("rx", 15) // Aumentado de 12 a 15
-    .attr("ry", 15) // Aumentado de 12 a 15
+    .attr("rx", 15) 
+    .attr("ry", 15) 
     .attr("fill", "none")
     .attr("stroke", "#4b5563")
-    .attr("stroke-width", 6); // Aumentado de 5 a 6
+    .attr("stroke-width", 6);
 
-// Terminal positivo - MÁS GRANDE
+// Terminal positivo 
 batteryGroup.append("rect")
-    .attr("x", -25) // Aumentado de -20 a -25
-    .attr("y", -22) // Aumentado de -18 a -22
-    .attr("width", 50) // Aumentado de 40 a 50
-    .attr("height", 22) // Aumentado de 18 a 22
-    .attr("rx", 6) // Aumentado de 5 a 6
+    .attr("x", -25)
+    .attr("y", -22)
+    .attr("width", 50)
+    .attr("height", 22)
+    .attr("rx", 6)
     .attr("fill", "#fbbf24")
     .attr("stroke", "#d97706")
-    .attr("stroke-width", 3); // Aumentado de 2.5 a 3
+    .attr("stroke-width", 3);
 
 // Nivel de carga
 const chargeLevel = batteryGroup.append("rect")
-    .attr("x", -batteryWidth/2 + 12) // Ajustado para el nuevo tamaño
+    .attr("x", -batteryWidth/2 + 12)
     .attr("y", batteryHeight)
-    .attr("width", batteryWidth - 24) // Ajustado para el nuevo tamaño
+    .attr("width", batteryWidth - 24)
     .attr("height", 0)
-    .attr("rx", 10) // Aumentado de 8 a 10
+    .attr("rx", 10)
     .attr("fill", "#10b981");
 
 // Marcas de nivel
 for (let i = 0; i <= 100; i += 20) {
     const yPos = batteryHeight - (i/100) * batteryHeight;
     
-    // Líneas de indicador - MÁS GRANDES
+    // Líneas de indicador 
     batteryGroup.append("line")
-    .attr("x1", -batteryWidth/2 - 20) // Aumentado de -15 a -20
-    .attr("x2", -batteryWidth/2 - 5)  // Mantenido
+    .attr("x1", -batteryWidth/2 - 20)
+    .attr("x2", -batteryWidth/2 - 5)
     .attr("y1", yPos)
     .attr("y2", yPos)
     .attr("stroke", "#6b7280")
-    .attr("stroke-width", 3); // Aumentado de 2.5 a 3
+    .attr("stroke-width", 3); 
     
-    // Texto de porcentaje - MÁS GRANDE
+    // Texto de porcentaje 
     batteryGroup.append("text")
-    .attr("x", -batteryWidth/2 - 25) // Aumentado de -20 a -25
+    .attr("x", -batteryWidth/2 - 25)
     .attr("y", yPos + 5)
     .attr("text-anchor", "end")
     .attr("fill", "#cbd5e1")
-    .attr("font-size", "20px") // Aumentado de 17px a 20px
+    .attr("font-size", "20px")
     .attr("font-weight", "600")
     .text(i + "%");
 }
@@ -102,22 +102,23 @@ function updateBattery(soc) {
     .attr("height", fillHeight)
     .attr("fill", color);
     
-    // Actualizar porcentaje debajo de la batería - MUCHO MÁS GRANDE
+    // Actualizar porcentaje debajo de la batería
     const percentageLarge = document.getElementById('battery-percentage-large');
     if (percentageLarge) {
     percentageLarge.textContent = Math.round(socPercent) + '%';
     percentageLarge.style.color = color;
-    percentageLarge.style.fontSize = '45px'; // Aumentado de 42px a 56px
-    percentageLarge.style.fontWeight = '850'; // Aumentado de 800 a 900
-    percentageLarge.style.textShadow = '0 3px 8px rgba(0,0,0,0.4)'; // Sombra más pronunciada
+    percentageLarge.style.fontSize = '45px'; 
+    percentageLarge.style.fontWeight = '850'; 
+    percentageLarge.style.marginTop = '0px';
+    percentageLarge.style.textShadow = '0 3px 8px rgba(0,0,0,0.4)';
     }
     
-    // Actualizar estado en el footer - TEXTO MÁS GRANDE
+    // Actualizar estado en el footer 
     const statusElement = document.getElementById('battery-status');
     if (statusElement) {
     statusElement.textContent = statusText;
     statusElement.style.color = color;
-    statusElement.style.fontSize = '1.1rem'; // Aumentado ligeramente
+    statusElement.style.fontSize = '2.0rem';
     statusElement.style.fontWeight = '700';
     }
     
@@ -143,16 +144,6 @@ const height = 520;
 const svg = container.append("svg")
     .attr("width", width)
     .attr("height", height);
-
-// Título
-// svg.append("text")
-//     .attr("x", width / 2)
-//     .attr("y", 35)
-//     .attr("fill", "#ffffffff")
-//     .attr("font-size", "24px")
-//     .attr("font-weight", "bold")
-//     .attr("text-anchor", "middle")
-//     .text("TANQUE DE AGUA");
 
 // Dimensiones del tanque
 const tanqueWidth = 200;
@@ -221,7 +212,7 @@ gradienteAgua.append("stop")
 
 // --- ESTRUCTURA DEL TANQUE ---
 
-// Base del tanque (sombra)
+// Base del tanque
 svg.append("rect")
     .attr("x", tanqueX + 5)
     .attr("y", tanqueY + 5)
@@ -245,7 +236,7 @@ const cuerpoTanque = svg.append("rect")
     .attr("stroke", "#4a6572")
     .attr("stroke-width", 3);
 
-// Reflejo metálico (efecto 3D)
+// Reflejo metálico
 const reflejo = svg.append("rect")
     .attr("x", tanqueX + 5)
     .attr("y", tanqueY + 5)
@@ -266,17 +257,6 @@ const tapa = svg.append("rect")
     .attr("stroke", "#4a6572")
     .attr("stroke-width", 2);
 
-// Indicador de llenado (barra lateral)
-// const indicadorBarra = svg.append("rect")
-//     .attr("x", tanqueX + tanqueWidth + 20)
-//     .attr("y", tanqueY)
-//     .attr("width", 12)
-//     .attr("height", tanqueHeight)
-//     .attr("rx", 6)
-//     .attr("fill", "#1a252f")
-//     .attr("stroke", "#34495e")
-//     .attr("stroke-width", 2);
-
 // Nivel de agua
 const agua = svg.append("rect")
     .attr("x", tanqueX)
@@ -285,7 +265,7 @@ const agua = svg.append("rect")
     .attr("rx", tanqueCurvatura - 2)
     .attr("opacity", 0.85);
 
-// Superficie del agua (ondulación)
+// Superficie del agua 
 const superficieAgua = svg.append("rect")
     .attr("x", tanqueX)
     .attr("width", tanqueWidth)
@@ -339,34 +319,16 @@ for (let i = 0; i <= 100; i += 25) {
 //     }
 // }
 
-// --- DISPLAY NUMÉRICO ---
-// const display = svg.append("rect")
-//     .attr("x", tanqueX + tanqueWidth - 180)
-//     .attr("y", tanqueY + tanqueHeight + 15)
-//     .attr("width", 150)
-//     .attr("height", 50)
-//     .attr("rx", 8)
-//     .attr("fill", "#1a252f")
-//     .attr("stroke", "#00bfff")
-//     .attr("stroke-width", 2);
-
 const textoNivel = svg.append("text")
     .attr("x", tanqueX + tanqueWidth - 100)
     .attr("y", tanqueY + tanqueHeight + 75)
     .attr("fill", "#00ffcc")
-    .attr("font-size", "50px")
-    .attr("font-weight", "bold")
+    .attr("font-size", "40px") 
+    .attr("font-weight", "700")
     .attr("text-anchor", "middle")
-    .style("font-family", "'Courier New', monospace")
+    .style("font-family", "inherit")
     .text("00.0%");
 
-// const textoLabel = svg.append("text")
-//     .attr("x", tanqueX + tanqueWidth - 100)
-//     .attr("y", tanqueY + tanqueHeight + 90)
-//     .attr("fill", "#ffffffff")
-//     .attr("font-size", "25px")
-//     .attr("text-anchor", "middle")
-//     .text("NIVEL ACTUAL");
 
 // --- ESCALA Y ANIMACIÓN ---
 const escala = d3.scaleLinear()
@@ -394,13 +356,6 @@ function actualizar(valor) {
     .duration(800)
     .ease(d3.easeCubicOut)
     .attr("y", yAgua);
-    
-    // Animación del indicador de la barra lateral
-    // indicadorNivel.transition()
-    // .duration(800)
-    // .ease(d3.easeCubicOut)
-    // .attr("y", yIndicador)
-    // .attr("height", alturaIndicador);
     
     // Actualizar display numérico
     textoNivel.transition()
@@ -450,9 +405,8 @@ function actualizar(valor) {
     agua.attr("fill", "url(#gradAgua)");
     // indicadorNivel.attr("fill", colorIndicador);
     
-    // Efecto de burbujas cuando se llena
+    // Efecto de llenado
     if (porcentaje > 90) {
-    // Crear burbujas aleatorias
     for (let i = 0; i < 3; i++) {
         const bubbleX = tanqueX + Math.random() * tanqueWidth * 0.8 + tanqueWidth * 0.1;
         const bubbleY = yAgua + Math.random() * 10;
@@ -504,13 +458,13 @@ function gaugeO2(containerId, initial) {
         medium: "#10b981",   // Verde esmeralda
         dark: "#059669",     // Verde bosque
         veryDark: "#047857", // Verde muy oscuro
-        amber: "#4dabf7",    // Ámbar cálido (cambié a azul para mejor visibilidad)
+        amber: "#4dabf7",    // Ámbar cálido
         red: "#dc2626"       // Rojo intenso
     };
 
     // outer frame
     const frameX = 60;
-    const frameY = 70;
+    const frameY = 45;
     const frameW = 180;
     const frameH = 360;
 
@@ -537,7 +491,7 @@ function gaugeO2(containerId, initial) {
 
     const valueText = svg.append("text")
         .attr("x", width/2)
-        .attr("y", frameY + frameH + 50)
+        .attr("y", frameY + frameH + 70)
         .attr("fill", greenPalette.light)
         .attr("font-size", "40px")
         .attr("font-weight", "700")
@@ -547,7 +501,7 @@ function gaugeO2(containerId, initial) {
     // Indicador de calidad EN EL SVG (opcional, puedes comentarlo si quieres)
     const qualityText = svg.append("text")
         .attr("x", width/2)
-        .attr("y", frameY + frameH + 85)
+        .attr("y", frameY + frameH + 100)
         .attr("fill", greenPalette.medium)
         .attr("font-size", "25px")
         .attr("font-weight", "600")
@@ -613,10 +567,6 @@ function gaugeO2(containerId, initial) {
                     qualityElement.style.color = "#dc2626"; // Rojo
                 }
             }
-            
-            // Actualizar tiempo (esto lo hará el WebSocket)
-            // El WebSocket debe llamar a esta función y pasar la fecha
-            
             return qualityStatus;
         }
     };
@@ -642,7 +592,7 @@ function gaugeCO2(containerId, initial) {
 
     // outer frame
     const frameX = 60;
-    const frameY = 60;
+    const frameY = 40;
     const frameW = 180;
     const frameH = 360;
 
@@ -671,7 +621,7 @@ function gaugeCO2(containerId, initial) {
 
     const valueText = svg.append("text")
         .attr("x", width/2)
-        .attr("y", frameY + frameH + 50)
+        .attr("y", frameY + frameH + 70)
         .attr("fill", "#ffb74d")
         .attr("font-size", "40px")
         .attr("font-weight", "700")
@@ -681,7 +631,7 @@ function gaugeCO2(containerId, initial) {
     // Indicador de concentración en SVG (opcional)
     const concentrationText = svg.append("text")
         .attr("x", width/2)
-        .attr("y", frameY + frameH + 85)
+        .attr("y", frameY + frameH + 100)
         .attr("fill", "#ffb74d")
         .attr("font-size", "25px")
         .attr("font-weight", "600")
@@ -847,7 +797,7 @@ function gaugeTemperatura(containerId, initial) {
         .attr("x", width/2)
         .attr("y", termometroY + termometroH + bulboRadio + 75) 
         .attr("fill", tempPalette.veryHot)
-        .attr("font-size", "40px") // Aumentado de 28px a 40px
+        .attr("font-size", "40px")
         .attr("font-weight", "700")
         .attr("text-anchor", "middle")
         .text(initial.toFixed(1) + " °C");
@@ -972,8 +922,8 @@ container.html(""); // Limpiar contenedor
 
 const width = 300;
 const height = 520;
-const min = 0;      // 0%
-const max = 100;    // 100%
+const min = 0;
+const max = 100;
 
 const svg = container.append("svg")
     .attr("width", width)
@@ -1090,22 +1040,10 @@ for (let i = 0; i <= 100; i += 10) {
     }
 }
 
-// Marcas en el lado derecho
-// for (let i = 0; i <= 100; i += 20) {
-//     const y = scale(i);
-//     svg.append("line")
-//     .attr("x1", frameX + frameW)
-//     .attr("y1", y)
-//     .attr("x2", frameX + frameW + 10)
-//     .attr("y2", y)
-//     .attr("stroke", "#4dabf7")
-//     .attr("stroke-width", 1.5);
-// }
-
 // VALOR NUMÉRICO
 const valueText = svg.append("text")
     .attr("x", width/2 + 30)
-    .attr("y", frameY + frameH + 50)
+    .attr("y", frameY + frameH + 70)
     .attr("fill", colorFor(initial))
     .attr("font-size", "40px")
     .attr("font-weight", "700")
@@ -1188,7 +1126,7 @@ let lastUpdate = {
 
 // Inicializar todas las visualizaciones
 function inicializarVisualizaciones() {
-    console.log("🚀 Inicializando visualizaciones...");
+    console.log("Inicializando visualizaciones...");
 
     // Inicializar con valores por defecto
     batteryActualizar = initBatteryVisualization("#battery-svg", 0.65);
