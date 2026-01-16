@@ -139,7 +139,7 @@ svg.append("text")
     .attr("font-weight", "700")
     .attr("text-anchor", "middle")
     .style("letter-spacing", "0.5px")
-    .text("HISTÓRICO DE CO₂ (ppm)");
+    .text(TRANSLATIONS.history_co2 || "HISTÓRICO DE CO₂ (ppm)");
 
 // Subtítulo
 svg.append("text")
@@ -149,7 +149,7 @@ svg.append("text")
     .attr("font-size", "12px")
     .attr("font-weight", "500")
     .attr("text-anchor", "middle")
-    .text("Concentración en tiempo real");
+    .text(TRANSLATIONS.concentracion || "Concentración en tiempo real");
 
 // Scales
 const x = d3.scaleTime().range([0, width]);

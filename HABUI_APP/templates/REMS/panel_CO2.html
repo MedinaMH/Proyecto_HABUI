@@ -1,5 +1,5 @@
 {% extends "REMS/estructura_base.html" %}
-
+{% load i18n %}
 {% block titulo %} Sistema REMS{% endblock %}
 
 {% block contenido %} 
@@ -7,13 +7,19 @@
 {% load static %}
 <!-- co2_monitor.html -->
 <script src="{% static 'js/d3.js' %}"></script>
+<script>
+  const TRANSLATIONS = {
+    history_co2: "{% trans 'HISTÓRICO DE CO₂ (ppm)' %}",
+    concentracion: "{% trans 'Concentración en tiempo real' %}",
+  };
+</script>
 <script src="{% static 'js/co2.js' %}"></script>
 <link rel="stylesheet" href="{% static 'css/estilos_view_co2.css' %}">
 
 <div class="monitor-container">
   <!-- Encabezado -->
   <div class="monitor-header">
-    <h3>Monitoreo de CO₂ (ppm)</h3>
+    <h3>{% trans "Monitoreo de CO₂ (ppm)" %}</h3>
     <!-- <div class="subtitle">Sistema de monitoreo en tiempo real de concentración de dióxido de carbono</div> -->
   </div>
   
@@ -23,7 +29,7 @@
     <div class="gauge-column">
       <div class="gauge-container">
         <div class="gauge-title">
-          <span>📊 Indicador Actual</span>
+          <span></span>
         </div>
         <div id="gauge-co2"></div>
       </div>
@@ -42,15 +48,15 @@
     <!-- Sección de niveles de referencia - DEBAJO DE AMBOS -->
     <div class="reference-section">
       <div class="reference-title">
-        <span>📋 Niveles de Referencia de CO₂</span>
+        <span>{% trans "Niveles de Referencia de CO₂" %}</span>
       </div>
       <div class="reference-grid">
         <div class="reference-item good">
           <div class="reference-header">
-            <div class="reference-icon">✅</div>
+            <div class="reference-icon"></div>
             <div>
               <div class="reference-range">300 - 800 ppm</div>
-              <div class="reference-label">CALIDAD ÓPTIMA</div>
+              <div class="reference-label">{% trans "CALIDAD ÓPTIMA" %}</div>
             </div>
           </div>
           <!-- <div class="reference-description">
@@ -63,10 +69,10 @@
         
         <div class="reference-item moderate">
           <div class="reference-header">
-            <div class="reference-icon">⚠️</div>
+            <div class="reference-icon"></div>
             <div>
               <div class="reference-range">800 - 1200 ppm</div>
-              <div class="reference-label">NIVEL MODERADO</div>
+              <div class="reference-label">{% trans "NIVEL MODERADO" %}</div>
             </div>
           </div>
           <!-- <div class="reference-description">
@@ -79,10 +85,10 @@
         
         <div class="reference-item high">
           <div class="reference-header">
-            <div class="reference-icon">🔴</div>
+            <div class="reference-icon"></div>
             <div>
               <div class="reference-range">1200 - 2000 ppm</div>
-              <div class="reference-label">NIVEL ALTO</div>
+              <div class="reference-label">{% trans "NIVEL ALTO" %}</div>
             </div>
           </div>
           <!-- <div class="reference-description">
@@ -95,10 +101,10 @@
         
         <div class="reference-item very-high">
           <div class="reference-header">
-            <div class="reference-icon">🚨</div>
+            <div class="reference-icon"></div>
             <div>
               <div class="reference-range">> 2000 ppm</div>
-              <div class="reference-label">NIVEL PELIGROSO</div>
+              <div class="reference-label">{% trans "NIVEL PELIGROSO" %}</div>
             </div>
           </div>
           <!-- <div class="reference-description">
