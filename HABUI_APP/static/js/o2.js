@@ -32,7 +32,7 @@ svg.append("text")
     .attr("font-size", "22px")
     .attr("font-weight", "700")
     .attr("text-anchor", "middle")
-    .text("Oxígeno (%)");
+    .text("O₂ (%)");
 
 // outer frame
 const frameX = 60;
@@ -88,8 +88,8 @@ function colorFor(v) {
 }
 
 function getQualityText(v) {
-    if (v >= 21.0) return "NIVEL ÓPTIMO";
-    if (v >= 19.5) return "NIVEL ACEPTABLE";
+    if (v >= 21.0) return TRANSLATIONS.nivel_optimo || "NIVEL ÓPTIMO";
+    if (v >= 19.5) return TRANSLATIONS.nivel_aceptable || "NIVEL ACEPTABLE";
     return "¡NIVEL BAJO!";
 }
 
@@ -147,7 +147,7 @@ svg.append("text")
     .attr("font-weight", "700")
     .attr("text-anchor", "middle")
     .style("letter-spacing", "0.5px")
-    .text("HISTÓRICO DE OXÍGENO (%)");
+    .text(TRANSLATIONS.hist_o2 || "HISTÓRICO DE OXÍGENO (%)");
 
 // Subtítulo
 // svg.append("text")
@@ -247,7 +247,7 @@ g.append("text")
     .attr("font-size", "14px")
     .attr("font-weight", "600")
     .attr("text-anchor", "middle")
-    .text("OXÍGENO (%)");
+    .text("O₂ (%)");
 
 // Zonas de oxígeno en el fondo
 const o2ZonesData = [
@@ -354,7 +354,7 @@ function redraw() {
     .attr("x", width - 5)
     .attr("y", y(normalLevel) - 5)
     .attr("text-anchor", "end")
-    .text(`${normalLevel}% (Nivel Normal)`);
+    .text(`${normalLevel}% (Normal)`);
 
     // Actualizar grid
     grid.call(d3.axisLeft(y)

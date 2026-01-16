@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-15 14:48-0600\n"
+"POT-Creation-Date: 2026-01-16 12:06-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,14 +48,20 @@ msgid "ÓPTIMO"
 msgstr "OPTIMUM"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:18
+#: .\HABUI_APP\templates\REMS\panel_agua.html:106
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:11
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:91
 msgid "NIVEL ÓPTIMO"
 msgstr "OPTIMAL LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:19
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:12
 msgid "NIVEL ACEPTABLE"
 msgstr "ACCEPTABLE LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:20
+#: .\HABUI_APP\templates\REMS\panel_agua.html:74
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:59
 msgid "NIVEL BAJO"
 msgstr "LOW LEVEL"
 
@@ -64,6 +70,8 @@ msgid "ACEPTABLE"
 msgstr "ACCEPTABLE"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:26
+#: .\HABUI_APP\templates\REMS\panel_agua.html:90
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:75
 msgid "NIVEL NORMAL"
 msgstr "NORMAL LEVEL"
 
@@ -301,6 +309,22 @@ msgstr "Humidity"
 #: .\HABUI_APP\templates\REMS\estructura_base.html:132
 msgid "Alimentos"
 msgstr "Food"
+
+#: .\HABUI_APP\templates\REMS\panel_agua.html:12
+msgid "HISTÓRICO DE NIVELES"
+msgstr "HISTORICAL LEVELS"
+
+#: .\HABUI_APP\templates\REMS\panel_agua.html:21
+msgid "Monitoreo del Nivel de Suministro de Agua"
+msgstr "Monitoring of Water Supply Level"
+
+#: .\HABUI_APP\templates\REMS\panel_agua.html:50
+msgid "Niveles de Referencia del Tanque"
+msgstr "Tank Reference Levels"
+
+#: .\HABUI_APP\templates\REMS\panel_agua.html:58
+msgid "NIVEL CRÍTICO"
+msgstr "CRITICAL LEVEL"
 
 #: .\HABUI_APP\templates\REMS\panel_energia.html:15
 msgid "Monitoreo de la Calidad y Niveles de Energía"
@@ -687,6 +711,18 @@ msgstr "Power"
 #: .\HABUI_APP\templates\REMS\panel_energia.html:1037
 msgid "Solar"
 msgstr "Solar"
+
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:13
+msgid "HISTÓRICO DE OXÍGENO"
+msgstr "HISTORICAL OXYGEN"
+
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:22
+msgid "Monitoreo de los niveles de Oxígeno"
+msgstr "Monitoring of Oxygen Levels"
+
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:51
+msgid "Niveles de Referencia de Oxígeno"
+msgstr "Oxygen Reference Levels"
 
 #: .\HABUI_APP\templates\modulo_control\control_inicial.html:10
 #: .\HABUI_APP\templates\panel_principal.html:10

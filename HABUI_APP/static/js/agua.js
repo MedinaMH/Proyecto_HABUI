@@ -24,7 +24,7 @@ svg.append("text")
     .attr("font-size", "24px")
     .attr("font-weight", "bold")
     .attr("text-anchor", "middle")
-    .text("TANQUE DE AGUA");
+    .text("");
 
 // Dimensiones del tanque
 const tanqueWidth = 220;
@@ -238,7 +238,7 @@ const textoLabel = svg.append("text")
     .attr("fill", "#ffffffff")
     .attr("font-size", "25px")
     .attr("text-anchor", "middle")
-    .text("NIVEL ACTUAL");
+    .text("");
 
 // --- ESCALA Y ANIMACIÓN ---
 const escala = d3.scaleLinear()
@@ -437,7 +437,7 @@ svg.append("text")
     .attr("font-size", "18px")
     .attr("font-weight", "bold")
     .attr("text-anchor", "middle")
-    .text("HISTÓRICO DE NIVELES");
+    .text(TRANSLATIONS.level_history || "HISTÓRICO DE NIVELES");
 
 // Grid horizontal
 svg.append("g")
