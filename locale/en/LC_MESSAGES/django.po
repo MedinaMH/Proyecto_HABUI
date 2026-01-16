@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-14 19:27-0600\n"
+"POT-Creation-Date: 2026-01-15 14:48-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,15 +20,14 @@ msgstr ""
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:12
 #: .\HABUI_APP\templates\REMS\all_resources.html:49
-#: .\HABUI_APP\templates\REMS\panel_energia.html:579
-#: .\HABUI_APP\templates\REMS\panel_energia.html:665
+#: .\HABUI_APP\templates\REMS\panel_energia.html:295
 msgid "CRÍTICO"
 msgstr "CRITICAL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:13
 #: .\HABUI_APP\templates\REMS\all_resources.html:23
 #: .\HABUI_APP\templates\REMS\all_resources.html:50
-#: .\HABUI_APP\templates\REMS\panel_energia.html:585
+#: .\HABUI_APP\templates\REMS\panel_energia.html:296
 msgid "BAJO"
 msgstr "LOW"
 
@@ -38,13 +37,13 @@ msgstr "LOW"
 #: .\HABUI_APP\templates\REMS\panel_energia.html:75
 #: .\HABUI_APP\templates\REMS\panel_energia.html:145
 #: .\HABUI_APP\templates\REMS\panel_energia.html:172
-#: .\HABUI_APP\templates\REMS\panel_energia.html:592
+#: .\HABUI_APP\templates\REMS\panel_energia.html:298
 msgid "NORMAL"
 msgstr "NORMAL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:15
 #: .\HABUI_APP\templates\REMS\all_resources.html:21
-#: .\HABUI_APP\templates\REMS\panel_energia.html:596
+#: .\HABUI_APP\templates\REMS\panel_energia.html:297
 msgid "ÓPTIMO"
 msgstr "OPTIMUM"
 
@@ -193,6 +192,7 @@ msgstr "State:"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:101
 #: .\HABUI_APP\templates\REMS\all_resources.html:120
+#: .\HABUI_APP\templates\REMS\panel_energia.html:267
 msgid "Normal"
 msgstr "Normal"
 
@@ -265,8 +265,8 @@ msgstr "All resources"
 
 #: .\HABUI_APP\templates\REMS\estructura_base.html:62
 #: .\HABUI_APP\templates\REMS\panel_energia.html:4
-#: .\HABUI_APP\templates\REMS\panel_energia.html:377
-#: .\HABUI_APP\templates\REMS\panel_energia.html:394
+#: .\HABUI_APP\templates\REMS\panel_energia.html:430
+#: .\HABUI_APP\templates\REMS\panel_energia.html:457
 msgid "Energía"
 msgstr "Energy"
 
@@ -323,6 +323,7 @@ msgid "ALERTA DE ENERGÍA"
 msgstr "ENERGY ALERT"
 
 #: .\HABUI_APP\templates\REMS\panel_energia.html:29
+#: .\HABUI_APP\templates\REMS\panel_energia.html:279
 msgid "Sistema energético operativo."
 msgstr "Operating energy system."
 
@@ -331,7 +332,7 @@ msgid "Recomendaciones para Atención de Fallas"
 msgstr "Recommendations for Troubleshooting"
 
 #: .\HABUI_APP\templates\REMS\panel_energia.html:46
-#: .\HABUI_APP\templates\REMS\panel_energia.html:308
+#: .\HABUI_APP\templates\REMS\panel_energia.html:281
 msgid "Protocolo de mantenimiento energético - Hábitat Análogo"
 msgstr "Energy Maintenance Protocol - Analog Habitat"
 
@@ -395,7 +396,7 @@ msgid "Área Crítica:"
 msgstr "Critical Area:"
 
 #: .\HABUI_APP\templates\REMS\panel_energia.html:111
-#: .\HABUI_APP\templates\REMS\panel_energia.html:254
+#: .\HABUI_APP\templates\REMS\panel_energia.html:264
 msgid "Sala de monitoreo"
 msgstr "Monitoring room"
 
@@ -424,8 +425,6 @@ msgid "Las áreas NO CRÍTICAS se apagarán automáticamente"
 msgstr "Non-critical areas will automatically shut down."
 
 #: .\HABUI_APP\templates\REMS\panel_energia.html:141
-#, fuzzy
-#| msgid "Nivel de Batería"
 msgid "Banco de Baterías"
 msgstr "Battery Bank"
 
@@ -458,7 +457,7 @@ msgid "SISTEMA"
 msgstr "SYSTEM"
 
 #: .\HABUI_APP\templates\REMS\panel_energia.html:190
-#: .\HABUI_APP\templates\REMS\panel_energia.html:384
+#: .\HABUI_APP\templates\REMS\panel_energia.html:301
 msgid "OPERATIVO"
 msgstr "OPERATIONAL"
 
@@ -467,8 +466,7 @@ msgid "ESTADO DEL FLUJO"
 msgstr "FLOW STATE"
 
 #: .\HABUI_APP\templates\REMS\panel_energia.html:197
-#: .\HABUI_APP\templates\REMS\panel_energia.html:671
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1139
+#: .\HABUI_APP\templates\REMS\panel_energia.html:307
 msgid "EQUILIBRADO"
 msgstr "BALANCED"
 
@@ -500,181 +498,195 @@ msgstr "Cutting off Non-Essential Areas"
 msgid "Apagado automático de dormitorios, baño, pasillo, exteriores"
 msgstr "Automatic shut-off of bedrooms, bathroom, hallway, exterior"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:307
-msgid "ALERTA CRÍTICA DE ENERGÍA"
-msgstr "CRITICAL ENERGY ALERT"
+#: .\HABUI_APP\templates\REMS\panel_energia.html:260
+msgid "Dormitorios"
+msgstr "Bedrooms"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:317
-#: .\HABUI_APP\templates\REMS\panel_energia.html:333
-msgid "Acciones inmediatas:"
-msgstr "Immediate actions:"
+#: .\HABUI_APP\templates\REMS\panel_energia.html:261
+msgid "Baño"
+msgstr "Bathroom"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:322
+#: .\HABUI_APP\templates\REMS\panel_energia.html:262
+msgid "Pasillo"
+msgstr "Hallway"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:263
+msgid "Exteriores"
+msgstr "Exteriors"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:268
+msgid "Advertencia"
+msgstr "Warning"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:269
+#, fuzzy
+#| msgid "Área Crítica:"
+msgid "Crítico"
+msgstr "Critical"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:272
 msgid "Revisar estado del banco de baterías"
 msgstr "Check battery bank status"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:323
+#: .\HABUI_APP\templates\REMS\panel_energia.html:273
 msgid "Verificar conexión y rendimiento de paneles solares"
 msgstr "Verify connection and performance of solar panels"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:324
+#: .\HABUI_APP\templates\REMS\panel_energia.html:274
 msgid "Reducir consumo en sistemas no esenciales"
 msgstr "Reduce consumption in non-essential systems"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:325
+#: .\HABUI_APP\templates\REMS\panel_energia.html:275
 msgid "Comprobar inversor y regulador de carga"
 msgstr "Check inverter and charge controller"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:326
+#: .\HABUI_APP\templates\REMS\panel_energia.html:276
 msgid "Evaluar posible sobreconsumo inesperado"
 msgstr "Assess for possible unexpected overconsumption"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:347
-msgid "ALERTA ENERGÉTICA"
-msgstr "ENERGY ALERT"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:355
-msgid "ADVERTENCIA DE ENERGÍA"
-msgstr "ENERGY WARNING"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:356
+#: .\HABUI_APP\templates\REMS\panel_energia.html:280
 msgid "Nivel de energía bajo. Preparar medidas de contingencia."
 msgstr "Low energy level. Prepare contingency measures."
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:361
-#: .\HABUI_APP\templates\REMS\panel_energia.html:368
-msgid "Reducir consumo en áreas no esenciales"
-msgstr "Reduce consumption in non-essential areas"
+#: .\HABUI_APP\templates\REMS\panel_energia.html:284
+msgid "ALERTA CRÍTICA DE ENERGÍA"
+msgstr "CRITICAL ENERGY ALERT"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:362
-#: .\HABUI_APP\templates\REMS\panel_energia.html:369
-msgid "Verificar generación solar"
-msgstr "Verify solar generation"
+#: .\HABUI_APP\templates\REMS\panel_energia.html:285
+msgid "ADVERTENCIA DE ENERGÍA"
+msgstr "ENERGY WARNING"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:363
-#: .\HABUI_APP\templates\REMS\panel_energia.html:370
-msgid "Preparar sistemas de respaldo"
-msgstr "Prepare backup systems"
+#: .\HABUI_APP\templates\REMS\panel_energia.html:286
+msgid "Acciones inmediatas:"
+msgstr "Immediate actions:"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:364
-#, fuzzy
-#| msgid "Nivel de Batería"
-msgid "Monitorear nivel de baterías"
-msgstr "Monitor battery level"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:365
-msgid "Revisar posibles fugas de energía"
-msgstr "Check for possible energy leaks"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:367
+#: .\HABUI_APP\templates\REMS\panel_energia.html:287
 msgid "Recomendaciones:"
 msgstr "Recommendations:"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:371
-#, fuzzy
-#| msgid "Energía"
-msgid "Energía Baja"
-msgstr "Low energy"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:383
-msgid "EMERGENCIA"
-msgstr "EMERGENCY"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:384
-msgid "ADVERTENCIA"
-msgstr "WARNING"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:398
-msgid "ALERTA CRÍTICA - REVISIÓN INMEDIATA"
-msgstr "CRITICAL ALERT - IMMEDIATE REVIEW"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:399
-msgid "SISTEMA ENERGÉTICO EN FALLA"
-msgstr "POWER SYSTEM FAILURE"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:434
+#: .\HABUI_APP\templates\REMS\panel_energia.html:288
 msgid "CRÍTICA - PRIORIDAD"
 msgstr "CRITICAL - PRIORITY"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:437
+#: .\HABUI_APP\templates\REMS\panel_energia.html:289
 msgid "ENERGÍA GARANTIZADA"
 msgstr "GUARANTEED ENERGY"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:440
+#: .\HABUI_APP\templates\REMS\panel_energia.html:290
 msgid "Sistema esencial - No se apaga"
 msgstr "Essential system - Does not turn off"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:460
+#: .\HABUI_APP\templates\REMS\panel_energia.html:291
 msgid "APAGADA"
 msgstr "OFF"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:460
+#: .\HABUI_APP\templates\REMS\panel_energia.html:292
 msgid "OPERATIVA"
 msgstr "OPERATIONAL"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:463
+#: .\HABUI_APP\templates\REMS\panel_energia.html:293
 msgid "CORTE DE ENERGÍA"
 msgstr "POWER OUTAGE"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:464
+#: .\HABUI_APP\templates\REMS\panel_energia.html:294
 msgid "Sistema no esencial"
 msgstr "Non-essential system"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:472
-msgid "No hay áreas configuradas"
-msgstr "There are no configured areas"
+#: .\HABUI_APP\templates\REMS\panel_energia.html:299
+msgid "EMERGENCIA"
+msgstr "EMERGENCY"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:668
-#, fuzzy
-#| msgid "ACEPTABLE"
-msgid "INESTABLE"
-msgstr "UNSTABLE"
+#: .\HABUI_APP\templates\REMS\panel_energia.html:300
+msgid "ADVERTENCIA"
+msgstr "WARNING"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:772
+#: .\HABUI_APP\templates\REMS\panel_energia.html:302
 msgid "CARGANDO"
 msgstr "CHARGING"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:774
+#: .\HABUI_APP\templates\REMS\panel_energia.html:303
 msgid "DESCARGANDO"
 msgstr "DOWNLOADING"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:776
+#: .\HABUI_APP\templates\REMS\panel_energia.html:304
 #, fuzzy
 #| msgid "ACEPTABLE"
 msgid "ESTABLE"
 msgstr "STABLE"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1037
-msgid "Tensión"
-msgstr "Voltage"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1038
-msgid "Corriente"
-msgstr "Current"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1039
-msgid "Potencia"
-msgstr "Power"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1040
-msgid "Solar"
-msgstr "Solar"
-
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1133
+#: .\HABUI_APP\templates\REMS\panel_energia.html:305
 msgid "CARGANDO BATERÍA"
 msgstr "CHARGING BATTERY"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1136
+#: .\HABUI_APP\templates\REMS\panel_energia.html:306
 msgid "DESCARGANDO BATERÍA"
 msgstr "BATTERY DISCHARGE"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1142
+#: .\HABUI_APP\templates\REMS\panel_energia.html:308
 msgid "EXCESO SOLAR"
 msgstr "EXCESS SUNLIGHT"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1145
+#: .\HABUI_APP\templates\REMS\panel_energia.html:309
 msgid "DÉFICIT ENERGÉTICO"
 msgstr "ENERGY DEFICIT"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:310
+#, fuzzy
+#| msgid "ACEPTABLE"
+msgid "INESTABLE"
+msgstr "UNSTABLE"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:412
+msgid "Reducir consumo en áreas no esenciales"
+msgstr "Reduce consumption in non-essential areas"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:413
+msgid "Verificar generación solar"
+msgstr "Verify solar generation"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:414
+msgid "Preparar sistemas de respaldo"
+msgstr "Prepare backup systems"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:415
+#, fuzzy
+#| msgid "Nivel de Batería"
+msgid "Monitorear nivel de baterías"
+msgstr "Monitor battery level"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:416
+msgid "Revisar posibles fugas de energía"
+msgstr "Check for possible energy leaks"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:425
+#, fuzzy
+#| msgid "Energía"
+msgid "Energía Baja"
+msgstr "Low energy"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:462
+msgid "SISTEMA ENERGÉTICO EN FALLA"
+msgstr "POWER SYSTEM FAILURE"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:540
+msgid "No hay áreas configuradas"
+msgstr "There are no configured areas"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:1034
+msgid "Tensión"
+msgstr "Voltage"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:1035
+msgid "Corriente"
+msgstr "Current"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:1036
+msgid "Potencia"
+msgstr "Power"
+
+#: .\HABUI_APP\templates\REMS\panel_energia.html:1037
+msgid "Solar"
+msgstr "Solar"
 
 #: .\HABUI_APP\templates\modulo_control\control_inicial.html:10
 #: .\HABUI_APP\templates\panel_principal.html:10
@@ -734,6 +746,12 @@ msgstr ""
 #: .\HABUI_APP\templates\panel_principal.html:52
 msgid "Supervisa el bienestar psicológico de la tripulación"
 msgstr "Monitors the psychological well-being of the crew"
+
+#~ msgid "ALERTA ENERGÉTICA"
+#~ msgstr "ENERGY ALERT"
+
+#~ msgid "ALERTA CRÍTICA - REVISIÓN INMEDIATA"
+#~ msgstr "CRITICAL ALERT - IMMEDIATE REVIEW"
 
 #~ msgid "Sistema REMS"
 #~ msgstr "REMS System"

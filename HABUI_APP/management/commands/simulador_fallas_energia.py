@@ -51,14 +51,14 @@ class Command(BaseCommand):
         # Áreas del hábitat
         # =========================
         AREAS_NO_CRITICAS = [
-            "Dormitorios",
-            "Baño",
-            "Pasillo",
-            "Exteriores"
+            "area.dormitorios",
+            "area.bano",
+            "area.pasillo",
+            "area.exteriores"
         ]
 
         AREAS_CRITICAS = [
-            "Sala de monitoreo"
+            "area.sala_monitoreo"
         ]
 
         # =========================
