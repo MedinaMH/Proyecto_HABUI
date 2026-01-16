@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-16 12:42-0600\n"
+"POT-Creation-Date: 2026-01-16 14:27-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,22 +94,27 @@ msgid "ALTO"
 msgstr "HIGH"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:34
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:57
 msgid "FRÍO"
 msgstr "COLD"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:35
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:67
 msgid "FRESCO"
 msgstr "COOL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:36
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:77
 msgid "CÁLIDO"
 msgstr "WARM"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:37
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:87
 msgid "CALIENTE"
 msgstr "HOT"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:38
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:97
 msgid "MUY CALIENTE"
 msgstr "VERY HOT"
 
@@ -749,6 +754,22 @@ msgstr "Monitoring of Oxygen Levels"
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:51
 msgid "Niveles de Referencia de Oxígeno"
 msgstr "Oxygen Reference Levels"
+
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:10
+msgid "TEMPERATURA (°C)"
+msgstr "TEMPERATURE (°C)"
+
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:20
+msgid "Monitoreo de Temperatura Interna del Hábitat"
+msgstr "Internal Habitat Temperature Monitoring"
+
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:40
+msgid "Histórico de Temperatura"
+msgstr "Temperature History"
+
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:49
+msgid "Niveles de Referencia de Temperatura"
+msgstr "Temperature Reference Levels"
 
 #: .\HABUI_APP\templates\modulo_control\control_inicial.html:10
 #: .\HABUI_APP\templates\panel_principal.html:10

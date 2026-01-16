@@ -26,7 +26,7 @@ const tempPalette = {
 
 // Diseño tipo termómetro
 const termometroX = width/2 - 15;
-const termometroY = 70;
+const termometroY = 30;
 const termometroH = 360;
 const bulboRadio = 35;
 
@@ -73,8 +73,8 @@ const mercurioBulbo = svg.append("circle")
 
 // Valor numérico
 const valueText = svg.append("text")
-    .attr("x", width/2)
-    .attr("y", termometroY + termometroH + bulboRadio + 120)
+    .attr("x", width/2 + 15)
+    .attr("y", termometroY + termometroH + bulboRadio + 70)
     .attr("fill", tempPalette.veryHot)
     .attr("font-size", "28px")
     .attr("font-weight", "700")
@@ -276,7 +276,7 @@ g.append("text")
     .attr("font-size", "12px")
     .attr("font-weight", "600")
     .attr("text-anchor", "middle")
-    .text("TEMPERATURA (°C)");
+    .text(TRANSLATIONS.temperatura || "TEMPERATURA (°C)");
 
 // Zonas de temperatura en el fondo
 const tempZonesData = [

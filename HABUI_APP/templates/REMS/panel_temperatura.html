@@ -1,10 +1,15 @@
 {% extends "REMS/estructura_base.html" %}
-
+{% load i18n %}
 {% block titulo %}Sistema REMS - Temperatura{% endblock %}
 
 {% block contenido %}
 {% load static %}
 <script src="{% static 'js/d3.js' %}"></script>
+<script>
+  const TRANSLATIONS = {
+    temperatura: "{% trans 'TEMPERATURA (°C)'%}"
+  };
+</script>
 <script src="{% static 'js/temperatura.js' %}"></script>
 
 <link rel="stylesheet" href="{% static 'css/estilos_view_temperatura.css' %}">
@@ -12,7 +17,7 @@
 <div class="monitor-container">
   <!-- Encabezado -->
   <div class="monitor-header">
-    <h3>Monitoreo de Temperatura (°C)</h3>
+    <h3>{% trans "Monitoreo de Temperatura Interna del Hábitat" %}</h3>
     <!-- <div class="subtitle">Sistema de monitoreo en tiempo real de temperatura ambiental</div> -->
   </div>
   
@@ -22,7 +27,7 @@
     <div class="gauge-column">
       <div class="gauge-container">
         <div class="gauge-title">
-          <span>📊 Indicador Actual</span>
+          <span></span>
         </div>
         <div id="gauge-temperatura"></div>
       </div>
@@ -32,7 +37,7 @@
     <div class="series-column">
       <div class="series-container">
         <div class="series-title">
-          <span>📈 Histórico de Temperatura</span>
+          <span>{% trans "Histórico de Temperatura" %}</span>
         </div>
         <div id="serie-temperatura"></div>
       </div>
@@ -41,55 +46,55 @@
     <!-- Sección de niveles de referencia para temperatura -->
     <div class="reference-section-temperatura">
       <div class="reference-title-temperatura">
-        <span>📋 Niveles de Referencia de Temperatura</span>
+        <span>{% trans "Niveles de Referencia de Temperatura" %}</span>
       </div>
       <div class="reference-grid-temperatura">
         <div class="reference-item-temperatura cold">
           <div class="reference-header-temperatura">
-            <div class="reference-icon-temperatura">❄️</div>
+            <div class="reference-icon-temperatura"></div>
             <div>
               <div class="reference-range-temperatura">&lt; 16 °C</div>
-              <div class="reference-label-temperatura">FRÍO</div>
+              <div class="reference-label-temperatura">{% trans "FRÍO" %}</div>
             </div>
           </div>
         </div>
         
         <div class="reference-item-temperatura fresh">
           <div class="reference-header-temperatura">
-            <div class="reference-icon-temperatura">🌿</div>
+            <div class="reference-icon-temperatura"></div>
             <div>
               <div class="reference-range-temperatura">16 - 22 °C</div>
-              <div class="reference-label-temperatura">FRESCO</div>
+              <div class="reference-label-temperatura">{% trans "FRESCO" %}</div>
             </div>
           </div>
         </div>
         
         <div class="reference-item-temperatura warm">
           <div class="reference-header-temperatura">
-            <div class="reference-icon-temperatura">☀️</div>
+            <div class="reference-icon-temperatura"></div>
             <div>
               <div class="reference-range-temperatura">22 - 28 °C</div>
-              <div class="reference-label-temperatura">CÁLIDO</div>
+              <div class="reference-label-temperatura">{% trans "CÁLIDO" %}</div>
             </div>
           </div>
         </div>
         
         <div class="reference-item-temperatura hot">
           <div class="reference-header-temperatura">
-            <div class="reference-icon-temperatura">🔥</div>
+            <div class="reference-icon-temperatura"></div>
             <div>
               <div class="reference-range-temperatura">28 - 32 °C</div>
-              <div class="reference-label-temperatura">CALIENTE</div>
+              <div class="reference-label-temperatura">{% trans "CALIENTE" %}</div>
             </div>
           </div>
         </div>
         
         <div class="reference-item-temperatura very-hot">
           <div class="reference-header-temperatura">
-            <div class="reference-icon-temperatura">🥵</div>
+            <div class="reference-icon-temperatura"></div>
             <div>
               <div class="reference-range-temperatura">&gt; 32 °C</div>
-              <div class="reference-label-temperatura">MUY CALIENTE</div>
+              <div class="reference-label-temperatura">{% trans "MUY CALIENTE" %}</div>
             </div>
           </div>
         </div>
