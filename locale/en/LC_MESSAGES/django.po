@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-16 14:27-0600\n"
+"POT-Creation-Date: 2026-01-16 15:22-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -123,22 +123,32 @@ msgid "AGRADABLE"
 msgstr "PLEASANT"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:42
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:13
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:64
 msgid "MUY SECO"
 msgstr "VERY DRY"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:43
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:14
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:74
 msgid "SECO"
 msgstr "DRY"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:44
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:15
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:84
 msgid "IDEAL"
 msgstr "IDEAL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:45
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:16
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:94
 msgid "HÚMEDO"
 msgstr "DAMP"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:46
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:17
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:104
 msgid "MUY HÚMEDO"
 msgstr "VERY HUMID"
 
@@ -742,6 +752,22 @@ msgstr "Power"
 #: .\HABUI_APP\templates\REMS\panel_energia.html:1037
 msgid "Solar"
 msgstr "Solar"
+
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:12
+msgid "HUMEDAD (%%)"
+msgstr "HUMIDITY (%)"
+
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:27
+msgid "Monitoreo de la Humedad interna en el Hábitat"
+msgstr "Monitoring Internal Humidity in the Habitat"
+
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:47
+msgid "Histórico de Humedad"
+msgstr "Humidity History"
+
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:56
+msgid "Niveles de Referencia de Humedad"
+msgstr "Reference Humidity Levels"
 
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:13
 msgid "HISTÓRICO DE OXÍGENO"

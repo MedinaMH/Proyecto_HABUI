@@ -48,11 +48,11 @@ function colorFor(v) {
 
 // Función para texto de nivel
 function getNivelTexto(v) {
-    if (v < 30) return "MUY SECO";
-    if (v < 40) return "SECO";
-    if (v < 60) return "IDEAL";
-    if (v < 70) return "HÚMEDO";
-    return "MUY HÚMEDO";
+    if (v < 30) return TRANSLATIONS.muy_seco || "MUY SECO";
+    if (v < 40) return TRANSLATIONS.seco || "SECO";
+    if (v < 60) return TRANSLATIONS.ideal || "IDEAL";
+    if (v < 70) return TRANSLATIONS.humedo || "HÚMEDO";
+    return TRANSLATIONS.muy_humedo || "MUY HÚMEDO";
 }
 
 // Crear zonas de color con degradado
@@ -293,7 +293,7 @@ g.append("text")
     .attr("font-size", "12px")
     .attr("font-weight", "600")
     .attr("text-anchor", "middle")
-    .text("HUMEDAD (%)");
+    .text(TRANSLATIONS.humedad || "HUMEDAD (%)");
 
 // Zonas de humedad en el fondo
 const humZonesData = [
@@ -469,11 +469,11 @@ function redraw() {
 
         // Mostrar tooltip
         const nivelTexto = (() => {
-        if (d.v < 30) return "MUY SECO";
-        if (d.v < 40) return "SECO";
-        if (d.v < 60) return "IDEAL";
-        if (d.v < 70) return "HÚMEDO";
-        return "MUY HÚMEDO";
+        if (d.v < 30) return TRANSLATIONS.muy_seco || "MUY SECO";
+        if (d.v < 40) return TRANSLATIONS.seco || "SECO";
+        if (d.v < 60) return TRANSLATIONS.ideal || "IDEAL";
+        if (d.v < 70) return TRANSLATIONS.humedo || "HÚMEDO";
+        return TRANSLATIONS.muy_humedo || "MUY HÚMEDO";
         })();
 
         tooltip
