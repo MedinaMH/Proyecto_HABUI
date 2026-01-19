@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-16 15:22-0600\n"
+"POT-Creation-Date: 2026-01-19 12:02-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,6 +20,8 @@ msgstr ""
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:12
 #: .\HABUI_APP\templates\REMS\all_resources.html:49
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:623
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:631
 #: .\HABUI_APP\templates\REMS\panel_energia.html:295
 msgid "CRÍTICO"
 msgstr "CRITICAL"
@@ -43,6 +45,7 @@ msgstr "NORMAL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:15
 #: .\HABUI_APP\templates\REMS\all_resources.html:21
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:635
 #: .\HABUI_APP\templates\REMS\panel_energia.html:297
 msgid "ÓPTIMO"
 msgstr "OPTIMUM"
@@ -366,6 +369,507 @@ msgstr "Tank Reference Levels"
 #: .\HABUI_APP\templates\REMS\panel_agua.html:58
 msgid "NIVEL CRÍTICO"
 msgstr "CRITICAL LEVEL"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:3
+#, fuzzy
+#| msgid "Sistema REMS"
+msgid "Sistema REMS - Alimentos"
+msgstr "REMS System"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:15
+msgid "Monitoreo de Alimentos"
+msgstr "Food Monitoring"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:23
+msgid "Registro de Consumo"
+msgstr "Consumption Record"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:27
+msgid "Comida del Día"
+msgstr "Meal of the Day"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:29
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:290
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:656
+msgid "Desayuno"
+msgstr "Breakfast"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:30
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:657
+msgid "Almuerzo"
+msgstr "Lunch"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:31
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:198
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:658
+msgid "Comida"
+msgstr "Meal"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:32
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:659
+msgid "Cena"
+msgstr "Dinner"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:37
+msgid "Total de Personas que Comieron"
+msgstr "Total number of people who ate"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:42
+msgid "Total de Porciones Consumidas"
+msgstr "Total Portions Consumed"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:47
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:867
+msgid "Registrar Consumo"
+msgstr "Consumption Record"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:53
+msgid "Consumo del Día"
+msgstr "Meal of the Day"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:56
+msgid "Desayuno:"
+msgstr "Breakfast:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:57
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:61
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:65
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:69
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:73
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:77
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:91
+#, fuzzy
+#| msgid " porciones"
+msgid "porciones"
+msgstr " portions"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:60
+msgid "Almuerzo:"
+msgstr "Lunch:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:64
+msgid "Comida:"
+msgstr "Meal:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:68
+msgid "Cena:"
+msgstr "Dinner:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:72
+msgid "TOTAL DÍA:"
+msgstr "TOTAL DAY:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:76
+msgid "Consumo Esperado:"
+msgstr "Expected Consumption:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:85
+msgid "Suministro de Alimentos"
+msgstr "Food Supply"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:92
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:284
+msgid "restantes de"
+msgstr "remaining of"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:92
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:285
+msgid "iniciales"
+msgstr "initials"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:98
+msgid "Porciones Restantes"
+msgstr "Remaining Portions"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:102
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:112
+msgid "CARGANDO..."
+msgstr "CHARGING..."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:108
+msgid "Días de Autonomía"
+msgstr "Days of Autonomy"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:120
+msgid "Alertas y Sugerencias"
+msgstr "Alerts and Suggestions"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:125
+msgid "Alertas de Consumo"
+msgstr "Consumer Alerts"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:129
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:246
+msgid "Calculando alertas de consumo..."
+msgstr "Calculating consumption alerts..."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:137
+msgid "Sugerencias de Racionamiento"
+msgstr "Rationing Suggestions"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:141
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:247
+msgid "Generando sugerencias..."
+msgstr "Generating suggestions..."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:149
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:286
+msgid "Tripulantes Actuales:"
+msgstr "Current Crew Members:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:153
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:287
+msgid "Comidas por día (por tripulante):"
+msgstr "Meals per day (per crew member):"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:157
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:288
+msgid "Duración total misión:"
+msgstr "Total mission duration:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:158
+msgid "7 días"
+msgstr "7 days"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:161
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:283
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:289
+msgid "Días restantes:"
+msgstr "Days remaining:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:171
+msgid "Análisis de Consumo"
+msgstr "Consumption Analysis"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:174
+msgid "Últimos 7 días"
+msgstr "Last 7 days"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:175
+msgid "Últimos 30 días"
+msgstr "Last 30 days"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:176
+msgid "Todo el histórico"
+msgstr "The entire history"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:183
+msgid "Distribución por Comida"
+msgstr "Distribution by Meal"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:192
+msgid "Historial de Consumo Reciente"
+msgstr "Recent Consumption History"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:197
+msgid "Fecha/Hora"
+msgstr "Date/Time"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:199
+msgid "Porciones"
+msgstr " Portions"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:200
+msgid "Tripulantes"
+msgstr "Crew members"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:201
+msgid "Acciones"
+msgstr " Actions"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:219
+msgid "Confirmar Operación"
+msgstr "Confirm Transaction"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:221
+msgid "¿Está seguro de que desea realizar esta operación?"
+msgstr "Are you sure you want to perform this operation?"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:225
+msgid "Cancelar"
+msgstr "Cancel"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:228
+msgid "Confirmar"
+msgstr "Confirm"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:235
+msgid " porciones"
+msgstr " portions"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:236
+msgid "Registro eliminado correctamente"
+msgstr "Record successfully deleted"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:237
+msgid "Error al eliminar registro"
+msgstr "Error deleting record"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:238
+msgid "Error de conexión"
+msgstr "Connection error"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:239
+msgid "Registrando..."
+msgstr "Registering..."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:240
+msgid "Debe registrar al menos una persona y una porción"
+msgstr "You must register at least one person and one portion"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:241
+msgid "El número de tripulantes debe estar entre 1 y 6"
+msgstr "The number of crew members must be between 1 and 6"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:242
+msgid "Consumo registrado exitosamente"
+msgstr "Consumption successfully recorded"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:243
+msgid "Error al registrar consumo"
+msgstr "Error registering consumption"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:244
+msgid "Sistema actualizado desde panel de control"
+msgstr "System updated from control panel"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:245
+msgid "Error al cargar datos iniciales"
+msgstr "Error loading initial data"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:248
+msgid "No hay alertas en este momento."
+msgstr "There are no alerts at this time."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:249
+msgid "Consumo Excesivo"
+msgstr "Excessive Consumption"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:250
+msgid "Consumo Normal"
+msgstr "Normal Consumption"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:251
+msgid "Consumo Inferior"
+msgstr "Lower Consumption"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:252
+msgid "Déficit de Suministros"
+msgstr "Supply Shortage"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:253
+msgid "Suministros Suficientes"
+msgstr "Sufficient Supplies"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:254
+msgid "Suministro Bajo"
+msgstr "Low Supply"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:255
+msgid "Misión Completada"
+msgstr "Mission Completed"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:256
+msgid "Media Porción"
+msgstr "Half Portion"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:257
+msgid "3 Comidas"
+msgstr "3 Meals"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:258
+msgid "Recomendación Principal"
+msgstr "Main Recommendation"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:259
+msgid "Consumo Óptimo"
+msgstr "Optimal Consumption"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:260
+msgid "Suministros alcanzarían para"
+msgstr "Supplies would be sufficient for"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:261
+msgid "Consumo diario:"
+msgstr "Daily consumption:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:262
+msgid "Ahorro:"
+msgstr "Saving:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:263
+msgid "Reducir el consumo"
+msgstr "Reduce consumption"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:264
+msgid "persona"
+msgstr "person"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:265
+msgid "personas"
+msgstr "people"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:266
+msgid "/día"
+msgstr "/day"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:267
+msgid "para completar la misión."
+msgstr "to complete the mission."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:268
+msgid "Hoy se consumieron"
+msgstr "Today, the following were consumed"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:269
+msgid "más de lo esperado"
+msgstr "more than expected"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:270
+msgid "menos de lo esperado."
+msgstr "less than expected."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:271
+msgid "Con el consumo actual, los suministros solo alcanzarán para"
+msgstr "With current consumption, supplies will only be enough to"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:272
+msgid "de los"
+msgstr "of the"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:273
+msgid "días restantes."
+msgstr "days remaining."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:274
+msgid "Faltan"
+msgstr "Missing"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:275
+msgid "del suministro inicial."
+msgstr "of the initial supply."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:276
+msgid "Si cada tripulante consume"
+msgstr "If each crew member consumes"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:277
+msgid "en cada comida:"
+msgstr "at each meal:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:278
+msgid "Reducir a"
+msgstr "Reduce to"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:279
+msgid "diarias en lugar de 4:"
+msgstr "daily instead of 4:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:280
+msgid "Consumo esperado/día:"
+msgstr "Expected consumption/day:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:281
+msgid "Consumo real hoy:"
+msgstr "Actual consumption today:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:282
+msgid "Días cubiertos:"
+msgstr "Days covered:"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:625
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:633
+msgid "ALERTA"
+msgstr "ALERT"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:627
+msgid "SUFICIENTE"
+msgstr "ENOUGH"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:887
+#, fuzzy
+#| msgid "Registro de Consumo"
+msgid "No hay registros de consumo aún"
+msgstr "There are no consumption records yet"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:930
+msgid "Eliminar"
+msgstr "Delete"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:940
+msgid "Eliminar Registro"
+msgstr "Delete Record"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:941
+msgid ""
+"¿Está seguro de que desea eliminar este registro de consumo? Esta acción no "
+"se puede deshacer."
+msgstr ""
+"Are you sure you want to delete this consumption record? This action cannot "
+"be undone."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1048
+msgid "El consumo de hoy está dentro del rango esperado."
+msgstr "Today's consumption is within the expected range."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1051
+msgid "consumidas correctamente."
+msgstr "consumed correctly."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1087
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1185
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1207
+msgid "días"
+msgstr "days"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1105
+msgid "Hay suficientes suministros para los"
+msgstr "There are enough supplies for the"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1105
+msgid "días restantes de misión."
+msgstr "days remaining on mission."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1123
+msgid "Solo queda el"
+msgstr "Only the"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1140
+msgid "La misión de 7 días ha sido completada"
+msgstr "The 7-day mission has been completed"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1183
+msgid "media porción"
+msgstr "half portion"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1205
+msgid "3 comidas"
+msgstr "3 meals"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1225
+msgid "a"
+msgstr "to"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1226
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1228
+msgid "día"
+msgstr "day"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1226
+msgid "por tripulante"
+msgstr "per crew member"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1228
+msgid "Actualmente hay un exceso de"
+msgstr "There is currently an excess of"
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1244
+msgid "El consumo actual es el adecuado para la misión."
+msgstr "The current consumption is adequate for the mission."
+
+#: .\HABUI_APP\templates\REMS\panel_alimentos.html:1245
+msgid "No se requieren ajustes en este momento."
+msgstr "No adjustments are required at this time."
 
 #: .\HABUI_APP\templates\REMS\panel_energia.html:15
 msgid "Monitoreo de la Calidad y Niveles de Energía"
@@ -861,6 +1365,3 @@ msgstr "Monitors the psychological well-being of the crew"
 
 #~ msgid "ALERTA CRÍTICA - REVISIÓN INMEDIATA"
 #~ msgstr "CRITICAL ALERT - IMMEDIATE REVIEW"
-
-#~ msgid "Sistema REMS"
-#~ msgstr "REMS System"

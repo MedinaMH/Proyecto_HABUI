@@ -1,6 +1,6 @@
 {% extends "REMS/estructura_base.html" %}
-
-{% block titulo %} Sistema REMS - Alimentos{% endblock %}
+{% load i18n %}
+{% block titulo %}{% trans "Sistema REMS - Alimentos" %}{% endblock %}
 
 {% block contenido %} 
 
@@ -12,7 +12,7 @@
 <div class="dashboard-container">
 <!-- Header -->
 <div class="dashboard-header" style="padding-top: 5px; padding-bottom: 15px;">
-<h1 class="dashboard-title">Monitoreo de Alimentos</h1>
+<h1 class="dashboard-title">{% trans "Monitoreo de Alimentos" %}</h1>
 </div>
 
 <!-- Grid Principal -->
@@ -20,61 +20,61 @@
 
 <!-- Panel de Control de Consumo -->
 <div class="control-panel">
-  <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 20px;">Registro de Consumo</h3>
+  <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 20px;">{% trans "Registro de Consumo" %}</h3>
   
   <div class="consumption-form">
     <div class="form-group">
-      <label class="form-label">Comida del Día</label>
+      <label class="form-label">{% trans "Comida del Día" %}</label>
       <select id="meal-type" class="form-select">
-        <option value="desayuno">🍳 Desayuno</option>
-        <option value="almuerzo">🍲 Almuerzo</option>
-        <option value="comida">🍽️ Comida</option>
-        <option value="cena">🍎 Cena</option>
+        <option value="desayuno">🍳 {% trans "Desayuno" %}</option>
+        <option value="almuerzo">🍲 {% trans "Almuerzo" %}</option>
+        <option value="comida">🍽️ {% trans "Comida" %}</option>
+        <option value="cena">🍎 {% trans "Cena" %}</option>
       </select>
     </div>
     
     <div class="form-group">
-      <label class="form-label">Total de Personas que Comieron</label>
+      <label class="form-label">{% trans "Total de Personas que Comieron" %}</label>
       <input type="number" id="total-people" class="form-input" min="1" max="6" value="1" style="text-align: center;">
     </div>
     
     <div class="form-group">
-      <label class="form-label">Total de Porciones Consumidas</label>
+      <label class="form-label">{% trans "Total de Porciones Consumidas" %}</label>
       <input type="number" id="total-portions-input" class="form-input" min="1" max="6" value="1" style="text-align: center;">
     </div>
     
     <button id="btn-register-consumption" class="btn-primary">
-      Registrar Consumo
+      {% trans "Registrar Consumo" %}
     </button>
   </div>
   
   <!-- Historial de consumo del día -->
   <div style="margin-top: 25px;">
-    <h4 style="color: #ffffff; margin-bottom: 15px;">Consumo del Día</h4>
+    <h4 style="color: #ffffff; margin-bottom: 15px;">{% trans "Consumo del Día" %}</h4>
     <div id="daily-consumption" style="background: rgba(30, 41, 59, 0.7); border-radius: 8px; padding: 15px;">
       <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span style="color: #ffa8a8;">Desayuno:</span>
-        <span id="breakfast-count" style="color: #fff; font-weight: 600;">0 porciones</span>
+        <span style="color: #ffa8a8;">{% trans "Desayuno:" %}</span>
+        <span id="breakfast-count" style="color: #fff; font-weight: 600;">0 {% trans "porciones" %}</span>
       </div>
       <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span style="color: #ffa8a8;">Almuerzo:</span>
-        <span id="lunch-count" style="color: #fff; font-weight: 600;">0 porciones</span>
+        <span style="color: #ffa8a8;">{% trans "Almuerzo:" %}</span>
+        <span id="lunch-count" style="color: #fff; font-weight: 600;">0 {% trans "porciones" %}</span>
       </div>
       <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span style="color: #ffa8a8;">Comida:</span>
-        <span id="dinner-count" style="color: #fff; font-weight: 600;">0 porciones</span>
+        <span style="color: #ffa8a8;">{% trans "Comida:" %}</span>
+        <span id="dinner-count" style="color: #fff; font-weight: 600;">0 {% trans "porciones" %}</span>
       </div>
       <div style="display: flex; justify-content: space-between;">
-        <span style="color: #ffa8a8;">Cena:</span>
-        <span id="snack-count" style="color: #fff; font-weight: 600;">0 porciones</span>
+        <span style="color: #ffa8a8;">{% trans "Cena:" %}</span>
+        <span id="snack-count" style="color: #fff; font-weight: 600;">0 {% trans "porciones" %}</span>
       </div>
       <div style="border-top: 1px solid #4b5563; margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between;">
-        <span style="color: #1ad0f9; font-weight: 700;">TOTAL DÍA:</span>
-        <span id="total-day-count" style="color: #1ad0f9; font-weight: 800;">0 porciones</span>
+        <span style="color: #1ad0f9; font-weight: 700;">{% trans "TOTAL DÍA:" %}</span>
+        <span id="total-day-count" style="color: #1ad0f9; font-weight: 800;">0 {% trans "porciones" %}</span>
       </div>
       <div style="border-top: 1px solid #4b5563; margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between;">
-        <span style="color: #ffa8a8; font-weight: 600;">Consumo Esperado:</span>
-        <span id="expected-day-count" style="color: #10b981; font-weight: 800;">0 porciones</span>
+        <span style="color: #ffa8a8; font-weight: 600;">{% trans "Consumo Esperado:" %}</span>
+        <span id="expected-day-count" style="color: #10b981; font-weight: 800;">0 {% trans "porciones" %}</span>
       </div>
     </div>
   </div>
@@ -82,34 +82,34 @@
 
 <!-- Panel de Métricas y Visualización -->
 <div class="metrics-panel">
-  <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 20px;">Suministro de Alimentos</h3>
+  <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 20px;">{% trans "Suministro de Alimentos" %}</h3>
   
   <!-- Gráfico de Porciones animado -->
   <div style="text-align: center; margin-bottom: 30px;">
     <svg id="portions-chart" width="100%" height="300"></svg>
     <div style="margin-top: 10px;">
-      <div id="portions-text" style="font-size: 35px; font-weight: 800; color: #ffffff;">-- porciones</div>
-      <div style="color: #ffa8a8; font-size: 25px;">restantes de <span id="total-portions-text" style="color: #fff; font-weight: 600;">--</span> iniciales</div>
+      <div id="portions-text" style="font-size: 35px; font-weight: 800; color: #ffffff;">-- {% trans "porciones" %}</div>
+      <div style="color: #ffa8a8; font-size: 25px;">{% trans "restantes de" %} <span id="total-portions-text" style="color: #fff; font-weight: 600;">--</span> {% trans "iniciales" %}</div>
     </div>
   </div>
   
   <!-- Métricas de Suministro -->
   <div class="metric">
-    <div class="metric-title">Porciones Restantes</div>
+    <div class="metric-title">{% trans "Porciones Restantes" %}</div>
     <div class="metric-value-container">
       <p class="metric-value" id="remaining-portions">--</p>
       <div class="metric-status-container">
-        <div class="metric-status-large status-good" id="portions-status">CARGANDO...</div>
+        <div class="metric-status-large status-good" id="portions-status">{% trans "CARGANDO..." %}</div>
       </div>
     </div>
   </div>
 
   <div class="metric">
-    <div class="metric-title">Días de Autonomía</div>
+    <div class="metric-title">{% trans "Días de Autonomía" %}</div>
     <div class="metric-value-container">
       <p class="metric-value" id="autonomy-days">--</p>
       <div class="metric-status-container">
-        <div class="metric-status-large status-good" id="autonomy-status">CARGANDO...</div>
+        <div class="metric-status-large status-good" id="autonomy-status">{% trans "CARGANDO..." %}</div>
       </div>
     </div>
   </div>
@@ -117,16 +117,16 @@
 
 <!-- Panel de Alertas y Sugerencias -->
 <div class="control-panel">
-  <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 20px;">Alertas y Sugerencias</h3>
+  <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 20px;">{% trans "Alertas y Sugerencias" %}</h3>
   
   <!-- Sección de Alertas -->
   <div style="margin-bottom: 25px;">
     <h4 style="color: #ffa8a8; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-      <span>🔔 Alertas de Consumo</span>
+      <span>🔔 {% trans "Alertas de Consumo" %}</span>
     </h4>
     <div id="consumption-alerts" style="background: rgba(30, 41, 59, 0.7); border-radius: 8px; padding: 15px; min-height: 120px;">
       <div class="alert-message" style="color: #9ca3af; text-align: center; padding: 20px;">
-        <span>Calculando alertas de consumo...</span>
+        <span>{% trans "Calculando alertas de consumo..." %}</span>
       </div>
     </div>
   </div>
@@ -134,11 +134,11 @@
   <!-- Sección de Sugerencias -->
   <div>
     <h4 style="color: #ffa8a8; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-      <span>💡 Sugerencias de Racionamiento</span>
+      <span>💡 {% trans "Sugerencias de Racionamiento" %}</span>
     </h4>
     <div id="rationing-suggestions" style="background: rgba(30, 41, 59, 0.7); border-radius: 8px; padding: 15px; min-height: 150px;">
       <div class="suggestion-message" style="color: #9ca3af; text-align: center; padding: 20px;">
-        <span>Generando sugerencias...</span>
+        <span>{% trans "Generando sugerencias..." %}</span>
       </div>
     </div>
   </div>
@@ -146,19 +146,19 @@
   <!-- Info de misión -->
   <div style="margin-top: 20px; background: rgba(30, 41, 59, 0.5); border-radius: 8px; padding: 12px; border-left: 4px solid #ff6b6b;">
     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-      <span style="color: #ffa8a8; font-size: 14px;">Tripulantes Actuales:</span>
+      <span style="color: #ffa8a8; font-size: 14px;">{% trans "Tripulantes Actuales:" %}</span>
       <span style="color: #fff; font-weight: 600; font-size: 14px;" id="mission-crew">--</span>
     </div>
     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-      <span style="color: #ffa8a8; font-size: 14px;">Comidas por día (por tripulante):</span>
+      <span style="color: #ffa8a8; font-size: 14px;">{% trans "Comidas por día (por tripulante):" %}</span>
       <span style="color: #fff; font-weight: 600; font-size: 14px;">4</span>
     </div>
     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-      <span style="color: #ffa8a8; font-size: 14px;">Duración total misión:</span>
-      <span style="color: #fff; font-weight: 600; font-size: 14px;">7 días</span>
+      <span style="color: #ffa8a8; font-size: 14px;">{% trans "Duración total misión:" %}</span>
+      <span style="color: #fff; font-weight: 600; font-size: 14px;">{% trans "7 días" %}</span>
     </div>
     <div style="display: flex; justify-content: space-between;">
-      <span style="color: #ffa8a8; font-size: 14px;">Días restantes:</span>
+      <span style="color: #ffa8a8; font-size: 14px;">{% trans "Días restantes:" %}</span>
       <span style="color: #fff; font-weight: 600; font-size: 14px;" id="mission-days-remaining">--</span>
     </div>
   </div>
@@ -168,19 +168,19 @@
 <!-- Panel de Gráficos de Análisis -->
 <div class="chart-panel" style="margin-top: 20px;">
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-  <h3 style="color: #ffffff; margin: 0;">Análisis de Consumo</h3>
+  <h3 style="color: #ffffff; margin: 0;">{% trans "Análisis de Consumo" %}</h3>
   <div style="display: flex; gap: 10px;">
     <select id="analysis-period" class="form-select" style="width: auto;">
-      <option value="7">Últimos 7 días</option>
-      <option value="30">Últimos 30 días</option>
-      <option value="all">Todo el histórico</option>
+      <option value="7">{% trans "Últimos 7 días" %}</option>
+      <option value="30">{% trans "Últimos 30 días" %}</option>
+      <option value="all">{% trans "Todo el histórico" %}</option>
     </select>
   </div>
 </div>
 
 <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
   <div>
-    <h4 style="color: #ffa8a8; margin-bottom: 15px;">Distribución por Comida</h4>
+    <h4 style="color: #ffa8a8; margin-bottom: 15px;">{% trans "Distribución por Comida" %}</h4>
     <div style="height: 350px; background: rgba(30, 41, 59, 0.3); border-radius: 10px; padding: 15px;">
       <svg id="meal-distribution" width="100%" height="100%"></svg>
     </div>
@@ -189,16 +189,16 @@
 
 <!-- Tabla de Historial -->
 <div style="margin-top: 30px;">
-  <h4 style="color: #ffa8a8; margin-bottom: 15px;">Historial de Consumo Reciente</h4>
+  <h4 style="color: #ffa8a8; margin-bottom: 15px;">{% trans "Historial de Consumo Reciente" %}</h4>
   <div style="overflow-x: auto;">
     <table style="width: 100%; border-collapse: collapse;">
       <thead>
         <tr style="background: #1f2937;">
-          <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Fecha/Hora</th>
-          <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Comida</th>
-          <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Porciones</th>
-          <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Tripulantes</th>
-          <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">Acciones</th>
+          <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">{% trans "Fecha/Hora" %}</th>
+          <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">{% trans "Comida" %}</th>
+          <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">{% trans "Porciones" %}</th>
+          <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">{% trans "Tripulantes" %}</th>
+          <th style="padding: 12px; text-align: left; color: #ffa8a8; border-bottom: 2px solid #ff6b6b;">{% trans "Acciones" %}</th>
         </tr>
       </thead>
       <tbody id="consumption-history">
@@ -216,21 +216,80 @@
 <!-- Modal de confirmación para eliminar registros -->
 <div id="confirmation-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; align-items: center; justify-content: center;">
 <div style="background: #1f2937; border-radius: 10px; padding: 30px; max-width: 500px; width: 90%; border: 2px solid #ff6b6b;">
-<h3 style="color: #fff; margin-top: 0; margin-bottom: 15px;" id="modal-title">Confirmar Operación</h3>
+<h3 style="color: #fff; margin-top: 0; margin-bottom: 15px;" id="modal-title">{% trans "Confirmar Operación" %}</h3>
 <p style="color: #ffa8a8; margin-bottom: 20px;" id="modal-message">
-  ¿Está seguro de que desea realizar esta operación?
+  {% trans "¿Está seguro de que desea realizar esta operación?" %}
 </p>
 <div style="display: flex; gap: 10px; justify-content: flex-end;">
   <button id="modal-cancel" style="padding: 10px 20px; background: #4b5563; color: #fff; border: none; border-radius: 6px; cursor: pointer;">
-    Cancelar
+    {% trans "Cancelar" %}
   </button>
   <button id="modal-confirm" style="padding: 10px 20px; background: #ef4444; color: #fff; border: none; border-radius: 6px; cursor: pointer;">
-    Confirmar
+    {% trans "Confirmar" %}
   </button>
 </div>
 </div>
 </div>
-
+<script>
+  const TRANSLATIONS = {
+    porciones: "{% trans ' porciones' %}",
+    eliminado_exito: "{% trans 'Registro eliminado correctamente' %}",
+    error_eliminar: "{% trans 'Error al eliminar registro' %}",
+    error_conexion: "{% trans 'Error de conexión' %}",
+    registrando: "{% trans 'Registrando...' %}",
+    debe_una_persona: "{% trans 'Debe registrar al menos una persona y una porción' %}",
+    tripulantes_entre_1_6: "{% trans 'El número de tripulantes debe estar entre 1 y 6' %}",
+    registrado_exito: "{% trans 'Consumo registrado exitosamente' %}",
+    error_registrar: "{% trans 'Error al registrar consumo' %}",
+    actualizado_panel: "{% trans 'Sistema actualizado desde panel de control' %}",
+    error_cargar_inicial: "{% trans 'Error al cargar datos iniciales' %}",
+    calcular_alertas: "{% trans 'Calculando alertas de consumo...' %}",
+    generar_sugerencias: "{% trans 'Generando sugerencias...' %}",
+    sin_alertas: "{% trans 'No hay alertas en este momento.' %}",
+    consumo_excesivo: "{% trans 'Consumo Excesivo' %}",
+    consumo_normal: "{% trans 'Consumo Normal' %}",
+    consumo_inferior: "{% trans 'Consumo Inferior' %}",
+    deficit_suministros: "{% trans 'Déficit de Suministros' %}",
+    suministros_suficientes: "{% trans 'Suministros Suficientes' %}",
+    suministro_bajo: "{% trans 'Suministro Bajo' %}",
+    mision_completada: "{% trans 'Misión Completada' %}",
+    media_porcion: "{% trans 'Media Porción' %}",
+    tres_comidas: "{% trans '3 Comidas' %}",
+    recomendacion_principal: "{% trans 'Recomendación Principal' %}",
+    consumo_optimo: "{% trans 'Consumo Óptimo' %}",
+    suministros_alcanzaran: "{% trans 'Suministros alcanzarían para' %}",
+    consumo_diario: "{% trans 'Consumo diario:' %}",
+    ahorro: "{% trans 'Ahorro:' %}",
+    reducir_consumo: "{% trans 'Reducir el consumo' %}",
+    persona: "{% trans 'persona' %}",
+    personas: "{% trans 'personas' %}",
+    por_dia: "{% trans '/día' %}",
+    para_completar: "{% trans 'para completar la misión.' %}",
+    hoy_consumieron: "{% trans 'Hoy se consumieron' %}",
+    mas_esperado: "{% trans 'más de lo esperado' %}",
+    menos_esperado: "{% trans 'menos de lo esperado.' %}",
+    con_consumo_actual: "{% trans 'Con el consumo actual, los suministros solo alcanzarán para' %}",
+    de_los: "{% trans 'de los' %}",
+    dias_restantes: "{% trans 'días restantes.' %}",
+    faltan: "{% trans 'Faltan' %}",
+    suministro_inicial: "{% trans 'del suministro inicial.' %}",
+    si_cada: "{% trans 'Si cada tripulante consume' %}",
+    en_cada_comida: "{% trans 'en cada comida:' %}",
+    reducir_a: "{% trans 'Reducir a' %}",
+    diarias: "{% trans 'diarias en lugar de 4:' %}",
+    consumo_esperado_dia: "{% trans 'Consumo esperado/día:' %}",
+    consumo_real_hoy: "{% trans 'Consumo real hoy:' %}",
+    dias_cubiertos: "{% trans 'Días cubiertos:' %}",
+    dias_restantes: "{% trans 'Días restantes:' %}",
+    restantes_de: "{% trans 'restantes de' %}",
+    iniciales: "{% trans 'iniciales' %}",
+    tripulantes_actuales: "{% trans 'Tripulantes Actuales:' %}",
+    comidas_por_dia: "{% trans 'Comidas por día (por tripulante):' %}",
+    duracion_total_mision: "{% trans 'Duración total misión:' %}",
+    dias_restantes_mision: "{% trans 'Días restantes:' %}",
+    desayuno: "{% trans 'Desayuno' %}",
+  };
+</script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 // ============================================
@@ -437,13 +496,13 @@ async function actualizarConsumoDiario() {
 // Función para actualizar solo las secciones de consumo
 function updateConsumptionSections() {
   // Actualizar consumo del día
-  d3.select("#breakfast-count").text(appState.dailyConsumption.desayuno + " porciones");
-  d3.select("#lunch-count").text(appState.dailyConsumption.almuerzo + " porciones");
-  d3.select("#dinner-count").text(appState.dailyConsumption.comida + " porciones");
-  d3.select("#snack-count").text(appState.dailyConsumption.cena + " porciones");
+  d3.select("#breakfast-count").text(appState.dailyConsumption.desayuno + TRANSLATIONS.porciones);
+  d3.select("#lunch-count").text(appState.dailyConsumption.almuerzo + TRANSLATIONS.porciones);
+  d3.select("#dinner-count").text(appState.dailyConsumption.comida + TRANSLATIONS.porciones);
+  d3.select("#snack-count").text(appState.dailyConsumption.cena + TRANSLATIONS.porciones);
   
   const totalDay = appState.totalConsumedToday;
-  d3.select("#total-day-count").text(totalDay + " porciones");
+  d3.select("#total-day-count").text(totalDay + TRANSLATIONS.porciones);
   
   // Actualizar información de misión
   updateMissionInfo();
@@ -561,19 +620,19 @@ function updateStatusIndicators() {
   const autonomyStatus = d3.select("#autonomy-status");
   
   if (appState.porcentajeRestante <= 10) {
-    portionsStatus.text("CRÍTICO").classed("status-critical", true).classed("status-warning", false).classed("status-good", false);
+    portionsStatus.text("{% trans 'CRÍTICO' %}").classed("status-critical", true).classed("status-warning", false).classed("status-good", false);
   } else if (appState.porcentajeRestante <= 30) {
-    portionsStatus.text("ALERTA").classed("status-warning", true).classed("status-critical", false).classed("status-good", false);
+    portionsStatus.text("{% trans 'ALERTA' %}").classed("status-warning", true).classed("status-critical", false).classed("status-good", false);
   } else {
-    portionsStatus.text("SUFICIENTE").classed("status-good", true).classed("status-warning", false).classed("status-critical", false);
+    portionsStatus.text("{% trans 'SUFICIENTE' %}").classed("status-good", true).classed("status-warning", false).classed("status-critical", false);
   }
   
   if (appState.autonomyDays <= 1) {
-    autonomyStatus.text("CRÍTICO").classed("status-critical", true).classed("status-warning", false).classed("status-good", false);
+    autonomyStatus.text("{% trans 'CRÍTICO' %}").classed("status-critical", true).classed("status-warning", false).classed("status-good", false);
   } else if (appState.autonomyDays <= 3) {
-    autonomyStatus.text("ALERTA").classed("status-warning", true).classed("status-critical", false).classed("status-good", false);
+    autonomyStatus.text("{% trans 'ALERTA' %}").classed("status-warning", true).classed("status-critical", false).classed("status-good", false);
   } else {
-    autonomyStatus.text("ÓPTIMO").classed("status-good", true).classed("status-warning", false).classed("status-critical", false);
+    autonomyStatus.text("{% trans 'ÓPTIMO' %}").classed("status-good", true).classed("status-warning", false).classed("status-critical", false);
   }
 }
 
@@ -594,10 +653,10 @@ function updateMealDistributionChart() {
   
   // Datos actuales del consumo diario
   const data = [
-    { meal: "Desayuno", value: appState.dailyConsumption.desayuno, color: "#ffd166" },
-    { meal: "Almuerzo", value: appState.dailyConsumption.almuerzo, color: "#06d6a0" },
-    { meal: "Comida", value: appState.dailyConsumption.comida, color: "#118ab2" },
-    { meal: "Cena", value: appState.dailyConsumption.cena, color: "#ff9e6d" }
+    { meal: "{% trans 'Desayuno' %}", value: appState.dailyConsumption.desayuno, color: "#ffd166" },
+    { meal: "{% trans 'Almuerzo' %}", value: appState.dailyConsumption.almuerzo, color: "#06d6a0" },
+    { meal: "{% trans 'Comida' %}", value: appState.dailyConsumption.comida, color: "#118ab2" },
+    { meal: "{% trans 'Cena' %}", value: appState.dailyConsumption.cena, color: "#ff9e6d" }
   ];
   
   const x = d3.scaleBand()
@@ -694,7 +753,7 @@ async function obtenerEstadoAlimentos() {
     return { success: true, data: data };
   } catch (error) {
     console.error('Error cargando estado:', error);
-    showNotification('Error al cargar datos de alimentos', 'error');
+    showNotification(TRANSLATIONS.error_cargar_inicial, 'error');
     return { success: false, error: error.message };
   }
 }
@@ -742,7 +801,7 @@ async function registrarConsumoAPI(tipo_comida, personas, porciones) {
   try {
     const btn = document.getElementById('btn-register-consumption');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '⏳ Procesando...';
+    btn.innerHTML = '⏳ ' + TRANSLATIONS.registrando;
     btn.disabled = true;
     
     const response = await fetch('/api/alimentos/registrar-consumo/', {
@@ -793,19 +852,19 @@ async function registrarConsumoAPI(tipo_comida, personas, porciones) {
         localStorage.setItem('alimentos_updated', Date.now());
       }
       
-      showNotification(data.message || 'Consumo registrado exitosamente', 'success');
+      showNotification(data.message || TRANSLATIONS.registrado_exito, 'success');
       return { success: true, data: data };
     } else {
-      showNotification(data.error || 'Error al registrar consumo', 'error');
+      showNotification(data.error || TRANSLATIONS.error_registrar, 'error');
       return { success: false, error: data.error };
     }
   } catch (error) {
-    console.error('❌ Error registrando consumo:', error);
-    showNotification('Error de conexión', 'error');
+    console.error('Error registrando consumo:', error);
+    showNotification(TRANSLATIONS.error_conexion, 'error');
     return { success: false, error: error.message };
   } finally {
     const btn = document.getElementById('btn-register-consumption');
-    btn.innerHTML = '📋 Registrar Consumo';
+    btn.innerHTML = '{% trans "Registrar Consumo" %}';
     btn.disabled = false;
   }
 }
@@ -825,7 +884,7 @@ function updateConsumptionHistoryTable() {
       .style("padding", "20px")
       .style("text-align", "center")
       .style("color", "#9ca3af")
-      .text("No hay registros de consumo aún");
+      .text("{% trans 'No hay registros de consumo aún' %}");
     return;
   }
   
@@ -849,12 +908,13 @@ function updateConsumptionHistoryTable() {
       .style("padding", "12px")
       .style("color", "#ff6b6b")
       .style("font-weight", "600")
-      .text(item.porciones + " porciones");
+      .text(item.porciones + TRANSLATIONS.porciones);
     
+    const pluralSuffix = item.personas !== 1 ? TRANSLATIONS.personas : TRANSLATIONS.persona;
     row.append("td")
       .style("padding", "12px")
       .style("color", "#fff")
-      .text(item.personas + " persona" + (item.personas !== 1 ? 's' : ''));
+      .text(item.personas + " " + pluralSuffix);
     
     const actionsCell = row.append("td")
       .style("padding", "12px");
@@ -867,7 +927,7 @@ function updateConsumptionHistoryTable() {
       .style("border-radius", "4px")
       .style("cursor", "pointer")
       .style("font-size", "12px")
-      .text("Eliminar")
+      .text("{% trans 'Eliminar' %}")
       .on("click", function() {
         deleteConsumptionRecord(item.id, index);
       });
@@ -877,8 +937,8 @@ function updateConsumptionHistoryTable() {
 // Función para eliminar un registro individual
 async function deleteConsumptionRecord(recordId, index) {
   showConfirmationModal(
-    "Eliminar Registro",
-    "¿Está seguro de que desea eliminar este registro de consumo? Esta acción no se puede deshacer.",
+    "{% trans 'Eliminar Registro' %}",
+    "{% trans '¿Está seguro de que desea eliminar este registro de consumo? Esta acción no se puede deshacer.' %}",
     async () => {
       try {
         const response = await fetch(`/api/alimentos/eliminar-registro/${recordId}/`, {
@@ -900,13 +960,13 @@ async function deleteConsumptionRecord(recordId, index) {
             localStorage.setItem('alimentos_updated', Date.now());
           }
           
-          showNotification('✅ Registro eliminado correctamente', 'success');
+          showNotification('✅ ' + TRANSLATIONS.eliminado_exito, 'success');
         } else {
-          showNotification(data.error || 'Error al eliminar registro', 'error');
+          showNotification(data.error || TRANSLATIONS.error_eliminar, 'error');
         }
       } catch (error) {
         console.error('❌ Error eliminando registro:', error);
-        showNotification('Error de conexión', 'error');
+        showNotification(TRANSLATIONS.error_conexion, 'error');
       }
       hideConfirmationModal();
     }
@@ -938,7 +998,7 @@ function updateMissionInfo() {
   
   d3.select("#mission-crew").text(appState.currentCrewSize);
   d3.select("#mission-days-remaining").text(missionInfo.daysRemaining);
-  d3.select("#expected-day-count").text(`${missionInfo.expectedDaily} porciones`);
+  d3.select("#expected-day-count").text(`${missionInfo.expectedDaily} ${TRANSLATIONS.porciones.trim()}`);
 }
 
 function generateConsumptionAlerts() {
@@ -965,14 +1025,13 @@ function generateConsumptionAlerts() {
               padding: 10px; margin-bottom: 10px; border-radius: 4px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
           <span style="font-size: 16px;">${icon}</span>
-          <span style="font-weight: 600; color: ${severity === 'critical' ? '#ef4444' : '#f59e0b'};">Consumo Excesivo</span>
+          <span style="font-weight: 600; color: ${severity === 'critical' ? '#ef4444' : '#f59e0b'};">${TRANSLATIONS.consumo_excesivo}</span>
         </div>
         <div style="color: #fff; font-size: 14px;">
-          Hoy se consumieron <span style="color: #ff6b6b; font-weight: 600;">${consumptionDeviation}</span> porciones más 
-          de lo esperado (${excessPercentage}% de exceso).
+          ${TRANSLATIONS.hoy_consumieron} <span style="color: #ff6b6b; font-weight: 600;">${consumptionDeviation}</span> ${TRANSLATIONS.porciones} ${TRANSLATIONS.mas_esperado} (${excessPercentage}% de exceso).
         </div>
         <div style="color: #ffa8a8; font-size: 12px; margin-top: 5px;">
-          Consumo esperado: ${expectedDailyConsumption} porciones | Consumo real: ${actualDailyConsumption} porciones
+          ${TRANSLATIONS.consumo_esperado_dia} ${expectedDailyConsumption} ${TRANSLATIONS.porciones} | ${TRANSLATIONS.consumo_real_hoy} ${actualDailyConsumption} ${TRANSLATIONS.porciones}
         </div>
       </div>
     `;
@@ -983,13 +1042,13 @@ function generateConsumptionAlerts() {
               padding: 10px; margin-bottom: 10px; border-radius: 4px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
           <span style="font-size: 16px;">✅</span>
-          <span style="font-weight: 600; color: #10b981;">Consumo Normal</span>
+          <span style="font-weight: 600; color: #10b981;">${TRANSLATIONS.consumo_normal}</span>
         </div>
         <div style="color: #fff; font-size: 14px;">
-          El consumo de hoy está dentro del rango esperado.
+          {% trans 'El consumo de hoy está dentro del rango esperado.' %}
         </div>
         <div style="color: #ffa8a8; font-size: 12px; margin-top: 5px;">
-          ${expectedDailyConsumption} porciones consumidas correctamente.
+          ${expectedDailyConsumption} ${TRANSLATIONS.porciones} {% trans 'consumidas correctamente.' %}
         </div>
       </div>
     `;
@@ -1000,11 +1059,11 @@ function generateConsumptionAlerts() {
               padding: 10px; margin-bottom: 10px; border-radius: 4px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
           <span style="font-size: 16px;">📉</span>
-          <span style="font-weight: 600; color: #3b82f6;">Consumo Inferior</span>
+          <span style="font-weight: 600; color: #3b82f6;">${TRANSLATIONS.consumo_inferior}</span>
         </div>
         <div style="color: #fff; font-size: 14px;">
-          Hoy se consumieron <span style="color: #10b981; font-weight: 600;">${Math.abs(consumptionDeviation)}</span> 
-          porciones menos de lo esperado.
+          ${TRANSLATIONS.hoy_consumieron} <span style="color: #10b981; font-weight: 600;">${Math.abs(consumptionDeviation)}</span> 
+          ${TRANSLATIONS.porciones} ${TRANSLATIONS.menos_esperado}
         </div>
       </div>
     `;
@@ -1021,15 +1080,15 @@ function generateConsumptionAlerts() {
               padding: 10px; margin-bottom: 10px; border-radius: 4px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
           <span style="font-size: 16px;">${icon}</span>
-          <span style="font-weight: 600; color: ${severity === 'critical' ? '#ef4444' : '#f59e0b'};">Déficit de Suministros</span>
+          <span style="font-weight: 600; color: ${severity === 'critical' ? '#ef4444' : '#f59e0b'};">${TRANSLATIONS.deficit_suministros}</span>
         </div>
         <div style="color: #fff; font-size: 14px;">
-          Con el consumo actual, los suministros solo alcanzarán para 
-          <span style="color: #ff6b6b; font-weight: 600;">${daysCovered}</span> días 
-          de los <span style="color: #ff6b6b; font-weight: 600;">${missionInfo.daysRemaining}</span> días restantes.
+          ${TRANSLATIONS.con_suministros_alcanzaran} 
+          <span style="color: #ff6b6b; font-weight: 600;">${daysCovered}</span> {% trans 'días' %} 
+          ${TRANSLATIONS.de_los} <span style="color: #ff6b6b; font-weight: 600;">${missionInfo.daysRemaining}</span> ${TRANSLATIONS.dias_restantes}
         </div>
         <div style="color: #ffa8a8; font-size: 12px; margin-top: 5px;">
-          Faltan ${supplyDeficit} porciones para completar la misión.
+          ${TRANSLATIONS.faltan} ${supplyDeficit} ${TRANSLATIONS.porciones} ${TRANSLATIONS.para_completar}
         </div>
       </div>
     `;
@@ -1040,10 +1099,10 @@ function generateConsumptionAlerts() {
               padding: 10px; margin-bottom: 10px; border-radius: 4px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
           <span style="font-size: 16px;">✅</span>
-          <span style="font-weight: 600; color: #10b981;">Suministros Suficientes</span>
+          <span style="font-weight: 600; color: #10b981;">${TRANSLATIONS.suministros_suficientes}</span>
         </div>
         <div style="color: #fff; font-size: 14px;">
-          Hay suficientes suministros para los ${missionInfo.daysRemaining} días restantes de misión.
+          {% trans 'Hay suficientes suministros para los' %} ${missionInfo.daysRemaining} {% trans 'días restantes de misión.' %}
         </div>
       </div>
     `;
@@ -1058,11 +1117,11 @@ function generateConsumptionAlerts() {
               padding: 10px; margin-bottom: 10px; border-radius: 4px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
           <span style="font-size: 16px;">${icon}</span>
-          <span style="font-weight: 600; color: ${severity === 'critical' ? '#ef4444' : '#f59e0b'};">Suministro Bajo</span>
+          <span style="font-weight: 600; color: ${severity === 'critical' ? '#ef4444' : '#f59e0b'};">${TRANSLATIONS.suministro_bajo}</span>
         </div>
         <div style="color: #fff; font-size: 14px;">
-          Solo queda el <span style="color: #ff6b6b; font-weight: 600;">${Math.round(appState.porcentajeRestante)}%</span> 
-          del suministro inicial.
+          {% trans 'Solo queda el' %} <span style="color: #ff6b6b; font-weight: 600;">${Math.round(appState.porcentajeRestante)}%</span> 
+          ${TRANSLATIONS.suministro_inicial}
         </div>
       </div>
     `;
@@ -1075,10 +1134,10 @@ function generateConsumptionAlerts() {
               padding: 10px; margin-bottom: 10px; border-radius: 4px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
           <span style="font-size: 16px;">🎉</span>
-          <span style="font-weight: 600; color: #8b5cf6;">Misión Completada</span>
+          <span style="font-weight: 600; color: #8b5cf6;">${TRANSLATIONS.mision_completada}</span>
         </div>
         <div style="color: #fff; font-size: 14px;">
-          ¡La misión de 7 días ha sido completada!
+          ¡{% trans 'La misión de 7 días ha sido completada' %}!
         </div>
       </div>
     `;
@@ -1087,7 +1146,7 @@ function generateConsumptionAlerts() {
   alertsContainer.innerHTML = alertsHTML || `
     <div class="alert-item info" style="background: rgba(30, 41, 59, 0.5); padding: 15px; text-align: center; border-radius: 4px;">
       <div style="color: #9ca3af;">
-        No hay alertas en este momento.
+        ${TRANSLATIONS.sin_alertas}
       </div>
     </div>
   `;
@@ -1118,14 +1177,14 @@ function generateRationingSuggestions() {
               padding: 10px; margin-bottom: 10px; border-radius: 4px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
           <span style="font-size: 16px;">🍽️</span>
-          <span style="font-weight: 600; color: #3b82f6;">Opción 1: Media Porción</span>
+          <span style="font-weight: 600; color: #3b82f6;">${TRANSLATIONS.media_porcion}</span>
         </div>
         <div style="color: #fff; font-size: 14px;">
-          Si cada tripulante consume <span style="color: #1ad0f9; font-weight: 600;">media porción</span> en cada comida:
+          ${TRANSLATIONS.si_cada} <span style="color: #1ad0f9; font-weight: 600;">{% trans 'media porción' %}</span> ${TRANSLATIONS.en_cada_comida}
           <ul style="margin: 5px 0 5px 20px; color: #fff;">
-            <li>Suministros alcanzarían para <span style="color: #1ad0f9; font-weight: 600;">${Math.floor(daysWithHalfPortions)}</span> días</li>
-            <li>Consumo diario: <span style="color: #1ad0f9; font-weight: 600;">${halfPortionDailyNeed}</span> porciones/día</li>
-            <li>Ahorro: <span style="color: #10b981; font-weight: 600;">${expectedDailyConsumption - halfPortionDailyNeed}</span> porciones/día</li>
+            <li>${TRANSLATIONS.suministros_alcanzaran} <span style="color: #1ad0f9; font-weight: 600;">${Math.floor(daysWithHalfPortions)}</span> {% trans 'días' %}</li>
+            <li>${TRANSLATIONS.consumo_diario} <span style="color: #1ad0f9; font-weight: 600;">${halfPortionDailyNeed}</span> ${TRANSLATIONS.porciones}${TRANSLATIONS.por_dia}</li>
+            <li>${TRANSLATIONS.ahorro} <span style="color: #10b981; font-weight: 600;">${expectedDailyConsumption - halfPortionDailyNeed}</span> ${TRANSLATIONS.porciones}${TRANSLATIONS.por_dia}</li>
           </ul>
         </div>
       </div>
@@ -1140,14 +1199,14 @@ function generateRationingSuggestions() {
               padding: 10px; margin-bottom: 10px; border-radius: 4px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
           <span style="font-size: 16px;">⏰</span>
-          <span style="font-weight: 600; color: #8b5cf6;">Opción 2: 3 Comidas</span>
+          <span style="font-weight: 600; color: #8b5cf6;">${TRANSLATIONS.tres_comidas}</span>
         </div>
         <div style="color: #fff; font-size: 14px;">
-          Reducir a <span style="color: #1ad0f9; font-weight: 600;">3 comidas</span> diarias en lugar de 4:
+          ${TRANSLATIONS.reducir_a} <span style="color: #1ad0f9; font-weight: 600;">{% trans '3 comidas' %}</span> ${TRANSLATIONS.diarias}
           <ul style="margin: 5px 0 5px 20px; color: #fff;">
-            <li>Suministros alcanzarían para <span style="color: #1ad0f9; font-weight: 600;">${Math.floor(daysWithThreeMeals)}</span> días</li>
-            <li>Consumo diario: <span style="color: #1ad0f9; font-weight: 600;">${threeMealsDailyNeed}</span> porciones/día</li>
-            <li>Ahorro: <span style="color: #10b981; font-weight: 600;">${expectedDailyConsumption - threeMealsDailyNeed}</span> porciones/día</li>
+            <li>${TRANSLATIONS.suministros_alcanzaran} <span style="color: #1ad0f9; font-weight: 600;">${Math.floor(daysWithThreeMeals)}</span> {% trans 'días' %}</li>
+            <li>${TRANSLATIONS.consumo_diario} <span style="color: #1ad0f9; font-weight: 600;">${threeMealsDailyNeed}</span> ${TRANSLATIONS.porciones}${TRANSLATIONS.por_dia}</li>
+            <li>${TRANSLATIONS.ahorro} <span style="color: #10b981; font-weight: 600;">${expectedDailyConsumption - threeMealsDailyNeed}</span> ${TRANSLATIONS.porciones}${TRANSLATIONS.por_dia}</li>
           </ul>
         </div>
       </div>
@@ -1160,13 +1219,13 @@ function generateRationingSuggestions() {
                 padding: 10px; margin-bottom: 10px; border-radius: 4px;">
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
             <span style="font-size: 16px;">🎯</span>
-            <span style="font-weight: 600; color: #10b981;">Recomendación Principal</span>
+            <span style="font-weight: 600; color: #10b981;">${TRANSLATIONS.recomendacion_principal}</span>
           </div>
           <div style="color: #fff; font-size: 14px;">
-            <span style="color: #1ad0f9; font-weight: 600;">Reducir el consumo</span> a 
-            ${expectedDailyConsumption} porciones/día (${CONFIG.mealsPerDayPerPerson} por tripulante).
+            <span style="color: #1ad0f9; font-weight: 600;">${TRANSLATIONS.reducir_consumo}</span> {% trans 'a' %} 
+            ${expectedDailyConsumption} ${TRANSLATIONS.porciones}/{% trans 'día' %} (${CONFIG.mealsPerDayPerPerson} {% trans 'por tripulante' %}).
             <div style="margin-top: 5px; font-size: 12px; color: #ffa8a8;">
-              Actualmente hay un exceso de ${consumptionDeviation} porciones/día.
+              {% trans 'Actualmente hay un exceso de' %} ${consumptionDeviation} ${TRANSLATIONS.porciones}/{% trans 'día' %}.
             </div>
           </div>
         </div>
@@ -1179,11 +1238,11 @@ function generateRationingSuggestions() {
               padding: 15px; text-align: center; border-radius: 4px;">
         <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
           <span style="font-size: 20px;">✅</span>
-          <span style="font-weight: 600; color: #10b981;">Consumo Óptimo</span>
+          <span style="font-weight: 600; color: #10b981;">${TRANSLATIONS.consumo_optimo}</span>
         </div>
         <div style="color: #fff; font-size: 14px;">
-          El consumo actual es el adecuado para la misión.
-          No se requieren ajustes en este momento.
+          {% trans 'El consumo actual es el adecuado para la misión.' %}
+          {% trans 'No se requieren ajustes en este momento.' %}
         </div>
       </div>
     `;
@@ -1193,21 +1252,21 @@ function generateRationingSuggestions() {
     <div style="background: rgba(30, 41, 59, 0.5); padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 12px;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; color: #fff;">
         <div>
-          <span style="color: #ffa8a8;">Consumo esperado/día:</span>
+          <span style="color: #ffa8a8;">${TRANSLATIONS.consumo_esperado_dia}</span>
           <span style="color: #1ad0f9; font-weight: 600; margin-left: 5px;">${expectedDailyConsumption}</span>
         </div>
         <div>
-          <span style="color: #ffa8a8;">Consumo real hoy:</span>
+          <span style="color: #ffa8a8;">${TRANSLATIONS.consumo_real_hoy}</span>
           <span style="color: ${actualDailyConsumption > expectedDailyConsumption ? '#ff6b6b' : '#10b981'}; font-weight: 600; margin-left: 5px;">
             ${actualDailyConsumption}
           </span>
         </div>
         <div>
-          <span style="color: #ffa8a8;">Días cubiertos:</span>
+          <span style="color: #ffa8a8;">${TRANSLATIONS.dias_cubiertos}</span>
           <span style="color: #1ad0f9; font-weight: 600; margin-left: 5px;">${Math.floor(appState.remainingPortions / expectedDailyConsumption)}</span>
         </div>
         <div>
-          <span style="color: #ffa8a8;">Días restantes:</span>
+          <span style="color: #ffa8a8;">${TRANSLATIONS.dias_restantes}</span>
           <span style="color: #fff; font-weight: 600; margin-left: 5px;">${daysRemaining}</span>
         </div>
       </div>
@@ -1221,17 +1280,17 @@ function updateAllDisplays() {
   // Actualizar métricas principales
   d3.select("#remaining-portions").text(appState.remainingPortions);
   d3.select("#total-portions-text").text(appState.initialPortions);
-  d3.select("#portions-text").text(`${appState.remainingPortions} porciones`);
+  d3.select("#portions-text").text(`${appState.remainingPortions} ${TRANSLATIONS.porciones.trim()}`);
   d3.select("#autonomy-days").text(appState.autonomyDays);
   
   // Actualizar consumo del día
-  d3.select("#breakfast-count").text(appState.dailyConsumption.desayuno + " porciones");
-  d3.select("#lunch-count").text(appState.dailyConsumption.almuerzo + " porciones");
-  d3.select("#dinner-count").text(appState.dailyConsumption.comida + " porciones");
-  d3.select("#snack-count").text(appState.dailyConsumption.cena + " porciones");
+  d3.select("#breakfast-count").text(appState.dailyConsumption.desayuno + TRANSLATIONS.porciones);
+  d3.select("#lunch-count").text(appState.dailyConsumption.almuerzo + TRANSLATIONS.porciones);
+  d3.select("#dinner-count").text(appState.dailyConsumption.comida + TRANSLATIONS.porciones);
+  d3.select("#snack-count").text(appState.dailyConsumption.cena + TRANSLATIONS.porciones);
   
   const totalDay = appState.totalConsumedToday;
-  d3.select("#total-day-count").text(totalDay + " porciones");
+  d3.select("#total-day-count").text(totalDay + TRANSLATIONS.porciones);
   
   // Actualizar estados de alerta
   updateStatusIndicators();
@@ -1270,12 +1329,12 @@ document.getElementById("btn-register-consumption").addEventListener("click", as
   const mealType = document.getElementById("meal-type").value;
   
   if (totalPeople === 0 || totalPortions === 0) {
-    showNotification("⚠️ Debe registrar al menos una persona y una porción", "warning");
+    showNotification("⚠️ " + TRANSLATIONS.debe_una_persona, "warning");
     return;
   }
   
   if (totalPeople < 1 || totalPeople > 6) {
-    showNotification("⚠️ El número de tripulantes debe estar entre 1 y 6", "warning");
+    showNotification("⚠️ " + TRANSLATIONS.tripulantes_entre_1_6, "warning");
     return;
   }
   
@@ -1333,7 +1392,7 @@ async function initializeApp() {
         // Actualizar todo inmediatamente
         actualizarTodoDesdeServidor().then(() => {
           // Mostrar notificación
-          showNotification('✅ Sistema actualizado desde panel de control', 'success');
+          showNotification('✅ ' + TRANSLATIONS.actualizado_panel, 'success');
         });
       }
     });
@@ -1367,7 +1426,7 @@ async function initializeApp() {
     console.log('✅ Aplicación inicializada');
   } catch (error) {
     console.error('Error inicializando aplicación:', error);
-    showNotification('Error al cargar datos iniciales', 'error');
+    showNotification(TRANSLATIONS.error_cargar_inicial, 'error');
   }
 }
 
