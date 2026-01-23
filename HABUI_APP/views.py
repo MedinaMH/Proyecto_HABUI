@@ -2,7 +2,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RecursoAguaSerializer, RecursoAlimentosSerializer, ConsumoAlimentosSerializer
+from .serializers import RecursoAguaSerializer, RecursoAlimentosSerializer, ConsumoAlimentosSerializer, RecursoCO2Serializer
 from .models import RecursoAlimentos, ConsumoAlimentos
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
@@ -14,7 +14,7 @@ import altair as alt
 import pandas as pd
 import plotly.express as px
 # import json
-from .models import RecursoAgua
+from .models import RecursoAgua, RecursoCO2
 # Create your views here.
 
 def panel_principal(request):
@@ -33,7 +33,7 @@ def panel_agua_rems(request, recurso_id=None):
 
 @api_view(['GET'])
 def api_agua_unity(request):
-    datos = RecursoAgua.objects.all().order_by('-fecha_hora')[:50]
+    datos = RecursoAgua.objects.all().order_by('-fecha_hora')[:1000]
     serializer = RecursoAguaSerializer(datos, many=True)
     return Response(serializer.data)
 
@@ -49,9 +49,16 @@ def api_agua_post(request):
 def panel_oxigeno_rems(request):
     return render(request, 'REMS/panel_oxigeno.html')
 
+
+# ============= CO2 =============
 def panel_co2(request):
     return render(request, 'REMS/panel_CO2.html')
 
+@api_view(['GET'])
+def api_co2_get(request):
+    datos = RecursoCO2.objects.all().order_by('-fecha_hora')[:1000]
+    serializer = RecursoCO2Serializer(datos, many=True)
+    return Response(serializer.data)
 # ----------recurso alimentos-----------------
 
 def panel_alimentos_rems(request, recurso_id=None):
