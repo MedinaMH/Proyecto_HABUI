@@ -55,7 +55,7 @@ class Command(BaseCommand):
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f"Error al guardar en BD: {str(e)}"))
 
-                # Preparar datos para WebSocket (manteniendo la estructura original)
+                # Preparar datos para WebSocket
                 data = {
                     "valor": round(current_value, 2),
                     "fecha_hora": timestamp.isoformat(),

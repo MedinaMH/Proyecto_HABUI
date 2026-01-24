@@ -602,8 +602,9 @@ function crearSerieTemporalAgua() {
         {min: 70, max: 100, color: "rgba(76, 175, 80, 0.08)", label: "ÓPTIMO"}
     ];
 
+    d3.select("body").selectAll(".tooltip-water").remove();
     // Tooltip
-    const tooltip = container.append("div")
+    const tooltip = d3.select("body").append("div")
         .attr("class", "tooltip-water")
         .style("position", "absolute")
         .style("background", "rgba(15, 23, 42, 0.95)")
@@ -895,7 +896,7 @@ function crearSerieTemporalAgua() {
 
     svg.style("cursor", "grab");
 
-    // Función para agregar nuevo dato (EXACTAMENTE IGUAL AL CO₂, pero con value en lugar de nivel)
+    // Función para agregar nuevo dato 
     function addData(value, timestampStr) {
         const time = new Date(timestampStr || new Date());
         const id = `water-data-${time.getTime()}-${Math.random()}`;
@@ -903,7 +904,7 @@ function crearSerieTemporalAgua() {
         data.push({
             id: id,
             time: time,
-            value: value  // Cambiado de "nivel" a "value" para coincidir con CO₂
+            value: value 
         });
         
         if (data.length > MAX_MEMORY_POINTS) {
@@ -913,7 +914,6 @@ function crearSerieTemporalAgua() {
             }
         }
         
-        // ESTA ES LA PARTE CLAVE QUE FALTABA - IGUAL AL CO₂
         const visibleData = getVisibleData();
         if (visibleData.length > 0 && 
             visibleData[visibleData.length - 1].id === data[data.length - 2]?.id) {
@@ -957,16 +957,14 @@ function crearSerieTemporalAgua() {
     // Cargar datos históricos al inicio
     loadHistoricalData();
 
-    // Función de actualización que mantiene la compatibilidad
+    // Función de actualización
     function actualizarSerie(nivel) {
         addData(nivel);
     }
 
     return {
-        // Función original para compatibilidad
         actualizarSerie: actualizarSerie,
         
-        // Nuevas funciones (IGUAL AL CO₂)
         push: function(value, timestampStr) {
             addData(value, timestampStr);
         },

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-23 20:37-0600\n"
+"POT-Creation-Date: 2026-01-24 16:28-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,18 +53,19 @@ msgstr "OPTIMUM"
 #: .\HABUI_APP\templates\REMS\all_resources.html:18
 #: .\HABUI_APP\templates\REMS\panel_agua.html:108
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:11
-#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:91
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:92
 msgid "NIVEL ÓPTIMO"
 msgstr "OPTIMAL LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:19
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:12
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:76
 msgid "NIVEL ACEPTABLE"
 msgstr "ACCEPTABLE LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:20
 #: .\HABUI_APP\templates\REMS\panel_agua.html:76
-#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:59
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:60
 msgid "NIVEL BAJO"
 msgstr "LOW LEVEL"
 
@@ -74,7 +75,6 @@ msgstr "ACCEPTABLE"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:26
 #: .\HABUI_APP\templates\REMS\panel_agua.html:92
-#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:75
 msgid "NIVEL NORMAL"
 msgstr "NORMAL LEVEL"
 
@@ -340,6 +340,7 @@ msgstr "Real-time concentration"
 
 #: .\HABUI_APP\templates\REMS\panel_CO2.html:14
 #: .\HABUI_APP\templates\REMS\panel_agua.html:14
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:14
 msgid "Tiempo"
 msgstr "Time"
 
@@ -1286,11 +1287,11 @@ msgstr "Reference Humidity Levels"
 msgid "HISTÓRICO DE OXÍGENO"
 msgstr "HISTORICAL OXYGEN"
 
-#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:22
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:23
 msgid "Monitoreo de los niveles de Oxígeno"
 msgstr "Monitoring of Oxygen Levels"
 
-#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:51
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:52
 msgid "Niveles de Referencia de Oxígeno"
 msgstr "Oxygen Reference Levels"
 

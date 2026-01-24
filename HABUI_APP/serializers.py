@@ -1,10 +1,15 @@
 # HABUI_APP/serializers.py
 from rest_framework import serializers
-from .models import RecursoAgua, RecursoAlimentos, ConsumoAlimentos, RecursoCO2
+from .models import RecursoAgua, RecursoAlimentos, ConsumoAlimentos, RecursoCO2, RecursoOxigeno
 
 class RecursoAguaSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecursoAgua
+        fields = ['id', 'recurso', 'nivel', 'fecha_hora']
+
+class RecursoO2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecursoOxigeno
         fields = ['id', 'recurso', 'nivel', 'fecha_hora']
 
 class RecursoCO2Serializer(serializers.ModelSerializer):

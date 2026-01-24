@@ -4,7 +4,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from HABUI_APP.models import Recurso
+from HABUI_APP.models import Recurso, RecursoOxigeno
 
 
 class Command(BaseCommand):
@@ -57,11 +57,25 @@ class Command(BaseCommand):
                     4
                 )
 
-                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                timestamp = datetime.now()
 
+                # ------------ GUARDAR EN BD ------------
+                try:
+                    # Crear registro en RecursoCO2
+                    reading = RecursoOxigeno.objects.create(
+                        recurso_id=recurso_id,
+                        nivel=round(valor, 2)
+                    )
+                    
+                    self.stdout.write(f"[{i}] Registro O₂ guardado en BD - ID: {reading.id}")
+                    
+                except Exception as e:
+                    self.stdout.write(self.style.ERROR(f"Error al guardar en BD: {str(e)}"))
+                
+                # Preparar datos para WebSocket
                 data = {
                     "nivel": valor,
-                    "fecha_hora": timestamp,
+                    "fecha_hora": timestamp.isoformat(),
                 }
 
                 # Enviar a WebSocket

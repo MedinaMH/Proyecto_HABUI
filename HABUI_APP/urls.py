@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/agua/', views.api_agua_unity, name='api_agua_unity'), # GET
     path('api/agua/post/', views.api_agua_post, name='api_agua_post'),  # POST
     path('oxigeno_rems', views.panel_oxigeno_rems, name='panel_oxigeno_rems'),
+    path('api/o2/', views.api_o2_get, name='api_o2_get'), # GET
     path('co2_rems', views.panel_co2, name='panel_co2_rems'),
     path('api/co2/', views.api_co2_get, name='api_co2_get'),# GET
     # ---------------Alimentos--------------------
