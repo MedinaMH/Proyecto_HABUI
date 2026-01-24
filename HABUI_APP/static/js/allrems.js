@@ -435,7 +435,84 @@ function actualizar(valor) {
 
 // Inicializar con el valor inicial
 actualizar(valorInicial);
-return actualizar;
+// return actualizar;
+// =================== CARGAR ÚLTIMO DATO DE LA BD ===================
+    async function cargarUltimoDatoBD() {
+        try {
+            console.log('Cargando datos de agua desde BD para obtener el último...');
+            const response = await fetch('/api/agua/');
+            
+            if (!response.ok) {
+                console.log('No se pudieron obtener datos de agua de la BD');
+                return;
+            }
+            
+            const datos = await response.json();
+            
+            if (datos && Array.isArray(datos) && datos.length > 0) {
+                // Tomar el primer elemento (el más reciente según tu estructura)
+                const ultimoDato = datos[0];
+                const ultimoNivel = parseFloat(ultimoDato.nivel);
+                
+                console.log('Último dato de agua encontrado:', ultimoNivel, 'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora);
+                
+                // Actualizar el tanque con el último valor de la BD
+                actualizar(ultimoNivel);
+                
+                return ultimoNivel;
+            } else {
+                console.log('No hay datos de agua en la BD');
+                return null;
+            }
+        } catch (error) {
+            console.log('Error al cargar datos de agua:', error);
+            return null;
+        }
+    }
+
+    // =================== FUNCIÓN PARA OBTENER MÚLTIPLES DATOS ===================
+    async function cargarDatosRecientesBD(limite = 10) {
+        try {
+            const response = await fetch('/api/agua/');
+            
+            if (!response.ok) {
+                console.log('No se pudieron obtener datos de agua de la BD');
+                return [];
+            }
+            
+            const datos = await response.json();
+            
+            if (datos && Array.isArray(datos)) {
+                // Tomar los primeros 'limite' elementos (los más recientes)
+                const datosRecientes = datos.slice(0, limite);
+                console.log(`Cargados ${datosRecientes.length} datos recientes de agua`);
+                return datosRecientes;
+            }
+            
+            return [];
+        } catch (error) {
+            console.log('Error al cargar datos recientes:', error);
+            return [];
+        }
+    }
+
+    // Cargar el último dato al iniciar (con un pequeño retraso para asegurar que el DOM esté listo)
+    setTimeout(() => {
+        cargarUltimoDatoBD();
+    }, 500);
+
+    // =================== RETORNO DE FUNCIONES ===================
+    // Para mantener compatibilidad con tu código existente
+    const funcionActualizar = function(valor) {
+        return actualizar(valor);
+    };
+    
+    // Añadir funciones adicionales al objeto retornado
+    funcionActualizar.cargarUltimoDato = cargarUltimoDatoBD;
+    funcionActualizar.cargarDatosRecientes = cargarDatosRecientesBD;
+    funcionActualizar.actualizar = actualizar;
+    
+    return funcionActualizar;
 }
 
 // ===================== GAUGE VERTICAL (Oxígeno %) =====================

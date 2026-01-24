@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-23 17:29-0600\n"
+"POT-Creation-Date: 2026-01-23 20:37-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,7 +51,7 @@ msgid "ÓPTIMO"
 msgstr "OPTIMUM"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:18
-#: .\HABUI_APP\templates\REMS\panel_agua.html:106
+#: .\HABUI_APP\templates\REMS\panel_agua.html:108
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:11
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:91
 msgid "NIVEL ÓPTIMO"
@@ -63,7 +63,7 @@ msgid "NIVEL ACEPTABLE"
 msgstr "ACCEPTABLE LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:20
-#: .\HABUI_APP\templates\REMS\panel_agua.html:74
+#: .\HABUI_APP\templates\REMS\panel_agua.html:76
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:59
 msgid "NIVEL BAJO"
 msgstr "LOW LEVEL"
@@ -73,7 +73,7 @@ msgid "ACEPTABLE"
 msgstr "ACCEPTABLE"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:26
-#: .\HABUI_APP\templates\REMS\panel_agua.html:90
+#: .\HABUI_APP\templates\REMS\panel_agua.html:92
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:75
 msgid "NIVEL NORMAL"
 msgstr "NORMAL LEVEL"
@@ -339,6 +339,7 @@ msgid "Concentración en tiempo real"
 msgstr "Real-time concentration"
 
 #: .\HABUI_APP\templates\REMS\panel_CO2.html:14
+#: .\HABUI_APP\templates\REMS\panel_agua.html:14
 msgid "Tiempo"
 msgstr "Time"
 
@@ -362,15 +363,19 @@ msgstr "DANGEROUS LEVEL"
 msgid "HISTÓRICO DE NIVELES"
 msgstr "HISTORICAL LEVELS"
 
-#: .\HABUI_APP\templates\REMS\panel_agua.html:21
+#: .\HABUI_APP\templates\REMS\panel_agua.html:13
+msgid "Nivel (%%)"
+msgstr "Level (%)"
+
+#: .\HABUI_APP\templates\REMS\panel_agua.html:23
 msgid "Monitoreo del Nivel de Suministro de Agua"
 msgstr "Monitoring of Water Supply Level"
 
-#: .\HABUI_APP\templates\REMS\panel_agua.html:50
+#: .\HABUI_APP\templates\REMS\panel_agua.html:52
 msgid "Niveles de Referencia del Tanque"
 msgstr "Tank Reference Levels"
 
-#: .\HABUI_APP\templates\REMS\panel_agua.html:58
+#: .\HABUI_APP\templates\REMS\panel_agua.html:60
 msgid "NIVEL CRÍTICO"
 msgstr "CRITICAL LEVEL"
 
