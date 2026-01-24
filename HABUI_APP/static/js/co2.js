@@ -113,7 +113,7 @@ return {
 // ===================== SERIE TEMPORAL DE CO₂ =====================
 function lineChartCO2(containerId) {
     const container = d3.select(containerId);
-    container.html(""); // Limpiar contenedor
+    container.html("");
 
     const outerW = 720, outerH = 520;
     const margin = {top: 50, right: 40, bottom: 60, left: 80};
@@ -130,7 +130,7 @@ function lineChartCO2(containerId) {
 
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Título mejorado
+    // Título
     svg.append("text")
         .attr("x", outerW/2)
         .attr("y", 28)
@@ -140,6 +140,50 @@ function lineChartCO2(containerId) {
         .attr("text-anchor", "middle")
         .style("letter-spacing", "0.5px")
         .text(TRANSLATIONS.history_co2 || "HISTÓRICO DE CO₂ (ppm)");
+
+    // Botón para regresar al inicio
+    const homeButton = container.append("button")
+        .attr("class", "btn btn-sm")
+        .style("position", "absolute")
+        .style("top", "12px")
+        .style("right", "12px")
+        .style("background", "rgba(255, 183, 77, 0.2)")
+        .style("color", "#ffb74d")
+        .style("border", "1px solid #ffb74d")
+        .style("border-radius", "6px")
+        .style("padding", "8px 12px")
+        .style("cursor", "pointer")
+        .style("z-index", "10")
+        .style("transition", "all 0.3s")
+        .html('<i class="bi bi-house-door"></i>')  // Icono de Bootstrap
+        .on("mouseover", function() {
+            d3.select(this)
+                .style("background", "#ffb74d")
+                .style("color", "#0f172a")
+                .style("transform", "scale(1.05)");
+        })
+        .on("mouseout", function() {
+            d3.select(this)
+                .style("background", "rgba(255, 183, 77, 0.2)")
+                .style("color", "#ffb74d")
+                .style("transform", "scale(1)");
+        })
+        .on("click", function() {
+            // Regresar al inicio 
+            currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
+            redraw();
+            
+            // Efecto visual de click
+            d3.select(this)
+                .style("background", "#ff9800")
+                .style("color", "#0f172a");
+            
+            setTimeout(() => {
+                d3.select(this)
+                    .style("background", "rgba(255, 183, 77, 0.2)")
+                    .style("color", "#ffb74d");
+            }, 300);
+        });
 
     // Scales
     const x = d3.scaleTime().range([0, width]);
@@ -224,12 +268,21 @@ function lineChartCO2(containerId) {
     g.append("text")
         .attr("transform", "rotate(-90)")
         .attr("x", -height/2)
-        .attr("y", -60)
+        .attr("y", -68)
         .attr("fill", "#ffb74d")
         .attr("font-size", "14px")
         .attr("font-weight", "600")
         .attr("text-anchor", "middle")
         .text("CO₂ (ppm)");
+    
+    g.append("text")
+    .attr("x", width/2)
+    .attr("y", height + 40) // 40px debajo del eje X
+    .attr("fill", "#ffb74d")
+    .attr("font-size", "14px")
+    .attr("font-weight", "600")
+    .attr("text-anchor", "middle")
+    .text(TRANSLATIONS.tiempo || "Tiempo");
 
     // Zonas de CO₂ en el fondo
     const co2ZonesData = [
@@ -283,21 +336,18 @@ function lineChartCO2(containerId) {
 
     // Variables de control
     let data = []; // Todos los datos
-    const MAX_VISIBLE_POINTS = 15; // 15 puntos visibles en pantalla
-    const MAX_MEMORY_POINTS = 500; // Máximo 500 puntos en memoria
-    let currentStartIndex = 0; // Índice del primer punto visible
+    const MAX_VISIBLE_POINTS = 15;
+    const MAX_MEMORY_POINTS = 1000;
+    let currentStartIndex = 0;
     let isDragging = false;
     let dragStartX = 0;
-    let currentTranslateX = 0;
 
     // Función para obtener datos visibles
     function getVisibleData() {
         if (data.length === 0) return [];
         
-        // Calcular índice final
         const endIndex = Math.min(currentStartIndex + MAX_VISIBLE_POINTS, data.length);
         
-        // Si no hay suficientes datos al final, ajustar el inicio
         if (endIndex - currentStartIndex < MAX_VISIBLE_POINTS && data.length >= MAX_VISIBLE_POINTS) {
             currentStartIndex = data.length - MAX_VISIBLE_POINTS;
         }
@@ -310,17 +360,13 @@ function lineChartCO2(containerId) {
         const visibleData = getVisibleData();
         if (visibleData.length === 0) return;
 
-        // Actualizar dominios
-        if (visibleData.length > 0) {
-            x.domain(d3.extent(visibleData, d => d.time));
-            
-            // Determinar rango Y dinámico
-            const minVal = Math.max(300, d3.min(visibleData, d => d.value) - 50);
-            const maxVal = Math.min(2500, d3.max(visibleData, d => d.value) + 50);
-            y.domain([minVal, maxVal]);
-        }
+        x.domain(d3.extent(visibleData, d => d.time));
+        
+        const minVal = Math.max(300, d3.min(visibleData, d => d.value) - 50);
+        const maxVal = Math.min(2500, d3.max(visibleData, d => d.value) + 50);
+        y.domain([minVal, maxVal]);
 
-        // Zonas de CO₂ en el fondo
+        // Zonas de CO₂
         const co2Zones = g.selectAll(".co2-zone").data(co2ZonesData);
 
         co2Zones.enter()
@@ -336,7 +382,7 @@ function lineChartCO2(containerId) {
 
         co2Zones.exit().remove();
 
-        // Actualizar línea de referencia (800 ppm - nivel recomendado)
+        // Actualizar línea de referencia
         const recommendedLevel = 800;
         referenceLine
             .attr("x1", 0)
@@ -353,7 +399,7 @@ function lineChartCO2(containerId) {
             .selectAll("line")
             .attr("stroke", "#ffb74d");
 
-        // Actualizar ejes con mejor formato
+        // Actualizar ejes
         xAxisG.call(d3.axisBottom(x)
             .ticks(Math.min(6, visibleData.length))
             .tickFormat(d3.timeFormat("%H:%M:%S"))
@@ -381,10 +427,9 @@ function lineChartCO2(containerId) {
             .attr("stroke", "#ffb74d")
             .attr("opacity", 0.5);
 
-        // Eliminar el dominio de la línea del eje Y
         yAxisG.select(".domain").attr("stroke", "none");
 
-        // Actualizar línea y área con transición
+        // Actualizar línea y área
         path.datum(visibleData)
             .transition()
             .duration(300)
@@ -397,7 +442,7 @@ function lineChartCO2(containerId) {
             .ease(d3.easeCubicOut)
             .attr("d", area);
 
-        // Puntos de datos interactivos
+        // Puntos de datos
         const points = g.selectAll(".data-point")
             .data(visibleData, d => d.id);
 
@@ -492,10 +537,10 @@ function lineChartCO2(containerId) {
             .attr("fill", "#94a3b8")
             .attr("font-size", "10px")
             .attr("text-anchor", "end")
-            .text(`${Math.min(currentStartIndex + MAX_VISIBLE_POINTS, data.length)}/${data.length} datos`);
+            .text(`${Math.min(currentStartIndex + MAX_VISIBLE_POINTS, data.length)}/${data.length}`);
     }
 
-    // Configurar arrastre para desplazamiento horizontal
+    // Configurar arrastre
     svg.on("mousedown", function(event) {
         isDragging = true;
         dragStartX = event.clientX;
@@ -506,22 +551,13 @@ function lineChartCO2(containerId) {
         if (!isDragging) return;
         
         const dragDelta = event.clientX - dragStartX;
-        
-        // Calcular cuántos puntos desplazar basado en la distancia del arrastre
         const pointsToMove = Math.round(dragDelta / (width / MAX_VISIBLE_POINTS) * -1);
         
         if (pointsToMove !== 0) {
-            // Actualizar índice de inicio
             currentStartIndex += pointsToMove;
-            
-            // Limitar el índice dentro de los límites válidos
             currentStartIndex = Math.max(0, currentStartIndex);
             currentStartIndex = Math.min(data.length - MAX_VISIBLE_POINTS, currentStartIndex);
-            
-            // Redibujar
             redraw();
-            
-            // Actualizar posición de inicio para el próximo movimiento
             dragStartX = event.clientX;
         }
     });
@@ -543,23 +579,19 @@ function lineChartCO2(containerId) {
         const time = new Date(timestampStr || new Date());
         const id = `data-${time.getTime()}-${Math.random()}`;
         
-        // Agregar nuevo dato
         data.push({
             id: id,
             time: time,
             value: value
         });
         
-        // Mantener máximo de puntos en memoria
         if (data.length > MAX_MEMORY_POINTS) {
             data = data.slice(data.length - MAX_MEMORY_POINTS);
-            // Ajustar índice de inicio si es necesario
             if (currentStartIndex > data.length - MAX_VISIBLE_POINTS) {
                 currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
             }
         }
         
-        // Si estamos viendo los datos más recientes, mantenernos al final
         const visibleData = getVisibleData();
         if (visibleData.length > 0 && 
             visibleData[visibleData.length - 1].id === data[data.length - 2]?.id) {
@@ -568,6 +600,44 @@ function lineChartCO2(containerId) {
         
         redraw();
     }
+
+    // Función para cargar datos históricos
+    async function loadHistoricalData() {
+        try {
+            const response = await fetch('/api/co2/');
+            if (!response.ok) return;
+            
+            const apiData = await response.json();
+            if (apiData && apiData.length > 0) {
+                // Convertir datos de la API usando concentracion y fecha_hora
+                const formattedData = apiData.map((item) => ({
+                    id: `db-${item.id}`,
+                    time: new Date(item.fecha_hora),
+                    value: parseFloat(item.concentracion)
+                })).filter(item => !isNaN(item.time.getTime()) && !isNaN(item.value));
+                
+                if (formattedData.length > 0) {
+                    // Ordenar por fecha (más antiguo primero)
+                    formattedData.sort((a, b) => a.time - b.time);
+                    
+                    data = formattedData;
+                    currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
+                    redraw();
+                    
+                    // Actualizar gauge con el último valor
+                    if (data.length > 0 && window.gaugeInstance) {
+                        const lastValue = data[data.length - 1].value;
+                        window.gaugeInstance.update(lastValue);
+                    }
+                }
+            }
+        } catch (error) {
+            console.log('No se pudieron cargar datos históricos:', error);
+        }
+    }
+
+    // Cargar datos históricos al inicio
+    loadHistoricalData();
 
     return {
         push: function(value, timestampStr) {
@@ -593,8 +663,11 @@ function lineChartCO2(containerId) {
                 time: new Date(d.t),
                 value: d.v
             }));
-            
-            // Comenzar mostrando los últimos 15 datos
+            currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
+            redraw();
+        },
+        // Función pública para regresar al inicio
+        goHome: function() {
             currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
             redraw();
         }

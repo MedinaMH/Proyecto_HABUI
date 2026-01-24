@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 12:02-0600\n"
+"POT-Creation-Date: 2026-01-23 17:29-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,12 +79,12 @@ msgid "NIVEL NORMAL"
 msgstr "NORMAL LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:27
-#: .\HABUI_APP\templates\REMS\panel_CO2.html:75
+#: .\HABUI_APP\templates\REMS\panel_CO2.html:76
 msgid "NIVEL MODERADO"
 msgstr "MODERATE LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:28
-#: .\HABUI_APP\templates\REMS\panel_CO2.html:91
+#: .\HABUI_APP\templates\REMS\panel_CO2.html:92
 msgid "NIVEL ALTO"
 msgstr "HIGH LEVEL"
 
@@ -338,19 +338,23 @@ msgstr "HISTORICAL CO₂ (ppm)"
 msgid "Concentración en tiempo real"
 msgstr "Real-time concentration"
 
-#: .\HABUI_APP\templates\REMS\panel_CO2.html:22
+#: .\HABUI_APP\templates\REMS\panel_CO2.html:14
+msgid "Tiempo"
+msgstr "Time"
+
+#: .\HABUI_APP\templates\REMS\panel_CO2.html:23
 msgid "Monitoreo de CO₂ (ppm)"
 msgstr "CO₂ monitoring (ppm)"
 
-#: .\HABUI_APP\templates\REMS\panel_CO2.html:51
+#: .\HABUI_APP\templates\REMS\panel_CO2.html:52
 msgid "Niveles de Referencia de CO₂"
 msgstr "Reference levels of CO₂"
 
-#: .\HABUI_APP\templates\REMS\panel_CO2.html:59
+#: .\HABUI_APP\templates\REMS\panel_CO2.html:60
 msgid "CALIDAD ÓPTIMA"
 msgstr "OPTIMAL QUALITY"
 
-#: .\HABUI_APP\templates\REMS\panel_CO2.html:107
+#: .\HABUI_APP\templates\REMS\panel_CO2.html:108
 msgid "NIVEL PELIGROSO"
 msgstr "DANGEROUS LEVEL"
 
