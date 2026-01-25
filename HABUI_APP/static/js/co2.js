@@ -10,104 +10,250 @@ history: []
 
 // ===================== GAUGE VERTICAL (CO2 ppm) =====================
 function gaugeCO2(containerId, initial) {
-const container = d3.select(containerId);
-container.html(""); // Limpiar contenedor
+    const container = d3.select(containerId);
+    container.html(""); // Limpiar contenedor
 
-const width = 300;
-const height = 520;
+    const width = 300;
+    const height = 520;
 
-const svg = container.append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .style("border-radius", "8px");
+    const svg = container.append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .style("border-radius", "8px");
 
-svg.append("text")
-    .attr("x", width/2)
-    .attr("y", 32)
-    .attr("fill", "#ffffffff")
-    .attr("font-size", "22px")
-    .attr("font-weight", "700")
-    .attr("text-anchor", "middle")
-    .text("CO₂ (ppm)");
+    svg.append("text")
+        .attr("x", width/2)
+        .attr("y", 32)
+        .attr("fill", "#ffffffff")
+        .attr("font-size", "22px")
+        .attr("font-weight", "700")
+        .attr("text-anchor", "middle")
+        .text("CO₂ (ppm)");
 
-// outer frame
-const frameX = 60;
-const frameY = 70;
-const frameW = 180;
-const frameH = 360;
+    // outer frame
+    const frameX = 60;
+    const frameY = 70;
+    const frameW = 180;
+    const frameH = 360;
 
-svg.append("rect")
-    .attr("x", frameX)
-    .attr("y", frameY)
-    .attr("width", frameW)
-    .attr("height", frameH)
-    .attr("rx", 14)
-    .attr("fill", "#0f1724")
-    .attr("stroke", "#ffb74d")
-    .attr("stroke-width", 3);
+    svg.append("rect")
+        .attr("x", frameX)
+        .attr("y", frameY)
+        .attr("width", frameW)
+        .attr("height", frameH)
+        .attr("rx", 14)
+        .attr("fill", "#0f1724")
+        .attr("stroke", "#ffb74d")
+        .attr("stroke-width", 3);
 
-// fill rect
-const min = 300;
-const max = 2500;
-const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
+    // fill rect
+    const min = 300;
+    const max = 2500;
+    const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
 
-const fillRect = svg.append("rect")
-    .attr("x", frameX)
-    .attr("width", frameW)
-    .attr("y", scale(initial))
-    .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
-    .attr("fill", "#ffb74d")
-    .attr("rx", 12);
+    const fillRect = svg.append("rect")
+        .attr("x", frameX)
+        .attr("width", frameW)
+        .attr("y", scale(initial))
+        .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
+        .attr("fill", "#ffb74d")
+        .attr("rx", 12);
 
-const valueText = svg.append("text")
-    .attr("x", width/2)
-    .attr("y", frameY + frameH + 50)
-    .attr("fill", "#ffb74d")
-    .attr("font-size", "40px")
-    .attr("font-weight", "700")
-    .attr("text-anchor", "middle")
-    .text(initial + " ppm");
+    const valueText = svg.append("text")
+        .attr("x", width/2)
+        .attr("y", frameY + frameH + 50)
+        .attr("fill", "#ffb74d")
+        .attr("font-size", "40px")
+        .attr("font-weight", "700")
+        .attr("text-anchor", "middle")
+        .text(initial + " ppm");
 
-// color overlay depending on ranges (good/moderate/high)
-function colorFor(v) {
-    if (v < 800) return "#7ef9a3";        // good (greenish)
-    if (v < 1200) return "#ffd86b";       // moderate (amber)
-    return "#ff7a7a";                     // high (red)
-}
+    // Indicador de calidad
+    const qualityText = svg.append("text")
+        .attr("x", width/2)
+        .attr("y", frameY + frameH + 85)
+        .attr("fill", "#ffb74d")
+        .attr("font-size", "25px")
+        .attr("font-weight", "600")
+        .attr("text-anchor", "middle")
+        .text(getQualityText(initial));
 
-// Actualizar estadísticas (aunque no se muestren)
-function updateStats(newVal) {
-    stats.current = newVal;
-    stats.min = Math.min(stats.min, newVal);
-    stats.max = Math.max(stats.max, newVal);
-    stats.history.push({
-    value: newVal,
-    timestamp: new Date().toISOString()
-    });
-    
-    // Mantener solo los últimos 100 valores en el historial
-    if (stats.history.length > 100) {
-    stats.history.shift();
+    // color overlay depending on ranges (good/moderate/high)
+    function colorFor(v) {
+        if (v < 800) return "#7ef9a3";        // good (greenish)
+        if (v < 1200) return "#ffd86b";       // moderate (amber)
+        return "#ff7a7a";                     // high (red)
     }
-}
 
-return {
-    update: function(newVal) {
-    const y = scale(newVal);
-    const h = Math.max(2, (frameY + frameH) - y);
+    function getQualityText(v) {
+        if (v < 800) return TRANSLATIONS.nivel_bueno || "NIVEL BUENO";
+        if (v < 1200) return TRANSLATIONS.nivel_moderado || "NIVEL MODERADO";
+        return "¡NIVEL ALTO!";
+    }
 
-    fillRect
-        .transition().duration(300)
-        .attr("y", y)
-        .attr("height", h)
-        .attr("fill", colorFor(newVal));
+    // Estadísticas
+    const stats = {
+        current: initial,
+        min: initial,
+        max: initial,
+        history: []
+    };
 
-    valueText.text(Math.round(newVal) + " ppm");
-    
     // Actualizar estadísticas
-    updateStats(newVal);
+    function updateStats(newVal) {
+        stats.current = newVal;
+        stats.min = Math.min(stats.min, newVal);
+        stats.max = Math.max(stats.max, newVal);
+        stats.history.push({
+            value: newVal,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Mantener solo los últimos 100 valores en el historial
+        if (stats.history.length > 100) {
+            stats.history.shift();
+        }
     }
-};
+
+    // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
+    async function cargarUltimoDatoBD() {
+        try {
+            console.log('Cargando datos de CO₂ desde BD para obtener el último...');
+            const response = await fetch('/api/co2/');
+            
+            if (!response.ok) {
+                console.log('No se pudieron obtener datos de CO₂ de la BD');
+                return null;
+            }
+            
+            const datos = await response.json();
+            
+            if (datos && Array.isArray(datos) && datos.length > 0) {
+                // Tomar el primer elemento (el más reciente)
+                const ultimoDato = datos[0];
+                
+                // Extraer el valor de CO₂
+                let ultimoValor;
+                ultimoValor = parseFloat(ultimoDato.concentracion);
+                console.log('Último dato de CO₂ encontrado:', ultimoValor.toFixed(0) + ' ppm', 
+                        'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
+                
+                // Actualizar el gauge con el último valor de la BD
+                actualizarGauge(ultimoValor);
+                
+                return ultimoValor;
+            } else {
+                console.log('No hay datos de CO₂ en la BD');
+                return null;
+            }
+        } catch (error) {
+            console.log('Error al cargar datos de CO₂:', error);
+            return null;
+        }
+    }
+
+    // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
+    async function cargarDatosRecientesBD(limite = 10) {
+        try {
+            console.log(`Cargando últimos ${limite} datos de CO₂...`);
+            const response = await fetch('/api/co2/');
+            
+            if (!response.ok) {
+                console.log('No se pudieron obtener datos de CO₂ de la BD');
+                return [];
+            }
+            
+            const datos = await response.json();
+            
+            if (datos && Array.isArray(datos)) {
+                // Tomar los primeros 'limite' elementos (los más recientes)
+                const datosRecientes = datos.slice(0, limite);
+                
+                // Procesar y formatear datos
+                const datosFormateados = datosRecientes.map(dato => {
+                    let valor;                  
+                    valor = parseFloat(dato.concentracion);                   
+                    if (isNaN(valor)) return null;
+                    
+                    return {
+                        id: dato.id,
+                        valor: valor,
+                        fecha: dato.fecha_hora || dato.timestamp,
+                        calidad: valor < 800 ? "BUENO" : valor < 1200 ? "MODERADO" : "ALTO"
+                    };
+                }).filter(dato => dato !== null);
+                
+                console.log(`Cargados ${datosFormateados.length} datos recientes de CO₂`);
+                return datosFormateados;
+            }
+            
+            return [];
+        } catch (error) {
+            console.log('Error al cargar datos recientes de CO₂:', error);
+            return [];
+        }
+    }
+
+    // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
+    function actualizarGauge(newVal) {
+        const y = scale(newVal);
+        const h = Math.max(2, (frameY + frameH) - y);
+        const newColor = colorFor(newVal);
+
+        fillRect
+            .transition().duration(300)
+            .attr("y", y)
+            .attr("height", h)
+            .attr("fill", newColor);
+
+        valueText
+            .transition().duration(300)
+            .text(Math.round(newVal) + " ppm")
+            .attr("fill", newColor);
+
+        qualityText
+            .transition().duration(300)
+            .text(getQualityText(newVal))
+            .attr("fill", newColor);
+        
+        // Actualizar estadísticas
+        updateStats(newVal);
+    }
+
+    // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
+    // Cargar el último dato al iniciar (con un pequeño retraso para asegurar que el DOM esté listo)
+    setTimeout(() => {
+        cargarUltimoDatoBD();
+    }, 500);
+
+    // =================== RETORNO DE FUNCIONES ===================
+    // Crear objeto de retorno con todas las funciones
+    const gaugeObject = {
+        update: function(newVal) {
+            actualizarGauge(newVal);
+        },
+        cargarUltimoDato: cargarUltimoDatoBD,
+        cargarDatosRecientes: cargarDatosRecientesBD,
+        actualizar: actualizarGauge,
+        obtenerColorSegunValor: colorFor,
+        obtenerTextoCalidad: getQualityText,
+        // Obtener estadísticas
+        getStats: function() {
+            return {
+                ...stats,
+                calidadActual: getQualityText(stats.current),
+                colorActual: colorFor(stats.current)
+            };
+        },
+        // Resetear estadísticas
+        resetStats: function() {
+            stats.min = stats.current;
+            stats.max = stats.current;
+            stats.history = [];
+        }
+    };
+
+    return gaugeObject;
 }
 
 // ===================== SERIE TEMPORAL DE CO₂ =====================
@@ -290,9 +436,9 @@ function lineChartCO2(containerId) {
         {min: 800, max: 1200, color: "rgba(255, 193, 7, 0.08)", label: "MODERADO"},
         {min: 1200, max: 2500, color: "rgba(244, 67, 54, 0.08)", label: "ALTO"}
     ];
-
+    d3.select("body").selectAll(".tooltip-co2").remove();
     // Tooltip
-    const tooltip = container.append("div")
+    const tooltip = d3.select("body").append("div")
         .attr("class", "tooltip-co2")
         .style("position", "absolute")
         .style("background", "rgba(15, 23, 42, 0.95)")

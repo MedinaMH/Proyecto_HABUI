@@ -591,6 +591,88 @@ function gaugeO2(containerId, initial) {
         if (v >= 19.5) return greenPalette.amber;   // acceptable (ámbar/azul)
         return greenPalette.red;                     // critico (rojo)
     }
+    
+    // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
+    async function cargarUltimoDatoBD() {
+        try {
+            console.log('Cargando datos de oxígeno desde BD para obtener el último...');
+            const response = await fetch('/api/o2/');
+            
+            if (!response.ok) {
+                console.log('No se pudieron obtener datos de oxígeno de la BD');
+                return null;
+            }
+            
+            const datos = await response.json();
+            
+            if (datos && Array.isArray(datos) && datos.length > 0) {
+                // Tomar el primer elemento (el más reciente)
+                const ultimoDato = datos[0];
+                
+                // Extraer el valor de oxígeno
+                let ultimoValor;
+                ultimoValor = parseFloat(ultimoDato.nivel);
+                
+                console.log('Último dato de oxígeno encontrado:', ultimoValor.toFixed(2) + '%', 
+                        'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
+                
+                // Actualizar el gauge con el último valor de la BD
+                actualizarGauge(ultimoValor);
+                
+                return ultimoValor;
+            } else {
+                console.log('No hay datos de oxígeno en la BD');
+                return null;
+            }
+        } catch (error) {
+            console.log('Error al cargar datos de oxígeno:', error);
+            return null;
+        }
+    }
+
+    // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
+    async function cargarDatosRecientesBD(limite = 10) {
+        try {
+            console.log(`Cargando últimos ${limite} datos de oxígeno...`);
+            const response = await fetch('/api/o2/');
+            
+            if (!response.ok) {
+                console.log('No se pudieron obtener datos de oxígeno de la BD');
+                return [];
+            }
+            
+            const datos = await response.json();
+            
+            if (datos && Array.isArray(datos)) {
+                // Tomar los primeros 'limite' elementos (los más recientes)
+                const datosRecientes = datos.slice(0, limite);
+                
+                // Procesar y formatear datos
+                const datosFormateados = datosRecientes.map(dato => {
+                    let valor;
+                    
+                    valor = parseFloat(dato.nivel);
+                    
+                    if (isNaN(valor)) return null;
+                    
+                    return {
+                        id: dato.id,
+                        valor: valor,
+                        fecha: dato.fecha_hora || dato.timestamp,
+                        calidad: valor >= 21.0 ? "ÓPTIMO" : valor >= 19.5 ? "ACEPTABLE" : "BAJO"
+                    };
+                }).filter(dato => dato !== null);
+                
+                console.log(`Cargados ${datosFormateados.length} datos recientes de oxígeno`);
+                return datosFormateados;
+            }
+            
+            return [];
+        } catch (error) {
+            console.log('Error al cargar datos recientes de oxígeno:', error);
+            return [];
+        }
+    }
 
     function getQualityText(v) {
         if (v >= 21.0) return TRANSLATIONS.optimal_level || "NIVEL ÓPTIMO";
@@ -604,6 +686,34 @@ function gaugeO2(containerId, initial) {
         if (v >= 19.5) return TRANSLATIONS.acceptable_o2 || "ACEPTABLE";
         return TRANSLATIONS.low_o2 || "BAJO";
     }
+    // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
+    function actualizarGauge(newVal) {
+        const y = scale(newVal);
+        const h = Math.max(2, (frameY + frameH) - y);
+        const newColor = colorFor(newVal);
+
+        fillRect
+            .transition().duration(300)
+            .attr("y", y)
+            .attr("height", h)
+            .attr("fill", newColor);
+
+        valueText
+            .transition().duration(300)
+            .text(newVal.toFixed(2) + " %")
+            .attr("fill", newColor);
+
+        qualityText
+            .transition().duration(300)
+            .text(getQualityText(newVal))
+            .attr("fill", newColor);
+    }
+
+    // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
+    // Cargar el último dato al iniciar (con un pequeño retraso para asegurar que el DOM esté listo)
+    setTimeout(() => {
+        cargarUltimoDatoBD();
+    }, 500);
 
     return {
         update: function(newVal) {
@@ -705,7 +815,7 @@ function gaugeCO2(containerId, initial) {
         .attr("text-anchor", "middle")
         .text(initial + " ppm");
 
-    // Indicador de concentración en SVG (opcional)
+    // Indicador de concentración en SVG
     const concentrationText = svg.append("text")
         .attr("x", width/2)
         .attr("y", frameY + frameH + 100)
@@ -736,7 +846,7 @@ function gaugeCO2(containerId, initial) {
         return TRANSLATIONS.high_co2 || "ALTO";
     }
 
-    // Actualizar estadísticas (aunque no se muestren)
+    // Actualizar estadísticas
     function updateStats(newVal) {
         stats.current = newVal;
         stats.min = Math.min(stats.min, newVal);
@@ -746,55 +856,246 @@ function gaugeCO2(containerId, initial) {
             timestamp: new Date().toISOString()
         });
         
-        // Mantener solo los últimos 100 valores en el historial
         if (stats.history.length > 100) {
             stats.history.shift();
         }
     }
 
+    // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
+    async function cargarUltimoDatoBD() {
+        try {
+            console.log('Cargando datos de CO₂ desde BD para obtener el último...');
+            const response = await fetch('/api/co2/');
+            
+            if (!response.ok) {
+                console.log('No se pudieron obtener datos de CO₂ de la BD');
+                return null;
+            }
+            
+            const datos = await response.json();
+            
+            if (datos && Array.isArray(datos) && datos.length > 0) {
+                // Tomar el primer elemento (el más reciente)
+                const ultimoDato = datos[0];
+                
+                // Extraer el valor de CO₂
+                let ultimoValor = null;
+                
+                if (ultimoDato.concentracion !== undefined && ultimoDato.concentracion !== null) {
+                    ultimoValor = parseFloat(ultimoDato.concentracion);
+                } else if (ultimoDato.valor !== undefined && ultimoDato.valor !== null) {
+                    ultimoValor = parseFloat(ultimoDato.valor);
+                } else {
+                    console.log('Campo "concentracion" o "valor" no encontrado en:', ultimoDato);
+                    return null;
+                }
+                
+                if (isNaN(ultimoValor)) {
+                    console.log('Valor de CO₂ no es un número:', ultimoDato);
+                    return null;
+                }
+                
+                console.log('Último dato de CO₂ encontrado:', ultimoValor.toFixed(0) + ' ppm', 
+                        'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora);
+                
+                // Actualizar el gauge con el último valor de la BD
+                actualizarGauge(ultimoValor);
+                
+                return ultimoValor;
+            } else {
+                console.log('No hay datos de CO₂ en la BD');
+                return null;
+            }
+        } catch (error) {
+            console.log('Error al cargar datos de CO₂:', error);
+            return null;
+        }
+    }
+
+    // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
+    async function cargarDatosRecientesBD(limite = 10) {
+        try {
+            console.log(`Cargando últimos ${limite} datos de CO₂...`);
+            const response = await fetch('/api/co2/');
+            
+            if (!response.ok) {
+                console.log('No se pudieron obtener datos de CO₂ de la BD');
+                return [];
+            }
+            
+            const datos = await response.json();
+            
+            if (datos && Array.isArray(datos)) {
+                // Tomar los primeros 'limite' elementos (los más recientes)
+                const datosRecientes = datos.slice(0, limite);
+                
+                // Procesar y formatear datos
+                const datosFormateados = datosRecientes.map(dato => {
+                    let valor;
+                    
+                    if (dato.concentracion !== undefined && dato.concentracion !== null) {
+                        valor = parseFloat(dato.concentracion);
+                    } else if (dato.valor !== undefined && dato.valor !== null) {
+                        valor = parseFloat(dato.valor);
+                    } else {
+                        return null;
+                    }
+                    
+                    if (isNaN(valor)) return null;
+                    
+                    return {
+                        id: dato.id,
+                        valor: valor,
+                        fecha: dato.fecha_hora || dato.timestamp,
+                        calidad: valor < 800 ? "NORMAL" : valor < 1200 ? "MODERADO" : "ALTO"
+                    };
+                }).filter(dato => dato !== null);
+                
+                console.log(`Cargados ${datosFormateados.length} datos recientes de CO₂`);
+                return datosFormateados;
+            }
+            
+            return [];
+        } catch (error) {
+            console.log('Error al cargar datos recientes de CO₂:', error);
+            return [];
+        }
+    }
+
+    // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
+    function actualizarGauge(newVal) {
+        const y = scale(newVal);
+        const h = Math.max(2, (frameY + frameH) - y);
+        const newColor = colorFor(newVal);
+        const concentrationStatus = getFooterConcentrationText(newVal);
+
+        // Actualizar gráfico SVG
+        fillRect
+            .transition().duration(300)
+            .attr("y", y)
+            .attr("height", h)
+            .attr("fill", newColor);
+
+        valueText
+            .transition().duration(300)
+            .text(Math.round(newVal) + " ppm")
+            .attr("fill", newColor);
+        
+        concentrationText
+            .transition().duration(300)
+            .text(getConcentrationText(newVal))
+            .attr("fill", newColor);
+        
+        // Actualizar estadísticas
+        updateStats(newVal);
+        
+        // ACTUALIZAR ELEMENTOS HTML DEL FOOTER
+        const concentrationElement = document.getElementById('co2-concentration');
+        const timeElement = document.getElementById('co2-time');
+        
+        if (concentrationElement) {
+            concentrationElement.textContent = concentrationStatus;
+            // Cambiar color según concentración
+            if (newVal < 800) {
+                concentrationElement.style.color = "#7ef9a3"; // Verde
+            } else if (newVal < 1200) {
+                concentrationElement.style.color = "#ffd86b"; // Ámbar
+            } else {
+                concentrationElement.style.color = "#ff7a7a"; // Rojo
+            }
+        }
+        
+        // Si hay datos de tiempo en la BD, actualizar el tiempo
+        if (stats.history.length > 0) {
+            const ultimoTimestamp = stats.history[stats.history.length - 1].timestamp;
+            if (timeElement && ultimoTimestamp) {
+                const fecha = new Date(ultimoTimestamp);
+                timeElement.textContent = fecha.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+        }
+        
+        return concentrationStatus;
+    }
+
+    // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
+    // Cargar el último dato al iniciar
+    setTimeout(() => {
+        cargarUltimoDatoBD().then(ultimoValor => {
+            if (ultimoValor !== null) {
+                console.log('Gauge CO₂ inicializado con valor de BD:', ultimoValor + ' ppm');
+            }
+        });
+    }, 500);
+
+    // =================== RETORNO DE FUNCIONES ===================
     return {
         update: function(newVal) {
-            const y = scale(newVal);
-            const h = Math.max(2, (frameY + frameH) - y);
-            const newColor = colorFor(newVal);
-            const concentrationStatus = getFooterConcentrationText(newVal);
-
-            // Actualizar gráfico SVG
-            fillRect
-                .transition().duration(300)
-                .attr("y", y)
-                .attr("height", h)
-                .attr("fill", newColor);
-
-            valueText.text(Math.round(newVal) + " ppm");
-            
-            concentrationText
-                .transition().duration(300)
-                .text(getConcentrationText(newVal))
-                .attr("fill", newColor);
-            
-            // Actualizar estadísticas
-            updateStats(newVal);
-            
-            // ACTUALIZAR ELEMENTOS HTML DEL FOOTER
+            return actualizarGauge(newVal);
+        },
+        cargarUltimoDato: cargarUltimoDatoBD,
+        cargarDatosRecientes: cargarDatosRecientesBD,
+        actualizar: actualizarGauge,
+        obtenerColorSegunValor: colorFor,
+        obtenerTextoConcentracion: getConcentrationText,
+        obtenerTextoFooter: getFooterConcentrationText,
+        // Obtener estadísticas
+        getStats: function() {
+            return {
+                ...stats,
+                concentracionActual: stats.current,
+                calidadActual: getFooterConcentrationText(stats.current),
+                colorActual: colorFor(stats.current),
+                // Datos para mostrar en UI
+                paraMostrar: {
+                    valor: Math.round(stats.current) + " ppm",
+                    calidad: getFooterConcentrationText(stats.current),
+                    color: colorFor(stats.current),
+                    min: Math.round(stats.min) + " ppm",
+                    max: Math.round(stats.max) + " ppm",
+                    historial: stats.history.length
+                }
+            };
+        },
+        // Resetear estadísticas
+        resetStats: function() {
+            stats.min = stats.current;
+            stats.max = stats.current;
+            stats.history = [];
+        },
+        // Función para actualizar elementos HTML externos
+        actualizarFooter: function() {
             const concentrationElement = document.getElementById('co2-concentration');
             const timeElement = document.getElementById('co2-time');
             
             if (concentrationElement) {
-                concentrationElement.textContent = concentrationStatus;
-                // Cambiar color según concentración
-                if (newVal < 800) {
-                    concentrationElement.style.color = "#7ef9a3"; // Verde
-                } else if (newVal < 1200) {
-                    concentrationElement.style.color = "#ffd86b"; // Ámbar
+                concentrationElement.textContent = getFooterConcentrationText(stats.current);
+                
+                if (stats.current < 800) {
+                    concentrationElement.style.color = "#7ef9a3";
+                } else if (stats.current < 1200) {
+                    concentrationElement.style.color = "#ffd86b";
                 } else {
-                    concentrationElement.style.color = "#ff7a7a"; // Rojo
+                    concentrationElement.style.color = "#ff7a7a";
                 }
             }
             
-            // El tiempo se actualizará desde el WebSocket
-            
-            return concentrationStatus;
+            if (timeElement && stats.history.length > 0) {
+                const ultimoTimestamp = stats.history[stats.history.length - 1].timestamp;
+                if (ultimoTimestamp) {
+                    const fecha = new Date(ultimoTimestamp);
+                    timeElement.textContent = fecha.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }
+            }
+        },
+        // Función para forzar actualización desde BD
+        actualizarDesdeBD: function() {
+            return cargarUltimoDatoBD().then(valor => {
+                if (valor !== null) {
+                    this.actualizarFooter();
+                    return valor;
+                }
+                return null;
+            });
         }
     };
 }

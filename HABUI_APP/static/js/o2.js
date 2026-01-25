@@ -3,119 +3,221 @@ d3.select("body").style("background-color", "#0b0f19");
 
 // ===================== GAUGE VERTICAL (Oxígeno %) =====================
 function gaugeO2(containerId, initial) {
-const container = d3.select(containerId);
-container.html(""); // Limpiar contenedor
+    const container = d3.select(containerId);
+    container.html(""); // Limpiar contenedor
 
-const width = 300;
-const height = 520;
-const min = 18.0;
-const max = 23.0;
+    const width = 300;
+    const height = 520;
+    const min = 18.0;
+    const max = 23.0;
 
-const svg = container.append("svg")
-    .attr("width", width)
-    .attr("height", height);
+    const svg = container.append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
-// Paleta de verdes
-const greenPalette = {
-    light: "#34d399",    // Verde menta claro
-    medium: "#10b981",   // Verde esmeralda
-    dark: "#059669",     // Verde bosque
-    veryDark: "#047857", // Verde muy oscuro
-    amber: "#4dabf7",    // Ámbar cálido
-    red: "#dc2626"       // Rojo intenso
-};
+    // Paleta de verdes
+    const greenPalette = {
+        light: "#34d399",    // Verde menta claro
+        medium: "#10b981",   // Verde esmeralda
+        dark: "#059669",     // Verde bosque
+        veryDark: "#047857", // Verde muy oscuro
+        amber: "#4dabf7",    // Ámbar cálido
+        red: "#dc2626"       // Rojo intenso
+    };
 
-svg.append("text")
-    .attr("x", width/2)
-    .attr("y", 32)
-    .attr("fill", "#ffffffff")
-    .attr("font-size", "22px")
-    .attr("font-weight", "700")
-    .attr("text-anchor", "middle")
-    .text("O₂ (%)");
+    svg.append("text")
+        .attr("x", width/2)
+        .attr("y", 32)
+        .attr("fill", "#ffffffff")
+        .attr("font-size", "22px")
+        .attr("font-weight", "700")
+        .attr("text-anchor", "middle")
+        .text("O₂ (%)");
 
-// outer frame
-const frameX = 60;
-const frameY = 70;
-const frameW = 180;
-const frameH = 360;
+    // outer frame
+    const frameX = 60;
+    const frameY = 70;
+    const frameW = 180;
+    const frameH = 360;
 
-svg.append("rect")
-    .attr("x", frameX)
-    .attr("y", frameY)
-    .attr("width", frameW)
-    .attr("height", frameH)
-    .attr("rx", 14)
-    .attr("fill", "#0f172a")
-    .attr("stroke", greenPalette.dark)
-    .attr("stroke-width", 3);
+    svg.append("rect")
+        .attr("x", frameX)
+        .attr("y", frameY)
+        .attr("width", frameW)
+        .attr("height", frameH)
+        .attr("rx", 14)
+        .attr("fill", "#0f172a")
+        .attr("stroke", greenPalette.dark)
+        .attr("stroke-width", 3);
 
-// fill rect
-const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
+    // fill rect
+    const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
 
-const fillRect = svg.append("rect")
-    .attr("x", frameX)
-    .attr("width", frameW)
-    .attr("y", scale(initial))
-    .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
-    .attr("fill", greenPalette.medium)
-    .attr("rx", 12);
+    const fillRect = svg.append("rect")
+        .attr("x", frameX)
+        .attr("width", frameW)
+        .attr("y", scale(initial))
+        .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
+        .attr("fill", greenPalette.medium)
+        .attr("rx", 12);
 
-const valueText = svg.append("text")
-    .attr("x", width/2)
-    .attr("y", frameY + frameH + 50)
-    .attr("fill", greenPalette.light)
-    .attr("font-size", "40px")
-    .attr("font-weight", "700")
-    .attr("text-anchor", "middle")
-    .text(initial.toFixed(2) + " %");
+    const valueText = svg.append("text")
+        .attr("x", width/2)
+        .attr("y", frameY + frameH + 50)
+        .attr("fill", greenPalette.light)
+        .attr("font-size", "40px")
+        .attr("font-weight", "700")
+        .attr("text-anchor", "middle")
+        .text(initial.toFixed(2) + " %");
 
-// Indicador de calidad
-const qualityText = svg.append("text")
-    .attr("x", width/2)
-    .attr("y", frameY + frameH + 85)
-    .attr("fill", greenPalette.medium)
-    .attr("font-size", "25px")
-    .attr("font-weight", "600")
-    .attr("text-anchor", "middle")
-    .text(getQualityText(initial));
+    // Indicador de calidad
+    const qualityText = svg.append("text")
+        .attr("x", width/2)
+        .attr("y", frameY + frameH + 85)
+        .attr("fill", greenPalette.medium)
+        .attr("font-size", "25px")
+        .attr("font-weight", "600")
+        .attr("text-anchor", "middle")
+        .text(getQualityText(initial));
 
-// color overlay depending on ranges
-function colorFor(v) {
-    if (v >= 21.0) return greenPalette.light;   // excelente (verde claro)
-    if (v >= 19.5) return greenPalette.amber;   // acceptable (ámbar)
-    return greenPalette.red;                     // critico (rojo)
-}
-
-function getQualityText(v) {
-    if (v >= 21.0) return TRANSLATIONS.nivel_optimo || "NIVEL ÓPTIMO";
-    if (v >= 19.5) return TRANSLATIONS.nivel_aceptable || "NIVEL ACEPTABLE";
-    return "¡NIVEL BAJO!";
-}
-
-return {
-    update: function(newVal) {
-    const y = scale(newVal);
-    const h = Math.max(2, (frameY + frameH) - y);
-    const newColor = colorFor(newVal);
-
-    fillRect
-        .transition().duration(300)
-        .attr("y", y)
-        .attr("height", h)
-        .attr("fill", newColor);
-
-    valueText
-        .transition().duration(300)
-        .text(newVal.toFixed(2) + " %")
-        .attr("fill", newColor);
-
-    qualityText
-        .transition().duration(300)
-        .text(getQualityText(newVal))
-        .attr("fill", newColor);
+    // color overlay depending on ranges
+    function colorFor(v) {
+        if (v >= 21.0) return greenPalette.light;   // excelente (verde claro)
+        if (v >= 19.5) return greenPalette.amber;   // acceptable (ámbar)
+        return greenPalette.red;                     // critico (rojo)
     }
-};
+
+    function getQualityText(v) {
+        if (v >= 21.0) return TRANSLATIONS.nivel_optimo || "NIVEL ÓPTIMO";
+        if (v >= 19.5) return TRANSLATIONS.nivel_aceptable || "NIVEL ACEPTABLE";
+        return "¡NIVEL BAJO!";
+    }
+
+    // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
+    async function cargarUltimoDatoBD() {
+        try {
+            console.log('Cargando datos de oxígeno desde BD para obtener el último...');
+            const response = await fetch('/api/o2/');
+            
+            if (!response.ok) {
+                console.log('No se pudieron obtener datos de oxígeno de la BD');
+                return null;
+            }
+            
+            const datos = await response.json();
+            
+            if (datos && Array.isArray(datos) && datos.length > 0) {
+                // Tomar el primer elemento (el más reciente)
+                const ultimoDato = datos[0];
+                
+                // Extraer el valor de oxígeno
+                let ultimoValor;
+                ultimoValor = parseFloat(ultimoDato.nivel);
+                
+                console.log('Último dato de oxígeno encontrado:', ultimoValor.toFixed(2) + '%', 
+                        'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
+                
+                // Actualizar el gauge con el último valor de la BD
+                actualizarGauge(ultimoValor);
+                
+                return ultimoValor;
+            } else {
+                console.log('No hay datos de oxígeno en la BD');
+                return null;
+            }
+        } catch (error) {
+            console.log('Error al cargar datos de oxígeno:', error);
+            return null;
+        }
+    }
+
+    // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
+    async function cargarDatosRecientesBD(limite = 10) {
+        try {
+            console.log(`Cargando últimos ${limite} datos de oxígeno...`);
+            const response = await fetch('/api/o2/');
+            
+            if (!response.ok) {
+                console.log('No se pudieron obtener datos de oxígeno de la BD');
+                return [];
+            }
+            
+            const datos = await response.json();
+            
+            if (datos && Array.isArray(datos)) {
+                // Tomar los primeros 'limite' elementos (los más recientes)
+                const datosRecientes = datos.slice(0, limite);
+                
+                // Procesar y formatear datos
+                const datosFormateados = datosRecientes.map(dato => {
+                    let valor;
+                    
+                    valor = parseFloat(dato.nivel);
+                    
+                    if (isNaN(valor)) return null;
+                    
+                    return {
+                        id: dato.id,
+                        valor: valor,
+                        fecha: dato.fecha_hora || dato.timestamp,
+                        calidad: valor >= 21.0 ? "ÓPTIMO" : valor >= 19.5 ? "ACEPTABLE" : "BAJO"
+                    };
+                }).filter(dato => dato !== null);
+                
+                console.log(`Cargados ${datosFormateados.length} datos recientes de oxígeno`);
+                return datosFormateados;
+            }
+            
+            return [];
+        } catch (error) {
+            console.log('Error al cargar datos recientes de oxígeno:', error);
+            return [];
+        }
+    }
+
+    // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
+    function actualizarGauge(newVal) {
+        const y = scale(newVal);
+        const h = Math.max(2, (frameY + frameH) - y);
+        const newColor = colorFor(newVal);
+
+        fillRect
+            .transition().duration(300)
+            .attr("y", y)
+            .attr("height", h)
+            .attr("fill", newColor);
+
+        valueText
+            .transition().duration(300)
+            .text(newVal.toFixed(2) + " %")
+            .attr("fill", newColor);
+
+        qualityText
+            .transition().duration(300)
+            .text(getQualityText(newVal))
+            .attr("fill", newColor);
+    }
+
+    // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
+    // Cargar el último dato al iniciar (con un pequeño retraso para asegurar que el DOM esté listo)
+    setTimeout(() => {
+        cargarUltimoDatoBD();
+    }, 500);
+
+    // =================== RETORNO DE FUNCIONES ===================
+    // Crear objeto de retorno con todas las funciones
+    const gaugeObject = {
+        update: function(newVal) {
+            actualizarGauge(newVal);
+        },
+        cargarUltimoDato: cargarUltimoDatoBD,
+        cargarDatosRecientes: cargarDatosRecientesBD,
+        actualizar: actualizarGauge,
+        obtenerColorSegunValor: colorFor,
+        obtenerTextoCalidad: getQualityText
+    };
+
+    return gaugeObject;
 }
 
 // ===================== SERIE TEMPORAL DE OXÍGENO =====================
