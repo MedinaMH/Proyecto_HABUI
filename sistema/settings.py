@@ -28,8 +28,25 @@ DEBUG = True
 # ALLOWED_HOSTS = ['192.168.1.75', 'localhost', '127.0.0.1']
 
 ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['192.168.1.82', '10.0.2.2', 'localhost', '127.0.0.1']
 
-STATICFILES_DIRS = [os.path.join(BASE_DIR,'HABUI_APP','static')]
+
+#STATICFILES_DIRS = [os.path.join(BASE_DIR,'HABUI_APP','static')]
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'HABUI_APP', 'static'),
+    os.path.join(BASE_DIR, 'PWMS', 'static'),  # ← AGREGAR ESTA
+]
+#Configuracion de login para PWMS
+LOGIN_URL = '/pwms/login/'
+LOGIN_REDIRECT_URL = '/PWMS/login/'
+
+# Añade estas configuraciones importantes
+SESSION_COOKIE_AGE = 3600  # 1 hora
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # IMPORTANTE
+SESSION_COOKIE_SECURE = False  # True en producción
+SESSION_COOKIE_HTTPONLY = True
+SESSION_SAVE_EVERY_REQUEST = True  # Actualiza expiry en cada request
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -45,13 +62,25 @@ INSTALLED_APPS = [
     'HABUI_APP',
     'PWMS',
     "rest_framework",
+    'rest_framework.authtoken',
     "corsheaders",
     "channels",
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.http.ConditionalGetMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -83,6 +112,36 @@ WSGI_APPLICATION = 'sistema.wsgi.application'
 
 # CORS (para pruebas)
 CORS_ALLOW_ALL_ORIGINS = True
+
+# CORS para permitir conexiones desde la app Android
+CORS_ALLOWED_ORIGINS = [
+    "http://192.168.1.82:8000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    # Agrega la IP de tu servidor cuando esté en producción
+]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # ASGI / Channels
 ASGI_APPLICATION = "sistema.asgi.application"
@@ -116,6 +175,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Configuración de sesiones
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 3600  # 1 hora
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Cerrar al cerrar navegador
+SESSION_COOKIE_SECURE = False  # True en producción con HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

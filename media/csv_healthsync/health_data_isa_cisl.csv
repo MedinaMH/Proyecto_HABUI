@@ -1,0 +1,20 @@
+id,fecha,usuario,pasos_diarios,frecuencia_cardiaca,calorias_quemadas,presion_sistolica,presion_diastolica,temperatura,oxigenacion_sangre,horas_sueno,puntuacion_sueno,estres_relajado,estres_bajo,estres_moderado,estres_alto,nivel_estres_calculado,notas_adicionales,dispositivo_origen
+13,2026-01-28 10:49:13,isa_cisl,16,92,0,100,80,36.0,91,5.2,69,0,0,0,0,0,10,HealthSync Pro
+14,2026-01-28 14:10:46,isa_cisl,457,91,16,110,80,36.0,93,6.25,76,23,8,54,15,40,9,HealthSync Pro
+15,2026-01-28 14:10:46,isa_cisl,73,86,2000,100,80,36.0,91,6.00,76,17,6,22,55,53,11,HealthSync Pro
+16,2026-01-28 14:10:46,isa_cisl,73,86,2000,100,80,36.0,91,6.25,76,21,4,33,42,49,12 actualizado % estrés,HealthSync Pro
+17,2026-01-28 14:12:21,isa_cisl,73,88,2000,100,80,36.0,91,6.25,76,21,4,33,42,49,12 %estrea actualizado,HealthSync Pro
+18,2026-01-30 00:39:00,isa_cisl,323,90,10000,120,80,36.5,90,5.133333333333334,61,0,23,23,54,57,5,HealthSync App
+19,2026-01-30 00:50:07,isa_cisl,0,70,0,120,80,36.5,98,7.5,85,50,30,15,5,18,,HealthSync App
+20,2026-01-30 00:50:07,isa_cisl,313,86,10000,120,80,36.5,90,6.35,61,0,23,23,54,57,2,HealthSync App
+21,2026-01-30 00:50:07,isa_cisl,323,90,10000,120,80,36.5,90,5.133333333333334,61,0,23,23,54,57,3,HealthSync App
+22,2026-01-30 00:50:07,isa_cisl,323,90,10000,120,80,36.5,90,5.133333333333334,61,0,23,23,54,57,3,HealthSync App
+23,2026-01-30 00:50:07,isa_cisl,323,90,10000,120,80,36.5,90,5.133333333333334,61,0,23,23,54,57,5,HealthSync App
+24,2026-01-30 00:50:07,isa_cisl,405,86,12000,120,100,36.4,90,5.133333333333334,61,29,17,37,17,35,,HealthSync Android
+25,2026-01-30 00:50:07,isa_cisl,630,96,20000,110,80,36.4,90,5.133333333333334,61,24,14,45,17,38,,HealthSync Android
+26,2026-01-30 00:50:07,isa_cisl,10000,75,500,120,80,36.6,98,7.5,85,25,25,25,25,37,Prueba de diagnóstico,Diagnóstico Android
+27,2026-01-30 00:50:07,isa_cisl,673,89,22000,120,80,36.4,90,5.133333333333334,61,21,12,43,24,42,,HealthSync Android
+28,2026-01-30 00:50:07,isa_cisl,1066,86,35000,120,80,36.4,90,5.133333333333334,61,18,10,39,33,46,,HealthSync Android
+29,2026-01-30 03:19:30,isa_cisl,10000,75,500,120,80,36.6,98,7.5,85,25,25,25,25,37,Prueba de diagnóstico,Diagnóstico Android
+30,2026-01-30 03:31:08,isa_cisl,323,90,10000,120,80,36.5,90,5.133333333333334,61,0,23,23,54,57,5,HealthSync App
+31,2026-01-30 03:35:16,isa_cisl,80,82,1066,120,80,36.5,90,5.133333333333334,61,16,9,43,32,47,,HealthSync Android

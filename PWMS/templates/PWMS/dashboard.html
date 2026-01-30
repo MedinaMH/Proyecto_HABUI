@@ -1,0 +1,65 @@
+<!-- dashboard.html - VERSIÓN SIN JAVASCRIPT -->
+{% extends "PWMS/estructura_base_PWMS.html" %}
+
+{% block title %}Dashboard - PWMS{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <h1>Panel de Control PWMS</h1>
+        <div class="dashboard-actions">
+            <!-- Botón sin funcionalidad JS -->
+            <button class="btn-refresh" disabled>Actualizar</button>
+            <span class="last-update">Última actualización: {% now "d/m/Y H:i" %}</span>
+        </div>
+    </header>
+    
+    <div class="dashboard-grid">
+        <!-- Mensaje de bienvenida -->
+        <div class="welcome-card">
+            <h2><i class="bi bi-heart-pulse"></i> Bienvenido al Sistema PWMS</h2>
+            <p>Monitoreo del Bienestar Psicológico y Fisiológico</p>
+            
+            <div class="welcome-features">
+                <div class="feature">
+                    <span class="feature-icon">📊</span>
+                    <h4>Dashboard Principal</h4>
+                    <p>Visualiza tu estado general de salud</p>
+                </div>
+                
+                <div class="feature">
+                    <span class="feature-icon">📈</span>
+                    <h4>Gráficas Detalladas</h4>
+                    <p>7 tipos de gráficas para análisis específico</p>
+                </div>
+                
+                <div class="feature">
+                    <span class="feature-icon">📝</span>
+                    <h4>Registros Diarios</h4>
+                    <p>Registra tu estado psicológico y fisiológico</p>
+                </div>
+                
+                <div class="feature">
+                    <span class="feature-icon">📋</span>
+                    <h4>Historial Completo</h4>
+                    <p>Revisa tu evolución a lo largo del tiempo</p>
+                </div>
+            </div>
+            
+            <div class="dashboard-instructions">
+                <h4><i class="bi bi-info-circle"></i> Cómo usar el sistema:</h4>
+                <ol>
+                    <li>Usa el menú lateral para navegar</li>
+                    <li>Selecciona "Nuevo Registro" para añadir datos diarios</li>
+                    <li>Visita las gráficas para ver tu evolución</li>
+                    <li>Revisa tu historial para análisis a largo plazo</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- NO HAY JAVASCRIPT - solo CSS -->
+{% endblock %}

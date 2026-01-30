@@ -1,0 +1,42 @@
+<!-- PWMS/templates/PWMS/graficas/presion_arterial.html -->
+{% extends "PWMS/estructura_base_PWMS.html" %}
+{% load static %}
+
+{% block title %}Sueño - PWMS{% endblock %}
+
+{% block extra_css %}
+<!-- CSS específico para gráficas -->
+<link rel="stylesheet" href="{% static 'css/graficas.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="grafica-container">
+    <div class="grafica-header">
+        <h2><i class="nav-icon">🫀</i> Sueño</h2>
+        <p class="grafica-subtitle">Monitoreo horas y calidad de sueño</p>
+    </div>
+    
+    <div class="grafica-content">
+        <!-- Aquí irá la gráfica específica -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="graficaSueño"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <!-- Estadísticas y leyenda -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Código JavaScript para la gráfica
+</script>
+{% endblock %}

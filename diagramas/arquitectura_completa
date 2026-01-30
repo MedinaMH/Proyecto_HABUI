@@ -1,0 +1,44 @@
+digraph HealthSyncArchitecture {
+	dpi=300 rankdir=LR size="12,8"
+	node [fontname=Arial shape=box style=filled]
+	fontname="Arial Bold" fontsize=20 label="HealthSync Pro - Arquitectura del Sistema
+Sistema de Monitoreo de Salud Integral" labelloc=t
+	android [label="Aplicación Android
+━━━━━━━━━━━━━━━━━━━
+• Kotlin/Java
+• Room Database
+• Sensores del dispositivo
+• Material Design UI" color=lightblue fontname=Arial fontsize=10 shape=component]
+	api [label="API REST Django
+━━━━━━━━━━━━━━━━━━━
+• Django REST Framework
+• Token Authentication
+• Validación de datos
+• Serialización JSON" color=lightgreen fontname=Arial fontsize=10 shape=cylinder]
+	db [label="Base de Datos
+━━━━━━━━━━━━━━━━━━━
+• PostgreSQL/MySQL
+• Modelos: Usuario, Registros
+• Migraciones automáticas" color=orange fontname=Arial fontsize=10 shape=cylinder]
+	web [label="Dashboard Web
+━━━━━━━━━━━━━━━━━━━
+• HTML5 + CSS3 + JavaScript
+• Chart.js / Plotly
+• Bootstrap 5
+• Responsive Design" color=lightpink fontname=Arial fontsize=10 shape=component]
+	csv [label="Archivos CSV
+━━━━━━━━━━━━━━━━━━━
+• Backup de datos
+• Análisis externo
+• Intercambio de datos" color=lightyellow fontname=Arial fontsize=10 shape=folder]
+	android -> api [label="HTTP/JSON
+POST /api/healthsync/save/" fontname=Arial fontsize=9]
+	api -> db [label="ORM Django
+Inserciones/Consultas" fontname=Arial fontsize=9]
+	db -> web [label="Datos para visualización
+Gráficos en tiempo real" fontname=Arial fontsize=9]
+	api -> csv [label="Generación automática
+Por cada registro nuevo" fontname=Arial fontsize=9]
+	web -> api [label="AJAX Requests
+GET /api/healthsync/dashboard/" fontname=Arial fontsize=9]
+}

@@ -1,0 +1,5 @@
+id,timestamp_unix,fecha_hora,pasos,ritmo_cardiaco,calorias,presion_sistolica,presion_diastolica,temperatura,oxigeno_sangre,estres_relajado_%,estres_bajo_%,estres_moderado_%,estres_alto_%,estres_nivel_calculado,estres_categoria,horas_sueno,calidad_sueno,notas,dispositivo_origen,sincronizado
+1,1769236948464,"Sat Jan 24 00:42:28 CST 2026",0,81,0,100,80,36.0,70,0,14,75,11,49,"Bajo",6.0,70,"1","HealthSync Pro",true
+2,1769237446045,"Sat Jan 24 00:50:46 CST 2026",0,79,0,100,80,36.0,70,0,14,75,11,49,"Bajo",6.0,70,"2","HealthSync Pro",true
+3,1769240472311,"Sat Jan 24 01:41:12 CST 2026",0,69,0,100,80,36.0,70,0,0,100,0,50,"Bajo",6.0,70,"3","HealthSync Pro",true
+4,1769241990012,"Sat Jan 24 02:06:30 CST 2026",0,83,0,100,80,36.0,70,25,0,75,0,37,"Bajo",6.0,70,"4","HealthSync Pro",false

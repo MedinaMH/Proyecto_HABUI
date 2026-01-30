@@ -11,6 +11,8 @@
 
     <link rel="stylesheet" href="{% static 'css/estilos_panel.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <!-- Bootstrap Icons local -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
 </head>
 <body>
 
@@ -29,8 +31,14 @@
             </form>
         </div>
 
+
         <!-- Título centrado -->
         <h1>{% trans "PROYECTO HABUI" %}</h1>
+        {% comment %} <a href="{% url 'PWMS:panel_login' %}" class="seccion">
+            <h2>Módulo PWMS</h2>
+            <img src="{% static 'iconos/icono_pwms.gif' %}" alt="GIF del sistema PWMS" class="icon-gif">
+            <h3>Supervisa el bienestar psicológico de la tripulación</h3>
+        </a> {% endcomment %}
 
     </div>
 </header>
@@ -44,7 +52,7 @@
         <h3>{% trans "Supervisa el estado de los recursos esenciales" %}</h3>
     </a>
 
-    <a href="{% url 'pwms_login' %}" class="seccion">
+    <a href="{% url 'PWMS:panel_login' %}" class="seccion">
         <h2>{% trans "Módulo PWMS" %}</h2>
         <img src="{% static 'iconos/icono_pwms.gif' %}"
             alt="{% trans 'GIF del sistema PWMS' %}"

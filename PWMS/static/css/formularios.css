@@ -1,0 +1,252 @@
+/* formularios.css - Estilos para formularios de PWMS */
+
+/* Variables para formularios */
+:root {
+    --form-bg: #ffffff;
+    --form-border: #dee2e6;
+    --form-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --form-radius: 10px;
+    --form-primary: #145ca3;
+    --form-success: #28a745;
+    --form-danger: #dc3545;
+    --form-warning: #ffc107;
+    --form-info: #17a2b8;
+}
+
+/* Contenedor de formulario */
+.form-container {
+    background: var(--form-bg);
+    border-radius: var(--form-radius);
+    border: 1px solid var(--form-border);
+    padding: 2rem;
+    box-shadow: var(--form-shadow);
+    margin-bottom: 2rem;
+}
+
+/* Títulos de sección */
+.form-section-title {
+    color: var(--form-primary);
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.form-section-title i {
+    margin-right: 0.5rem;
+}
+
+/* Campos de formulario */
+.form-control, .form-select {
+    border: 1px solid var(--form-border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--form-primary);
+    box-shadow: 0 0 0 0.2rem rgba(20, 92, 163, 0.25);
+}
+
+/* Labels */
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.form-label i {
+    margin-right: 0.5rem;
+    color: var(--form-primary);
+}
+
+/* Textos de ayuda */
+.form-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Checkboxes y radios */
+.form-check-input {
+    margin-right: 0.5rem;
+}
+
+.form-check-label {
+    color: #495057;
+}
+
+/* Botones de formulario */
+.form-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.form-button-primary {
+    background-color: var(--form-primary);
+    border-color: var(--form-primary);
+    color: white;
+}
+
+.form-button-primary:hover {
+    background-color: #0d4a8a;
+    border-color: #0d4a8a;
+    transform: translateY(-1px);
+}
+
+.form-button-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.form-button-outline {
+    background-color: transparent;
+    border: 2px solid var(--form-border);
+    color: #495057;
+}
+
+.form-button-outline:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+/* Alertas en formularios */
+.form-alert {
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid transparent;
+}
+
+.form-alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.form-alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+.form-alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.form-alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+/* Progreso/indicadores */
+.progress-indicator {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    height: 8px;
+    margin: 0.5rem 0;
+}
+
+.progress-fill {
+    background-color: var(--form-primary);
+    border-radius: 10px;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+/* Tablas en formularios */
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.form-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 0.75rem;
+    border-bottom: 2px solid var(--form-border);
+}
+
+.form-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--form-border);
+    vertical-align: middle;
+}
+
+/* Badges en formularios */
+.form-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge-normal {
+    background-color: var(--form-success);
+    color: white;
+}
+
+.badge-alert {
+    background-color: var(--form-danger);
+    color: white;
+}
+
+.badge-warning {
+    background-color: var(--form-warning);
+    color: #212529;
+}
+
+/* Validación */
+.is-invalid {
+    border-color: var(--form-danger);
+}
+
+.is-valid {
+    border-color: var(--form-success);
+}
+
+.invalid-feedback {
+    color: var(--form-danger);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.valid-feedback {
+    color: var(--form-success);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 1.5rem;
+    }
+    
+    .form-section-title {
+        font-size: 1.1rem;
+    }
+    
+    .form-control, .form-select {
+        padding: 0.625rem 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .form-container {
+        padding: 1rem;
+        margin: 0 -15px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+}

@@ -1,0 +1,195 @@
+/* erros.css - Estilos para páginas de error */
+
+/* Variables de color para errores */
+:root {
+    --error-404-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --error-500-bg: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --error-403-bg: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --error-400-bg: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --error-card-bg: #ffffff;
+    --error-text-primary: #333333;
+    --error-text-secondary: #666666;
+    --error-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    --error-border-radius: 20px;
+}
+
+/* Estilos base para todas las páginas de error */
+.error-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Contenedor principal de error */
+.error-container {
+    background: var(--error-card-bg);
+    border-radius: var(--error-border-radius);
+    padding: 40px;
+    box-shadow: var(--error-shadow);
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Iconos de error */
+.error-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+    display: block;
+}
+
+/* Títulos de error */
+.error-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--error-text-primary);
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+/* Mensajes de error */
+.error-message {
+    color: var(--error-text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+/* Botones de error */
+.error-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.error-button {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.error-button-primary {
+    background-color: #0d6efd;
+    color: white;
+    border: 2px solid #0d6efd;
+}
+
+.error-button-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.error-button-secondary {
+    background-color: transparent;
+    color: #6c757d;
+    border: 2px solid #dee2e6;
+}
+
+.error-button-secondary:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+    color: #495057;
+}
+
+/* Footer de error */
+.error-footer {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.error-footer small {
+    color: #6c757d;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Colores específicos para cada tipo de error */
+.error-404 {
+    background: var(--error-404-bg);
+}
+
+.error-404 .error-icon {
+    color: #667eea;
+}
+
+.error-500 {
+    background: var(--error-500-bg);
+}
+
+.error-500 .error-icon {
+    color: #f5576c;
+}
+
+.error-403 {
+    background: var(--error-403-bg);
+}
+
+.error-403 .error-icon {
+    color: #4facfe;
+}
+
+.error-400 {
+    background: var(--error-400-bg);
+}
+
+.error-400 .error-icon {
+    color: #43e97b;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .error-container {
+        padding: 30px 20px;
+        margin: 0 15px;
+    }
+    
+    .error-icon {
+        font-size: 4rem;
+    }
+    
+    .error-title {
+        font-size: 2.5rem;
+    }
+    
+    .error-message {
+        font-size: 1rem;
+    }
+    
+    .error-button {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-container {
+    animation: fadeIn 0.5s ease-out;
+}

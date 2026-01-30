@@ -1,0 +1,212 @@
+{% extends 'PWMS/dashboard.html' %}
+
+{% block titulo %}Historial Psicológico - PWMS{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">Historial Psicológico</h1>
+                    <p class="text-muted mb-0">Tus registros de bienestar emocional</p>
+                </div>
+                <div>
+                    <a href="{% url 'PWMS:pwms_dashboard' %}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-arrow-left me-1"></i>Dashboard
+                    </a>
+                    <a href="{% url 'PWMS:nuevo_registro_psicologico' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Nuevo Registro
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if registros %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="bi bi-calendar-event me-1"></i>Fecha</th>
+                                    <th><i class="bi bi-lightning-charge text-danger me-1"></i>Estrés</th>
+                                    <th><i class="bi bi-activity text-warning me-1"></i>Ansiedad</th>
+                                    <th><i class="bi bi-emoji-smile text-success me-1"></i>Ánimo</th>
+                                    <th><i class="bi bi-journal-text me-1"></i>Notas</th>
+                                    <th><i class="bi bi-activity me-1"></i>Tendencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for registro in registros %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ registro.fecha|date:"d/m/Y" }}</strong><br>
+                                        <small class="text-muted">{{ registro.fecha|date:"H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-danger" 
+                                                     style="width: {{ registro.nivel_estres|add:'0' }}0%"
+                                                     role="progressbar">
+                                                </div>
+                                            </div>
+                                            <span class="badge bg-danger">{{ registro.nivel_estres }}/10</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-warning" 
+                                                     style="width: {{ registro.nivel_ansiedad|add:'0' }}0%"
+                                                     role="progressbar">
+                                                </div>
+                                            </div>
+                                            <span class="badge bg-warning">{{ registro.nivel_ansiedad }}/10</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-success" 
+                                                     style="width: {{ registro.estado_animo|add:'0' }}0%"
+                                                     role="progressbar">
+                                                </div>
+                                            </div>
+                                            <span class="badge bg-success">{{ registro.estado_animo }}/10</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="small text-truncate" style="max-width: 200px;" 
+                                             title="{{ registro.notas_dia }}">
+                                            {{ registro.notas_dia|truncatechars:100 }}
+                                        </div>
+                                        {% if registro.eventos_significativos %}
+                                        <small class="text-info">
+                                            <i class="bi bi-star-fill"></i> Con eventos
+                                        </small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if forloop.counter < registros|length %}
+                                            {% with next_registro=registros|slice:forloop.counter|first %}
+                                                {% if registro.estado_animo > next_registro.estado_animo %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-arrow-up"></i> Mejorando
+                                                    </span>
+                                                {% elif registro.estado_animo < next_registro.estado_animo %}
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-arrow-down"></i> Bajando
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">
+                                                        <i class="bi bi-dash"></i> Estable
+                                                    </span>
+                                                {% endif %}
+                                            {% endwith %}
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">
+                                                <i class="bi bi-dash"></i> Último
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-graph-up text-primary me-2"></i>Resumen Estadístico
+                    </h5>
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <div class="display-6 text-danger">{{ promedio_estres|default:"0.0" }}</div>
+                            <small class="text-muted">Estrés Promedio</small>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="display-6 text-warning">{{ promedio_ansiedad|default:"0.0" }}</div>
+                            <small class="text-muted">Ansiedad Promedio</small>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="display-6 text-success">{{ promedio_animo|default:"0.0" }}</div>
+                            <small class="text-muted">Ánimo Promedio</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-calendar-check text-success me-2"></i>Consistencia
+                    </h5>
+                    <div class="text-center">
+                        <div class="display-4">{{ registros.count }}</div>
+                        <small class="text-muted">Registros Totales</small>
+                    </div>
+                    <div class="progress mt-3" style="height: 10px;">
+                        <div class="progress-bar bg-success" 
+                             style="width: {{ porcentaje_consistencia|default:0 }}%"
+                             role="progressbar">
+                        </div>
+                    </div>
+                    <small class="text-muted">Consistencia en registros: {{ porcentaje_consistencia|default:0 }}%</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-journal-x display-1 text-muted mb-3"></i>
+                    <h3 class="text-muted">No hay registros psicológicos aún</h3>
+                    <p class="text-muted mb-4">
+                        Comienza tu seguimiento registrando tu estado emocional diario
+                    </p>
+                    <a href="{% url 'PWMS:nuevo_registro_psicologico' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>Crear Primer Registro
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .progress {
+        background-color: #e9ecef;
+    }
+    
+    .table th {
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .badge {
+        font-size: 0.75em;
+        padding: 4px 8px;
+    }
+</style>
+{% endblock %}

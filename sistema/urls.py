@@ -15,11 +15,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from django.urls import include
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.views.generic import RedirectView
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('HABUI_APP.urls')),
-    path('PWMS/', include('PWMS.urls')),
-    path('i18n/', include('django.conf.urls.i18n')),
+    path('i18n/', include('django.conf.urls.i18n')), 
+    # ========== URLs PWMS ==========
+    path('pwms/', include('PWMS.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# Manejadores de error
+handler404 = 'PWMS.views.pagina_no_encontrada'
+handler500 = 'PWMS.views.error_servidor'
+handler403 = 'PWMS.views.permiso_denegado'
+handler400 = 'PWMS.views.solicitud_erronea'

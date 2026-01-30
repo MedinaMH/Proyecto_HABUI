@@ -1,0 +1,87 @@
+{% extends 'PWMS/estructura_base_PWMS.html' %}
+{% load static %}
+
+{% block title %}Completar Perfil - PWMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-fill me-2"></i>
+                        Completar Información del Perfil
+                    </h4>
+                </div>
+                
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="mb-3">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            <i class="bi bi-info-circle me-2"></i>
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Teléfono</label>
+                                <input type="tel" name="telefono" class="form-control form-control-lg" value="{{ perfil.telefono|default:'' }}" placeholder="Ej: 555-1234567"required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Fecha de Nacimiento</label>
+                                <input type="date" name="fecha_nacimiento" class="form-control form-control-lg" value="{{ perfil.fecha_nacimiento|date:'Y-m-d'|default:'' }}" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">Género</label>
+                                <select name="genero" class="form-select form-select-lg" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="masculino" {% if perfil.genero == 'masculino' %}selected{% endif %}>
+                                        Masculino
+                                    </option>
+                                    <option value="femenino" {% if perfil.genero == 'femenino' %}selected{% endif %}>
+                                        Femenino
+                                    </option>
+                                    <option value="otro" {% if perfil.genero == 'otro' %}selected{% endif %}>
+                                        Otro
+                                    </option>
+                                    <option value="prefiero_no_decirlo" {% if perfil.genero == 'prefiero_no_decirlo' %}selected{% endif %}>
+                                        Prefiero no decirlo
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold">PIN Actual</label>
+                                <input type="text" class="form-control form-control-lg" value="{{ perfil.pin|default:'0000' }}" readonly>
+                                <small class="text-muted">El PIN de 4 dígitos se puede cambiar en Configuración</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Guardar Perfil
+                            </button>
+                            
+                            <a href="{% url 'PWMS:pwms_dashboard' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Volver al Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

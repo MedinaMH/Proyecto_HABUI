@@ -1,0 +1,244 @@
+{% extends 'PWMS/dashboard.html' %}
+
+{% block titulo %}Registro Fisiológico - PWMS{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">Registro de Signos Vitales</h1>
+                    <p class="text-muted mb-0">Registra tus datos fisiológicos diarios</p>
+                </div>
+                <a href="{% url 'PWMS:pwms_dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Volver al Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-primary mb-4">
+                        <i class="bi bi-heart-pulse me-2"></i>
+                        <strong>Importante:</strong> Registra estos datos preferiblemente en reposo, 
+                        después de 5 minutos de descanso para obtener medidas más precisas.
+                    </div>
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="card-title mb-3">
+                                    <i class="bi bi-activity text-danger me-2"></i>
+                                    Signos Vitales Básicos
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.frecuencia_cardiaca.id_for_label }}" class="form-label">
+                                            <i class="bi bi-heart-fill me-1 text-danger"></i>Frecuencia Cardíaca
+                                        </label>
+                                        {{ form.frecuencia_cardiaca }}
+                                        <small class="form-text text-muted">Latidos por minuto (60-100 normal en reposo)</small>
+                                        {% if form.frecuencia_cardiaca.errors %}
+                                        <div class="text-danger small">{{ form.frecuencia_cardiaca.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.presion_arterial_sistolica.id_for_label }}" class="form-label">
+                                            <i class="bi bi-speedometer me-1 text-primary"></i>Presión Arterial (Sistólica)
+                                        </label>
+                                        {{ form.presion_arterial_sistolica }}
+                                        <small class="form-text text-muted">Presión alta (90-120 normal)</small>
+                                        {% if form.presion_arterial_sistolica.errors %}
+                                        <div class="text-danger small">{{ form.presion_arterial_sistolica.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.presion_arterial_diastolica.id_for_label }}" class="form-label">
+                                            <i class="bi bi-speedometer2 me-1 text-primary"></i>Presión Arterial (Diastólica)
+                                        </label>
+                                        {{ form.presion_arterial_diastolica }}
+                                        <small class="form-text text-muted">Presión baja (60-80 normal)</small>
+                                        {% if form.presion_arterial_diastolica.errors %}
+                                        <div class="text-danger small">{{ form.presion_arterial_diastolica.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.temperatura.id_for_label }}" class="form-label">
+                                            <i class="bi bi-thermometer-half me-1 text-warning"></i>Temperatura Corporal
+                                        </label>
+                                        {{ form.temperatura }}
+                                        <small class="form-text text-muted">En °C (36.5-37.2 normal)</small>
+                                        {% if form.temperatura.errors %}
+                                        <div class="text-danger small">{{ form.temperatura.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.oxigenacion_sangre.id_for_label }}" class="form-label">
+                                            <i class="bi bi-droplet-half me-1 text-info"></i>Oxigenación en Sangre (SpO2)
+                                        </label>
+                                        {{ form.oxigenacion_sangre }}
+                                        <small class="form-text text-muted">En porcentaje (95-100% normal)</small>
+                                        {% if form.oxigenacion_sangre.errors %}
+                                        <div class="text-danger small">{{ form.oxigenacion_sangre.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.horas_sueno.id_for_label }}" class="form-label">
+                                            <i class="bi bi-moon-stars-fill me-1 text-secondary"></i>Horas de Sueño
+                                        </label>
+                                        {{ form.horas_sueno }}
+                                        <small class="form-text text-muted">Horas dormidas la noche anterior</small>
+                                        {% if form.horas_sueno.errors %}
+                                        <div class="text-danger small">{{ form.horas_sueno.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="card-title mb-3">
+                                    <i class="bi bi-person-walking text-success me-2"></i>
+                                    Actividad Física
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.pasos_diarios.id_for_label }}" class="form-label">
+                                            <i class="bi bi-footsteps me-1 text-success"></i>Pasos Diarios
+                                        </label>
+                                        {{ form.pasos_diarios }}
+                                        <small class="form-text text-muted">Número de pasos hoy</small>
+                                        {% if form.pasos_diarios.errors %}
+                                        <div class="text-danger small">{{ form.pasos_diarios.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.calorias_quemadas.id_for_label }}" class="form-label">
+                                            <i class="bi bi-fire me-1 text-danger"></i>Calorías Quemadas
+                                        </label>
+                                        {{ form.calorias_quemadas }}
+                                        <small class="form-text text-muted">Calorías quemadas hoy</small>
+                                        {% if form.calorias_quemadas.errors %}
+                                        <div class="text-danger small">{{ form.calorias_quemadas.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.dispositivo_origen.id_for_label }}" class="form-label">
+                                        <i class="bi bi-smartwatch me-1 text-primary"></i>Dispositivo de Origen
+                                    </label>
+                                    {{ form.dispositivo_origen }}
+                                    <small class="form-text text-muted">Ej: Smartwatch, aplicación móvil, manual</small>
+                                    {% if form.dispositivo_origen.errors %}
+                                    <div class="text-danger small">{{ form.dispositivo_origen.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-lightbulb-fill me-2"></i>
+                            <strong>Recomendación:</strong> Para seguimiento óptimo, registra estos datos 
+                            a la misma hora cada día, preferiblemente por la mañana.
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                            <a href="{% url 'PWMS:historial_fisiologico' %}" class="btn btn-outline-info">
+                                <i class="bi bi-graph-up me-1"></i>Ver Historial
+                            </a>
+                            <div>
+                                <button type="reset" class="btn btn-outline-secondary me-2">
+                                    <i class="bi bi-x-circle me-1"></i>Limpiar
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save me-1"></i>Guardar Registro
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-info-circle me-2"></i>Valores Normales
+                            </h6>
+                            <ul class="small mb-0">
+                                <li>Frecuencia cardíaca: 60-100 lpm</li>
+                                <li>Presión arterial: 90-120/60-80 mmHg</li>
+                                <li>Temperatura: 36.5-37.2 °C</li>
+                                <li>Oxigenación: 95-100%</li>
+                                <li>Sueño: 7-9 horas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Cuándo consultar
+                            </h6>
+                            <ul class="small mb-0">
+                                <li>FC > 100 o < 60 en reposo</li>
+                                <li>PA > 140/90 o < 90/60</li>
+                                <li>Temperatura > 38 °C</li>
+                                <li>Oxigenación < 92%</li>
+                                <li>Sueño < 6 horas por varios días</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input, select, textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        margin-bottom: 5px;
+    }
+    
+    textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+    
+    select {
+        height: 38px;
+    }
+    
+    .card-title {
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
