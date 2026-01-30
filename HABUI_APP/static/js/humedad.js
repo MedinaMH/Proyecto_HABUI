@@ -1,591 +1,881 @@
 document.addEventListener("DOMContentLoaded", function () {
-d3.select("body").style("background-color", "#0b0f19");
+    d3.select("body").style("background-color", "#0b0f19");
 
-// ===================== GAUGE VERTICAL (HUMEDAD %) =====================
-function gaugeHumedad(containerId, initial) {
-const container = d3.select(containerId);
-container.html(""); // Limpiar contenedor
+    // ===================== GAUGE VERTICAL (HUMEDAD %) =====================
+    function gaugeHumedad(containerId, initial) {
+        const container = d3.select(containerId);
+        container.html(""); // Limpiar contenedor
 
-const width = 300;
-const height = 520;
-const min = 0;      // 0%
-const max = 100;    // 100%
+        const width = 300;
+        const height = 520;
 
-const svg = container.append("svg")
-    .attr("width", width)
-    .attr("height", height);
+        const svg = container.append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .style("border-radius", "8px");
 
-// Marco exterior vertical
-const frameX = 85;
-const frameY = 70;
-const frameW = 180;
-const frameH = 360;
+        svg.append("text")
+            .attr("x", width/2)
+            .attr("y", 32)
+            .attr("fill", "#ffffffff")
+            .attr("font-size", "22px")
+            .attr("font-weight", "700")
+            .attr("text-anchor", "middle")
+            .text("HUMEDAD (%)");
 
-// Marco de fondo
-svg.append("rect")
-    .attr("x", frameX)
-    .attr("y", frameY)
-    .attr("width", frameW)
-    .attr("height", frameH)
-    .attr("rx", 14)
-    .attr("fill", "#0f1724")
-    .attr("stroke", "#4dabf7")
-    .attr("stroke-width", 2);
+        // outer frame
+        const frameX = 85;
+        const frameY = 70;
+        const frameW = 180;
+        const frameH = 360;
 
-// Escala para mapear humedad (0-100%) a posición vertical
-const scale = d3.scaleLinear()
-    .domain([min, max])
-    .range([frameY + frameH, frameY]);
+        svg.append("rect")
+            .attr("x", frameX)
+            .attr("y", frameY)
+            .attr("width", frameW)
+            .attr("height", frameH)
+            .attr("rx", 14)
+            .attr("fill", "#0f1724")
+            .attr("stroke", "#4dabf7")
+            .attr("stroke-width", 3);
 
-// Función para determinar color según humedad
-function colorFor(v) {
-    if (v < 30) return "#adb5bd";        // Gris (muy seco)
-    if (v < 40) return "#ffa94d";        // Naranja (seco)
-    if (v < 60) return "#4dabf7";        // Azul (ideal)
-    if (v < 70) return "#339af0";        // Azul medio (húmedo)
-    return "#228be6";                    // Azul oscuro (muy húmedo)
-}
+        // fill rect
+        const min = 0;
+        const max = 100;
+        const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
+        // ===================== LÍNEAS DE NIVEL =====================
+        for (let i = 0; i <= 100; i += 25) {
+            const y = scale(i);
+            
+            // Línea horizontal de nivel
+            svg.append("line")
+                .attr("x1", frameX - 10)
+                .attr("y1", y)
+                .attr("x2", frameX)
+                .attr("y2", y)
+                .attr("stroke", "#ffffff")
+                .attr("stroke-width", 1.5);
+            
+            // Texto de valor
+            svg.append("text")
+                .attr("x", frameX - 20)
+                .attr("y", y + 4)
+                .attr("fill", "#ffffff")
+                .attr("font-size", "28px")
+                .attr("font-weight", "500")
+                .attr("text-anchor", "end")
+                .text(i + "%");
+        }
 
-// Función para texto de nivel
-function getNivelTexto(v) {
-    if (v < 30) return TRANSLATIONS.muy_seco || "MUY SECO";
-    if (v < 40) return TRANSLATIONS.seco || "SECO";
-    if (v < 60) return TRANSLATIONS.ideal || "IDEAL";
-    if (v < 70) return TRANSLATIONS.humedo || "HÚMEDO";
-    return TRANSLATIONS.muy_humedo || "MUY HÚMEDO";
-}
+        const fillRect = svg.append("rect")
+            .attr("x", frameX)
+            .attr("width", frameW)
+            .attr("y", scale(initial))
+            .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
+            .attr("fill", "#4dabf7")
+            .attr("rx", 12);
 
-// Crear zonas de color con degradado
-const zones = [
-    {min: 70, max: 100, label: "Muy Húmedo"},
-    {min: 60, max: 70, label: "Húmedo"},
-    {min: 40, max: 60, label: "Ideal"},
-    {min: 30, max: 40, label: "Seco"},
-    {min: 0, max: 30, label: "Muy Seco"}
-];
+        const valueText = svg.append("text")
+            .attr("x", width/2+30)
+            .attr("y", frameY + frameH + 50)
+            .attr("fill", "#4dabf7")
+            .attr("font-size", "40px")
+            .attr("font-weight", "700")
+            .attr("text-anchor", "middle")
+            .text(initial.toFixed(1) + " %");
 
-// Dibujar zonas de color en el fondo
-zones.forEach(zone => {
-    const yTop = scale(zone.max);
-    const yBottom = scale(zone.min);
-    const zoneColor = colorFor(zone.min + (zone.max - zone.min)/2);
-    
-    svg.append("rect")
-    .attr("x", frameX)
-    .attr("y", yTop)
-    .attr("width", frameW)
-    .attr("height", Math.max(2, yBottom - yTop))
-    .attr("fill", zoneColor)
-    .attr("opacity", 0.15)
-    .attr("rx", 12);
-});
+        // Indicador de nivel
+        const levelText = svg.append("text")
+            .attr("x", width/2+30)
+            .attr("y", frameY + frameH + 85)
+            .attr("fill", "#4dabf7")
+            .attr("font-size", "25px")
+            .attr("font-weight", "600")
+            .attr("text-anchor", "middle")
+            .text(getNivelTexto(initial));
 
-// Rectángulo de llenado (indicador principal)
-const fillRect = svg.append("rect")
-    .attr("x", frameX)
-    .attr("width", frameW)
-    .attr("y", scale(initial))
-    .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
-    .attr("fill", colorFor(initial))
-    .attr("rx", 12);
+        // color overlay depending on ranges
+        function colorFor(v) {
+            if (v < 30) return "#adb5bd";        // Muy seco (gris)
+            if (v < 40) return "#ffa94d";        // Seco (naranja)
+            if (v < 60) return "#4dabf7";        // Ideal (azul)
+            if (v < 70) return "#339af0";        // Húmedo (azul medio)
+            return "#228be6";                    // Muy húmedo (azul oscuro)
+        }
 
-// Marcas de escala
-for (let i = 0; i <= 100; i += 10) {
-    const y = scale(i);
-    
-    // Marcas principales cada 20%
-    if (i % 20 === 0) {
-    // Línea de marca
-    svg.append("line")
-        .attr("x1", frameX - 10)
-        .attr("y1", y)
-        .attr("x2", frameX)
-        .attr("y2", y)
-        .attr("stroke", "#4dabf7")
-        .attr("stroke-width", 1.5);
-    
-    // Texto de valor
-    svg.append("text")
-        .attr("x", frameX - 20)
-        .attr("y", y + 4)
-        .attr("fill", "#4dabf7")
-        .attr("font-size", "28px")
-        .attr("font-weight", "500")
-        .attr("text-anchor", "end")
-        .text(i + "%");
-    } else {
-    // Marcas menores
-    svg.append("line")
-        .attr("x1", frameX - 5)
-        .attr("y1", y)
-        .attr("x2", frameX)
-        .attr("y2", y)
-        .attr("stroke", "#4dabf7")
-        .attr("stroke-width", 1)
-        .attr("opacity", 0.7);
-    }
-}
+        function getNivelTexto(v) {
+            if (v < 30) return "MUY SECO";
+            if (v < 40) return "SECO";
+            if (v < 60) return "IDEAL";
+            if (v < 70) return "HÚMEDO";
+            return "MUY HÚMEDO";
+        }
 
-// Marcas en el lado derecho
-// for (let i = 0; i <= 100; i += 20) {
-//     const y = scale(i);
-//     svg.append("line")
-//     .attr("x1", frameX + frameW)
-//     .attr("y1", y)
-//     .attr("x2", frameX + frameW + 10)
-//     .attr("y2", y)
-//     .attr("stroke", "#4dabf7")
-//     .attr("stroke-width", 1.5);
-// }
+        // Estadísticas
+        const stats = {
+            current: initial,
+            min: initial,
+            max: initial,
+            history: []
+        };
 
-// VALOR NUMÉRICO
-const valueText = svg.append("text")
-    .attr("x", width/2 + 30)
-    .attr("y", frameY + frameH + 50)
-    .attr("fill", colorFor(initial))
-    .attr("font-size", "40px")
-    .attr("font-weight", "700")
-    .attr("text-anchor", "middle")
-    .text(initial.toFixed(1) + " %");
+        // Actualizar estadísticas
+        function updateStats(newVal) {
+            stats.current = newVal;
+            stats.min = Math.min(stats.min, newVal);
+            stats.max = Math.max(stats.max, newVal);
+            stats.history.push({
+                value: newVal,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Mantener solo los últimos 100 valores en el historial
+            if (stats.history.length > 100) {
+                stats.history.shift();
+            }
+        }
 
-// INDICADOR DE NIVEL
-const nivelText = svg.append("text")
-    .attr("x", width/2 + 25)
-    .attr("y", frameY + frameH + 85)
-    .attr("fill", colorFor(initial))
-    .attr("font-size", "28px")
-    .attr("font-weight", "600")
-    .attr("text-anchor", "middle")
-    .style("letter-spacing", "0.5px")
-    .text(getNivelTexto(initial));
+        // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
+        async function cargarUltimoDatoBD() {
+            try {
+                console.log('Cargando datos de Humedad desde BD para obtener el último...');
+                const response = await fetch('/api/humedad/');
+                
+                if (!response.ok) {
+                    console.log('No se pudieron obtener datos de Humedad de la BD');
+                    return null;
+                }
+                
+                const datos = await response.json();
+                
+                if (datos && Array.isArray(datos) && datos.length > 0) {
+                    // Tomar el primer elemento (el más reciente)
+                    const ultimoDato = datos[0];
+                    
+                    // Extraer el valor de Humedad - campo "valor"
+                    let ultimoValor = parseFloat(ultimoDato.valor);
+                    console.log('Último dato de Humedad encontrado:', ultimoValor.toFixed(1) + ' %', 
+                            'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
+                    
+                    // Actualizar el gauge con el último valor de la BD
+                    actualizarGauge(ultimoValor);
+                    
+                    return ultimoValor;
+                } else {
+                    console.log('No hay datos de Humedad en la BD');
+                    return null;
+                }
+            } catch (error) {
+                console.log('Error al cargar datos de Humedad:', error);
+                return null;
+            }
+        }
 
-return {
-    update: function(newVal) {
-    const y = scale(newVal);
-    const h = Math.max(2, (frameY + frameH) - y);
-    const newColor = colorFor(newVal);
+        // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
+        async function cargarDatosRecientesBD(limite = 10) {
+            try {
+                console.log(`Cargando últimos ${limite} datos de Humedad...`);
+                const response = await fetch('/api/humedad/');
+                
+                if (!response.ok) {
+                    console.log('No se pudieron obtener datos de Humedad de la BD');
+                    return [];
+                }
+                
+                const datos = await response.json();
+                
+                if (datos && Array.isArray(datos)) {
+                    // Tomar los primeros 'limite' elementos (los más recientes)
+                    const datosRecientes = datos.slice(0, limite);
+                    
+                    // Procesar y formatear datos
+                    const datosFormateados = datosRecientes.map(dato => {
+                        let valor = parseFloat(dato.valor);
+                        if (isNaN(valor)) return null;
+                        
+                        return {
+                            id: dato.id,
+                            valor: valor,
+                            fecha: dato.fecha_hora || dato.timestamp,
+                            nivel: getNivelTexto(valor)
+                        };
+                    }).filter(dato => dato !== null);
+                    
+                    console.log(`Cargados ${datosFormateados.length} datos recientes de Humedad`);
+                    return datosFormateados;
+                }
+                
+                return [];
+            } catch (error) {
+                console.log('Error al cargar datos recientes de Humedad:', error);
+                return [];
+            }
+        }
 
-    // Transición del rectángulo de llenado
-    fillRect
-        .transition()
-        .duration(300)
-        .attr("y", y)
-        .attr("height", h)
-        .attr("fill", newColor);
+        // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
+        function actualizarGauge(newVal) {
+            const y = scale(newVal);
+            const h = Math.max(2, (frameY + frameH) - y);
+            const newColor = colorFor(newVal);
 
-    // Actualizar textos
-    valueText
-        .text(newVal.toFixed(1) + " %")
-        .attr("fill", newColor);
+            fillRect
+                .transition().duration(300)
+                .attr("y", y)
+                .attr("height", h)
+                .attr("fill", newColor);
 
-    nivelText
-        .text(getNivelTexto(newVal))
-        .attr("fill", newColor);
-    }
-};
-}
+            valueText
+                .transition().duration(300)
+                .text(newVal.toFixed(1) + " %")
+                .attr("fill", newColor);
 
-// ===================== SERIE TEMPORAL DE HUMEDAD =====================
-function lineChartHumedad(containerId) {
-const container = d3.select(containerId);
-container.html(""); // Limpiar contenedor
+            levelText
+                .transition().duration(300)
+                .text(getNivelTexto(newVal))
+                .attr("fill", newColor);
+            
+            // Actualizar estadísticas
+            updateStats(newVal);
+        }
 
-const outerW = 720, outerH = 520;
-const margin = {top: 50, right: 40, bottom: 60, left: 70};
-const width = outerW - margin.left - margin.right;
-const height = outerH - margin.top - margin.bottom;
+        // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
+        setTimeout(() => {
+            cargarUltimoDatoBD();
+        }, 500);
 
-const svg = container.append("svg")
-    .attr("width", outerW)
-    .attr("height", outerH)
-    .style("background", "#0f172a")
-    .style("border", "2px solid #1e293b")
-    .style("border-radius", "12px")
-    .style("box-shadow", "0 4px 20px rgba(0, 0, 0, 0.15)");
+        // =================== RETORNO DE FUNCIONES ===================
+        const gaugeObject = {
+            update: function(newVal) {
+                actualizarGauge(newVal);
+            },
+            cargarUltimoDato: cargarUltimoDatoBD,
+            cargarDatosRecientes: cargarDatosRecientesBD,
+            actualizar: actualizarGauge,
+            obtenerColorSegunValor: colorFor,
+            obtenerNivelTexto: getNivelTexto,
+            // Obtener estadísticas
+            getStats: function() {
+                return {
+                    ...stats,
+                    nivelActual: getNivelTexto(stats.current),
+                    colorActual: colorFor(stats.current)
+                };
+            },
+            // Resetear estadísticas
+            resetStats: function() {
+                stats.min = stats.current;
+                stats.max = stats.current;
+                stats.history = [];
+            }
+        };
 
-const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-// Scales
-const x = d3.scaleTime().range([0, width]);
-const y = d3.scaleLinear().range([height, 0]);
-
-// Gradiente para el área
-const gradient = svg.append("defs")
-    .append("linearGradient")
-    .attr("id", "hum-gradient")
-    .attr("x1", "0%").attr("y1", "0%")
-    .attr("x2", "0%").attr("y2", "100%");
-
-gradient.append("stop")
-    .attr("offset", "0%")
-    .attr("stop-color", "rgba(77, 171, 247, 0.4)")
-    .attr("stop-opacity", 0.5);
-
-gradient.append("stop")
-    .attr("offset", "80%")
-    .attr("stop-color", "rgba(77, 171, 247, 0.1)");
-
-gradient.append("stop")
-    .attr("offset", "100%")
-    .attr("stop-color", "rgba(77, 171, 247, 0.05)");
-
-// Gradiente para la línea
-const lineGradient = svg.append("defs")
-    .append("linearGradient")
-    .attr("id", "line-gradient")
-    .attr("x1", "0%").attr("y1", "0%")
-    .attr("x2", "100%").attr("y2", "0%");
-
-lineGradient.append("stop")
-    .attr("offset", "0%")
-    .attr("stop-color", "#4dabf7");
-
-lineGradient.append("stop")
-    .attr("offset", "100%")
-    .attr("stop-color", "#00e5ff");
-
-// Generadores de línea y área
-const line = d3.line()
-    .x(d => x(new Date(d.t)))
-    .y(d => y(d.v))
-    .curve(d3.curveMonotoneX);
-
-const area = d3.area()
-    .x(d => x(new Date(d.t)))
-    .y0(height)
-    .y1(d => y(d.v))
-    .curve(d3.curveMonotoneX);
-
-// Grid horizontal
-const grid = g.append("g")
-    .attr("class", "grid");
-
-// Área de fondo con gradiente
-const areaPath = g.append("path")
-    .attr("class", "area-hum")
-    .attr("fill", "url(#hum-gradient)")
-    .attr("stroke", "none");
-
-// Línea principal
-const path = g.append("path")
-    .attr("class", "line-hum")
-    .attr("fill", "none")
-    .attr("stroke", "url(#line-gradient)")
-    .attr("stroke-width", 3)
-    .style("filter", "drop-shadow(0 0 6px rgba(77, 171, 247, 0.3))");
-
-// Ejes
-const xAxisG = g.append("g")
-    .attr("class", "x-axis")
-    .attr("transform", `translate(0,${height})`)
-    .style("font-size", "11px");
-
-const yAxisG = g.append("g")
-    .attr("class", "y-axis")
-    .style("font-size", "11px");
-
-// Etiqueta eje Y
-g.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("x", -height/2)
-    .attr("y", -55)
-    .attr("fill", "#4dabf7")
-    .attr("font-size", "12px")
-    .attr("font-weight", "600")
-    .attr("text-anchor", "middle")
-    .text(TRANSLATIONS.humedad || "HUMEDAD (%)");
-
-// Zonas de humedad en el fondo
-const humZonesData = [
-    {min: 0, max: 30, color: "rgba(173, 181, 189, 0.08)", label: "Muy Seco"},
-    {min: 30, max: 40, color: "rgba(255, 169, 77, 0.08)", label: "Seco"},
-    {min: 40, max: 60, color: "rgba(77, 171, 247, 0.08)", label: "Ideal"},
-    {min: 60, max: 70, color: "rgba(51, 154, 240, 0.08)", label: "Húmedo"},
-    {min: 70, max: 100, color: "rgba(34, 139, 230, 0.08)", label: "Muy Húmedo"}
-];
-
-// Tooltip
-const tooltip = container.append("div")
-    .attr("class", "tooltip-humedad")
-    .style("position", "absolute")
-    .style("background", "rgba(15, 23, 42, 0.95)")
-    .style("color", "#e2e8f0")
-    .style("padding", "12px 16px")
-    .style("border", "2px solid #4dabf7")
-    .style("border-radius", "10px")
-    .style("font-size", "13px")
-    .style("font-weight", "500")
-    .style("pointer-events", "none")
-    .style("opacity", 0)
-    .style("box-shadow", "0 8px 24px rgba(0, 0, 0, 0.3)")
-    .style("backdrop-filter", "blur(4px)")
-    .style("z-index", "9999");
-
-// Punto focal interactivo
-const focus = g.append("circle")
-    .attr("class", "focus-point")
-    .attr("r", 0)
-    .attr("fill", "#00ffcc")
-    .attr("stroke", "#ffffff")
-    .attr("stroke-width", 2)
-    .style("filter", "drop-shadow(0 0 6px rgba(0, 255, 204, 0.6))")
-    .style("opacity", 0);
-
-// Línea vertical guía
-const verticalLine = g.append("line")
-    .attr("class", "vertical-line")
-    .attr("stroke", "rgba(255, 255, 255, 0.3)")
-    .attr("stroke-width", 1)
-    .attr("stroke-dasharray", "5,5")
-    .style("opacity", 0);
-
-let data = [];
-
-function redraw() {
-    if (data.length === 0) return;
-
-    const maxPoints = 80;
-    if (data.length > maxPoints) {
-    data = data.slice(data.length - maxPoints);
+        return gaugeObject;
     }
 
-    // Actualizar dominios
-    x.domain(d3.extent(data, d => new Date(d.t)));
-    
-    // Determinar rango Y dinámico pero con márgenes
-    const minVal = Math.max(0, d3.min(data, d => d.v) - 5);
-    const maxVal = Math.min(100, d3.max(data, d => d.v) + 5);
-    y.domain([minVal, maxVal]);
+    // ===================== SERIE TEMPORAL DE HUMEDAD =====================
+    function lineChartHumedad(containerId) {
+        const container = d3.select(containerId);
+        container.html("");
 
-    // Zonas de humedad en el fondo
-    const humZones = g.selectAll(".hum-zone").data(humZonesData);
+        const outerW = 720, outerH = 520;
+        const margin = {top: 50, right: 40, bottom: 60, left: 80};
+        const width = outerW - margin.left - margin.right;
+        const height = outerH - margin.top - margin.bottom;
 
-    humZones.enter()
-    .append("rect")
-    .attr("class", "hum-zone")
-    .merge(humZones)
-    .attr("x", 0)
-    .attr("width", width)
-    .attr("y", d => y(d.max))
-    .attr("height", d => y(d.min) - y(d.max))
-    .attr("fill", d => d.color)
-    .attr("rx", 2);
+        const svg = container.append("svg")
+            .attr("width", outerW)
+            .attr("height", outerH)
+            .style("background", "#0f172a")
+            .style("border", "3px solid #4dabf7")
+            .style("border-radius", "12px")
+            .style("box-shadow", "0 4px 20px rgba(77, 171, 247, 0.15)");
 
-    humZones.exit().remove();
+        const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Actualizar grid
-    grid.call(d3.axisLeft(y)
-    .ticks(8)
-    .tickSize(-width)
-    .tickFormat(""))
-    .attr("opacity", 0.1)
-    .selectAll("line")
-    .attr("stroke", "#4dabf7");
+        // Título
+        svg.append("text")
+            .attr("x", outerW/2)
+            .attr("y", 28)
+            .attr("fill", "#ffffffff")
+            .attr("font-size", "20px")
+            .attr("font-weight", "700")
+            .attr("text-anchor", "middle")
+            .style("letter-spacing", "0.5px")
+            .text("HISTÓRICO DE HUMEDAD (%)");
 
-    // Actualizar ejes con mejor formato
-    xAxisG.call(d3.axisBottom(x)
-    .ticks(6)
-    .tickFormat(d3.timeFormat("%H:%M:%S"))
-    .tickSizeOuter(0))
-    .selectAll("text")
-    .attr("fill", "#94a3b8")
-    .attr("font-size", "10px")
-    .attr("font-weight", "500");
+        // Botón para regresar al inicio
+        const homeButton = container.append("button")
+            .attr("class", "btn btn-sm")
+            .style("position", "absolute")
+            .style("top", "12px")
+            .style("right", "12px")
+            .style("background", "rgba(77, 171, 247, 0.2)")
+            .style("color", "#4dabf7")
+            .style("border", "1px solid #4dabf7")
+            .style("border-radius", "6px")
+            .style("padding", "8px 12px")
+            .style("cursor", "pointer")
+            .style("z-index", "10")
+            .style("transition", "all 0.3s")
+            .html('<i class="bi bi-house-door"></i>')
+            .on("mouseover", function() {
+                d3.select(this)
+                    .style("background", "#4dabf7")
+                    .style("color", "#0f172a")
+                    .style("transform", "scale(1.05)");
+            })
+            .on("mouseout", function() {
+                d3.select(this)
+                    .style("background", "rgba(77, 171, 247, 0.2)")
+                    .style("color", "#4dabf7")
+                    .style("transform", "scale(1)");
+            })
+            .on("click", function() {
+                // Regresar al inicio 
+                currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
+                redraw();
+                
+                // Efecto visual de click
+                d3.select(this)
+                    .style("background", "#339af0")
+                    .style("color", "#0f172a");
+                
+                setTimeout(() => {
+                    d3.select(this)
+                        .style("background", "rgba(77, 171, 247, 0.2)")
+                        .style("color", "#4dabf7");
+                }, 300);
+            });
 
-    xAxisG.selectAll("path, line")
-    .attr("stroke", "#64748b")
-    .attr("opacity", 0.5);
+        // Scales
+        const x = d3.scaleTime().range([0, width]);
+        const y = d3.scaleLinear().range([height, 0]);
 
-    yAxisG.call(d3.axisLeft(y)
-    .ticks(8)
-    .tickFormat(d => d + "%")
-    .tickSizeOuter(0))
-    .selectAll("text")
-    .attr("fill", "#94a3b8")
-    .attr("font-size", "10px")
-    .attr("font-weight", "500");
+        // Gradiente para el área
+        const gradient = svg.append("defs")
+            .append("linearGradient")
+            .attr("id", "hum-gradient")
+            .attr("x1", "0%").attr("y1", "0%")
+            .attr("x2", "0%").attr("y2", "100%");
 
-    yAxisG.selectAll("path, line")
-    .attr("stroke", "#64748b")
-    .attr("opacity", 0.5);
+        gradient.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", "rgba(77, 171, 247, 0.4)")
+            .attr("stop-opacity", 0.5);
 
-    // Actualizar línea y área con transición
-    path.datum(data)
-    .transition()
-    .duration(500)
-    .ease(d3.easeCubicOut)
-    .attr("d", line);
+        gradient.append("stop")
+            .attr("offset", "80%")
+            .attr("stop-color", "rgba(77, 171, 247, 0.1)");
 
-    areaPath.datum(data)
-    .transition()
-    .duration(500)
-    .ease(d3.easeCubicOut)
-    .attr("d", area);
+        gradient.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", "rgba(77, 171, 247, 0.05)");
 
-    // Puntos de datos interactivos
-    const points = g.selectAll(".data-point")
-    .data(data, d => d.t);
+        // Gradiente para la línea
+        const lineGradient = svg.append("defs")
+            .append("linearGradient")
+            .attr("id", "hum-line-gradient")
+            .attr("x1", "0%").attr("y1", "0%")
+            .attr("x2", "100%").attr("y2", "0%");
 
-    points.enter()
-    .append("circle")
-    .attr("class", "data-point")
-    .merge(points)
-    .attr("cx", d => x(new Date(d.t)))
-    .attr("cy", d => y(d.v))
-    .attr("r", 3.5)
-    .attr("fill", d => {
-        if (d.v < 30) return "#adb5bd";      // Gris
-        if (d.v < 40) return "#ffa94d";      // Naranja
-        if (d.v < 60) return "#4dabf7";      // Azul ideal
-        if (d.v < 70) return "#339af0";      // Azul medio
-        return "#228be6";                    // Azul oscuro
-    })
-    .attr("stroke", "#ffffff")
-    .attr("stroke-width", 1)
-    .style("opacity", 0.8)
-    .style("cursor", "pointer")
-    .on("mouseover", function(event, d) {
-        const mouseX = x(new Date(d.t));
-        const mouseY = y(d.v);
+        lineGradient.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", "#4dabf7");
+
+        lineGradient.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", "#00e5ff");
+
+        // Generadores de línea y área
+        const line = d3.line()
+            .x(d => x(d.time))
+            .y(d => y(d.value))
+            .curve(d3.curveMonotoneX);
+
+        const area = d3.area()
+            .x(d => x(d.time))
+            .y0(height)
+            .y1(d => y(d.value))
+            .curve(d3.curveMonotoneX);
+
+        // Grid horizontal
+        const grid = g.append("g")
+            .attr("class", "grid");
+
+        // Área de fondo con gradiente
+        const areaPath = g.append("path")
+            .attr("class", "area-hum")
+            .attr("fill", "url(#hum-gradient)")
+            .attr("stroke", "none");
+
+        // Línea principal
+        const path = g.append("path")
+            .attr("class", "line-hum")
+            .attr("fill", "none")
+            .attr("stroke", "url(#hum-line-gradient)")
+            .attr("stroke-width", 3.5)
+            .style("filter", "drop-shadow(0 0 8px rgba(77, 171, 247, 0.5))");
+
+        // Ejes
+        const xAxisG = g.append("g")
+            .attr("class", "x-axis")
+            .attr("transform", `translate(0,${height})`)
+            .style("font-size", "12px");
+
+        const yAxisG = g.append("g")
+            .attr("class", "y-axis")
+            .style("font-size", "12px");
+
+        // Etiqueta eje Y 
+        g.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -height/2)
+            .attr("y", -68)
+            .attr("fill", "#4dabf7")
+            .attr("font-size", "14px")
+            .attr("font-weight", "600")
+            .attr("text-anchor", "middle")
+            .text("HUMEDAD (%)");
         
-        // Mostrar punto focal
-        focus
-        .attr("cx", mouseX)
-        .attr("cy", mouseY)
-        .transition()
-        .duration(200)
-        .attr("r", 6)
-        .style("opacity", 1);
+        g.append("text")
+            .attr("x", width/2)
+            .attr("y", height + 40)
+            .attr("fill", "#4dabf7")
+            .attr("font-size", "14px")
+            .attr("font-weight", "600")
+            .attr("text-anchor", "middle")
+            .text("Tiempo");
 
-        // Mostrar línea vertical
-        verticalLine
-        .attr("x1", mouseX)
-        .attr("y1", 0)
-        .attr("x2", mouseX)
-        .attr("y2", height)
-        .transition()
-        .duration(200)
-        .style("opacity", 1);
+        // Zonas de humedad en el fondo
+        const humZonesData = [
+            {min: 0, max: 30, color: "rgba(173, 181, 189, 0.08)", label: "MUY SECO"},
+            {min: 30, max: 40, color: "rgba(255, 169, 77, 0.08)", label: "SECO"},
+            {min: 40, max: 60, color: "rgba(77, 171, 247, 0.08)", label: "IDEAL"},
+            {min: 60, max: 70, color: "rgba(51, 154, 240, 0.08)", label: "HÚMEDO"},
+            {min: 70, max: 100, color: "rgba(34, 139, 230, 0.08)", label: "MUY HÚMEDO"}
+        ];
 
-        // Mostrar tooltip
-        const nivelTexto = (() => {
-        if (d.v < 30) return TRANSLATIONS.muy_seco || "MUY SECO";
-        if (d.v < 40) return TRANSLATIONS.seco || "SECO";
-        if (d.v < 60) return TRANSLATIONS.ideal || "IDEAL";
-        if (d.v < 70) return TRANSLATIONS.humedo || "HÚMEDO";
-        return TRANSLATIONS.muy_humedo || "MUY HÚMEDO";
-        })();
+        // Tooltip
+        d3.select("body").selectAll(".tooltip-humedad").remove();
+        const tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip-humedad")
+            .style("position", "absolute")
+            .style("background", "rgba(15, 23, 42, 0.95)")
+            .style("color", "#e2e8f0")
+            .style("padding", "12px 16px")
+            .style("border", "2px solid #4dabf7")
+            .style("border-radius", "10px")
+            .style("font-size", "13px")
+            .style("font-weight", "500")
+            .style("pointer-events", "none")
+            .style("opacity", 0)
+            .style("box-shadow", "0 8px 24px rgba(0, 0, 0, 0.3)")
+            .style("backdrop-filter", "blur(4px)")
+            .style("z-index", "9999");
 
-        tooltip
-        .html(`
-            <div style="display: flex; align-items: center; margin-bottom: 6px;">
-            <div style="width: 12px; height: 12px; background: ${d.v < 30 ? '#adb5bd' : d.v < 40 ? '#ffa94d' : d.v < 60 ? '#4dabf7' : d.v < 70 ? '#339af0' : '#228be6'}; border-radius: 50%; margin-right: 8px;"></div>
-            <strong style="font-size: 14px; color: #4dabf7;">${d.v.toFixed(1)}%</strong>
-            </div>
-            <div style="color: #94a3b8; margin-bottom: 4px; font-size: 12px;">
-            <span style="color: #00ffcc; font-weight: 600;">${nivelTexto}</span>
-            </div>
-            <div style="font-size: 11px; color: #94a3b8;">
-            ${d3.timeFormat("%H:%M:%S")(new Date(d.t))}<br>
-            ${d3.timeFormat("%d/%m/%Y")(new Date(d.t))}
-            </div>
-        `)
-        .style("left", (event.pageX + 15) + "px")
-        .style("top", (event.pageY - 80) + "px")
-        .transition()
-        .duration(200)
-        .style("opacity", 1);
-    })
-    .on("mouseout", function() {
-        focus.transition()
-        .duration(200)
-        .attr("r", 0)
-        .style("opacity", 0);
+        // Punto focal interactivo
+        const focus = g.append("circle")
+            .attr("class", "focus-point")
+            .attr("r", 0)
+            .attr("fill", "#00ffcc")
+            .attr("stroke", "#ffffff")
+            .attr("stroke-width", 2)
+            .style("filter", "drop-shadow(0 0 6px rgba(0, 255, 204, 0.8))")
+            .style("opacity", 0);
 
-        verticalLine.transition()
-        .duration(200)
-        .style("opacity", 0);
+        // Línea vertical guía
+        const verticalLine = g.append("line")
+            .attr("class", "vertical-line")
+            .attr("stroke", "rgba(255, 255, 255, 0.3)")
+            .attr("stroke-width", 1)
+            .attr("stroke-dasharray", "5,5")
+            .style("opacity", 0);
 
-        tooltip.transition()
-        .duration(200)
-        .style("opacity", 0);
-    });
+        // Línea de referencia (nivel ideal 50%)
+        const referenceLine = g.append("line")
+            .attr("class", "reference-line")
+            .attr("stroke", "rgba(255, 255, 255, 0.5)")
+            .attr("stroke-width", 1)
+            .attr("stroke-dasharray", "8,4")
+            .style("opacity", 0.6);
 
-    points.exit()
-    .transition()
-    .duration(200)
-    .attr("r", 0)
-    .remove();
+        // Variables de control
+        let data = []; // Todos los datos
+        const MAX_VISIBLE_POINTS = 15;
+        const MAX_MEMORY_POINTS = 1000;
+        let currentStartIndex = 0;
+        let isDragging = false;
+        let dragStartX = 0;
 
-    // Último valor destacado
-    const lastData = data[data.length - 1];
-    g.selectAll(".last-value-label").remove();
-    
-    if (lastData) {
-    g.append("text")
-        .attr("class", "last-value-label")
-        .attr("x", width - 10)
-        .attr("y", y(lastData.v) - 12)
-        .attr("fill", lastData.v < 30 ? '#adb5bd' : lastData.v < 40 ? '#ffa94d' : lastData.v < 60 ? '#4dabf7' : lastData.v < 70 ? '#339af0' : '#228be6')
-        .attr("font-size", "10px")
-        .attr("font-weight", "600")
-        .attr("text-anchor", "end")
-        .text(`${lastData.v.toFixed(1)}%`);
+        // Función para obtener datos visibles
+        function getVisibleData() {
+            if (data.length === 0) return [];
+            
+            const endIndex = Math.min(currentStartIndex + MAX_VISIBLE_POINTS, data.length);
+            
+            if (endIndex - currentStartIndex < MAX_VISIBLE_POINTS && data.length >= MAX_VISIBLE_POINTS) {
+                currentStartIndex = data.length - MAX_VISIBLE_POINTS;
+            }
+            
+            return data.slice(currentStartIndex, endIndex);
+        }
+
+        // Función para redibujar el gráfico
+        function redraw() {
+            const visibleData = getVisibleData();
+            if (visibleData.length === 0) return;
+
+            x.domain(d3.extent(visibleData, d => d.time));
+            
+            const minVal = Math.max(0, d3.min(visibleData, d => d.value) - 5);
+            const maxVal = Math.min(100, d3.max(visibleData, d => d.value) + 5);
+            y.domain([minVal, maxVal]);
+
+            // Zonas de humedad
+            const humZones = g.selectAll(".hum-zone").data(humZonesData);
+
+            humZones.enter()
+                .append("rect")
+                .attr("class", "hum-zone")
+                .merge(humZones)
+                .attr("x", 0)
+                .attr("width", width)
+                .attr("y", d => y(d.max))
+                .attr("height", d => y(d.min) - y(d.max))
+                .attr("fill", d => d.color)
+                .attr("rx", 2);
+
+            humZones.exit().remove();
+
+            // Actualizar línea de referencia
+            const idealLevel = 50;
+            referenceLine
+                .attr("x1", 0)
+                .attr("y1", y(idealLevel))
+                .attr("x2", width)
+                .attr("y2", y(idealLevel));
+
+            // Actualizar grid
+            grid.call(d3.axisLeft(y)
+                .ticks(6)
+                .tickSize(-width)
+                .tickFormat(""))
+                .attr("opacity", 0.15)
+                .selectAll("line")
+                .attr("stroke", "#4dabf7");
+
+            // Actualizar ejes
+            xAxisG.call(d3.axisBottom(x)
+                .ticks(Math.min(6, visibleData.length))
+                .tickFormat(d3.timeFormat("%H:%M:%S"))
+                .tickSizeOuter(0))
+                .selectAll("text")
+                .attr("fill", "#94a3b8")
+                .attr("font-size", "11px")
+                .attr("font-weight", "500");
+
+            xAxisG.selectAll("path, line")
+                .attr("stroke", "#4dabf7")
+                .attr("opacity", 0.5);
+
+            yAxisG.call(d3.axisLeft(y)
+                .ticks(6)
+                .tickFormat(d => d + " %")
+                .tickSizeOuter(0))
+                .selectAll("text")
+                .attr("fill", "#94a3b8")
+                .attr("font-size", "11px")
+                .attr("font-weight", "500")
+                .attr("dx", "-5px");
+
+            yAxisG.selectAll("path, line")
+                .attr("stroke", "#4dabf7")
+                .attr("opacity", 0.5);
+
+            yAxisG.select(".domain").attr("stroke", "none");
+
+            // Actualizar línea y área
+            path.datum(visibleData)
+                .transition()
+                .duration(300)
+                .ease(d3.easeCubicOut)
+                .attr("d", line);
+
+            areaPath.datum(visibleData)
+                .transition()
+                .duration(300)
+                .ease(d3.easeCubicOut)
+                .attr("d", area);
+
+            // Puntos de datos
+            const points = g.selectAll(".data-point")
+                .data(visibleData, d => d.id);
+
+            points.enter()
+                .append("circle")
+                .attr("class", "data-point")
+                .merge(points)
+                .attr("cx", d => x(d.time))
+                .attr("cy", d => y(d.value))
+                .attr("r", 4)
+                .attr("fill", d => {
+                    if (d.value < 30) return "#adb5bd";
+                    if (d.value < 40) return "#ffa94d";
+                    if (d.value < 60) return "#4dabf7";
+                    if (d.value < 70) return "#339af0";
+                    return "#228be6";
+                })
+                .attr("stroke", "#ffffff")
+                .attr("stroke-width", 1.5)
+                .style("opacity", 0.9)
+                .style("cursor", "pointer")
+                .on("mouseover", function(event, d) {
+                    focus
+                        .attr("cx", x(d.time))
+                        .attr("cy", y(d.value))
+                        .transition()
+                        .duration(200)
+                        .attr("r", 8)
+                        .style("opacity", 1);
+
+                    verticalLine
+                        .attr("x1", x(d.time))
+                        .attr("y1", 0)
+                        .attr("x2", x(d.time))
+                        .attr("y2", height)
+                        .transition()
+                        .duration(200)
+                        .style("opacity", 1);
+
+                    const nivelTexto = d.value < 30 ? "MUY SECO" : 
+                                     d.value < 40 ? "SECO" : 
+                                     d.value < 60 ? "IDEAL" : 
+                                     d.value < 70 ? "HÚMEDO" : "MUY HÚMEDO";
+                    const nivelColor = d.value < 30 ? "#adb5bd" : 
+                                     d.value < 40 ? "#ffa94d" : 
+                                     d.value < 60 ? "#4dabf7" : 
+                                     d.value < 70 ? "#339af0" : "#228be6";
+
+                    tooltip
+                        .html(`
+                            <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                                <div style="width: 12px; height: 12px; background: ${nivelColor}; border-radius: 50%; margin-right: 8px;"></div>
+                                <strong style="font-size: 16px; color: #4dabf7;">${d.value.toFixed(1)} %</strong>
+                            </div>
+                            <div style="color: #94a3b8; margin-bottom: 4px;">
+                                <span style="color: ${nivelColor}; font-weight: 600;">${nivelTexto}</span>
+                                <span style="margin-left: 8px; font-size: 11px;">
+                                    ${d.value >= 40 && d.value < 60 ? '✅ ' : d.value < 30 || d.value >= 70 ? '⚠️ ' : '🔵 '}
+                                </span>
+                            </div>
+                            <div style="font-size: 11px; color: #cbd5e1;">
+                                ${d3.timeFormat("%H:%M:%S")(d.time)}<br>
+                                ${d3.timeFormat("%d/%m/%Y")(d.time)}
+                            </div>
+                            ${d.value < 40 ? '<div style="margin-top: 8px; padding: 4px 8px; background: rgba(255, 169, 77, 0.1); border-radius: 4px; font-size: 10px; color: #ffa94d;">Humedad baja</div>' : 
+                              d.value >= 70 ? '<div style="margin-top: 8px; padding: 4px 8px; background: rgba(34, 139, 230, 0.1); border-radius: 4px; font-size: 10px; color: #228be6;">Humedad alta</div>' : ''}
+                        `)
+                        .style("left", (event.pageX + 15) + "px")
+                        .style("top", (event.pageY - 80) + "px")
+                        .transition()
+                        .duration(200)
+                        .style("opacity", 1);
+                })
+                .on("mouseout", function() {
+                    focus.transition()
+                        .duration(200)
+                        .attr("r", 0)
+                        .style("opacity", 0);
+
+                    verticalLine.transition()
+                        .duration(200)
+                        .style("opacity", 0);
+
+                    tooltip.transition()
+                        .duration(200)
+                        .style("opacity", 0);
+                });
+
+            points.exit()
+                .transition()
+                .duration(200)
+                .attr("r", 0)
+                .remove();
+
+            // Mostrar contador de datos
+            g.selectAll(".data-counter").remove();
+            g.append("text")
+                .attr("class", "data-counter")
+                .attr("x", width - 10)
+                .attr("y", 20)
+                .attr("fill", "#94a3b8")
+                .attr("font-size", "10px")
+                .attr("text-anchor", "end")
+                .text(`${Math.min(currentStartIndex + MAX_VISIBLE_POINTS, data.length)}/${data.length}`);
+        }
+
+        // Configurar arrastre
+        svg.on("mousedown", function(event) {
+            isDragging = true;
+            dragStartX = event.clientX;
+            svg.style("cursor", "grabbing");
+        });
+
+        svg.on("mousemove", function(event) {
+            if (!isDragging) return;
+            
+            const dragDelta = event.clientX - dragStartX;
+            const pointsToMove = Math.round(dragDelta / (width / MAX_VISIBLE_POINTS) * -1);
+            
+            if (pointsToMove !== 0) {
+                currentStartIndex += pointsToMove;
+                currentStartIndex = Math.max(0, currentStartIndex);
+                currentStartIndex = Math.min(data.length - MAX_VISIBLE_POINTS, currentStartIndex);
+                redraw();
+                dragStartX = event.clientX;
+            }
+        });
+
+        svg.on("mouseup", function() {
+            isDragging = false;
+            svg.style("cursor", "grab");
+        });
+
+        svg.on("mouseleave", function() {
+            isDragging = false;
+            svg.style("cursor", "default");
+        });
+
+        svg.style("cursor", "grab");
+
+        // Función para agregar nuevo dato
+        function addData(value, timestampStr) {
+            const time = new Date(timestampStr || new Date());
+            const id = `hum-${time.getTime()}-${Math.random()}`;
+            
+            data.push({
+                id: id,
+                time: time,
+                value: value
+            });
+            
+            if (data.length > MAX_MEMORY_POINTS) {
+                data = data.slice(data.length - MAX_MEMORY_POINTS);
+                if (currentStartIndex > data.length - MAX_VISIBLE_POINTS) {
+                    currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
+                }
+            }
+            
+            const visibleData = getVisibleData();
+            if (visibleData.length > 0 && 
+                visibleData[visibleData.length - 1].id === data[data.length - 2]?.id) {
+                currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
+            }
+            
+            redraw();
+        }
+
+        // Función para cargar datos históricos
+        async function loadHistoricalData() {
+            try {
+                const response = await fetch('/api/humedad/');
+                if (!response.ok) return;
+                
+                const apiData = await response.json();
+                if (apiData && apiData.length > 0) {
+                    // Convertir datos de la API usando valor y fecha_hora
+                    const formattedData = apiData.map((item) => ({
+                        id: `db-${item.id}`,
+                        time: new Date(item.fecha_hora),
+                        value: parseFloat(item.valor)
+                    })).filter(item => !isNaN(item.time.getTime()) && !isNaN(item.value));
+                    
+                    if (formattedData.length > 0) {
+                        // Ordenar por fecha (más antiguo primero)
+                        formattedData.sort((a, b) => a.time - b.time);
+                        
+                        data = formattedData;
+                        currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
+                        redraw();
+                        
+                        // Actualizar gauge con el último valor
+                        if (data.length > 0 && window.gaugeHumInstance) {
+                            const lastValue = data[data.length - 1].value;
+                            window.gaugeHumInstance.update(lastValue);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('No se pudieron cargar datos históricos de humedad:', error);
+            }
+        }
+
+        // Cargar datos históricos al inicio
+        loadHistoricalData();
+
+        return {
+            push: function(value, timestampStr) {
+                addData(value, timestampStr);
+            },
+            reset: function() {
+                data = [];
+                currentStartIndex = 0;
+                path.datum([]).attr("d", line);
+                areaPath.datum([]).attr("d", area);
+                
+                g.selectAll(".data-point").remove();
+                g.selectAll(".hum-zone").remove();
+                g.selectAll(".data-counter").remove();
+                
+                focus.attr("r", 0).style("opacity", 0);
+                verticalLine.style("opacity", 0);
+                tooltip.style("opacity", 0);
+            },
+            setData: function(newData) {
+                data = newData.map((d, i) => ({
+                    id: `data-${i}`,
+                    time: new Date(d.t),
+                    value: d.v
+                }));
+                currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
+                redraw();
+            },
+            // Función pública para regresar al inicio
+            goHome: function() {
+                currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
+                redraw();
+            }
+        };
     }
-}
 
-return {
-    push: function(value, timestampStr) {
-    const t = timestampStr || new Date().toISOString();
-    data.push({ v: value, t: t });
-    redraw();
-    },
-    reset: function() {
-    data = [];
-    path.datum(data).attr("d", line);
-    areaPath.datum(data).attr("d", area);
-    
-    // Limpiar elementos
-    g.selectAll(".data-point").remove();
-    g.selectAll(".hum-zone").remove();
-    g.selectAll(".last-value-label").remove();
-    
-    focus.attr("r", 0).style("opacity", 0);
-    verticalLine.style("opacity", 0);
-    tooltip.style("opacity", 0);
-    },
-    setData: function(newData) {
-    data = newData;
-    redraw();
-    }
-};
-}
+    // ============== INSTANCIAS ==============
+    const gauge = gaugeHumedad("#gauge-humedad", 50.0);
+    const series = lineChartHumedad("#serie-humedad");
 
-// ============== INSTANCIAS ==============
-const gauge = gaugeHumedad("#gauge-humedad", 50.0);
-const series = lineChartHumedad("#serie-humedad");
+    // ================= WEBSOCKET =================
+    const socket = new WebSocket("ws://" + window.location.host + "/ws/humedad/");
 
-// ================= WEBSOCKET =================
-const socket = new WebSocket("ws://" + window.location.host + "/ws/humedad/");
+    socket.onmessage = function(e) {
+        const mensaje = JSON.parse(e.data);
+        const valor = mensaje.valor;
+        const fecha = mensaje.fecha_hora;
 
-socket.onmessage = function(e) {
-const mensaje = JSON.parse(e.data);
-const valor = mensaje.valor;
-const fecha = mensaje.fecha_hora;
+        gauge.update(valor);
+        series.push(valor, fecha);
+    };
 
-gauge.update(valor);
-series.push(valor, fecha);
-};
+    socket.onopen = function() {
+        console.log("WebSocket Humedad conectado");
+    };
 
-socket.onopen = function() {
-console.log("WebSocket Humedad conectado");
-};
+    socket.onerror = function() {
+        console.error("Error en WebSocket Humedad");
+    };
 
-socket.onerror = function() {
-console.error("Error en WebSocket Humedad");
-};
-
-socket.onclose = function() {
-console.warn("WebSocket Humedad desconectado");
-};
+    socket.onclose = function() {
+        console.warn("WebSocket Humedad desconectado");
+        setTimeout(() => {
+            location.reload();
+        }, 5000);
+    };
 });

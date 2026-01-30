@@ -8,8 +8,8 @@ function gaugeO2(containerId, initial) {
 
     const width = 300;
     const height = 520;
-    const min = 18.0;
-    const max = 23.0;
+    const min = 0.0;
+    const max = 100.0;
 
     const svg = container.append("svg")
         .attr("width", width)
@@ -35,7 +35,7 @@ function gaugeO2(containerId, initial) {
         .text("O₂ (%)");
 
     // outer frame
-    const frameX = 60;
+    const frameX = 85;
     const frameY = 70;
     const frameW = 180;
     const frameH = 360;
@@ -52,6 +52,29 @@ function gaugeO2(containerId, initial) {
 
     // fill rect
     const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
+    // ===================== LÍNEAS DE NIVEL NUMÉRICAS CADA 20% =====================
+    for (let i = 0; i <= 100; i += 25) {
+        const y = scale(i);
+        
+        // Línea horizontal de nivel
+        svg.append("line")
+            .attr("x1", frameX - 10)
+            .attr("y1", y)
+            .attr("x2", frameX)
+            .attr("y2", y)
+            .attr("stroke", "#ffffff")
+            .attr("stroke-width", 1.5);
+        
+        // Texto de valor
+        svg.append("text")
+            .attr("x", frameX - 20)
+            .attr("y", y + 4)
+            .attr("fill", "#ffffff")
+            .attr("font-size", "28px")
+            .attr("font-weight", "500")
+            .attr("text-anchor", "end")
+            .text(i + "%");
+    }
 
     const fillRect = svg.append("rect")
         .attr("x", frameX)
@@ -82,13 +105,13 @@ function gaugeO2(containerId, initial) {
 
     // color overlay depending on ranges
     function colorFor(v) {
-        if (v >= 21.0) return greenPalette.light;   // excelente (verde claro)
+        if (v >= 21.5) return greenPalette.light;   // excelente (verde claro)
         if (v >= 19.5) return greenPalette.amber;   // acceptable (ámbar)
         return greenPalette.red;                     // critico (rojo)
     }
 
     function getQualityText(v) {
-        if (v >= 21.0) return TRANSLATIONS.nivel_optimo || "NIVEL ÓPTIMO";
+        if (v >= 21.5) return TRANSLATIONS.nivel_optimo || "NIVEL ÓPTIMO";
         if (v >= 19.5) return TRANSLATIONS.nivel_aceptable || "NIVEL ACEPTABLE";
         return "¡NIVEL BAJO!";
     }

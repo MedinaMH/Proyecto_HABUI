@@ -4,8 +4,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from HABUI_APP.models import Recurso, RecursoHumedad
-
+from HABUI_APP.models import RecursoHumedad
 
 class Command(BaseCommand):
     help = "Simula lecturas del sensor de Humedad (%) y envía datos por WebSocket."
@@ -24,8 +23,8 @@ class Command(BaseCommand):
                             help='Tiempo entre lecturas (segundos)')
         parser.add_argument('--count', type=int, default=0,
                             help='Número de lecturas (0 = infinito)')
-        parser.add_argument('--recurso-id', type=int, required=False,
-                            help='ID del recurso tipo humedad (opcional)')
+        parser.add_argument('--recurso-id', type=int, required=True,
+                            help='ID del recurso tipo humedad')
         parser.add_argument('--modo', type=str, default='normal',
                             choices=['normal', 'seco', 'humedo', 'estable'],
                             help='Modo de simulación: normal, seco, humedo, estable')
@@ -38,18 +37,8 @@ class Command(BaseCommand):
 
         channel_layer = get_channel_layer()
 
-        # Obtener recurso Humedad
-        # if recurso_id:
-        #     recurso = Recurso.objects.filter(id=recurso_id, tipo='humedad').first()
-        # else:
-        #     recurso = Recurso.objects.filter(tipo='humedad').first()
-
-        # if not recurso:
-        #     self.stdout.write(self.style.ERROR("❌ No existe Recurso tipo 'humedad'."))
-        #     return
-        # self.stdout.write(f"📊 Recurso asociado: {recurso.nombre}")
         self.stdout.write(self.style.SUCCESS(f"💧 Iniciando simulador Humedad (modo: {modo})..."))
-        
+        self.stdout.write(f"📊 Recurso ID: {recurso_id}")
 
         # Ajustar parámetros según el modo
         if modo == 'estable':
@@ -99,13 +88,24 @@ class Command(BaseCommand):
                 
                 valor = round(current_hum, 2)
                 timestamp = datetime.now()
-                timestamp_str = timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
+                # ------------ GUARDAR EN BD ------------
+                try:
+                    # Crear registro en RecursoHumedad
+                    reading = RecursoHumedad.objects.create(
+                        recurso_id=recurso_id,
+                        valor=valor
+                    )
+                    
+                    self.stdout.write(f"[{i}] Registro Humedad guardado en BD - ID: {reading.id}")
+                    
+                except Exception as e:
+                    self.stdout.write(self.style.ERROR(f"Error al guardar en BD: {str(e)}"))
+
+                timestamp_str = timestamp.isoformat()
                 data = {
                     "valor": valor,
                     "fecha_hora": timestamp_str,
-                    # "recurso_id": recurso.id,
-                    # "recurso_nombre": recurso.nombre,
                     "unidad": "%",
                     "estado": self._determinar_estado(valor)
                 }
@@ -116,17 +116,6 @@ class Command(BaseCommand):
                     {"type": "enviar_dato", "data": data}
                 )
 
-                # Guardar en base de datos
-                # try:
-                #     RecursoHumedad.objects.create(
-                #         recurso=recurso,
-                #         valor=valor,
-                #         fecha_hora=timestamp
-                #     )
-                #     self.stdout.write(f"[{i}] 💧 {valor}% | Estado: {data['estado']} | ✓")
-                # except Exception as e:
-                #     self.stdout.write(f"[{i}] ⚠️  {valor}% | Error: {str(e)}")
-                
                 self.stdout.write(f"[{i}] Dato enviado: {data}")
                 i += 1
                 time.sleep(intervalo)

@@ -35,5 +35,8 @@ urlpatterns = [
     path('api/alimentos/obtener-configuracion/', views.api_alimentos_obtener_configuracion, name='api_alimentos_obtener_configuracion'),
     #---------------------------------------------
     path('temperatura_rems', views.panel_temperatura_rems, name='temperatura_rems'),
+    path('api/temperatura/', views.api_temperatura_get, name='api_temperatura_get'),# GET
     path('humedad_rems', views.panel_humedad_rems, name='humedad_rems'),
+    path('api/humedad/', views.api_humedad_get, name='api_humedad_get'),# GET
+
 ]

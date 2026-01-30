@@ -15,6 +15,7 @@ import pandas as pd
 import plotly.express as px
 # import json
 from .models import RecursoAgua, RecursoCO2, RecursoOxigeno
+from .import models, serializers
 # Create your views here.
 
 def panel_principal(request):
@@ -616,12 +617,25 @@ def api_alimentos_obtener_configuracion(request):
         )
 #----------------Fin recurso alimentos----------------------------
 
+#=============== Temperatura ===============
 def panel_temperatura_rems(request):
     return render(request, 'REMS/panel_temperatura.html')
 
+@api_view(['GET'])
+def api_temperatura_get(request):
+    datos = models.RecursoTemperatura.objects.all().order_by('-fecha_hora')[:1000]
+    serializer = serializers.RecursoTemperaturaSerializer(datos, many=True)
+    return Response(serializer.data)
+
+#=============== Humedad ===============
 def panel_humedad_rems(request):
     return render(request, 'REMS/panel_humedad.html')
 
+@api_view(['GET'])
+def api_humedad_get(request):
+    datos = models.RecursoHumedad.objects.all().order_by('-fecha_hora')[:1000]
+    serializer = serializers.RecursoHumedadSerializer(datos, many=True)
+    return Response(serializer.data)
 
 
 #-------------VISTAS DEL MODULO DE CONTROL------------------------
