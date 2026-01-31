@@ -1,5 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import RecursoAguaSerializer, RecursoAlimentosSerializer, ConsumoAlimentosSerializer, RecursoCO2Serializer, RecursoO2Serializer
@@ -14,7 +15,7 @@ import altair as alt
 import pandas as pd
 import plotly.express as px
 # import json
-from .models import RecursoAgua, RecursoCO2, RecursoOxigeno
+from .models import RecursoAgua, RecursoCO2, RecursoOxigeno, Recurso
 from .import models, serializers
 # Create your views here.
 
@@ -33,12 +34,14 @@ def panel_agua_rems(request, recurso_id=None):
     return render(request, 'REMS/panel_agua.html', contexto)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def api_agua_unity(request):
     datos = RecursoAgua.objects.all().order_by('-fecha_hora')[:1000]
     serializer = RecursoAguaSerializer(datos, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def api_agua_post(request):
     serializer = RecursoAguaSerializer(data=request.data)
     if serializer.is_valid():
@@ -52,6 +55,7 @@ def panel_oxigeno_rems(request):
     return render(request, 'REMS/panel_oxigeno.html')
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def api_o2_get(request):
     datos = RecursoOxigeno.objects.all().order_by('-fecha_hora')[:1000]
     serializer = RecursoO2Serializer(datos, many=True)
@@ -62,6 +66,7 @@ def panel_co2(request):
     return render(request, 'REMS/panel_CO2.html')
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def api_co2_get(request):
     datos = RecursoCO2.objects.all().order_by('-fecha_hora')[:1000]
     serializer = RecursoCO2Serializer(datos, many=True)
@@ -73,27 +78,34 @@ def panel_alimentos_rems(request, recurso_id=None):
     return render(request, 'REMS/panel_alimentos.html', contexto)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def api_alimentos_estado(request):
-    """
-    Obtiene el estado actual de los alimentos
-    """
     try:
-        recurso_alimentos = RecursoAlimentos.objects.first()
-        if not recurso_alimentos:
-            return Response(
-                {'error': 'No se encontró recurso de alimentos'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        
-        serializer = RecursoAlimentosSerializer(recurso_alimentos)
-        return Response(serializer.data)
-    except Exception as e:
-        return Response(
-            {'error': str(e)},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        recurso = Recurso.objects.first()
+
+        if not recurso:
+            return Response({'error': 'No existe recurso base'}, status=404)
+
+        recurso_alimentos, _ = RecursoAlimentos.objects.get_or_create(
+            recurso=recurso,
+            defaults={
+                'porciones_iniciales': 112,
+                'porciones_actuales': 112,
+                'num_tripulantes': 4,
+                'porciones_por_persona_dia': 4,
+                'duracion_mision_dias': 7
+            }
         )
 
+        serializer = RecursoAlimentosSerializer(recurso_alimentos)
+        return Response(serializer.data)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def api_alimentos_consumos_recientes(request):
     """
     Obtiene los consumos más recientes
@@ -109,6 +121,7 @@ def api_alimentos_consumos_recientes(request):
         )
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def api_alimentos_consumos_diarios(request):
     """
     Obtiene el resumen de consumo del día actual
@@ -158,6 +171,7 @@ def api_alimentos_consumos_diarios(request):
         )
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def api_alimentos_registrar_consumo(request):
     """
     Registra un nuevo consumo de alimentos y actualiza las porciones disponibles
@@ -239,6 +253,7 @@ def api_alimentos_registrar_consumo(request):
         )
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def api_alimentos_reset(request):
     """
     Resetea las porciones disponibles a su valor inicial
@@ -273,6 +288,7 @@ def api_alimentos_reset(request):
 # ---------- Funciones de Administración para Alimentos ----------
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def api_alimentos_configurar_tripulacion(request):
     """
     Configura el número de tripulantes para la misión
@@ -325,6 +341,7 @@ def api_alimentos_configurar_tripulacion(request):
         )
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def api_alimentos_configurar_suministros(request):
     """
     Configura las porciones iniciales totales
@@ -387,6 +404,7 @@ def api_alimentos_configurar_suministros(request):
         )
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def api_alimentos_configurar_mision(request):
     """
     Configura todos los parámetros de la misión
@@ -452,6 +470,7 @@ def api_alimentos_configurar_mision(request):
         )
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def api_alimentos_borrar_registros(request):
     """
     Borra todos los registros de consumo
@@ -486,6 +505,7 @@ def api_alimentos_borrar_registros(request):
         )
 
 @api_view(['DELETE'])
+@permission_classes([AllowAny])
 def api_alimentos_eliminar_registro(request, registro_id):
     """
     Elimina un registro específico de consumo y restaura las porciones
@@ -528,6 +548,7 @@ def api_alimentos_eliminar_registro(request, registro_id):
         )
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def api_alimentos_reiniciar_completo(request):
     """
     Reinicia completamente el sistema: suministros, registros y configuración
@@ -581,6 +602,7 @@ def api_alimentos_reiniciar_completo(request):
         )
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def api_alimentos_obtener_configuracion(request):
     """
     Obtiene la configuración actual del sistema
@@ -622,6 +644,7 @@ def panel_temperatura_rems(request):
     return render(request, 'REMS/panel_temperatura.html')
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def api_temperatura_get(request):
     datos = models.RecursoTemperatura.objects.all().order_by('-fecha_hora')[:1000]
     serializer = serializers.RecursoTemperaturaSerializer(datos, many=True)
@@ -632,6 +655,7 @@ def panel_humedad_rems(request):
     return render(request, 'REMS/panel_humedad.html')
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def api_humedad_get(request):
     datos = models.RecursoHumedad.objects.all().order_by('-fecha_hora')[:1000]
     serializer = serializers.RecursoHumedadSerializer(datos, many=True)

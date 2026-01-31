@@ -61,15 +61,6 @@ class RecursoHumedad(models.Model):
 class RecursoAlimentos(models.Model):
     recurso = models.OneToOneField(Recurso, on_delete=models.CASCADE, related_name='alimentos')
     # Porciones totales al inicio de la misión
-    porciones_iniciales = models.PositiveIntegerField()
-    # Porciones actualmente disponibles (irán disminuyendo)
-    porciones_actuales = models.PositiveIntegerField()
-    fecha_registro = models.DateTimeField(auto_now_add=True)
-
-# ALIMENTOS
-class RecursoAlimentos(models.Model):
-    recurso = models.OneToOneField(Recurso, on_delete=models.CASCADE, related_name='alimentos')
-    # Porciones totales al inicio de la misión
     porciones_iniciales = models.PositiveIntegerField(default=112, validators=[MinValueValidator(1)])
     # Porciones actualmente disponibles (irán disminuyendo)
     porciones_actuales = models.PositiveIntegerField(default=112, validators=[MinValueValidator(0)])

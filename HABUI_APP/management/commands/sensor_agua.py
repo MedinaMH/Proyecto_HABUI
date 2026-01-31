@@ -42,12 +42,18 @@ class Command(BaseCommand):
         max_count = options['count']
         modo = options['modo']
 
-        try:
-            recurso = Recurso.objects.get(pk=recurso_id, tipo='agua')
-        except Recurso.DoesNotExist:
-            self.stderr.write(self.style.ERROR(f"Recurso agua id={recurso_id} no existe o no es tipo 'agua'."))
-            return
+        # ------------------ AUTO-CREAR / OBTENER RECURSO ------------------
+        recurso, creado = Recurso.objects.get_or_create(
+            tipo='agua',
+            defaults={'nombre': 'Agua'}
+        )
 
+        if creado:
+            self.stdout.write(self.style.SUCCESS("Recurso 'Agua Cabina' creado automáticamente."))
+        else:
+            self.stdout.write(self.style.SUCCESS("Recurso 'Agua Cabina' ya existe."))
+
+        self.stdout.write(self.style.SUCCESS("Iniciando simulador Agua..."))
         channel_layer = get_channel_layer()
 
         # -------- INICIALIZACIÓN SEGÚN MODO --------

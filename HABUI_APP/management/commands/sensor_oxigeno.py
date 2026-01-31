@@ -31,18 +31,18 @@ class Command(BaseCommand):
 
         channel_layer = get_channel_layer()
 
-        # Obtener recurso O2
-        # if recurso_id:
-        #     recurso = Recurso.objects.filter(id=recurso_id, tipo='oxigeno').first()
-        # else:
-        #     recurso = Recurso.objects.filter(tipo='oxigeno').first()
+# ------------------ AUTO-CREAR / OBTENER RECURSO ------------------
+        recurso, creado = Recurso.objects.get_or_create(
+            tipo='oxigeno',
+            defaults={'nombre': 'Oxígeno'}
+        )
 
-        # if not recurso:
-        #     self.stdout.write(self.style.ERROR("❌ No existe Recurso tipo 'oxigeno'."))
-        #     return
+        if creado:
+            self.stdout.write(self.style.SUCCESS("Recurso 'Oxígeno Cabina' creado automáticamente."))
+        else:
+            self.stdout.write(self.style.SUCCESS("Recurso 'Oxígeno Cabina' ya existe."))
 
         self.stdout.write(self.style.SUCCESS("Iniciando simulador O₂..."))
-
         i = 1
         try:
             while True:
