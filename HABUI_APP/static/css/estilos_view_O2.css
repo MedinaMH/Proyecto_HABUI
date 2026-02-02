@@ -1,4 +1,3 @@
-/* Reutilizar los mismos estilos del monitoreo de CO₂ */
 .monitor-container {
 display: flex;
 flex-direction: column;
@@ -117,6 +116,9 @@ border: 2px solid #1e293b;
 border-radius: 16px;
 padding: 25px;
 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+/* width: 110%;
+min-height: 200px; */
+height: auto;
 }
 
 .reference-title-o2 {
@@ -148,16 +150,20 @@ transform: translateY(-3px);
 box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Actualización de colores según la especificación */
 .reference-item-o2.low {
-border-left-color: #f87171;
+border-left-color: #ef4444; /* Rojo - Estado Crítico */
+background: rgba(239, 68, 68, 0.05); /* Fondo rojo muy claro */
 }
 
 .reference-item-o2.normal {
-border-left-color: #4dabf7;
+border-left-color: #fbbf24; /* Amarillo - Advertencia */
+background: rgba(251, 191, 36, 0.05); /* Fondo amarillo muy claro */
 }
 
 .reference-item-o2.optimal {
-border-left-color: #10b981;
+border-left-color: #10b981; /* Verde - Óptimo (se mantiene igual) */
+background: rgba(16, 185, 129, 0.05); /* Fondo verde muy claro */
 }
 
 .reference-header-o2 {
@@ -178,19 +184,20 @@ font-size: 18px;
 font-weight: 600;
 }
 
+/* Actualización de íconos según la especificación */
 .reference-item-o2.low .reference-icon-o2 {
-background: rgba(248, 113, 113, 0.2);
-color: #f87171;
+background: rgba(239, 68, 68, 0.2);
+color: #ef4444; /* Rojo - Estado Crítico */
 }
 
 .reference-item-o2.normal .reference-icon-o2 {
-background: rgba(77, 171, 247, 0.2);
-color: #4dabf7;
+background: rgba(251, 191, 36, 0.2);
+color: #fbbf24; /* Amarillo - Advertencia */
 }
 
 .reference-item-o2.optimal .reference-icon-o2 {
 background: rgba(16, 185, 129, 0.2);
-color: #10b981;
+color: #10b981; /* Verde - Óptimo */
 }
 
 .reference-range-o2 {
@@ -206,16 +213,17 @@ font-weight: 600;
 margin-bottom: 8px;
 }
 
+/* Actualización de colores de etiquetas */
 .reference-item-o2.low .reference-label-o2 {
-color: #f87171;
+color: #ef4444; /* Rojo - Estado Crítico */
 }
 
 .reference-item-o2.normal .reference-label-o2 {
-color: #4dabf7;
+color: #fbbf24; /* Amarillo - Advertencia */
 }
 
 .reference-item-o2.optimal .reference-label-o2 {
-color: #10b981;
+color: #10b981; /* Verde - Óptimo */
 }
 
 .reference-description-o2 {
@@ -234,16 +242,17 @@ color: #cbd5e1;
 border-left: 3px solid;
 }
 
+/* Actualización de bordes de recomendaciones */
 .reference-item-o2.low .reference-recommendation-o2 {
-border-left-color: #f87171;
+border-left-color: #ef4444; /* Rojo - Estado Crítico */
 }
 
 .reference-item-o2.normal .reference-recommendation-o2 {
-border-left-color: #4dabf7;
+border-left-color: #fbbf24; /* Amarillo - Advertencia */
 }
 
 .reference-item-o2.optimal .reference-recommendation-o2 {
-border-left-color: #10b981;
+border-left-color: #10b981; /* Verde - Óptimo */
 }
 
 /* Asegurar que los tooltips estén por encima de todo */
