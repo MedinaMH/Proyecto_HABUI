@@ -23,6 +23,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("text-anchor", "middle")
             .text("HUMEDAD (%)");
 
+        // Paleta de colores según el semáforo de 3 estados
+        const humPalette = {
+            critico: "#ff6b6b",      // Rojo para CRÍTICO (<30% o >70%)
+            advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA (30-40% o 60-70%)
+            optimo: "#69db7c"        // Verde para ÓPTIMO (40-60%)
+        };
+
         // outer frame
         const frameX = 85;
         const frameY = 70;
@@ -36,13 +43,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("height", frameH)
             .attr("rx", 14)
             .attr("fill", "#0f1724")
-            .attr("stroke", "#4dabf7")
+            .attr("stroke", humPalette.critico)
             .attr("stroke-width", 3);
 
         // fill rect
         const min = 0;
         const max = 100;
         const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
+        
         // ===================== LÍNEAS DE NIVEL =====================
         for (let i = 0; i <= 100; i += 25) {
             const y = scale(i);
@@ -72,13 +80,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("width", frameW)
             .attr("y", scale(initial))
             .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
-            .attr("fill", "#4dabf7")
+            .attr("fill", humPalette.critico)
             .attr("rx", 12);
 
         const valueText = svg.append("text")
             .attr("x", width/2+30)
             .attr("y", frameY + frameH + 50)
-            .attr("fill", "#4dabf7")
+            .attr("fill", humPalette.critico)
             .attr("font-size", "40px")
             .attr("font-weight", "700")
             .attr("text-anchor", "middle")
@@ -88,27 +96,30 @@ document.addEventListener("DOMContentLoaded", function () {
         const levelText = svg.append("text")
             .attr("x", width/2+30)
             .attr("y", frameY + frameH + 85)
-            .attr("fill", "#4dabf7")
+            .attr("fill", humPalette.critico)
             .attr("font-size", "25px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text(getNivelTexto(initial));
 
-        // color overlay depending on ranges
         function colorFor(v) {
-            if (v < 30) return "#adb5bd";        // Muy seco (gris)
-            if (v < 40) return "#ffa94d";        // Seco (naranja)
-            if (v < 60) return "#4dabf7";        // Ideal (azul)
-            if (v < 70) return "#339af0";        // Húmedo (azul medio)
-            return "#228be6";                    // Muy húmedo (azul oscuro)
+            if (v < 30 || v > 70) return humPalette.critico;        // CRÍTICO (rojo)
+            if ((v >= 30 && v < 40) || (v >= 60 && v <= 70)) return humPalette.advertencia; // ADVERTENCIA (amarillo)
+            return humPalette.optimo;                                // ÓPTIMO (verde)
         }
 
         function getNivelTexto(v) {
-            if (v < 30) return "MUY SECO";
-            if (v < 40) return "SECO";
-            if (v < 60) return "IDEAL";
-            if (v < 70) return "HÚMEDO";
-            return "MUY HÚMEDO";
+            if (v < 30 || v > 70) return "CRÍTICO";
+            if ((v >= 30 && v < 40) || (v >= 60 && v <= 70)) return "ADVERTENCIA";
+            return "ÓPTIMO";
+        }
+
+        function getDescripcionNivel(v) {
+            if (v < 30) return "Irritación respiratoria por sequedad extrema";
+            if (v < 40) return "Riesgo de sequedad respiratoria";
+            if (v < 60) return "Minimiza patógenos, maximiza confort respiratorio";
+            if (v <= 70) return "Riesgo de proliferación microbiana";
+            return "Riesgo de crecimiento de moho e irritación respiratoria";
         }
 
         // Estadísticas
@@ -126,7 +137,9 @@ document.addEventListener("DOMContentLoaded", function () {
             stats.max = Math.max(stats.max, newVal);
             stats.history.push({
                 value: newVal,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                nivel: getNivelTexto(newVal),
+                color: colorFor(newVal)
             });
             
             // Mantener solo los últimos 100 valores en el historial
@@ -154,8 +167,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     
                     // Extraer el valor de Humedad - campo "valor"
                     let ultimoValor = parseFloat(ultimoDato.valor);
-                    console.log('Último dato de Humedad encontrado:', ultimoValor.toFixed(1) + ' %', 
-                            'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
+                    const nivel = getNivelTexto(ultimoValor);
+                    console.log('Último dato de Humedad encontrado:', 
+                        ultimoValor.toFixed(1) + ' %', 
+                        'Nivel:', nivel,
+                        'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
                     
                     // Actualizar el gauge con el último valor de la BD
                     actualizarGauge(ultimoValor);
@@ -197,7 +213,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             id: dato.id,
                             valor: valor,
                             fecha: dato.fecha_hora || dato.timestamp,
-                            nivel: getNivelTexto(valor)
+                            nivel: getNivelTexto(valor),
+                            estado: getNivelTexto(valor).toLowerCase(),
+                            color: colorFor(valor),
+                            descripcion: getDescripcionNivel(valor)
                         };
                     }).filter(dato => dato !== null);
                     
@@ -253,12 +272,14 @@ document.addEventListener("DOMContentLoaded", function () {
             actualizar: actualizarGauge,
             obtenerColorSegunValor: colorFor,
             obtenerNivelTexto: getNivelTexto,
+            obtenerDescripcionNivel: getDescripcionNivel,
             // Obtener estadísticas
             getStats: function() {
                 return {
                     ...stats,
                     nivelActual: getNivelTexto(stats.current),
-                    colorActual: colorFor(stats.current)
+                    colorActual: colorFor(stats.current),
+                    descripcionActual: getDescripcionNivel(stats.current)
                 };
             },
             // Resetear estadísticas
@@ -286,9 +307,9 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("width", outerW)
             .attr("height", outerH)
             .style("background", "#0f172a")
-            .style("border", "3px solid #4dabf7")
+            .style("border", "3px solid #ff6b6b")
             .style("border-radius", "12px")
-            .style("box-shadow", "0 4px 20px rgba(77, 171, 247, 0.15)");
+            .style("box-shadow", "0 4px 20px rgba(255, 107, 107, 0.15)");
 
         const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -309,9 +330,9 @@ document.addEventListener("DOMContentLoaded", function () {
             .style("position", "absolute")
             .style("top", "12px")
             .style("right", "12px")
-            .style("background", "rgba(77, 171, 247, 0.2)")
-            .style("color", "#4dabf7")
-            .style("border", "1px solid #4dabf7")
+            .style("background", "rgba(255, 107, 107, 0.2)")
+            .style("color", "#ff6b6b")
+            .style("border", "1px solid #ff6b6b")
             .style("border-radius", "6px")
             .style("padding", "8px 12px")
             .style("cursor", "pointer")
@@ -320,14 +341,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .html('<i class="bi bi-house-door"></i>')
             .on("mouseover", function() {
                 d3.select(this)
-                    .style("background", "#4dabf7")
+                    .style("background", "#ff6b6b")
                     .style("color", "#0f172a")
                     .style("transform", "scale(1.05)");
             })
             .on("mouseout", function() {
                 d3.select(this)
-                    .style("background", "rgba(77, 171, 247, 0.2)")
-                    .style("color", "#4dabf7")
+                    .style("background", "rgba(255, 107, 107, 0.2)")
+                    .style("color", "#ff6b6b")
                     .style("transform", "scale(1)");
             })
             .on("click", function() {
@@ -337,19 +358,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 // Efecto visual de click
                 d3.select(this)
-                    .style("background", "#339af0")
+                    .style("background", "#ff5252")
                     .style("color", "#0f172a");
                 
                 setTimeout(() => {
                     d3.select(this)
-                        .style("background", "rgba(77, 171, 247, 0.2)")
-                        .style("color", "#4dabf7");
+                        .style("background", "rgba(255, 107, 107, 0.2)")
+                        .style("color", "#ff6b6b");
                 }, 300);
             });
 
         // Scales
         const x = d3.scaleTime().range([0, width]);
         const y = d3.scaleLinear().range([height, 0]);
+
+        // Paleta de colores para humedad según el semáforo
+        const humColors = {
+            critico: "#ff6b6b",      // Rojo para CRÍTICO
+            advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA
+            optimo: "#69db7c"        // Verde para ÓPTIMO
+        };
 
         // Gradiente para el área
         const gradient = svg.append("defs")
@@ -360,16 +388,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         gradient.append("stop")
             .attr("offset", "0%")
-            .attr("stop-color", "rgba(77, 171, 247, 0.4)")
+            .attr("stop-color", "rgba(255, 107, 107, 0.4)")
             .attr("stop-opacity", 0.5);
 
         gradient.append("stop")
             .attr("offset", "80%")
-            .attr("stop-color", "rgba(77, 171, 247, 0.1)");
+            .attr("stop-color", "rgba(255, 107, 107, 0.1)");
 
         gradient.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", "rgba(77, 171, 247, 0.05)");
+            .attr("stop-color", "rgba(255, 107, 107, 0.05)");
 
         // Gradiente para la línea
         const lineGradient = svg.append("defs")
@@ -380,11 +408,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         lineGradient.append("stop")
             .attr("offset", "0%")
-            .attr("stop-color", "#4dabf7");
+            .attr("stop-color", "#ff6b6b");
 
         lineGradient.append("stop")
             .attr("offset", "100%")
-            .attr("stop-color", "#00e5ff");
+            .attr("stop-color", "#ff8787");
 
         // Generadores de línea y área
         const line = d3.line()
@@ -414,7 +442,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("fill", "none")
             .attr("stroke", "url(#hum-line-gradient)")
             .attr("stroke-width", 3.5)
-            .style("filter", "drop-shadow(0 0 8px rgba(77, 171, 247, 0.5))");
+            .style("filter", "drop-shadow(0 0 8px rgba(255, 107, 107, 0.5))");
 
         // Ejes
         const xAxisG = g.append("g")
@@ -431,7 +459,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("transform", "rotate(-90)")
             .attr("x", -height/2)
             .attr("y", -68)
-            .attr("fill", "#4dabf7")
+            .attr("fill", "#ff6b6b")
             .attr("font-size", "14px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
@@ -440,19 +468,19 @@ document.addEventListener("DOMContentLoaded", function () {
         g.append("text")
             .attr("x", width/2)
             .attr("y", height + 40)
-            .attr("fill", "#4dabf7")
+            .attr("fill", "#ff6b6b")
             .attr("font-size", "14px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text("Tiempo");
 
-        // Zonas de humedad en el fondo
+        // Zonas de humedad en el fondo según el semáforo
         const humZonesData = [
-            {min: 0, max: 30, color: "rgba(173, 181, 189, 0.08)", label: "MUY SECO"},
-            {min: 30, max: 40, color: "rgba(255, 169, 77, 0.08)", label: "SECO"},
-            {min: 40, max: 60, color: "rgba(77, 171, 247, 0.08)", label: "IDEAL"},
-            {min: 60, max: 70, color: "rgba(51, 154, 240, 0.08)", label: "HÚMEDO"},
-            {min: 70, max: 100, color: "rgba(34, 139, 230, 0.08)", label: "MUY HÚMEDO"}
+            {min: 0, max: 30, color: "rgba(255, 107, 107, 0.08)", label: "CRÍTICO", emoji: "⚠️"},
+            {min: 30, max: 40, color: "rgba(255, 212, 59, 0.08)", label: "ADVERTENCIA", emoji: "⚠️"},
+            {min: 40, max: 60, color: "rgba(105, 219, 124, 0.08)", label: "ÓPTIMO", emoji: "✅"},
+            {min: 60, max: 70, color: "rgba(255, 212, 59, 0.08)", label: "ADVERTENCIA", emoji: "⚠️"},
+            {min: 70, max: 100, color: "rgba(255, 107, 107, 0.08)", label: "CRÍTICO", emoji: "⚠️"}
         ];
 
         // Tooltip
@@ -463,7 +491,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .style("background", "rgba(15, 23, 42, 0.95)")
             .style("color", "#e2e8f0")
             .style("padding", "12px 16px")
-            .style("border", "2px solid #4dabf7")
+            .style("border", "2px solid #ff6b6b")
             .style("border-radius", "10px")
             .style("font-size", "13px")
             .style("font-weight", "500")
@@ -491,7 +519,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("stroke-dasharray", "5,5")
             .style("opacity", 0);
 
-        // Línea de referencia (nivel ideal 50%)
+        // Línea de referencia (nivel óptimo 50%)
         const referenceLine = g.append("line")
             .attr("class", "reference-line")
             .attr("stroke", "rgba(255, 255, 255, 0.5)")
@@ -518,6 +546,31 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             
             return data.slice(currentStartIndex, endIndex);
+        }
+
+        // Función para determinar nivel de humedad según el semáforo
+        function getHumLevel(v) {
+            if (v < 30 || v > 70) return {
+                level: "CRÍTICO", 
+                color: humColors.critico, 
+                emoji: "⚠️",
+                estado: "critico",
+                descripcion: v < 30 ? "Irritación respiratoria por sequedad extrema" : "Riesgo de crecimiento de moho e irritación respiratoria"
+            };
+            if ((v >= 30 && v < 40) || (v >= 60 && v <= 70)) return {
+                level: "ADVERTENCIA", 
+                color: humColors.advertencia, 
+                emoji: "⚠️",
+                estado: "advertencia",
+                descripcion: v < 40 ? "Riesgo de sequedad respiratoria" : "Riesgo de proliferación microbiana"
+            };
+            return {
+                level: "ÓPTIMO", 
+                color: humColors.optimo, 
+                emoji: "✅",
+                estado: "optimo",
+                descripcion: "Minimiza patógenos, maximiza confort respiratorio"
+            };
         }
 
         // Función para redibujar el gráfico
@@ -547,13 +600,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             humZones.exit().remove();
 
-            // Actualizar línea de referencia
-            const idealLevel = 50;
+            // Actualizar línea de referencia (centro del rango óptimo)
+            const optimoCentro = 50;
             referenceLine
                 .attr("x1", 0)
-                .attr("y1", y(idealLevel))
+                .attr("y1", y(optimoCentro))
                 .attr("x2", width)
-                .attr("y2", y(idealLevel));
+                .attr("y2", y(optimoCentro));
 
             // Actualizar grid
             grid.call(d3.axisLeft(y)
@@ -562,7 +615,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .tickFormat(""))
                 .attr("opacity", 0.15)
                 .selectAll("line")
-                .attr("stroke", "#4dabf7");
+                .attr("stroke", "#ff6b6b");
 
             // Actualizar ejes
             xAxisG.call(d3.axisBottom(x)
@@ -575,7 +628,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .attr("font-weight", "500");
 
             xAxisG.selectAll("path, line")
-                .attr("stroke", "#4dabf7")
+                .attr("stroke", "#ff6b6b")
                 .attr("opacity", 0.5);
 
             yAxisG.call(d3.axisLeft(y)
@@ -589,7 +642,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .attr("dx", "-5px");
 
             yAxisG.selectAll("path, line")
-                .attr("stroke", "#4dabf7")
+                .attr("stroke", "#ff6b6b")
                 .attr("opacity", 0.5);
 
             yAxisG.select(".domain").attr("stroke", "none");
@@ -619,64 +672,57 @@ document.addEventListener("DOMContentLoaded", function () {
                 .attr("cy", d => y(d.value))
                 .attr("r", 4)
                 .attr("fill", d => {
-                    if (d.value < 30) return "#adb5bd";
-                    if (d.value < 40) return "#ffa94d";
-                    if (d.value < 60) return "#4dabf7";
-                    if (d.value < 70) return "#339af0";
-                    return "#228be6";
+                    const level = getHumLevel(d.value);
+                    return level.color;
                 })
                 .attr("stroke", "#ffffff")
                 .attr("stroke-width", 1.5)
                 .style("opacity", 0.9)
                 .style("cursor", "pointer")
                 .on("mouseover", function(event, d) {
+                    const mouseX = x(d.time);
+                    const mouseY = y(d.value);
+                    const levelInfo = getHumLevel(d.value);
+                    
+                    // Mostrar punto focal
                     focus
-                        .attr("cx", x(d.time))
-                        .attr("cy", y(d.value))
+                        .attr("cx", mouseX)
+                        .attr("cy", mouseY)
                         .transition()
                         .duration(200)
                         .attr("r", 8)
                         .style("opacity", 1);
 
+                    // Mostrar línea vertical
                     verticalLine
-                        .attr("x1", x(d.time))
+                        .attr("x1", mouseX)
                         .attr("y1", 0)
-                        .attr("x2", x(d.time))
+                        .attr("x2", mouseX)
                         .attr("y2", height)
                         .transition()
                         .duration(200)
                         .style("opacity", 1);
 
-                    const nivelTexto = d.value < 30 ? "MUY SECO" : 
-                                     d.value < 40 ? "SECO" : 
-                                     d.value < 60 ? "IDEAL" : 
-                                     d.value < 70 ? "HÚMEDO" : "MUY HÚMEDO";
-                    const nivelColor = d.value < 30 ? "#adb5bd" : 
-                                     d.value < 40 ? "#ffa94d" : 
-                                     d.value < 60 ? "#4dabf7" : 
-                                     d.value < 70 ? "#339af0" : "#228be6";
-
+                    // Mostrar tooltip
                     tooltip
                         .html(`
                             <div style="display: flex; align-items: center; margin-bottom: 6px;">
-                                <div style="width: 12px; height: 12px; background: ${nivelColor}; border-radius: 50%; margin-right: 8px;"></div>
-                                <strong style="font-size: 16px; color: #4dabf7;">${d.value.toFixed(1)} %</strong>
+                                <div style="width: 12px; height: 12px; background: ${levelInfo.color}; border-radius: 50%; margin-right: 8px;"></div>
+                                <strong style="font-size: 16px; color: #ff6b6b;">${d.value.toFixed(1)} %</strong>
                             </div>
                             <div style="color: #94a3b8; margin-bottom: 4px;">
-                                <span style="color: ${nivelColor}; font-weight: 600;">${nivelTexto}</span>
-                                <span style="margin-left: 8px; font-size: 11px;">
-                                    ${d.value >= 40 && d.value < 60 ? '✅ ' : d.value < 30 || d.value >= 70 ? '⚠️ ' : '🔵 '}
+                                <span style="color: ${levelInfo.color}; font-weight: 600;">
+                                    ${levelInfo.emoji} ${levelInfo.level}
                                 </span>
                             </div>
                             <div style="font-size: 11px; color: #cbd5e1;">
+                                ${levelInfo.descripcion}<br><br>
                                 ${d3.timeFormat("%H:%M:%S")(d.time)}<br>
                                 ${d3.timeFormat("%d/%m/%Y")(d.time)}
                             </div>
-                            ${d.value < 40 ? '<div style="margin-top: 8px; padding: 4px 8px; background: rgba(255, 169, 77, 0.1); border-radius: 4px; font-size: 10px; color: #ffa94d;">Humedad baja</div>' : 
-                              d.value >= 70 ? '<div style="margin-top: 8px; padding: 4px 8px; background: rgba(34, 139, 230, 0.1); border-radius: 4px; font-size: 10px; color: #228be6;">Humedad alta</div>' : ''}
                         `)
                         .style("left", (event.pageX + 15) + "px")
-                        .style("top", (event.pageY - 80) + "px")
+                        .style("top", (event.pageY - 100) + "px")
                         .transition()
                         .duration(200)
                         .style("opacity", 1);
@@ -851,6 +897,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // ============== INSTANCIAS ==============
     const gauge = gaugeHumedad("#gauge-humedad", 50.0);
     const series = lineChartHumedad("#serie-humedad");
+
+    // Guardar instancias en ventana global
+    window.gaugeHumInstance = gauge;
+    window.seriesHumInstance = series;
 
     // ================= WEBSOCKET =================
     const socket = new WebSocket("ws://" + window.location.host + "/ws/humedad/");

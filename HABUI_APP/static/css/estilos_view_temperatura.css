@@ -1,6 +1,3 @@
-/* estilos_view_temperatura.css - ADAPTADO A ESTILOS CO₂ */
-
-/* Reutilizar los mismos estilos del monitoreo de CO₂ */
 .monitor-container {
 display: flex;
 flex-direction: column;
@@ -133,7 +130,7 @@ gap: 8px;
 
 .reference-grid-temperatura {
 display: grid;
-grid-template-columns: repeat(5, 1fr);
+grid-template-columns: repeat(3, 1fr);
 gap: 20px;
 }
 
@@ -150,24 +147,19 @@ transform: translateY(-3px);
 box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* CRÍTICO - Rojo */
 .reference-item-temperatura.cold {
-border-left-color: #4dabf7;
+border-left-color: #ff6b6b;
 }
 
+/* ADVERTENCIA - Amarillo */
 .reference-item-temperatura.fresh {
-border-left-color: #69db7c;
-}
-
-.reference-item-temperatura.warm {
 border-left-color: #ffd43b;
 }
 
-.reference-item-temperatura.hot {
-border-left-color: #ff922b;
-}
-
-.reference-item-temperatura.very-hot {
-border-left-color: #ff6b6b;
+/* ÓPTIMO - Verde */
+.reference-item-temperatura.warm {
+border-left-color: #69db7c;
 }
 
 .reference-header-temperatura {
@@ -188,29 +180,22 @@ font-size: 18px;
 font-weight: 600;
 }
 
+/* CRÍTICO - Rojo */
 .reference-item-temperatura.cold .reference-icon-temperatura {
-background: rgba(77, 171, 247, 0.2);
-color: #4dabf7;
+background: rgba(255, 107, 107, 0.2);
+color: #ff6b6b;
 }
 
+/* ADVERTENCIA - Amarillo */
 .reference-item-temperatura.fresh .reference-icon-temperatura {
-background: rgba(105, 219, 124, 0.2);
-color: #69db7c;
-}
-
-.reference-item-temperatura.warm .reference-icon-temperatura {
 background: rgba(255, 212, 59, 0.2);
 color: #ffd43b;
 }
 
-.reference-item-temperatura.hot .reference-icon-temperatura {
-background: rgba(255, 146, 43, 0.2);
-color: #ff922b;
-}
-
-.reference-item-temperatura.very-hot .reference-icon-temperatura {
-background: rgba(255, 107, 107, 0.2);
-color: #ff6b6b;
+/* ÓPTIMO - Verde */
+.reference-item-temperatura.warm .reference-icon-temperatura {
+background: rgba(105, 219, 124, 0.2);
+color: #69db7c;
 }
 
 .reference-range-temperatura {
@@ -226,24 +211,19 @@ font-weight: 600;
 margin-bottom: 8px;
 }
 
+/* CRÍTICO - Rojo */
 .reference-item-temperatura.cold .reference-label-temperatura {
-color: #4dabf7;
+color: #ff6b6b;
 }
 
+/* ADVERTENCIA - Amarillo */
 .reference-item-temperatura.fresh .reference-label-temperatura {
-color: #69db7c;
-}
-
-.reference-item-temperatura.warm .reference-label-temperatura {
 color: #ffd43b;
 }
 
-.reference-item-temperatura.hot .reference-label-temperatura {
-color: #ff922b;
-}
-
-.reference-item-temperatura.very-hot .reference-label-temperatura {
-color: #ff6b6b;
+/* ÓPTIMO - Verde */
+.reference-item-temperatura.warm .reference-label-temperatura {
+color: #69db7c;
 }
 
 .reference-description-temperatura {
@@ -262,24 +242,19 @@ color: #cbd5e1;
 border-left: 3px solid;
 }
 
+/* CRÍTICO - Rojo */
 .reference-item-temperatura.cold .reference-recommendation-temperatura {
-border-left-color: #4dabf7;
+border-left-color: #ff6b6b;
 }
 
+/* ADVERTENCIA - Amarillo */
 .reference-item-temperatura.fresh .reference-recommendation-temperatura {
-border-left-color: #69db7c;
-}
-
-.reference-item-temperatura.warm .reference-recommendation-temperatura {
 border-left-color: #ffd43b;
 }
 
-.reference-item-temperatura.hot .reference-recommendation-temperatura {
-border-left-color: #ff922b;
-}
-
-.reference-item-temperatura.very-hot .reference-recommendation-temperatura {
-border-left-color: #ff6b6b;
+/* ÓPTIMO - Verde */
+.reference-item-temperatura.warm .reference-recommendation-temperatura {
+border-left-color: #69db7c;
 }
 
 /* Asegurar que los tooltips estén por encima de todo */

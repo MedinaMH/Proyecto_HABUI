@@ -60,8 +60,11 @@
           <div class="reference-header-humedad">
             <div class="reference-icon-humedad"></div>
             <div>
-              <div class="reference-range-humedad">&lt; 30 %</div>
-              <div class="reference-label-humedad">{% trans "MUY SECO" %}</div>
+              <div class="reference-range-humedada">
+                <div>&lt; 30 %</div>
+                <div>&gt; 70 %</div>
+              </div>
+              <div class="reference-label-humedad">{% trans "CRÍTICO" %}</div>
             </div>
           </div>
         </div>
@@ -70,8 +73,11 @@
           <div class="reference-header-humedad">
             <div class="reference-icon-humedad"></div>
             <div>
-              <div class="reference-range-humedad">30 - 40 %</div>
-              <div class="reference-label-humedad">{% trans "SECO" %}</div>
+              <div class="reference-range-humedada">
+                <div>30 - 40 %</div>
+                <div>60 - 70 %</div>
+              </div>
+              <div class="reference-label-humedad">{% trans "ADVERTENCIA" %}</div>
             </div>
           </div>
         </div>
@@ -80,28 +86,8 @@
           <div class="reference-header-humedad">
             <div class="reference-icon-humedad"></div>
             <div>
-              <div class="reference-range-humedad">40 - 60 %</div>
-              <div class="reference-label-humedad">{% trans "IDEAL" %}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="reference-item-humedad humid">
-          <div class="reference-header-humedad">
-            <div class="reference-icon-humedad"></div>
-            <div>
-              <div class="reference-range-humedad">60 - 70 %</div>
-              <div class="reference-label-humedad">{% trans "HÚMEDO" %}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="reference-item-humedad very-humid">
-          <div class="reference-header-humedad">
-            <div class="reference-icon-humedad"></div>
-            <div>
-              <div class="reference-range-humedad">&gt; 70 %</div>
-              <div class="reference-label-humedad">{% trans "MUY HÚMEDO" %}</div>
+              <div class="reference-range-humedada">40 - 60 %</div>
+              <div class="reference-label-humedad">{% trans "ÓPTIMO" %}</div>
             </div>
           </div>
         </div>

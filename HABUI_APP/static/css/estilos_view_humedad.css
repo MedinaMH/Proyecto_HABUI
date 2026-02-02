@@ -1,6 +1,3 @@
-/* estilos_view_humedad.css - ADAPTADO A ESTILOS CO₂ */
-
-/* Reutilizar los mismos estilos del monitoreo de CO₂ */
 .monitor-container {
 display: flex;
 flex-direction: column;
@@ -133,7 +130,7 @@ gap: 8px;
 
 .reference-grid-humedad {
 display: grid;
-grid-template-columns: repeat(5, 1fr);
+grid-template-columns: repeat(3, 1fr);
 gap: 20px;
 }
 
@@ -150,24 +147,19 @@ transform: translateY(-3px);
 box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* CRÍTICO - Rojo */
 .reference-item-humedad.very-dry {
-border-left-color: #adb5bd;
+border-left-color: #ff6b6b;
 }
 
+/* ADVERTENCIA - Amarillo */
 .reference-item-humedad.dry {
-border-left-color: #ffa94d;
+border-left-color: #ffd43b;
 }
 
+/* ÓPTIMO - Verde */
 .reference-item-humedad.ideal {
-border-left-color: #4dabf7;
-}
-
-.reference-item-humedad.humid {
-border-left-color: #339af0;
-}
-
-.reference-item-humedad.very-humid {
-border-left-color: #228be6;
+border-left-color: #69db7c;
 }
 
 .reference-header-humedad {
@@ -188,36 +180,38 @@ font-size: 18px;
 font-weight: 600;
 }
 
+/* CRÍTICO - Rojo */
 .reference-item-humedad.very-dry .reference-icon-humedad {
-background: rgba(173, 181, 189, 0.2);
-color: #adb5bd;
+background: rgba(255, 107, 107, 0.2);
+color: #ff6b6b;
 }
 
+/* ADVERTENCIA - Amarillo */
 .reference-item-humedad.dry .reference-icon-humedad {
-background: rgba(255, 169, 77, 0.2);
-color: #ffa94d;
+background: rgba(255, 212, 59, 0.2);
+color: #ffd43b;
 }
 
+/* ÓPTIMO - Verde */
 .reference-item-humedad.ideal .reference-icon-humedad {
-background: rgba(77, 171, 247, 0.2);
-color: #4dabf7;
+background: rgba(105, 219, 124, 0.2);
+color: #69db7c;
 }
 
-.reference-item-humedad.humid .reference-icon-humedad {
-background: rgba(51, 154, 240, 0.2);
-color: #339af0;
-}
-
-.reference-item-humedad.very-humid .reference-icon-humedad {
-background: rgba(34, 139, 230, 0.2);
-color: #228be6;
-}
-
-.reference-range-humedad {
+/* Estilos para rangos múltiples (CRÍTICO y ADVERTENCIA tienen dos rangos) */
+.reference-range-humedada {
 font-size: 22px;
 font-weight: 700;
 color: #e2e8f0;
 margin-bottom: 6px;
+}
+
+.reference-range-humedada div {
+margin-bottom: 4px;
+}
+
+.reference-range-humedada div:last-child {
+margin-bottom: 0;
 }
 
 .reference-label-humedad {
@@ -226,24 +220,19 @@ font-weight: 600;
 margin-bottom: 8px;
 }
 
+/* CRÍTICO - Rojo */
 .reference-item-humedad.very-dry .reference-label-humedad {
-color: #adb5bd;
+color: #ff6b6b;
 }
 
+/* ADVERTENCIA - Amarillo */
 .reference-item-humedad.dry .reference-label-humedad {
-color: #ffa94d;
+color: #ffd43b;
 }
 
+/* ÓPTIMO - Verde */
 .reference-item-humedad.ideal .reference-label-humedad {
-color: #4dabf7;
-}
-
-.reference-item-humedad.humid .reference-label-humedad {
-color: #339af0;
-}
-
-.reference-item-humedad.very-humid .reference-label-humedad {
-color: #228be6;
+color: #69db7c;
 }
 
 .reference-description-humedad {
@@ -262,24 +251,19 @@ color: #cbd5e1;
 border-left: 3px solid;
 }
 
+/* CRÍTICO - Rojo */
 .reference-item-humedad.very-dry .reference-recommendation-humedad {
-border-left-color: #adb5bd;
+border-left-color: #ff6b6b;
 }
 
+/* ADVERTENCIA - Amarillo */
 .reference-item-humedad.dry .reference-recommendation-humedad {
-border-left-color: #ffa94d;
+border-left-color: #ffd43b;
 }
 
+/* ÓPTIMO - Verde */
 .reference-item-humedad.ideal .reference-recommendation-humedad {
-border-left-color: #4dabf7;
-}
-
-.reference-item-humedad.humid .reference-recommendation-humedad {
-border-left-color: #339af0;
-}
-
-.reference-item-humedad.very-humid .reference-recommendation-humedad {
-border-left-color: #228be6;
+border-left-color: #69db7c;
 }
 
 /* Asegurar que los tooltips estén por encima de todo */
@@ -321,6 +305,11 @@ padding: 15px;
 .monitor-header h3 {
 font-size: 20px;
 }
+
+/* Ajustar tamaño de fuente para rangos múltiples en móviles */
+.reference-range-humedada {
+font-size: 18px;
+}
 }
 
 @media (max-width: 576px) {
@@ -328,7 +317,7 @@ font-size: 20px;
 grid-template-columns: 1fr;
 }
 
-.reference-range-humedad {
+.reference-range-humedada {
 font-size: 18px;
 }
 

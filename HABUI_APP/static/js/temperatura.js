@@ -15,13 +15,11 @@ function gaugeTemperatura(containerId, initial) {
         .attr("width", width)
         .attr("height", height);
 
-    // Paleta de colores térmica según la imagen
+    // Paleta de colores según el semáforo de 3 estados
     const tempPalette = {
-        frio: "#4dabf7",        // Azul para FRÍO (< 16°C)
-        fresco: "#69db7c",      // Verde para FRESCO (16-22°C)
-        calido: "#ffd43b",      // Amarillo para CÁLIDO (22-28°C)
-        caliente: "#ff922b",    // Naranja para CALIENTE (28-32°C)
-        muyCaliente: "#ff6b6b"  // Rojo para MUY CALIENTE (> 32°C)
+        critico: "#ff6b6b",      // Rojo para CRÍTICO (<18°C o >26°C)
+        advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA (18-20°C o 24-26°C)
+        optimo: "#69db7c"        // Verde para ÓPTIMO (20-24°C)
     };
 
     // Diseño tipo termómetro
@@ -36,7 +34,7 @@ function gaugeTemperatura(containerId, initial) {
         .attr("cy", termometroY + termometroH + bulboRadio)
         .attr("r", bulboRadio)
         .attr("fill", "#0f1724")
-        .attr("stroke", tempPalette.muyCaliente)
+        .attr("stroke", tempPalette.critico)
         .attr("stroke-width", 4);
 
     // Tubo del termómetro
@@ -47,7 +45,7 @@ function gaugeTemperatura(containerId, initial) {
         .attr("height", termometroH)
         .attr("rx", 15)
         .attr("fill", "#0f1724")
-        .attr("stroke", tempPalette.muyCaliente)
+        .attr("stroke", tempPalette.critico)
         .attr("stroke-width", 3);
 
     // Escala para el mercurio
@@ -61,7 +59,7 @@ function gaugeTemperatura(containerId, initial) {
         .attr("width", 52)
         .attr("y", scale(initial))
         .attr("height", Math.max(2, (termometroY + termometroH) - scale(initial)))
-        .attr("fill", tempPalette.muyCaliente)
+        .attr("fill", tempPalette.critico)
         .attr("rx", 11);
 
     // Mercurio en el bulbo
@@ -69,44 +67,37 @@ function gaugeTemperatura(containerId, initial) {
         .attr("cx", width/2 + 15)
         .attr("cy", termometroY + termometroH + bulboRadio)
         .attr("r", bulboRadio - 5)
-        .attr("fill", tempPalette.muyCaliente);
+        .attr("fill", tempPalette.critico);
 
     // Valor numérico (justo arriba del texto del nivel)
     const valueText = svg.append("text")
         .attr("x", width/2 + 15)
         .attr("y", termometroY + termometroH + bulboRadio + 70)
-        .attr("fill", tempPalette.muyCaliente)
+        .attr("fill", tempPalette.critico)
         .attr("font-size", "28px")
         .attr("font-weight", "700")
         .attr("text-anchor", "middle")
         .text(initial.toFixed(1) + " °C");
 
-    // FUNCIÓN para determinar nivel de temperatura según la imagen
+    // FUNCIÓN para determinar nivel de temperatura según el semáforo
     function getTempLevel(v) {
-        if (v < 16) return {
-            nivel: "FRÍO", 
-            emoji: "❄️",
-            color: tempPalette.frio
+        if (v < 18 || v > 26) return {
+            nivel: "CRÍTICO", 
+            emoji: "⚠️",
+            color: tempPalette.critico,
+            estado: "critico"
         };
-        if (v < 22) return {
-            nivel: "FRESCO", 
-            emoji: "🌿",
-            color: tempPalette.fresco
-        };
-        if (v < 28) return {
-            nivel: "CÁLIDO", 
-            emoji: "☀️",
-            color: tempPalette.calido
-        };
-        if (v < 32) return {
-            nivel: "CALIENTE", 
-            emoji: "🔥",
-            color: tempPalette.caliente
+        if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return {
+            nivel: "ADVERTENCIA", 
+            emoji: "⚠️",
+            color: tempPalette.advertencia,
+            estado: "advertencia"
         };
         return {
-            nivel: "MUY CALIENTE", 
-            emoji: "🥵",
-            color: tempPalette.muyCaliente
+            nivel: "ÓPTIMO", 
+            emoji: "✅",
+            color: tempPalette.optimo,
+            estado: "optimo"
         };
     }
 
@@ -119,9 +110,9 @@ function gaugeTemperatura(containerId, initial) {
     // TEXTO DE NIVEL
     const levelText = svg.append("text")
         .attr("x", width/2 + 15)
-        .attr("y", termometroY + termometroH + bulboRadio + 100) 
-        .attr("fill", tempPalette.muyCaliente)
-        .attr("font-size", "20px")  
+        .attr("y", termometroY + termometroH + bulboRadio + 110) 
+        .attr("fill", tempPalette.critico)
+        .attr("font-size", "30px")  
         .attr("font-weight", "600")
         .attr("text-anchor", "middle")
         .text(getTempLevel(initial).nivel);
@@ -138,11 +129,9 @@ function gaugeTemperatura(containerId, initial) {
 
     // Función para obtener descripción según el nivel
     function getTempDescription(v) {
-        if (v < 16) return "Temperatura baja";
-        if (v < 22) return "Temperatura agradable";
-        if (v < 28) return "Temperatura cálida";
-        if (v < 32) return "Temperatura alta";
-        return "Temperatura muy alta";
+        if (v < 18 || v > 26) return "Riesgo fisiológico, estrés térmico";
+        if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return "Leve incomodidad térmica";
+        return "Zona de confort térmico humano óptimo";
     }
 
     // Marcas de escala
@@ -153,13 +142,13 @@ function gaugeTemperatura(containerId, initial) {
             .attr("x2", termometroX)
             .attr("y1", y)
             .attr("y2", y)
-            .attr("stroke", tempPalette.muyCaliente)
+            .attr("stroke", tempPalette.critico)
             .attr("stroke-width", 2);
         
         svg.append("text")
             .attr("x", termometroX - 18)
             .attr("y", y + 4)
-            .attr("fill", tempPalette.muyCaliente)
+            .attr("fill", tempPalette.critico)
             .attr("font-size", "25px")
             .attr("text-anchor", "end")
             .text(temp + "°");
@@ -173,7 +162,7 @@ function gaugeTemperatura(containerId, initial) {
             
             if (!response.ok) {
                 console.log('No se pudieron obtener datos de Temperatura de la BD');
-                // Si no hay datos se agrega 22°C como valor por defecto
+                // Si no hay datos se agrega 22°C como valor por defecto (dentro del rango óptimo)
                 actualizarGauge(22.0);
                 return 22.0;
             }
@@ -191,12 +180,13 @@ function gaugeTemperatura(containerId, initial) {
                 } else if (ultimoDato.valor !== undefined) {
                     ultimoValor = parseFloat(ultimoDato.valor);
                 } else {
-                    // Si no encuentra temperatura ni valor, usar 22°C
+                    // Si no encuentra temperatura ni valor, usar 22°C (óptimo)
                     console.log('Campo no encontrado, usando valor por defecto 22°C');
                     ultimoValor = 22.0;
                 }
                 
                 console.log('Último dato de Temperatura encontrado:', ultimoValor.toFixed(1) + ' °C', 
+                        'Estado:', getTempLevel(ultimoValor).nivel,
                         'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
                 
                 // Actualizar el gauge con el último valor de la BD
@@ -205,13 +195,13 @@ function gaugeTemperatura(containerId, initial) {
                 return ultimoValor;
             } else {
                 console.log('No hay datos de Temperatura en la BD, usando valor por defecto 22°C');
-                // Si no hay datos, usar 22°C como valor por defecto
+                // Si no hay datos, usar 22°C como valor por defecto (dentro del rango óptimo)
                 actualizarGauge(22.0);
                 return 22.0;
             }
         } catch (error) {
             console.log('Error al cargar datos de Temperatura:', error);
-            // En caso de error, usar 22°C como valor por defecto
+            // En caso de error, usar 22°C como valor por defecto (dentro del rango óptimo)
             actualizarGauge(22.0);
             return 22.0;
         }
@@ -248,11 +238,15 @@ function gaugeTemperatura(containerId, initial) {
                     
                     if (isNaN(valor)) return null;
                     
+                    const nivelInfo = getTempLevel(valor);
+                    
                     return {
                         id: dato.id || `temp-${Date.now()}-${Math.random()}`,
                         valor: valor,
                         fecha: dato.fecha_hora || dato.timestamp,
-                        nivel: getTempLevel(valor).nivel
+                        nivel: nivelInfo.nivel,
+                        estado: nivelInfo.estado,
+                        color: nivelInfo.color
                     };
                 }).filter(dato => dato !== null);
                 
@@ -407,16 +401,14 @@ function gaugeTemperatura(containerId, initial) {
         const x = d3.scaleTime().range([0, width]);
         const y = d3.scaleLinear().range([height, 0]);
 
-        // Paleta de colores para temperatura
+        // Paleta de colores para temperatura según el semáforo
         const tempColors = {
-            cold: "#4dabf7",       // Azul para frío
-            cool: "#69db7c",       // Verde para fresco
-            warm: "#ffd43b",       // Amarillo para cálido
-            hot: "#ff922b",        // Naranja para caliente
-            veryHot: "#ff6b6b"     // Rojo para muy caliente
+            critico: "#ff6b6b",      // Rojo para CRÍTICO
+            advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA
+            optimo: "#69db7c"        // Verde para ÓPTIMO
         };
 
-        // Gradiente para el área
+        // Gradiente para el área (usar color del nivel actual)
         const gradient = svg.append("defs")
             .append("linearGradient")
             .attr("id", "temp-gradient")
@@ -511,13 +503,13 @@ function gaugeTemperatura(containerId, initial) {
             .attr("text-anchor", "middle")
             .text(TRANSLATIONS.tiempo || "Tiempo");
 
-        // Zonas de temperatura en el fondo
+        // Zonas de temperatura en el fondo según el semáforo
         const tempZonesData = [
-            {min: 0, max: 16, color: "rgba(77, 171, 247, 0.08)", label: "FRÍO", emoji: "❄️"},
-            {min: 16, max: 22, color: "rgba(105, 219, 124, 0.08)", label: "FRESCO", emoji: "🌿"},
-            {min: 22, max: 28, color: "rgba(255, 212, 59, 0.08)", label: "CÁLIDO", emoji: "☀️"},
-            {min: 28, max: 32, color: "rgba(255, 146, 43, 0.08)", label: "CALIENTE", emoji: "🔥"},
-            {min: 32, max: 45, color: "rgba(255, 107, 107, 0.08)", label: "MUY CALIENTE", emoji: "🥵"}
+            {min: 0, max: 18, color: "rgba(255, 107, 107, 0.08)", label: "CRÍTICO", emoji: "⚠️"},
+            {min: 18, max: 20, color: "rgba(255, 212, 59, 0.08)", label: "ADVERTENCIA", emoji: "⚠️"},
+            {min: 20, max: 24, color: "rgba(105, 219, 124, 0.08)", label: "ÓPTIMO", emoji: "✅"},
+            {min: 24, max: 26, color: "rgba(255, 212, 59, 0.08)", label: "ADVERTENCIA", emoji: "⚠️"},
+            {min: 26, max: 45, color: "rgba(255, 107, 107, 0.08)", label: "CRÍTICO", emoji: "⚠️"}
         ];
 
         // Tooltip
@@ -577,13 +569,26 @@ function gaugeTemperatura(containerId, initial) {
             return data.slice(currentStartIndex, endIndex);
         }
 
-        // Función para determinar nivel de temperatura
+        // Función para determinar nivel de temperatura según el semáforo
         function getTempLevel(v) {
-            if (v < 16) return {level: "FRÍO", color: tempColors.cold, emoji: "❄️"};
-            if (v < 22) return {level: "FRESCO", color: tempColors.cool, emoji: "🌿"};
-            if (v < 28) return {level: "CÁLIDO", color: tempColors.warm, emoji: "☀️"};
-            if (v < 32) return {level: "CALIENTE", color: tempColors.hot, emoji: "🔥"};
-            return {level: "MUY CALIENTE", color: tempColors.veryHot, emoji: "🥵"};
+            if (v < 18 || v > 26) return {
+                level: "CRÍTICO", 
+                color: tempColors.critico, 
+                emoji: "⚠️",
+                estado: "critico"
+            };
+            if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return {
+                level: "ADVERTENCIA", 
+                color: tempColors.advertencia, 
+                emoji: "⚠️",
+                estado: "advertencia"
+            };
+            return {
+                level: "ÓPTIMO", 
+                color: tempColors.optimo, 
+                emoji: "✅",
+                estado: "optimo"
+            };
         }
 
         // Función para redibujar el gráfico

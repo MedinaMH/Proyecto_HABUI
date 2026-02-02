@@ -44,62 +44,48 @@
     </div>
     
     <!-- Sección de niveles de referencia para temperatura -->
-    <div class="reference-section-temperatura">
-      <div class="reference-title-temperatura">
-        <span>{% trans "Niveles de Referencia de Temperatura" %}</span>
-      </div>
-      <div class="reference-grid-temperatura">
-        <div class="reference-item-temperatura cold">
-          <div class="reference-header-temperatura">
-            <div class="reference-icon-temperatura"></div>
-            <div>
-              <div class="reference-range-temperatura">&lt; 16 °C</div>
-              <div class="reference-label-temperatura">{% trans "FRÍO" %}</div>
-            </div>
+<div class="reference-section-temperatura">
+  <div class="reference-title-temperatura">
+    <span>{% trans "Niveles de Referencia de Temperatura" %}</span>
+  </div>
+  <div class="reference-grid-temperatura">
+    <div class="reference-item-temperatura cold">
+      <div class="reference-header-temperatura">
+        <div class="reference-icon-temperatura"></div>
+        <div>
+          <div class="reference-range-temperatura">
+            <div>&lt; 18 °C</div>
+            <div>&gt; 26 °C</div>
           </div>
-        </div>
-        
-        <div class="reference-item-temperatura fresh">
-          <div class="reference-header-temperatura">
-            <div class="reference-icon-temperatura"></div>
-            <div>
-              <div class="reference-range-temperatura">16 - 22 °C</div>
-              <div class="reference-label-temperatura">{% trans "FRESCO" %}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="reference-item-temperatura warm">
-          <div class="reference-header-temperatura">
-            <div class="reference-icon-temperatura"></div>
-            <div>
-              <div class="reference-range-temperatura">22 - 28 °C</div>
-              <div class="reference-label-temperatura">{% trans "CÁLIDO" %}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="reference-item-temperatura hot">
-          <div class="reference-header-temperatura">
-            <div class="reference-icon-temperatura"></div>
-            <div>
-              <div class="reference-range-temperatura">28 - 32 °C</div>
-              <div class="reference-label-temperatura">{% trans "CALIENTE" %}</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="reference-item-temperatura very-hot">
-          <div class="reference-header-temperatura">
-            <div class="reference-icon-temperatura"></div>
-            <div>
-              <div class="reference-range-temperatura">&gt; 32 °C</div>
-              <div class="reference-label-temperatura">{% trans "MUY CALIENTE" %}</div>
-            </div>
-          </div>
+          <div class="reference-label-temperatura">{% trans "CRÍTICO" %}</div>
         </div>
       </div>
     </div>
+    
+    <div class="reference-item-temperatura fresh">
+      <div class="reference-header-temperatura">
+        <div class="reference-icon-temperatura"></div>
+        <div>
+          <div class="reference-range-temperatura">
+            <div>18 - 20 °C</div>
+            <div>24 - 26 °C</div>
+          </div>
+          <div class="reference-label-temperatura">{% trans "ADVERTENCIA" %}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="reference-item-temperatura warm">
+      <div class="reference-header-temperatura">
+        <div class="reference-icon-temperatura"></div>
+        <div>
+          <div class="reference-range-temperatura">20 - 24 °C</div>
+          <div class="reference-label-temperatura">{% trans "ÓPTIMO" %}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
   </div>
 </div>
 {% endblock %}
