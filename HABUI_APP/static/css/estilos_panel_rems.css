@@ -86,4 +86,55 @@ main {
     width: 100%;
 }*/
 
+/* Estados de alerta - Parpadeo */
+@keyframes blink-warning {
+    0%, 100% { 
+        border-left-color: transparent;
+        box-shadow: none;
+    }
+    50% { 
+        border-left-color: #ffc107; /* Naranja/ámbar Bootstrap warning */
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    }
+}
 
+@keyframes blink-critical {
+    0%, 100% { 
+        border-left-color: transparent;
+        box-shadow: none;
+    }
+    50% { 
+        border-left-color: #dc3545; /* Rojo Bootstrap danger */
+        box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+    }
+}
+
+/* Clases para activar parpadeo */
+.nav-link.warning-alert {
+    animation: blink-warning 1s infinite;
+    background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+.nav-link.critical-alert {
+    animation: blink-critical 1s infinite;
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+/* Para mantener el borde izquierdo coloreado cuando está en parpadeo */
+.nav-link.warning-alert,
+.nav-link.critical-alert {
+    border-left: 4px solid transparent; /* Transparent para que la animación funcione */
+}
+
+/* Asegurar que el hover y active sigan funcionando incluso con alerta */
+.nav-link.warning-alert:hover,
+.nav-link.critical-alert:hover {
+    animation-play-state: paused;
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.nav-link.warning-alert.active,
+.nav-link.critical-alert.active {
+    animation-play-state: paused;
+    border-left: 4px solid #0d6efd !important;
+}
