@@ -466,7 +466,7 @@ class HealthSyncRegistroFisiologicoAPI(APIView):
             from datetime import datetime
             
             # 1. Directorio y nombre del archivo
-            csv_dir = os.path.join('media', 'csv_healthsync')
+            csv_dir = os.path.join('uploads', 'csv_healthsync')
             os.makedirs(csv_dir, exist_ok=True)
             
             username_clean = user.username.replace(' ', '_').lower()

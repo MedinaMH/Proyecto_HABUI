@@ -3,7 +3,7 @@
 <html lang="es">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, #145ca3" />
         <title>{% block titulo %}Sistema PWMS{% endblock %}</title>
 
         <!-- Bootstrap local -->
@@ -162,15 +162,8 @@
 
                 <!-- Perfil -->
                 <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/pwms/perfil/' %}active{% endif %}" href="{% url 'PWMS:completar_perfil' %}">
+                    <a class="nav-link {% if request.path == '/pwms/perfil/' %}active{% endif %}" href="{% url 'PWMS:perfil' %}">
                     <i class="bi bi-person-circle me-2"></i>Mi Perfil
-                    </a>
-                </li>
-
-                <!-- Registro de Usuario -->
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/pwms/registro/' %}active{% endif %}" href="{% url 'PWMS:registro_usuario' %}">
-                    <i class="bi bi-person-plus me-2"></i>Registro de Usuario
                     </a>
                 </li>
 

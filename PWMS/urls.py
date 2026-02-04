@@ -22,14 +22,16 @@ urlpatterns = [
     path('api/health/', views.health_check, name='health_check'),
     
     # Autenticacion 
-    path('', views.panel_login, name='panel_login'),  
-    path('login/', views.panel_login, name='panel_login'),
+    path('perfil/', views.perfil, name='perfil'),
     path('registro/', views.registro_usuario, name='registro_usuario'), 
+    path('login/', views.panel_login, name='panel_login'),
     path('logout/', views.panel_logout, name='panel_logout'),
+    path('', views.panel_login, name='panel_login'), 
+
     
     # Dashboard y Perfil
     path('dashboard/', views.pwms_dashboard, name='pwms_dashboard'),
-    path('perfil/', views.completar_perfil, name='completar_perfil'),
+    
     
     # Gráficos
     path('graficas/presion-arterial/', views.grafica_presion_arterial, name='grafica_presion_arterial'),

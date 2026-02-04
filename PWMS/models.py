@@ -54,9 +54,9 @@ def crear_perfil_pwms(sender, instance, created, **kwargs):
     if created:
         PerfilPWMS.objects.create(usuario=instance)
 
-@receiver(post_save, sender=User)
-def guardar_perfil_pwms(sender, instance, **kwargs):
-    instance.perfil_pwms.save()
+#@receiver(post_save, sender=User)
+#def guardar_perfil_pwms(sender, instance, **kwargs):
+#    instance.perfil_pwms.save()
 
 class RegistroPsicologico(models.Model):
     """

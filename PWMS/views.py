@@ -24,9 +24,6 @@ import os
 def panel_login(request):
     """Login que previene problemas de cache"""
     
-    # Agregar headers anti-cache a la respuesta
-    response = None
-    
     # Verificar si viene de logout
     if request.GET.get('logout') == '1':
         messages.info(request, 'Has cerrado sesión exitosamente.')
@@ -45,10 +42,6 @@ def panel_login(request):
             if hasattr(user, 'perfil_pwms') and user.perfil_pwms.pin == pin:
                 login(request, user)
                 messages.success(request, f'¡Bienvenido {user.username}!')
-                
-                perfil = user.perfil_pwms
-                if not perfil.telefono or not perfil.fecha_nacimiento or not perfil.genero:
-                    return redirect('PWMS:completar_perfil')
                 
                 return redirect('PWMS:pwms_dashboard')
             else:
@@ -121,7 +114,6 @@ def panel_logout(request):
     
     return response
 
-
 # ===== DASHBOARD (SOLO SI ESTÁS LOGEADO) =====
 @never_cache
 @login_required
@@ -137,36 +129,91 @@ def pwms_dashboard(request):
 
 # ====== REGISTRO DE USUARIO =====
 @never_cache
-@login_required
 def registro_usuario(request):
-    """Registro de usuario simple"""
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        pin = request.POST.get('pin')
-        
-        # Validaciones básicas
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'El usuario ya existe')
-        elif len(pin) != 4 or not pin.isdigit():
-            messages.error(request, 'El PIN debe tener 4 dígitos numéricos')
-        else:
-            # Crear usuario
-            user = User.objects.create_user(
-                username=username,
-                password=password,
-                email=request.POST.get('email', '')
-            )
-            
-            # Configurar PIN en perfil
-            user.perfil_pwms.pin = pin
-            user.perfil_pwms.save()
-            
-            messages.success(request, 'Usuario registrado exitosamente. Ahora puedes iniciar sesión.')
-            return redirect('PWMS:panel_login')
+    """Registro de usuario completo con formulario de 2 pasos"""
+    print("Vista de registro_usuario llamada (sistema unificado)")
     
+    if request.user.is_authenticated:
+        return redirect('PWMS:pwms_dashboard')
+    
+    if request.method == 'POST':
+        try:
+            # Obtener todos los datos del formulario de 2 pasos
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            pin = request.POST.get('pin')
+            email = request.POST.get('email', '')
+            telefono = request.POST.get('telefono')
+            fecha_nacimiento = request.POST.get('fecha_nacimiento')
+            genero = request.POST.get('genero')
+            
+            print(f"Registrando usuario: {username}")
+            print(f"Datos recibidos: email={email}, tel={telefono}, fecha={fecha_nacimiento}, genero={genero}")
+            
+            # Validaciones básicas
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'El usuario ya existe')
+                return render(request, 'PWMS/registro.html')
+            
+            if len(pin) != 4 or not pin.isdigit():
+                messages.error(request, 'El PIN debe tener 4 dígitos numéricos')
+                return render(request, 'PWMS/registro.html')
+            
+            # Validar campos del perfil (si están vacíos, usar valores por defecto o requerir)
+            if not telefono:
+                messages.error(request, 'El teléfono es requerido')
+                return render(request, 'PWMS/registro.html')
+            
+            if not fecha_nacimiento:
+                messages.error(request, 'La fecha de nacimiento es requerida')
+                return render(request, 'PWMS/registro.html')
+            
+            if not genero:
+                messages.error(request, 'El género es requerido')
+                return render(request, 'PWMS/registro.html')
+            
+            # Crear usuario y perfil en una transacción
+            with transaction.atomic():
+                # Crear usuario
+                user = User.objects.create_user(
+                    username=username,
+                    password=password,
+                    email=email
+                )
+                
+                # Asumiendo que tienes un modelo PerfilPWMS con signal que lo crea automáticamente
+                # Actualizar el perfil con los datos adicionales
+                if hasattr(user, 'perfil_pwms'):
+                    perfil = user.perfil_pwms
+                    perfil.pin = pin
+                    perfil.telefono = telefono
+                    perfil.fecha_nacimiento = fecha_nacimiento
+                    perfil.genero = genero
+                    perfil.save()
+                    print(f"Perfil actualizado para {username}")
+                else:
+                    print(f"Advertencia: Usuario {username} no tiene perfil_pwms")
+                
+                print(f"Usuario {username} creado exitosamente")
+                
+                # Opcional: iniciar sesión automáticamente
+                # login(request, user)
+                # messages.success(request, f'¡Registro exitoso! Bienvenido {username}.')
+                # return redirect('PWMS:pwms_dashboard')
+                
+                # O redirigir al login con mensaje de éxito
+                messages.success(request, 'Usuario registrado exitosamente. Ahora puedes iniciar sesión.')
+                return redirect('PWMS:panel_login')
+                
+        except Exception as e:
+            print(f"Error en registro: {str(e)}")
+            messages.error(request, f'Error al registrar usuario: {str(e)}')
+            return render(request, 'PWMS/registro.html')
+    
+    # GET request: mostrar el formulario de registro unificado
     return render(request, 'PWMS/registro.html')
 
+# ===== VISTAS DE REGISTROS Y GRÁFICAS =====
 @never_cache
 @login_required
 def nuevo_registro_psicologico(request):
@@ -183,8 +230,6 @@ def nuevo_registro_fisiologico(request):
         'titulo': 'Nuevo Registro Fisiológico'
     })
 
-
-# views.py - Añadir esta vista
 @csrf_exempt
 @require_POST
 def healthsync_registro_fisiologico(request):
@@ -423,25 +468,15 @@ def grafica_psicologico(request):
     return render(request, 'PWMS/graficas/psicologico.html', {
         'titulo': 'Estado Psicológico'
     })
-
-# ===== COMPLETAR PERFIL =====
+    
 @never_cache
 @login_required
-def completar_perfil(request):
-    """Completar información del perfil"""
-    perfil = request.user.perfil_pwms
-    
-    if request.method == 'POST':
-        perfil.telefono = request.POST.get('telefono')
-        perfil.fecha_nacimiento = request.POST.get('fecha_nacimiento')
-        perfil.genero = request.POST.get('genero')
-        perfil.save()
-        
-        messages.success(request, 'Perfil actualizado exitosamente')
-        return redirect('PWMS:pwms_dashboard')
-    
-    return render(request, 'PWMS/completar_perfil.html', {'perfil': perfil})
-        
+def perfil(request):
+    """Nuevo registro psicológico - versión simple"""
+    return render(request, 'PWMS/perfil.html', {
+        'titulo': 'Mi Perfil'
+    })
+
 # ===== VISTAS DE ERROR =====
 def pagina_no_encontrada(request, exception):
     context = {'titulo': '404 - Página no encontrada', 'mensaje': 'La página que buscas no existe o ha sido movida.'}

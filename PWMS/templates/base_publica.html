@@ -1,0 +1,83 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block titulo %}Sistema PWMS{% endblock %}</title>
+    
+    <!-- Bootstrap local -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .public-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .public-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .public-header {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .public-footer {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Header simple -->
+    <header class="public-header py-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'PWMS:panel_login' %}" class="text-decoration-none">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Volver al Login
+                </a>
+                <span class="fw-bold">Sistema PWMS</span>
+                <div></div> <!-- Spacer -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="public-main">
+        <div class="container">
+            {% block contenido %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer simple -->
+    <footer class="public-footer py-3 text-center">
+        <div class="container">
+            <small class="text-muted">&copy; 2025 MACII CREDES - Sistema de Monitoreo de Bienestar Psicológico</small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

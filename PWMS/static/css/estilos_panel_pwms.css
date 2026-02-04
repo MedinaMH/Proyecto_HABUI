@@ -34,7 +34,7 @@ body {
 .sidebar {
     min-height: calc(100vh - 56px);
     padding: 2rem 1rem;
-    background: linear-gradient(to bottom, #2a3c4e, #435e79);
+    background: linear-gradient(to bottom, #2a3c4e, #145ca3);
     border-right: 1px solid #dee2e6;
     box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1); /* sombra sutil hacia la derecha */
     color: #fff; /* texto blanco para buen contraste */

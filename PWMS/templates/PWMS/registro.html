@@ -1,69 +1,432 @@
-{% extends 'PWMS/estructura_base_PWMS.html' %}
 {% load static %}
-
-{% block title %}Registro de Usuario - PWMS{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="bi bi-person-plus me-2"></i>
-                        Registro de Nuevo Usuario
-                    </h4>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registro Completo - Sistema PWMS</title>
+    
+    <!-- Bootstrap local -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
+    
+    <!-- Estilos generales para formularios -->
+    <link rel="stylesheet" href="{% static 'css/formularios.css' %}">
+    
+    <!-- Estilos específicos para el registro de dos pasos -->
+    <link rel="stylesheet" href="{% static 'css/registro.css' %}">
+</head>
+<body>
+    <div class="registration-container">
+        <div class="registration-card">
+            <div class="registration-header">
+                <h1>
+                    <i class="bi bi-person-plus-fill me-2"></i>
+                    Registro Completo - Sistema PWMS
+                </h1>
+                <p class="subtitle">Monitoreo del Bienestar Psicológico</p>
+            </div>
+            
+            <div class="registration-body">
+                <!-- Indicador de pasos -->
+                <div class="step-indicator">
+                    <div class="step active">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Cuenta</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Perfil</div>
+                    </div>
                 </div>
                 
-                <div class="card-body">
-                    {% if messages %}
-                    <div class="mb-3">
-                        {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
-                            {{ message }}
-                        </div>
-                        {% endfor %}
+                <!-- Mensajes del sistema -->
+                {% if messages %}
+                <div class="registration-messages">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show d-flex align-items-center">
+                        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% elif message.tags == 'danger' %}x-circle{% else %}info-circle{% endif %}-fill me-2"></i>
+                        <div class="flex-grow-1">{{ message }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                     </div>
-                    {% endif %}
-                    
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Usuario</label>
-                            <input type="text" name="username" class="form-control" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Contraseña</label>
-                            <input type="password" name="password" class="form-control" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">PIN (4 dígitos)</label>
-                            <input type="text" name="pin" class="form-control" maxlength="4" required>
-                            <small class="text-muted">Solo números, 4 dígitos</small>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Email (opcional)</label>
-                            <input type="email" name="email" class="form-control">
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle me-2"></i>
-                                Registrarse
-                            </button>
-                            <a href="{% url 'PWMS:panel_login' %}" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-2"></i>
-                                Volver al Login
-                            </a>
-                        </div>
-                    </form>
+                    {% endfor %}
                 </div>
+                {% endif %}
+                
+                <!-- Formulario de registro -->
+                <form method="post" id="registrationForm" class="form-container">
+                    {% csrf_token %}
+                    
+                    <!-- Paso 1: Información de la cuenta -->
+                    <div class="step-content active" id="step1">
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="bi bi-shield-lock-fill"></i>
+                                Información de la Cuenta
+                            </h3>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-person-badge"></i>
+                                        Nombre de Usuario *
+                                    </label>
+                                    <input type="text" name="username" class="form-control form-control-lg" placeholder="Ingrese su usuario" required pattern=".{3,}" title="Mínimo 3 caracteres">
+                                    <div class="form-text">Este será tu nombre para iniciar sesión (mínimo 3 caracteres)</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-envelope"></i>
+                                        Correo Electrónico
+                                    </label>
+                                    <input type="email" name="email" class="form-control form-control-lg" placeholder="ejemplo@email.com">
+                                    <div class="form-text">Opcional - Para recuperación de cuenta</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-key-fill"></i>
+                                        Contraseña *
+                                    </label>
+                                    <input type="password" name="password" class="form-control form-control-lg" 
+                                           placeholder="••••••••" required
+                                           pattern=".{8,}" title="Mínimo 8 caracteres">
+                                    <div class="form-text">Mínimo 8 caracteres</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-lock-fill"></i>
+                                        PIN de Seguridad *
+                                    </label>
+                                    <input type="text" name="pin" id="pinInput" class="form-control form-control-lg" 
+                                           maxlength="4" placeholder="0000" pattern="\d{4}" required
+                                           title="4 dígitos numéricos">
+                                    <div class="form-text">4 dígitos numéricos para acceso rápido</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Paso 2: Información del perfil -->
+                    <div class="step-content" id="step2">
+                        <div class="form-section">
+                            <h3 class="form-section-title">
+                                <i class="bi bi-person-badge-fill"></i>
+                                Información Personal
+                            </h3>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-telephone-fill"></i>
+                                        Teléfono *
+                                    </label>
+                                    <input type="tel" name="telefono" class="form-control form-control-lg" 
+                                           placeholder="Ej: 555-1234567" required>
+                                    <div class="form-text">Para contacto y notificaciones</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-calendar-heart"></i>
+                                        Fecha de Nacimiento *
+                                    </label>
+                                    <input type="date" name="fecha_nacimiento" class="form-control form-control-lg" 
+                                           max="{% now 'Y-m-d' %}" required>
+                                    <div class="form-text">Selecciona tu fecha de nacimiento</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-gender-ambiguous"></i>
+                                        Género *
+                                    </label>
+                                    <select name="genero" class="form-select form-select-lg" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="masculino">Masculino</option>
+                                        <option value="femenino">Femenino</option>
+                                        <option value="otro">Otro</option>
+                                        <option value="prefiero_no_decirlo">Prefiero no decirlo</option>
+                                    </select>
+                                    <div class="form-text">Información para personalización</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-shield-check"></i>
+                                        Tu PIN de Seguridad
+                                    </label>
+                                    <div class="pin-display-container">
+                                        <div class="pin-display-label">PIN Configurado:</div>
+                                        <div class="pin-display-value" id="pinDisplay">----</div>
+                                        <small class="text-muted">Este es el PIN que configuraste en el paso anterior</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones de navegación -->
+                    <div class="form-button-group">
+                        <button type="button" id="prevBtn" class="btn btn-outline-secondary" style="display: none;">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Anterior
+                        </button>
+                        
+                        <div class="spacer"></div>
+                        
+                        <button type="button" id="nextBtn" class="btn btn-primary">
+                            Siguiente
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                        
+                        <button type="submit" id="submitBtn" class="btn btn-primary" style="display: none;">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Completar Registro
+                        </button>
+                        
+                        <a href="{% url 'PWMS:panel_login' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-2"></i>
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+    
+    <!-- Bootstrap JS -->
+    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+    
+    <!-- JavaScript para el formulario multi-paso -->
+    <script>
+        // ... (el mismo script de antes, pero sin los estilos)
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentStep = 1;
+            const totalSteps = 2;
+            
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const pinInput = document.getElementById('pinInput');
+            const pinDisplay = document.getElementById('pinDisplay');
+            const steps = document.querySelectorAll('.step');
+            
+            // Configurar el PIN display
+            function updatePinDisplay() {
+                const pinValue = pinInput.value || '----';
+                pinDisplay.textContent = pinValue.padEnd(4, '-').substring(0, 4);
+                
+                // Animar cambio
+                if (pinInput.value.length === 4) {
+                    pinDisplay.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        pinDisplay.style.transform = 'scale(1)';
+                    }, 300);
+                }
+            }
+            
+            // Inicializar display del PIN
+            updatePinDisplay();
+            pinInput.addEventListener('input', updatePinDisplay);
+            
+            // Función para mostrar paso específico
+            function showStep(step) {
+                // Ocultar todos los pasos
+                document.querySelectorAll('.step-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Mostrar el paso actual
+                document.getElementById(`step${step}`).classList.add('active');
+                
+                // Actualizar indicadores de pasos
+                steps.forEach((stepEl, index) => {
+                    if (index + 1 < step) {
+                        stepEl.classList.remove('active');
+                        stepEl.classList.add('completed');
+                    } else if (index + 1 === step) {
+                        stepEl.classList.add('active');
+                        stepEl.classList.remove('completed');
+                    } else {
+                        stepEl.classList.remove('active', 'completed');
+                    }
+                });
+                
+                // Actualizar visibilidad de botones
+                if (step === 1) {
+                    prevBtn.style.display = 'none';
+                    nextBtn.style.display = 'block';
+                    submitBtn.style.display = 'none';
+                } else if (step === totalSteps) {
+                    prevBtn.style.display = 'block';
+                    nextBtn.style.display = 'none';
+                    submitBtn.style.display = 'block';
+                }
+                
+                currentStep = step;
+                
+                // Scroll suave al principio del formulario
+                document.querySelector('.step-content.active').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+            
+            // Validar paso 1
+            function validateStep1() {
+                const username = document.querySelector('input[name="username"]');
+                const password = document.querySelector('input[name="password"]');
+                const pin = pinInput;
+                let isValid = true;
+                
+                // Resetear estados
+                [username, password, pin].forEach(input => {
+                    input.classList.remove('is-invalid');
+                });
+                
+                // Validar usuario
+                if (!username.value.trim() || username.value.length < 3) {
+                    username.classList.add('is-invalid');
+                    showValidationError('El usuario debe tener al menos 3 caracteres');
+                    isValid = false;
+                }
+                
+                // Validar contraseña
+                if (!password.value || password.value.length < 8) {
+                    password.classList.add('is-invalid');
+                    showValidationError('La contraseña debe tener al menos 8 caracteres');
+                    isValid = false;
+                }
+                
+                // Validar PIN
+                if (!pin.value || !/^\d{4}$/.test(pin.value)) {
+                    pin.classList.add('is-invalid');
+                    showValidationError('El PIN debe ser de exactamente 4 dígitos numéricos');
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+            
+            // Validar paso 2
+            function validateStep2() {
+                const telefono = document.querySelector('input[name="telefono"]');
+                const fechaNacimiento = document.querySelector('input[name="fecha_nacimiento"]');
+                const genero = document.querySelector('select[name="genero"]');
+                let isValid = true;
+                
+                // Resetear estados
+                [telefono, fechaNacimiento, genero].forEach(input => {
+                    input.classList.remove('is-invalid');
+                });
+                
+                // Validar teléfono
+                if (!telefono.value.trim()) {
+                    telefono.classList.add('is-invalid');
+                    showValidationError('Por favor ingresa tu número de teléfono');
+                    isValid = false;
+                }
+                
+                // Validar fecha de nacimiento
+                if (!fechaNacimiento.value) {
+                    fechaNacimiento.classList.add('is-invalid');
+                    showValidationError('Por favor selecciona tu fecha de nacimiento');
+                    isValid = false;
+                } else {
+                    const birthDate = new Date(fechaNacimiento.value);
+                    const today = new Date();
+                    if (birthDate >= today) {
+                        fechaNacimiento.classList.add('is-invalid');
+                        showValidationError('La fecha de nacimiento debe ser en el pasado');
+                        isValid = false;
+                    }
+                }
+                
+                // Validar género
+                if (!genero.value) {
+                    genero.classList.add('is-invalid');
+                    showValidationError('Por favor selecciona tu género');
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+            
+            // Mostrar mensaje de error
+            function showValidationError(message) {
+                // Crear o actualizar alerta de error
+                let errorAlert = document.querySelector('.alert-danger');
+                if (!errorAlert) {
+                    errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert alert-danger alert-dismissible fade show';
+                    errorAlert.innerHTML = `
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span>${message}</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    
+                    const messagesContainer = document.querySelector('.registration-messages');
+                    if (messagesContainer) {
+                        messagesContainer.prepend(errorAlert);
+                    } else {
+                        document.querySelector('.registration-body').insertBefore(
+                            errorAlert, 
+                            document.querySelector('.step-indicator')
+                        );
+                    }
+                } else {
+                    errorAlert.querySelector('span').textContent = message;
+                }
+                
+                // Auto-ocultar después de 5 segundos
+                setTimeout(() => {
+                    if (errorAlert) {
+                        const bsAlert = new bootstrap.Alert(errorAlert);
+                        bsAlert.close();
+                    }
+                }, 5000);
+            }
+            
+            // Event listeners para botones
+            nextBtn.addEventListener('click', function() {
+                if (validateStep1()) {
+                    showStep(2);
+                }
+            });
+            
+            prevBtn.addEventListener('click', function() {
+                showStep(1);
+            });
+            
+            // Validar formulario completo antes de enviar
+            document.getElementById('registrationForm').addEventListener('submit', function(e) {
+                if (!validateStep1() || !validateStep2()) {
+                    e.preventDefault();
+                    showValidationError('Por favor completa todos los campos requeridos correctamente.');
+                    showStep(1); // Volver al primer paso para correcciones
+                }
+            });
+            
+            // Validación en tiempo real para campos requeridos
+            document.querySelectorAll('input[required], select[required]').forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() === '') {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                        if (this.checkValidity()) {
+                            this.classList.add('is-valid');
+                        }
+                    }
+                });
+            });
+            
+            // Inicializar mostrando el primer paso
+            showStep(1);
+        });
+    </script>
+</body>
+</html>
