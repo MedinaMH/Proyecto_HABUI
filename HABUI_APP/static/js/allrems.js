@@ -10,7 +10,7 @@ svg.attr("width", width).attr("height", height);
 
 // Crear batería principal
 const batteryGroup = svg.append("g")
-    .attr("transform", `translate(${width/2 + 25}, 55)`);
+    .attr("transform", `translate(${width/2 + 25}, 22)`);
 
 // Cuerpo de la batería 
 const batteryWidth = 180; 
@@ -25,7 +25,7 @@ batteryGroup.append("rect")
     .attr("rx", 15) 
     .attr("ry", 15) 
     .attr("fill", "none")
-    .attr("stroke", "#4b5563")
+    .attr("stroke", "#ffffff")
     .attr("stroke-width", 6);
 
 // Terminal positivo 
@@ -59,15 +59,15 @@ for (let i = 0; i <= 100; i += 20) {
     .attr("y1", yPos)
     .attr("y2", yPos)
     .attr("stroke", "#6b7280")
-    .attr("stroke-width", 3); 
+    .attr("stroke-width", 4); 
     
     // Texto de porcentaje 
     batteryGroup.append("text")
     .attr("x", -batteryWidth/2 - 25)
     .attr("y", yPos + 5)
     .attr("text-anchor", "end")
-    .attr("fill", "#cbd5e1")
-    .attr("font-size", "20px")
+    .attr("fill", "#ffffff")
+    .attr("font-size", "28px")
     .attr("font-weight", "600")
     .text(i + "%");
 }
@@ -106,11 +106,11 @@ function updateBattery(soc) {
     const percentageLarge = document.getElementById('battery-percentage-large');
     if (percentageLarge) {
     percentageLarge.textContent = Math.round(socPercent) + '%';
-    percentageLarge.style.color = color;
-    percentageLarge.style.fontSize = '45px'; 
-    percentageLarge.style.fontWeight = '850'; 
-    percentageLarge.style.marginTop = '0px';
-    percentageLarge.style.textShadow = '0 3px 8px rgba(0,0,0,0.4)';
+    // percentageLarge.style.color = color;
+    // percentageLarge.style.fontSize = '45px'; 
+    // percentageLarge.style.fontWeight = '850'; 
+    // percentageLarge.style.marginTop = '0px';
+    // percentageLarge.style.textShadow = '0 3px 8px rgba(0,0,0,0.4)';
     }
     
     // Actualizar estado en el footer 
@@ -118,8 +118,8 @@ function updateBattery(soc) {
     if (statusElement) {
     statusElement.textContent = statusText;
     statusElement.style.color = color;
-    statusElement.style.fontSize = '2.0rem';
-    statusElement.style.fontWeight = '700';
+    // statusElement.style.fontSize = '2.0rem';
+    // statusElement.style.fontWeight = '700';
     }
     
     return socPercent;
@@ -149,7 +149,7 @@ const svg = container.append("svg")
 const tanqueWidth = 200;
 const tanqueHeight = 340;
 const tanqueX = (width - tanqueWidth) / 2;
-const tanqueY = 80;
+const tanqueY = 50;
 const tanqueCurvatura = 15;
 
 // --- Efectos 3D y sombras ---
@@ -233,7 +233,7 @@ const cuerpoTanque = svg.append("rect")
     .attr("rx", tanqueCurvatura)
     .attr("ry", tanqueCurvatura)
     .attr("fill", "url(#gradTanque)")
-    .attr("stroke", "#4a6572")
+    .attr("stroke", "#ffffff")
     .attr("stroke-width", 3);
 
 // Reflejo metálico
@@ -254,7 +254,7 @@ const tapa = svg.append("rect")
     .attr("height", 20)
     .attr("rx", 10)
     .attr("fill", "#2c3e50")
-    .attr("stroke", "#4a6572")
+    .attr("stroke", "#ffffff")
     .attr("stroke-width", 2);
 
 // Nivel de agua
@@ -300,7 +300,7 @@ for (let i = 0; i <= 100; i += 25) {
     .attr("x", tanqueX - 20)
     .attr("y", y + 4)
     .attr("fill", "#ffffffff")
-    .attr("font-size", "20px")
+    .attr("font-size", "28px")
     .attr("text-anchor", "end")
     .text(i + "%");
 }
@@ -321,7 +321,7 @@ for (let i = 0; i <= 100; i += 25) {
 
 const textoNivel = svg.append("text")
     .attr("x", tanqueX + tanqueWidth - 100)
-    .attr("y", tanqueY + tanqueHeight + 75)
+    .attr("y", tanqueY + tanqueHeight + 60)
     .attr("fill", "#00ffcc")
     .attr("font-size", "40px") 
     .attr("font-weight", "700")
@@ -544,18 +544,18 @@ function gaugeO2(containerId, initial) {
         white: "#ffffff"
     };
 
-    svg.append("text")
-        .attr("x", width/2)
-        .attr("y", 32)
-        .attr("fill", colorPalette.white)
-        .attr("font-size", "22px")
-        .attr("font-weight", "700")
-        .attr("text-anchor", "middle")
-        .text("O₂ (%)");
+    // svg.append("text")
+    //     .attr("x", width/2)
+    //     .attr("y", 32)
+    //     .attr("fill", colorPalette.white)
+    //     .attr("font-size", "22px")
+    //     .attr("font-weight", "700")
+    //     .attr("text-anchor", "middle")
+    //     .text("O₂ (%)");
 
     // outer frame
     const frameX = 85;
-    const frameY = 70;
+    const frameY = 15;
     const frameW = 180;
     const frameH = 360;
 
@@ -566,7 +566,7 @@ function gaugeO2(containerId, initial) {
         .attr("height", frameH)
         .attr("rx", 14)
         .attr("fill", "#0f172a")
-        .attr("stroke", colorPalette.darkGreen)
+        .attr("stroke", colorPalette.white)
         .attr("stroke-width", 3);
 
     // fill rect
@@ -590,7 +590,7 @@ function gaugeO2(containerId, initial) {
                 .attr("x", frameX - 20)
                 .attr("y", y + 4)
                 .attr("fill", colorPalette.white)
-                .attr("font-size", "18px")
+                .attr("font-size", "28px")
                 .attr("font-weight", "500")
                 .attr("text-anchor", "end")
                 .text(i + "%");
@@ -617,7 +617,7 @@ function gaugeO2(containerId, initial) {
     // Indicador de calidad
     const qualityText = svg.append("text")
         .attr("x", width/2)
-        .attr("y", frameY + frameH + 85)
+        .attr("y", frameY + frameH + 120)
         .attr("fill", colorFor(initial))
         .attr("font-size", "25px")
         .attr("font-weight", "600")
@@ -690,10 +690,10 @@ function gaugeO2(containerId, initial) {
             .text(valorLimitado.toFixed(2) + " %")
             .attr("fill", newColor);
 
-        qualityText
-            .transition().duration(300)
-            .text(qualityTextValue)
-            .attr("fill", newColor);
+        // qualityText
+        //     .transition().duration(300)
+        //     .text(qualityTextValue)
+        //     .attr("fill", newColor);
 
         // Actualizar elementos HTML
         const qualityElement = document.getElementById('oxigeno-quality');
@@ -886,18 +886,18 @@ function gaugeCO2(containerId, initial) {
         white: "#ffffff"
     };
 
-    svg.append("text")
-        .attr("x", width/2)
-        .attr("y", 32)
-        .attr("fill", colorPalette.white)
-        .attr("font-size", "22px")
-        .attr("font-weight", "700")
-        .attr("text-anchor", "middle")
-        .text("CO₂ (ppm)");
+    // svg.append("text")
+    //     .attr("x", width/2)
+    //     .attr("y", 32)
+    //     .attr("fill", colorPalette.white)
+    //     .attr("font-size", "22px")
+    //     .attr("font-weight", "700")
+    //     .attr("text-anchor", "middle")
+    //     .text("CO₂ (ppm)");
 
     // outer frame
     const frameX = 85;
-    const frameY = 60;
+    const frameY = 15;
     const frameW = 180;
     const frameH = 360;
 
@@ -908,13 +908,45 @@ function gaugeCO2(containerId, initial) {
         .attr("height", frameH)
         .attr("rx", 14)
         .attr("fill", "#0f172a")
-        .attr("stroke", colorPalette.darkGreen)
+        .attr("stroke", colorPalette.white)
         .attr("stroke-width", 3);
 
     // fill rect
     const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
+    
+    // ===================== LÍNEAS DE NIVEL PARA CO2 (0-3000 ppm) =====================
+    const nivelesCO2 = [0, 600, 1200, 1800, 2400, 3000];
+    
+    nivelesCO2.forEach(ppm => {
+        const y = scale(ppm);
+        
+        // Línea horizontal de nivel
+        svg.append("line")
+            .attr("x1", frameX - 10)
+            .attr("y1", y)
+            .attr("x2", frameX)
+            .attr("y2", y)
+            .attr("stroke", colorPalette.white)
+            .attr("stroke-width", 1.5);
 
-    // Crear y almacenar los elementos que se actualizarán
+        svg.append("text")
+            .attr("x", frameX - 20)
+            .attr("y", y + 4)
+            .attr("fill", colorPalette.white)
+            .attr("font-size", "28px")
+            .attr("font-weight", "500")
+            .attr("text-anchor", "end")
+            .text(formatPPM(ppm));
+    });
+    
+    // Función para formatear valores de ppm
+    function formatPPM(ppm) {
+        if (ppm >= 1000) {
+            return (ppm / 1000).toFixed(1) + 'k';  // Ej: 1000 → "1.0k", 2400 → "2.4k"
+        }
+        return ppm.toString();  // Ej: 0 → "0", 600 → "600"
+    }
+
     const fillRect = svg.append("rect")
         .attr("x", frameX)
         .attr("width", frameW)
@@ -935,7 +967,7 @@ function gaugeCO2(containerId, initial) {
     // Indicador de calidad
     const qualityText = svg.append("text")
         .attr("x", width/2)
-        .attr("y", frameY + frameH + 85)
+        .attr("y", frameY + frameH + 130)
         .attr("fill", colorFor(initial))
         .attr("font-size", "25px")
         .attr("font-weight", "600")
@@ -1188,8 +1220,8 @@ function gaugeTemperatura(containerId, initial) {
     const container = d3.select(containerId);
     container.html(""); // Limpiar contenedor
 
-    const width = 300;
-    const height = 520;
+    const width = 280;
+    const height = 420;
     const min = 0;      // °C mínimo visual
     const max = 45;     // °C máximo visual
 
@@ -1200,14 +1232,15 @@ function gaugeTemperatura(containerId, initial) {
     const tempPalette = {
         critico: "#ff6b6b",      // Rojo para CRÍTICO (<18°C o >26°C)
         advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA (18-20°C o 24-26°C)
-        optimo: "#69db7c"        // Verde para ÓPTIMO (20-24°C)
+        optimo: "#69db7c",        // Verde para ÓPTIMO (20-24°C)
+        contorno: "#ffffff"
     };
 
     // Diseño tipo termómetro
     const termometroX = width/2 - 15;
     const termometroY = 15;
-    const termometroH = 360;
-    const bulboRadio = 35;
+    const termometroH = 280;
+    const bulboRadio = 28;
 
     // Bulbo inferior
     svg.append("circle")
@@ -1215,7 +1248,7 @@ function gaugeTemperatura(containerId, initial) {
         .attr("cy", termometroY + termometroH + bulboRadio)
         .attr("r", bulboRadio)
         .attr("fill", "#0f1724")
-        .attr("stroke", tempPalette.critico)
+        .attr("stroke", tempPalette.contorno)
         .attr("stroke-width", 4);
 
     // Tubo del termómetro
@@ -1226,7 +1259,7 @@ function gaugeTemperatura(containerId, initial) {
         .attr("height", termometroH)
         .attr("rx", 15)
         .attr("fill", "#0f1724")
-        .attr("stroke", tempPalette.critico)
+        .attr("stroke", tempPalette.contorno)
         .attr("stroke-width", 3);
 
     // Escala para el mercurio
@@ -1253,9 +1286,9 @@ function gaugeTemperatura(containerId, initial) {
     // Valor numérico (justo arriba del texto del nivel)
     const valueText = svg.append("text")
         .attr("x", width/2 + 15)
-        .attr("y", termometroY + termometroH + bulboRadio + 70)
+        .attr("y", termometroY + termometroH + bulboRadio + 85)
         .attr("fill", tempPalette.critico)
-        .attr("font-size", "28px")
+        .attr("font-size", "40px")
         .attr("font-weight", "700")
         .attr("text-anchor", "middle")
         .text(initial.toFixed(1) + " °C");
@@ -1291,7 +1324,7 @@ function gaugeTemperatura(containerId, initial) {
     // TEXTO DE NIVEL
     const levelText = svg.append("text")
         .attr("x", width/2 + 15)
-        .attr("y", termometroY + termometroH + bulboRadio + 110) 
+        .attr("y", termometroY + termometroH + bulboRadio + 130) 
         .attr("fill", tempPalette.critico)
         .attr("font-size", "30px")  
         .attr("font-weight", "600")
@@ -1323,13 +1356,13 @@ function gaugeTemperatura(containerId, initial) {
             .attr("x2", termometroX)
             .attr("y1", y)
             .attr("y2", y)
-            .attr("stroke", tempPalette.critico)
+            .attr("stroke", tempPalette.contorno)
             .attr("stroke-width", 2);
         
         svg.append("text")
-            .attr("x", termometroX - 18)
+            .attr("x", termometroX - 25)
             .attr("y", y + 4)
-            .attr("fill", tempPalette.critico)
+            .attr("fill", tempPalette.contorno)
             .attr("font-size", "25px")
             .attr("text-anchor", "end")
             .text(temp + "°");
@@ -1557,12 +1590,13 @@ function gaugeHumedad(containerId, initial) {
     const humPalette = {
         critico: "#ff6b6b",      // Rojo para CRÍTICO (<30% o >70%)
         advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA (30-40% o 60-70%)
-        optimo: "#69db7c"        // Verde para ÓPTIMO (40-60%)
+        optimo: "#69db7c",        // Verde para ÓPTIMO (40-60%)
+        contorno: "#ffffff"
     };
 
     // outer frame
     const frameX = 85;
-    const frameY = 70;
+    const frameY = 15;
     const frameW = 180;
     const frameH = 360;
 
@@ -1573,7 +1607,7 @@ function gaugeHumedad(containerId, initial) {
         .attr("height", frameH)
         .attr("rx", 14)
         .attr("fill", "#0f1724")
-        .attr("stroke", humPalette.critico)
+        .attr("stroke", humPalette.contorno)
         .attr("stroke-width", 3);
 
     // fill rect
@@ -1625,7 +1659,7 @@ function gaugeHumedad(containerId, initial) {
     // Indicador de nivel
     const levelText = svg.append("text")
         .attr("x", width/2+30)
-        .attr("y", frameY + frameH + 85)
+        .attr("y", frameY + frameH + 130)
         .attr("fill", humPalette.critico)
         .attr("font-size", "25px")
         .attr("font-weight", "600")

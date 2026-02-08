@@ -62,7 +62,7 @@ body, html {
 /* ===== LAYOUT DE GRID ===== */
 .grid-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    grid-template-columns: repeat(3, minmax(360px, 1fr));
     gap: 25px;
     margin-bottom: 30px;
     /* margin: 0 20px 30px 20px; */
@@ -71,8 +71,6 @@ body, html {
 /* ===== TARJETAS DE RECURSOS ===== */
 .resource-card {
     background: rgba(15, 23, 42, 0.95);
-    /* background: #0f172a; */ /* Color sólido más oscuro */
-    /* background: rgba(2, 6, 23, 0.95); */ /* Aún más oscuro #020617 */
     border-radius: 16px;
     padding: 20px;
     border: 1px solid #334155;
@@ -80,7 +78,7 @@ body, html {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
-    min-height: 620px;
+    min-height: 610px;
 }
 
 .resource-card:hover {
@@ -100,7 +98,7 @@ body, html {
 
 .card-header h2 {
     margin: 0;
-    font-size: 1.4rem;
+    font-size: 2.2rem;
     color: #efe2f0;
     display: flex;
     align-items: center;
@@ -193,7 +191,7 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 480px;
+    min-height: 460px;
     width: 100%;
 }
 
@@ -202,28 +200,35 @@ body, html {
 .oxigeno-gauge-container svg,
 .co2-gauge-container svg {
     max-width: 100%;
-    max-height: 480px;
+    max-height: 460px;
 }
 
 /* ===== FOOTER DE TARJETAS ===== */
 .card-footer {
-    margin-top: 20px;
-    padding-top: 15px;
+    margin-top: 10px;
+    padding: 8px 0;
     border-top: 1px solid #334155;
     display: flex;
     justify-content: space-between;
+    align-items: center; /* Alinear en una sola línea */
+    gap: 15px; /* Espacio entre stats */
     flex-shrink: 0;
 }
 
 .stat {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
+    flex-direction: row;
+    align-items: center; /* Centrar verticalmente */
+    gap: 8px;
+    flex: 1; /* Ocupar espacio disponible */
+    min-width: 1.2; /* Permitir reducción */
 }
 
 .stat-label {
     font-size: 1.5rem;
     color: #94a3b8;
+    white-space: nowrap;
+    font-weight: 500;
 }
 
 .stat-value {
@@ -231,6 +236,8 @@ body, html {
     font-weight: 600;
     color: #e2e8f0;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ===== COLORES POR RECURSO ===== */
@@ -422,7 +429,7 @@ body, html {
     font-size: 42px;
     font-weight: 800;
     color: #10b981;
-    /* margin-top: 50px; */
+    margin-top: -50px;
     margin-bottom: 20px;
     text-align: center;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
