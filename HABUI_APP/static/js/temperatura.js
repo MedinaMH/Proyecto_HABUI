@@ -1,333 +1,334 @@
 document.addEventListener("DOMContentLoaded", function () {
     d3.select("body").style("background-color", "#0b0f19");
 
-// ===================== GAUGE TERMÓMETRO =====================
-function gaugeTemperatura(containerId, initial) {
-    const container = d3.select(containerId);
-    container.html(""); // Limpiar contenedor
+    // ===================== GAUGE TERMÓMETRO =====================
+    function gaugeTemperatura(containerId, initial) {
+        const container = d3.select(containerId);
+        container.html(""); // Limpiar contenedor
 
-    const width = 300;
-    const height = 520;
-    const min = 0;      // °C mínimo visual
-    const max = 45;     // °C máximo visual
+        const width = 300;
+        const height = 520;
+        const min = 0;      // °C mínimo visual
+        const max = 45;     // °C máximo visual
 
-    const svg = container.append("svg")
-        .attr("width", width)
-        .attr("height", height);
+        const svg = container.append("svg")
+            .attr("width", width)
+            .attr("height", height);
 
-    // Paleta de colores según el semáforo de 3 estados
-    const tempPalette = {
-        critico: "#ff6b6b",      // Rojo para CRÍTICO (<18°C o >26°C)
-        advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA (18-20°C o 24-26°C)
-        optimo: "#69db7c"        // Verde para ÓPTIMO (20-24°C)
-    };
-
-    // Diseño tipo termómetro
-    const termometroX = width/2 - 15;
-    const termometroY = 15;
-    const termometroH = 360;
-    const bulboRadio = 35;
-
-    // Bulbo inferior
-    svg.append("circle")
-        .attr("cx", width/2 + 15)
-        .attr("cy", termometroY + termometroH + bulboRadio)
-        .attr("r", bulboRadio)
-        .attr("fill", "#0f1724")
-        .attr("stroke", tempPalette.critico)
-        .attr("stroke-width", 4);
-
-    // Tubo del termómetro
-    svg.append("rect")
-        .attr("x", termometroX)
-        .attr("y", termometroY)
-        .attr("width", 60)
-        .attr("height", termometroH)
-        .attr("rx", 15)
-        .attr("fill", "#0f1724")
-        .attr("stroke", tempPalette.critico)
-        .attr("stroke-width", 3);
-
-    // Escala para el mercurio
-    const scale = d3.scaleLinear()
-        .domain([min, max])
-        .range([termometroY + termometroH, termometroY]);
-
-    // Mercurio (líquido del termómetro)
-    const mercurio = svg.append("rect")
-        .attr("x", termometroX + 4)
-        .attr("width", 52)
-        .attr("y", scale(initial))
-        .attr("height", Math.max(2, (termometroY + termometroH) - scale(initial)))
-        .attr("fill", tempPalette.critico)
-        .attr("rx", 11);
-
-    // Mercurio en el bulbo
-    const mercurioBulbo = svg.append("circle")
-        .attr("cx", width/2 + 15)
-        .attr("cy", termometroY + termometroH + bulboRadio)
-        .attr("r", bulboRadio - 5)
-        .attr("fill", tempPalette.critico);
-
-    // Valor numérico (justo arriba del texto del nivel)
-    const valueText = svg.append("text")
-        .attr("x", width/2 + 15)
-        .attr("y", termometroY + termometroH + bulboRadio + 70)
-        .attr("fill", tempPalette.critico)
-        .attr("font-size", "28px")
-        .attr("font-weight", "700")
-        .attr("text-anchor", "middle")
-        .text(initial.toFixed(1) + " °C");
-
-    // FUNCIÓN para determinar nivel de temperatura según el semáforo
-    function getTempLevel(v) {
-        if (v < 18 || v > 26) return {
-            nivel: "CRÍTICO", 
-            emoji: "⚠️",
-            color: tempPalette.critico,
-            estado: "critico"
+        // Paleta de colores según el semáforo de 3 estados
+        const tempPalette = {
+            critico: "#ff6b6b",      // Rojo para CRÍTICO (<18°C o >26°C)
+            advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA (18-20°C o 24-26°C)
+            optimo: "#69db7c",        // Verde para ÓPTIMO (20-24°C)
+            white: "#ffffff"
         };
-        if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return {
-            nivel: "ADVERTENCIA", 
-            emoji: "⚠️",
-            color: tempPalette.advertencia,
-            estado: "advertencia"
-        };
-        return {
-            nivel: "ÓPTIMO", 
-            emoji: "✅",
-            color: tempPalette.optimo,
-            estado: "optimo"
-        };
-    }
 
-    // Función para determinar color según temperatura
-    function colorFor(v) {
-        const level = getTempLevel(v);
-        return level.color;
-    }
+        // Diseño tipo termómetro
+        const termometroX = width/2 - 15;
+        const termometroY = 15;
+        const termometroH = 360;
+        const bulboRadio = 35;
 
-    // TEXTO DE NIVEL
-    const levelText = svg.append("text")
-        .attr("x", width/2 + 15)
-        .attr("y", termometroY + termometroH + bulboRadio + 110) 
-        .attr("fill", tempPalette.critico)
-        .attr("font-size", "30px")  
-        .attr("font-weight", "600")
-        .attr("text-anchor", "middle")
-        .text(getTempLevel(initial).nivel);
+        // Bulbo inferior
+        svg.append("circle")
+            .attr("cx", width/2 + 15)
+            .attr("cy", termometroY + termometroH + bulboRadio)
+            .attr("r", bulboRadio)
+            .attr("fill", "#0f1724")
+            .attr("stroke", tempPalette.white)
+            .attr("stroke-width", 4);
 
-    // TEXTO DESCRIPTIVO 
-    const descText = svg.append("text")
-        .attr("x", width/2 + 15)
-        .attr("y", termometroY + termometroH + bulboRadio + 125)
-        .attr("fill", "#94a3b8")  // Color gris para contraste
-        .attr("font-size", "14px")
-        .attr("font-weight", "500")
-        .attr("text-anchor", "middle")
-        .text(getTempDescription(initial));
+        // Tubo del termómetro
+        svg.append("rect")
+            .attr("x", termometroX)
+            .attr("y", termometroY)
+            .attr("width", 60)
+            .attr("height", termometroH)
+            .attr("rx", 15)
+            .attr("fill", "#0f1724")
+            .attr("stroke", tempPalette.white)
+            .attr("stroke-width", 3);
 
-    // Función para obtener descripción según el nivel
-    function getTempDescription(v) {
-        if (v < 18 || v > 26) return "Riesgo fisiológico, estrés térmico";
-        if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return "Leve incomodidad térmica";
-        return "Zona de confort térmico humano óptimo";
-    }
+        // Escala para el mercurio
+        const scale = d3.scaleLinear()
+            .domain([min, max])
+            .range([termometroY + termometroH, termometroY]);
 
-    // Marcas de escala
-    for (let temp = min; temp <= max; temp += 5) {
-        const y = scale(temp);
-        svg.append("line")
-            .attr("x1", termometroX - 20)
-            .attr("x2", termometroX)
-            .attr("y1", y)
-            .attr("y2", y)
-            .attr("stroke", tempPalette.critico)
-            .attr("stroke-width", 2);
-        
-        svg.append("text")
-            .attr("x", termometroX - 18)
-            .attr("y", y + 4)
+        // Mercurio (líquido del termómetro)
+        const mercurio = svg.append("rect")
+            .attr("x", termometroX + 4)
+            .attr("width", 52)
+            .attr("y", scale(initial))
+            .attr("height", Math.max(2, (termometroY + termometroH) - scale(initial)))
             .attr("fill", tempPalette.critico)
-            .attr("font-size", "25px")
-            .attr("text-anchor", "end")
-            .text(temp + "°");
-    }
+            .attr("rx", 11);
 
-    // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
-    async function cargarUltimoDatoBD() {
-        try {
-            console.log('Cargando datos de Temperatura desde BD para obtener el último...');
-            const response = await fetch('/api/temperatura/');
+        // Mercurio en el bulbo
+        const mercurioBulbo = svg.append("circle")
+            .attr("cx", width/2 + 15)
+            .attr("cy", termometroY + termometroH + bulboRadio)
+            .attr("r", bulboRadio - 5)
+            .attr("fill", tempPalette.critico);
+
+        // Valor numérico (justo arriba del texto del nivel)
+        const valueText = svg.append("text")
+            .attr("x", width/2 + 15)
+            .attr("y", termometroY + termometroH + bulboRadio + 70)
+            .attr("fill", tempPalette.critico)
+            .attr("font-size", "40px")
+            .attr("font-weight", "700")
+            .attr("text-anchor", "middle")
+            .text(initial.toFixed(1) + " °C");
+
+        // FUNCIÓN para determinar nivel de temperatura según el semáforo
+        function getTempLevel(v) {
+            if (v < 18 || v > 26) return {
+                nivel: "CRÍTICO", 
+                emoji: "⚠️",
+                color: tempPalette.critico,
+                estado: "critico"
+            };
+            if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return {
+                nivel: "ADVERTENCIA", 
+                emoji: "⚠️",
+                color: tempPalette.advertencia,
+                estado: "advertencia"
+            };
+            return {
+                nivel: "ÓPTIMO", 
+                emoji: "✅",
+                color: tempPalette.optimo,
+                estado: "optimo"
+            };
+        }
+
+        // Función para determinar color según temperatura
+        function colorFor(v) {
+            const level = getTempLevel(v);
+            return level.color;
+        }
+
+        // TEXTO DE NIVEL
+        const levelText = svg.append("text")
+            .attr("x", width/2 + 15)
+            .attr("y", termometroY + termometroH + bulboRadio + 110) 
+            .attr("fill", tempPalette.critico)
+            .attr("font-size", "36px")  
+            .attr("font-weight", "600")
+            .attr("text-anchor", "middle")
+            .text(getTempLevel(initial).nivel);
+
+        // TEXTO DESCRIPTIVO 
+        const descText = svg.append("text")
+            .attr("x", width/2 + 15)
+            .attr("y", termometroY + termometroH + bulboRadio + 125)
+            .attr("fill", "#94a3b8")  // Color gris para contraste
+            .attr("font-size", "14px")
+            .attr("font-weight", "500")
+            .attr("text-anchor", "middle")
+            .text(getTempDescription(initial));
+
+        // Función para obtener descripción según el nivel
+        function getTempDescription(v) {
+            if (v < 18 || v > 26) return "Riesgo fisiológico, estrés térmico";
+            if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return "Leve incomodidad térmica";
+            return "Zona de confort térmico humano óptimo";
+        }
+
+        // Marcas de escala
+        for (let temp = min; temp <= max; temp += 5) {
+            const y = scale(temp);
+            svg.append("line")
+                .attr("x1", termometroX - 20)
+                .attr("x2", termometroX)
+                .attr("y1", y)
+                .attr("y2", y)
+                .attr("stroke", tempPalette.white)
+                .attr("stroke-width", 2);
             
-            if (!response.ok) {
-                console.log('No se pudieron obtener datos de Temperatura de la BD');
-                // Si no hay datos se agrega 22°C como valor por defecto (dentro del rango óptimo)
-                actualizarGauge(22.0);
-                return 22.0;
-            }
-            
-            const datos = await response.json();
-            
-            if (datos && Array.isArray(datos) && datos.length > 0) {
-                // Tomar el primer elemento (el más reciente)
-                const ultimoDato = datos[0];
+            svg.append("text")
+                .attr("x", termometroX - 18)
+                .attr("y", y + 4)
+                .attr("fill", tempPalette.white)
+                .attr("font-size", "28px")
+                .attr("text-anchor", "end")
+                .text(temp + "°");
+        }
+
+        // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
+        async function cargarUltimoDatoBD() {
+            try {
+                console.log('Cargando datos de Temperatura desde BD para obtener el último...');
+                const response = await fetch('/api/temperatura/');
                 
-                // Extraer el valor de Temperatura
-                let ultimoValor;
-                if (ultimoDato.temperatura !== undefined) {
-                    ultimoValor = parseFloat(ultimoDato.temperatura);
-                } else if (ultimoDato.valor !== undefined) {
-                    ultimoValor = parseFloat(ultimoDato.valor);
-                } else {
-                    // Si no encuentra temperatura ni valor, usar 22°C (óptimo)
-                    console.log('Campo no encontrado, usando valor por defecto 22°C');
-                    ultimoValor = 22.0;
+                if (!response.ok) {
+                    console.log('No se pudieron obtener datos de Temperatura de la BD');
+                    // Si no hay datos se agrega 22°C como valor por defecto (dentro del rango óptimo)
+                    actualizarGauge(22.0);
+                    return 22.0;
                 }
                 
-                console.log('Último dato de Temperatura encontrado:', ultimoValor.toFixed(1) + ' °C', 
-                        'Estado:', getTempLevel(ultimoValor).nivel,
-                        'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
+                const datos = await response.json();
                 
-                // Actualizar el gauge con el último valor de la BD
-                actualizarGauge(ultimoValor);
-                
-                return ultimoValor;
-            } else {
-                console.log('No hay datos de Temperatura en la BD, usando valor por defecto 22°C');
-                // Si no hay datos, usar 22°C como valor por defecto (dentro del rango óptimo)
+                if (datos && Array.isArray(datos) && datos.length > 0) {
+                    // Tomar el primer elemento (el más reciente)
+                    const ultimoDato = datos[0];
+                    
+                    // Extraer el valor de Temperatura
+                    let ultimoValor;
+                    if (ultimoDato.temperatura !== undefined) {
+                        ultimoValor = parseFloat(ultimoDato.temperatura);
+                    } else if (ultimoDato.valor !== undefined) {
+                        ultimoValor = parseFloat(ultimoDato.valor);
+                    } else {
+                        // Si no encuentra temperatura ni valor, usar 22°C (óptimo)
+                        console.log('Campo no encontrado, usando valor por defecto 22°C');
+                        ultimoValor = 22.0;
+                    }
+                    
+                    console.log('Último dato de Temperatura encontrado:', ultimoValor.toFixed(1) + ' °C', 
+                            'Estado:', getTempLevel(ultimoValor).nivel,
+                            'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
+                    
+                    // Actualizar el gauge con el último valor de la BD
+                    actualizarGauge(ultimoValor);
+                    
+                    return ultimoValor;
+                } else {
+                    console.log('No hay datos de Temperatura en la BD, usando valor por defecto 22°C');
+                    // Si no hay datos, usar 22°C como valor por defecto (dentro del rango óptimo)
+                    actualizarGauge(22.0);
+                    return 22.0;
+                }
+            } catch (error) {
+                console.log('Error al cargar datos de Temperatura:', error);
+                // En caso de error, usar 22°C como valor por defecto (dentro del rango óptimo)
                 actualizarGauge(22.0);
                 return 22.0;
             }
-        } catch (error) {
-            console.log('Error al cargar datos de Temperatura:', error);
-            // En caso de error, usar 22°C como valor por defecto (dentro del rango óptimo)
-            actualizarGauge(22.0);
-            return 22.0;
         }
-    }
 
-    // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
-    async function cargarDatosRecientesBD(limite = 10) {
-        try {
-            console.log(`Cargando últimos ${limite} datos de Temperatura...`);
-            const response = await fetch('/api/temperatura/');
-            
-            if (!response.ok) {
-                console.log('No se pudieron obtener datos de Temperatura de la BD');
+        // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
+        async function cargarDatosRecientesBD(limite = 10) {
+            try {
+                console.log(`Cargando últimos ${limite} datos de Temperatura...`);
+                const response = await fetch('/api/temperatura/');
+                
+                if (!response.ok) {
+                    console.log('No se pudieron obtener datos de Temperatura de la BD');
+                    return [];
+                }
+                
+                const datos = await response.json();
+                
+                if (datos && Array.isArray(datos)) {
+                    // Tomar los primeros 'limite' elementos (los más recientes)
+                    const datosRecientes = datos.slice(0, limite);
+                    
+                    // Procesar y formatear datos
+                    const datosFormateados = datosRecientes.map(dato => {
+                        let valor;
+                        // Buscar el campo de temperatura
+                        if (dato.temperatura !== undefined) {
+                            valor = parseFloat(dato.temperatura);
+                        } else if (dato.valor !== undefined) {
+                            valor = parseFloat(dato.valor);
+                        } else {
+                            return null;
+                        }
+                        
+                        if (isNaN(valor)) return null;
+                        
+                        const nivelInfo = getTempLevel(valor);
+                        
+                        return {
+                            id: dato.id || `temp-${Date.now()}-${Math.random()}`,
+                            valor: valor,
+                            fecha: dato.fecha_hora || dato.timestamp,
+                            nivel: nivelInfo.nivel,
+                            estado: nivelInfo.estado,
+                            color: nivelInfo.color
+                        };
+                    }).filter(dato => dato !== null);
+                    
+                    console.log(`Cargados ${datosFormateados.length} datos recientes de Temperatura`);
+                    return datosFormateados;
+                }
+                
+                return [];
+            } catch (error) {
+                console.log('Error al cargar datos recientes de Temperatura:', error);
                 return [];
             }
-            
-            const datos = await response.json();
-            
-            if (datos && Array.isArray(datos)) {
-                // Tomar los primeros 'limite' elementos (los más recientes)
-                const datosRecientes = datos.slice(0, limite);
-                
-                // Procesar y formatear datos
-                const datosFormateados = datosRecientes.map(dato => {
-                    let valor;
-                    // Buscar el campo de temperatura
-                    if (dato.temperatura !== undefined) {
-                        valor = parseFloat(dato.temperatura);
-                    } else if (dato.valor !== undefined) {
-                        valor = parseFloat(dato.valor);
-                    } else {
-                        return null;
-                    }
-                    
-                    if (isNaN(valor)) return null;
-                    
-                    const nivelInfo = getTempLevel(valor);
-                    
-                    return {
-                        id: dato.id || `temp-${Date.now()}-${Math.random()}`,
-                        valor: valor,
-                        fecha: dato.fecha_hora || dato.timestamp,
-                        nivel: nivelInfo.nivel,
-                        estado: nivelInfo.estado,
-                        color: nivelInfo.color
-                    };
-                }).filter(dato => dato !== null);
-                
-                console.log(`Cargados ${datosFormateados.length} datos recientes de Temperatura`);
-                return datosFormateados;
+        }
+
+        // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
+        function actualizarGauge(newVal) {
+            const y = scale(newVal);
+            const h = Math.max(2, (termometroY + termometroH) - y);
+            const newLevel = getTempLevel(newVal);
+            const newColor = newLevel.color;
+
+            mercurio
+                .transition().duration(300)
+                .attr("y", y)
+                .attr("height", h)
+                .attr("fill", newColor);
+
+            mercurioBulbo
+                .transition().duration(300)
+                .attr("fill", newColor);
+
+            valueText
+                .transition().duration(300)
+                .text(newVal.toFixed(1) + " °C")
+                .attr("fill", newColor);
+
+            // Actualizar texto del nivel
+            levelText
+                .transition().duration(300)
+                .text(newLevel.nivel)
+                .attr("fill", newColor);
+
+            // Actualizar texto descriptivo
+            descText
+                .transition().duration(300)
+                .text(getTempDescription(newVal))
+                .attr("fill", "#94a3b8");
+        }
+
+        // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
+        // Cargar el último dato al iniciar (con un pequeño retraso para asegurar que el DOM esté listo)
+        setTimeout(() => {
+            cargarUltimoDatoBD();
+        }, 500);
+
+        // =================== RETORNO DE FUNCIONES ===================
+        // Crear objeto de retorno con todas las funciones
+        const gaugeObject = {
+            update: function(newVal) {
+                actualizarGauge(newVal);
+            },
+            cargarUltimoDato: cargarUltimoDatoBD,
+            cargarDatosRecientes: cargarDatosRecientesBD,
+            actualizar: actualizarGauge,
+            obtenerColorSegunValor: colorFor,
+            obtenerNivelTemperatura: getTempLevel,
+            // Función para obtener el nivel actual
+            getNivelActual: function() {
+                return getTempLevel(parseFloat(valueText.text().replace(' °C', '')));
             }
-            
-            return [];
-        } catch (error) {
-            console.log('Error al cargar datos recientes de Temperatura:', error);
-            return [];
-        }
+        };
+
+        return gaugeObject;
     }
-
-    // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
-    function actualizarGauge(newVal) {
-        const y = scale(newVal);
-        const h = Math.max(2, (termometroY + termometroH) - y);
-        const newLevel = getTempLevel(newVal);
-        const newColor = newLevel.color;
-
-        mercurio
-            .transition().duration(300)
-            .attr("y", y)
-            .attr("height", h)
-            .attr("fill", newColor);
-
-        mercurioBulbo
-            .transition().duration(300)
-            .attr("fill", newColor);
-
-        valueText
-            .transition().duration(300)
-            .text(newVal.toFixed(1) + " °C")
-            .attr("fill", newColor);
-
-        // Actualizar texto del nivel
-        levelText
-            .transition().duration(300)
-            .text(newLevel.nivel)
-            .attr("fill", newColor);
-
-        // Actualizar texto descriptivo
-        descText
-            .transition().duration(300)
-            .text(getTempDescription(newVal))
-            .attr("fill", "#94a3b8");
-    }
-
-    // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
-    // Cargar el último dato al iniciar (con un pequeño retraso para asegurar que el DOM esté listo)
-    setTimeout(() => {
-        cargarUltimoDatoBD();
-    }, 500);
-
-    // =================== RETORNO DE FUNCIONES ===================
-    // Crear objeto de retorno con todas las funciones
-    const gaugeObject = {
-        update: function(newVal) {
-            actualizarGauge(newVal);
-        },
-        cargarUltimoDato: cargarUltimoDatoBD,
-        cargarDatosRecientes: cargarDatosRecientesBD,
-        actualizar: actualizarGauge,
-        obtenerColorSegunValor: colorFor,
-        obtenerNivelTemperatura: getTempLevel,
-        // Función para obtener el nivel actual
-        getNivelActual: function() {
-            return getTempLevel(parseFloat(valueText.text().replace(' °C', '')));
-        }
-    };
-
-    return gaugeObject;
-}
 
     // ===================== SERIE TEMPORAL DE TEMPERATURA =====================
     function lineChartTemperatura(containerId) {
         const container = d3.select(containerId);
         container.html(""); // Limpiar contenedor
 
-        const outerW = 720, outerH = 520;
+        const outerW = 1200, outerH = 600;
         const margin = {top: 50, right: 40, bottom: 60, left: 80};
         const width = outerW - margin.left - margin.right;
         const height = outerH - margin.top - margin.bottom;
@@ -336,7 +337,7 @@ function gaugeTemperatura(containerId, initial) {
             .attr("width", outerW)
             .attr("height", outerH)
             .style("background", "#0f172a")
-            .style("border", "2px solid #1e293b")
+            .style("border", "3px solid #ffffff")
             .style("border-radius", "12px")
             .style("box-shadow", "0 4px 20px rgba(0, 0, 0, 0.15)");
 
@@ -487,9 +488,9 @@ function gaugeTemperatura(containerId, initial) {
         g.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -height/2)
-            .attr("y", -68)
-            .attr("fill", "#ff6b6b")
-            .attr("font-size", "14px")
+            .attr("y", -60)
+            .attr("fill", "#ffffff")
+            .attr("font-size", "22px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text("TEMPERATURA (°C)");
@@ -497,8 +498,8 @@ function gaugeTemperatura(containerId, initial) {
         g.append("text")
             .attr("x", width/2)
             .attr("y", height + 40)
-            .attr("fill", "#ff6b6b")
-            .attr("font-size", "14px")
+            .attr("fill", "#ffffff")
+            .attr("font-size", "22px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text(TRANSLATIONS.tiempo || "Tiempo");

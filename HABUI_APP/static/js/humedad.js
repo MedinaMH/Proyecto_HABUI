@@ -14,20 +14,12 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("height", height)
             .style("border-radius", "8px");
 
-        svg.append("text")
-            .attr("x", width/2)
-            .attr("y", 32)
-            .attr("fill", "#ffffffff")
-            .attr("font-size", "22px")
-            .attr("font-weight", "700")
-            .attr("text-anchor", "middle")
-            .text("HUMEDAD (%)");
-
         // Paleta de colores según el semáforo de 3 estados
         const humPalette = {
             critico: "#ff6b6b",      // Rojo para CRÍTICO (<30% o >70%)
             advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA (30-40% o 60-70%)
-            optimo: "#69db7c"        // Verde para ÓPTIMO (40-60%)
+            optimo: "#69db7c",        // Verde para ÓPTIMO (40-60%)
+            white: "#ffffff" 
         };
 
         // outer frame
@@ -43,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("height", frameH)
             .attr("rx", 14)
             .attr("fill", "#0f1724")
-            .attr("stroke", humPalette.critico)
+            .attr("stroke", humPalette.white)
             .attr("stroke-width", 3);
 
         // fill rect
@@ -97,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("x", width/2+30)
             .attr("y", frameY + frameH + 85)
             .attr("fill", humPalette.critico)
-            .attr("font-size", "25px")
+            .attr("font-size", "36px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text(getNivelTexto(initial));
@@ -298,7 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const container = d3.select(containerId);
         container.html("");
 
-        const outerW = 720, outerH = 520;
+        const outerW = 1200, outerH = 600;
         const margin = {top: 50, right: 40, bottom: 60, left: 80};
         const width = outerW - margin.left - margin.right;
         const height = outerH - margin.top - margin.bottom;
@@ -307,7 +299,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("width", outerW)
             .attr("height", outerH)
             .style("background", "#0f172a")
-            .style("border", "3px solid #ff6b6b")
+            .style("border", "3px solid #ffffff")
             .style("border-radius", "12px")
             .style("box-shadow", "0 4px 20px rgba(255, 107, 107, 0.15)");
 
@@ -458,9 +450,9 @@ document.addEventListener("DOMContentLoaded", function () {
         g.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -height/2)
-            .attr("y", -68)
-            .attr("fill", "#ff6b6b")
-            .attr("font-size", "14px")
+            .attr("y", -60)
+            .attr("fill", "#ffffff")
+            .attr("font-size", "22px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text("HUMEDAD (%)");
@@ -468,8 +460,8 @@ document.addEventListener("DOMContentLoaded", function () {
         g.append("text")
             .attr("x", width/2)
             .attr("y", height + 40)
-            .attr("fill", "#ff6b6b")
-            .attr("font-size", "14px")
+            .attr("fill", "#ffffff")
+            .attr("font-size", "22px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text("Tiempo");

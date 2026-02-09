@@ -30,15 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
             white: "#ffffff"
         };
 
-        svg.append("text")
-            .attr("x", width/2)
-            .attr("y", 32)
-            .attr("fill", colorPalette.white)
-            .attr("font-size", "22px")
-            .attr("font-weight", "700")
-            .attr("text-anchor", "middle")
-            .text("O₂ (%)");
-
         // outer frame
         const frameX = 85;
         const frameY = 70;
@@ -52,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("height", frameH)
             .attr("rx", 14)
             .attr("fill", "#0f172a")
-            .attr("stroke", colorPalette.darkGreen)
+            .attr("stroke", colorPalette.white)
             .attr("stroke-width", 3);
 
         // fill rect
@@ -104,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("x", width/2)
             .attr("y", frameY + frameH + 85)
             .attr("fill", colorFor(initial))
-            .attr("font-size", "25px")
+            .attr("font-size", "36px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text(getQualityText(initial));
@@ -271,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const container = d3.select(containerId);
         container.html("");
 
-        const outerW = 720, outerH = 520;
+        const outerW = 1200, outerH = 600;
         const margin = {top: 50, right: 40, bottom: 60, left: 70};
         const width = outerW - margin.left - margin.right;
         const height = outerH - margin.top - margin.bottom;
@@ -280,7 +271,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("width", outerW)
             .attr("height", outerH)
             .style("background", "#0f172a")
-            .style("border", "3px solid #00ff88")
+            .style("border", "3px solid #ffffff")
             .style("border-radius", "12px")
             .style("box-shadow", "0 4px 20px rgba(0, 255, 136, 0.15)");
 
@@ -423,8 +414,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("transform", "rotate(-90)")
             .attr("x", -height/2)
             .attr("y", -50)
-            .attr("fill", "#00ff88")
-            .attr("font-size", "14px")
+            .attr("fill", "#ffffff")
+            .attr("font-size", "22px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text("O₂ (%)");
@@ -433,8 +424,8 @@ document.addEventListener("DOMContentLoaded", function () {
         g.append("text")
             .attr("x", width/2)
             .attr("y", height + 40)
-            .attr("fill", "#00ff88")
-            .attr("font-size", "14px")
+            .attr("fill", "#ffffff")
+            .attr("font-size", "22px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text(TRANSLATIONS.tiempo || "Tiempo");

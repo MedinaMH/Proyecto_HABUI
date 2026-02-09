@@ -425,7 +425,7 @@ function crearSerieTemporalAgua() {
     const container = d3.select("#serie-temporal");
     container.html(""); // Limpiar contenedor
 
-    const outerW = 720, outerH = 520;
+    const outerW = 1200, outerH = 600;
     const margin = { top: 50, right: 40, bottom: 60, left: 80 };
     const width = outerW - margin.left - margin.right;
     const height = outerH - margin.top - margin.bottom;
@@ -434,7 +434,7 @@ function crearSerieTemporalAgua() {
         .attr("width", outerW)
         .attr("height", outerH)
         .style("background", "#0f172a")
-        .style("border", "3px solid #00bfff")
+        .style("border", "3px solid #ffffff")
         .style("border-radius", "12px")
         .style("box-shadow", "0 4px 20px rgba(0, 191, 255, 0.15)");
 
@@ -578,9 +578,9 @@ function crearSerieTemporalAgua() {
     g.append("text")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
-        .attr("y", -68)
-        .attr("fill", "#00bfff")
-        .attr("font-size", "14px")
+        .attr("y", -50)
+        .attr("fill", "#ffffff")
+        .attr("font-size", "22px")
         .attr("font-weight", "600")
         .attr("text-anchor", "middle")
         .text(TRANSLATIONS.nivel || "Nivel (%)");
@@ -588,8 +588,8 @@ function crearSerieTemporalAgua() {
     g.append("text")
         .attr("x", width / 2)
         .attr("y", height + 40)
-        .attr("fill", "#00bfff")
-        .attr("font-size", "14px")
+        .attr("fill", "#ffffff")
+        .attr("font-size", "22px")
         .attr("font-weight", "600")
         .attr("text-anchor", "middle")
         .text(TRANSLATIONS.tiempo || "Tiempo");

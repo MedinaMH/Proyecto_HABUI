@@ -37,6 +37,12 @@ document.addEventListener("DOMContentLoaded", function () {
             quality: "CRÍTICO",
             description: "Riesgo fisiológico, hipercapnia progresiva",
             icon: "🔴"
+        },
+        {
+            min: 2000,
+            max: Infinity,
+            color: "#ffffff",
+            textColor: "#ffffff"
         }
     ];
 
@@ -64,27 +70,43 @@ document.addEventListener("DOMContentLoaded", function () {
     function gaugeCO2(containerId, initial) {
         const container = d3.select(containerId);
         container.html(""); // Limpiar contenedor
-
+        
         const width = 300;
         const height = 520;
+        const min = 0.0;
+        const max = 3000.0; // Máximo 3000 ppm para mejor visualización
 
         const svg = container.append("svg")
             .attr("width", width)
-            .attr("height", height)
-            .style("border-radius", "8px");
+            .attr("height", height);
 
-        svg.append("text")
-            .attr("x", width/2)
-            .attr("y", 32)
-            .attr("fill", "#ffffffff")
-            .attr("font-size", "22px")
-            .attr("font-weight", "700")
-            .attr("text-anchor", "middle")
-            .text("CO₂ (ppm)");
+        // Paleta de colores según los rangos especificados para CO2
+        const colorPalette = {
+            // Óptimo: 400 – 1,000 ppm
+            green: "#10b981",     // Verde
+            // Advertencia: 1,000 – 2,000 ppm
+            yellow: "#fbbf24",    // Amarillo
+            // Crítico: > 2,000 ppm
+            red: "#ef4444",       // Rojo
+            // Colores adicionales
+            lightGreen: "#34d399",
+            darkGreen: "#059669",
+            lightRed: "#f87171",
+            white: "#ffffff"
+        };
+
+        // svg.append("text")
+        //     .attr("x", width/2)
+        //     .attr("y", 32)
+        //     .attr("fill", colorPalette.white)
+        //     .attr("font-size", "22px")
+        //     .attr("font-weight", "700")
+        //     .attr("text-anchor", "middle")
+        //     .text("CO₂ (ppm)");
 
         // outer frame
-        const frameX = 60;
-        const frameY = 70;
+        const frameX = 85;
+        const frameY = 15;
         const frameW = 180;
         const frameH = 360;
 
@@ -94,86 +116,159 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("width", frameW)
             .attr("height", frameH)
             .attr("rx", 14)
-            .attr("fill", "#0f1724")
-            .attr("stroke", "#4caf50") // Cambiado de naranja a verde por defecto
+            .attr("fill", "#0f172a")
+            .attr("stroke", colorPalette.white)
             .attr("stroke-width", 3);
 
         // fill rect
-        const min = 300;
-        const max = 3000; // Aumentado para permitir valores críticos altos
         const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
+        
+        // ===================== LÍNEAS DE NIVEL PARA CO2 (0-3000 ppm) =====================
+        const nivelesCO2 = [0, 600, 1200, 1800, 2400, 3000];
+        
+        nivelesCO2.forEach(ppm => {
+            const y = scale(ppm);
+            
+            // Línea horizontal de nivel
+            svg.append("line")
+                .attr("x1", frameX - 10)
+                .attr("y1", y)
+                .attr("x2", frameX)
+                .attr("y2", y)
+                .attr("stroke", colorPalette.white)
+                .attr("stroke-width", 1.5);
+
+            svg.append("text")
+                .attr("x", frameX - 20)
+                .attr("y", y + 4)
+                .attr("fill", colorPalette.white)
+                .attr("font-size", "28px")
+                .attr("font-weight", "500")
+                .attr("text-anchor", "end")
+                .text(formatPPM(ppm));
+        });
+        
+        // Función para formatear valores de ppm
+        function formatPPM(ppm) {
+            if (ppm >= 1000) {
+                return (ppm / 1000).toFixed(1) + 'k';  // Ej: 1000 → "1.0k", 2400 → "2.4k"
+            }
+            return ppm.toString();  // Ej: 0 → "0", 600 → "600"
+        }
 
         const fillRect = svg.append("rect")
             .attr("x", frameX)
             .attr("width", frameW)
             .attr("y", scale(initial))
             .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
-            .attr("fill", getRangeForValue(initial).color)
+            .attr("fill", colorFor(initial))
             .attr("rx", 12);
 
         const valueText = svg.append("text")
             .attr("x", width/2)
             .attr("y", frameY + frameH + 50)
-            .attr("fill", getRangeForValue(initial).textColor)
+            .attr("fill", colorFor(initial))
             .attr("font-size", "40px")
             .attr("font-weight", "700")
             .attr("text-anchor", "middle")
-            .text(initial + " ppm");
+            .text(initial.toFixed(0) + " ppm");
 
         // Indicador de calidad
         const qualityText = svg.append("text")
             .attr("x", width/2)
-            .attr("y", frameY + frameH + 85)
-            .attr("fill", getRangeForValue(initial).textColor)
-            .attr("font-size", "25px")
+            .attr("y", frameY + frameH + 100)
+            .attr("fill", colorFor(initial))
+            .attr("font-size", "36px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
-            .text(getRangeForValue(initial).quality);
+            .text(getQualityText(initial));
 
-        // NUEVA: Descripción técnica
-        const descriptionText = svg.append("text")
-            .attr("x", width/2)
-            .attr("y", frameY + frameH + 115)
-            .attr("fill", "#94a3b8")
-            .attr("font-size", "14px")
-            .attr("font-weight", "400")
-            .attr("text-anchor", "middle")
-            .style("max-width", "250px")
-            .text(getRangeForValue(initial).description);
-
-        // Función para obtener color según el valor (mantenida por compatibilidad)
+        // Definir funciones auxiliares primero
         function colorFor(v) {
-            return getRangeForValue(v).color;
-        }
-
-        // Función para obtener texto de calidad (mantenida por compatibilidad)
-        function getQualityText(v) {
-            return getRangeForValue(v).quality;
-        }
-
-        // Estadísticas
-        const stats = {
-            current: initial,
-            min: initial,
-            max: initial,
-            history: []
-        };
-
-        // Actualizar estadísticas
-        function updateStats(newVal) {
-            stats.current = newVal;
-            stats.min = Math.min(stats.min, newVal);
-            stats.max = Math.max(stats.max, newVal);
-            stats.history.push({
-                value: newVal,
-                timestamp: new Date().toISOString(),
-                range: getRangeForValue(newVal)
-            });
+            // Asegurar que el valor esté entre 0 y max (3000 ppm)
+            const valor = Math.max(min, Math.min(max, v));
             
-            // Mantener solo los últimos 100 valores en el historial
-            if (stats.history.length > 100) {
-                stats.history.shift();
+            // Rangos
+            if (valor >= 400 && valor <= 1000) {
+                return colorPalette.green;      // Óptimo (verde)
+            } else if (valor > 1000 && valor <= 2000) {
+                return colorPalette.yellow;     // Advertencia (amarillo)
+            } else {
+                return colorPalette.red;        // Crítico (rojo)
             }
+        }
+
+        function getQualityText(v) {
+            // Asegurar que el valor esté entre 0 y max (3000 ppm)
+            const valor = Math.max(min, Math.min(max, v));
+            
+            if (valor >= 400 && valor <= 1000) {
+                return "ÓPTIMO";
+            } else if (valor > 1000 && valor <= 2000) {
+                return "ADVERTENCIA";
+            } else {
+                return "¡CRÍTICO!";
+            }
+        }
+
+        // Función para obtener texto corto para el footer
+        function getFooterQualityText(v) {
+            // Asegurar que el valor esté entre 0 y max (3000 ppm)
+            const valor = Math.max(min, Math.min(max, v));
+            if (valor >= 400 && valor <= 1000) {
+                return "ÓPTIMO";
+            } else if (valor > 1000 && valor <= 2000) {
+                return "ADVERTENCIA";
+            } else {
+                return "CRÍTICO";
+            }
+        }
+
+        // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
+        function actualizarGauge(newVal) {
+            // LIMITAR EL VALOR ENTRE min y max
+            const valorLimitado = Math.max(min, Math.min(max, newVal));
+            
+            const y = scale(valorLimitado);
+            const h = Math.max(2, (frameY + frameH) - y);
+            const newColor = colorFor(valorLimitado);
+            const qualityTextValue = getQualityText(valorLimitado);
+
+            // Actualizar elementos SVG
+            fillRect
+                .transition().duration(300)
+                .attr("y", y)
+                .attr("height", h)
+                .attr("fill", newColor);
+
+            valueText
+                .transition().duration(300)
+                .text(valorLimitado.toFixed(0) + " ppm")
+                .attr("fill", newColor);
+
+            qualityText
+                .transition().duration(300)
+                .text(qualityTextValue)
+                .attr("fill", newColor);
+
+            // Actualizar elementos HTML
+            const qualityElement = document.getElementById('co2-concentration');
+            const timeElement = document.getElementById('co2-time');
+            
+            if (qualityElement) {
+                const footerText = getFooterQualityText(valorLimitado);
+                qualityElement.textContent = footerText;
+                qualityElement.style.color = newColor;
+            }
+            
+            if (timeElement) {
+                const ahora = new Date();
+                const horaStr = ahora.getHours().toString().padStart(2, '0') + ':' + 
+                            ahora.getMinutes().toString().padStart(2, '0');
+                timeElement.textContent = horaStr;
+            }
+
+            return valorLimitado;
         }
 
         // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
@@ -194,11 +289,26 @@ document.addEventListener("DOMContentLoaded", function () {
                     const ultimoDato = datos[0];
                     
                     // Extraer el valor de CO₂
-                    let ultimoValor;
-                    ultimoValor = parseFloat(ultimoDato.concentracion);
+                    let ultimoValor = null;
+                    
+                    if (ultimoDato.concentracion !== undefined && ultimoDato.concentracion !== null) {
+                        ultimoValor = parseFloat(ultimoDato.concentracion);
+                    } else if (ultimoDato.valor !== undefined && ultimoDato.valor !== null) {
+                        ultimoValor = parseFloat(ultimoDato.valor);
+                    } else if (ultimoDato.nivel !== undefined && ultimoDato.nivel !== null) {
+                        ultimoValor = parseFloat(ultimoDato.nivel);
+                    } else {
+                        console.log('Campo "concentracion", "valor" o "nivel" no encontrado en:', ultimoDato);
+                        return null;
+                    }
+                    
+                    if (isNaN(ultimoValor)) {
+                        console.log('Valor de CO₂ no es un número:', ultimoDato);
+                        return null;
+                    }
+                    
                     console.log('Último dato de CO₂ encontrado:', ultimoValor.toFixed(0) + ' ppm', 
-                            'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp,
-                            'Rango:', getRangeForValue(ultimoValor).quality);
+                            'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
                     
                     // Actualizar el gauge con el último valor de la BD
                     actualizarGauge(ultimoValor);
@@ -231,22 +341,37 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Tomar los primeros 'limite' elementos (los más recientes)
                     const datosRecientes = datos.slice(0, limite);
                     
-                    // Procesar y formatear datos con los nuevos rangos
+                    // Procesar y formatear datos
                     const datosFormateados = datosRecientes.map(dato => {
-                        let valor;                  
-                        valor = parseFloat(dato.concentracion);                   
+                        let valor;
+                        
+                        if (dato.concentracion !== undefined && dato.concentracion !== null) {
+                            valor = parseFloat(dato.concentracion);
+                        } else if (dato.valor !== undefined && dato.valor !== null) {
+                            valor = parseFloat(dato.valor);
+                        } else if (dato.nivel !== undefined && dato.nivel !== null) {
+                            valor = parseFloat(dato.nivel);
+                        } else {
+                            return null;
+                        }
+                        
                         if (isNaN(valor)) return null;
                         
-                        const range = getRangeForValue(valor);
+                        // Determinar calidad según rangos de CO2
+                        let calidad;
+                        if (valor >= 400 && valor <= 1000) {
+                            calidad = "ÓPTIMO";
+                        } else if (valor > 1000 && valor <= 2000) {
+                            calidad = "ADVERTENCIA";
+                        } else {
+                            calidad = "CRÍTICO";
+                        }
                         
                         return {
                             id: dato.id,
                             valor: valor,
                             fecha: dato.fecha_hora || dato.timestamp,
-                            calidad: range.quality,
-                            color: range.color,
-                            icon: range.icon,
-                            descripcion: range.description
+                            calidad: calidad
                         };
                     }).filter(dato => dato !== null);
                     
@@ -261,45 +386,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
-        function actualizarGauge(newVal) {
-            const range = getRangeForValue(newVal);
-            const y = scale(newVal);
-            const h = Math.max(2, (frameY + frameH) - y);
-            const newColor = range.color;
-            const newTextColor = range.textColor;
-
-            // Actualizar borde del gauge según el nivel
-            svg.select("rect[stroke]")
-                .transition().duration(300)
-                .attr("stroke", newTextColor);
-
-            fillRect
-                .transition().duration(300)
-                .attr("y", y)
-                .attr("height", h)
-                .attr("fill", newColor);
-
-            valueText
-                .transition().duration(300)
-                .text(Math.round(newVal) + " ppm")
-                .attr("fill", newTextColor);
-
-            qualityText
-                .transition().duration(300)
-                .text(range.quality)
-                .attr("fill", newTextColor);
-
-            descriptionText
-                .transition().duration(300)
-                .text(range.description);
-            
-            // Actualizar estadísticas
-            updateStats(newVal);
-        }
-
         // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
-        // Cargar el último dato al iniciar (con un pequeño retraso para asegurar que el DOM esté listo)
+        // Cargar el último dato al iniciar
         setTimeout(() => {
             cargarUltimoDatoBD();
         }, 500);
@@ -308,32 +396,28 @@ document.addEventListener("DOMContentLoaded", function () {
         // Crear objeto de retorno con todas las funciones
         const gaugeObject = {
             update: function(newVal) {
-                actualizarGauge(newVal);
+                // Versión pública de update que también actualiza elementos HTML
+                const valorActualizado = actualizarGauge(newVal);
+                
+                // Retornar información para usar en otros lugares
+                return {
+                    valor: valorActualizado,
+                    calidad: getQualityText(valorActualizado),
+                    color: colorFor(valorActualizado),
+                    textoFooter: getFooterQualityText(valorActualizado)
+                };
             },
             cargarUltimoDato: cargarUltimoDatoBD,
             cargarDatosRecientes: cargarDatosRecientesBD,
             actualizar: actualizarGauge,
             obtenerColorSegunValor: colorFor,
             obtenerTextoCalidad: getQualityText,
-            obtenerRango: getRangeForValue,
-            // Obtener estadísticas
-            getStats: function() {
+            obtenerRangos: function() {
                 return {
-                    ...stats,
-                    calidadActual: getQualityText(stats.current),
-                    colorActual: colorFor(stats.current),
-                    rangeActual: getRangeForValue(stats.current)
+                    optimo: { min: 400, max: 1000, color: colorPalette.green, estado: "ÓPTIMO" },
+                    advertencia: { min: 1000, max: 2000, color: colorPalette.yellow, estado: "ADVERTENCIA" },
+                    critico: { min: 2000, max: 3000, color: colorPalette.red, estado: "CRÍTICO" }
                 };
-            },
-            // Obtener configuración de rangos
-            getRanges: function() {
-                return CO2_RANGES;
-            },
-            // Resetear estadísticas
-            resetStats: function() {
-                stats.min = stats.current;
-                stats.max = stats.current;
-                stats.history = [];
             }
         };
 
@@ -345,7 +429,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const container = d3.select(containerId);
         container.html("");
 
-        const outerW = 720, outerH = 520;
+        const outerW = 1200, outerH = 600;
         const margin = {top: 50, right: 40, bottom: 60, left: 80};
         const width = outerW - margin.left - margin.right;
         const height = outerH - margin.top - margin.bottom;
@@ -354,7 +438,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("width", outerW)
             .attr("height", outerH)
             .style("background", "#0f172a")
-            .style("border", "3px solid #4caf50") // Cambiado a verde por defecto
+            .style("border", "3px solid #ffffff") // Cambiado a verde por defecto
             .style("border-radius", "12px")
             .style("box-shadow", "0 4px 20px rgba(76, 175, 80, 0.15)");
 
@@ -498,9 +582,9 @@ document.addEventListener("DOMContentLoaded", function () {
         g.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -height/2)
-            .attr("y", -68)
-            .attr("fill", "#4caf50")
-            .attr("font-size", "14px")
+            .attr("y", -62)
+            .attr("fill", "#ffffff")
+            .attr("font-size", "22px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text("CO₂ (ppm)");
@@ -508,8 +592,8 @@ document.addEventListener("DOMContentLoaded", function () {
         g.append("text")
             .attr("x", width/2)
             .attr("y", height + 40) // 40px debajo del eje X
-            .attr("fill", "#4caf50")
-            .attr("font-size", "14px")
+            .attr("fill", "#ffffff")
+            .attr("font-size", "22px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
             .text(TRANSLATIONS.tiempo || "Tiempo");
