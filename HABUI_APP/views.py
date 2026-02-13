@@ -11,9 +11,6 @@ from rest_framework.views import APIView
 from django.utils import timezone
 from django.db import transaction
 # from .utils.data_simulator import DataSimulator
-import altair as alt
-import pandas as pd
-import plotly.express as px
 # import json
 from .models import RecursoAgua, RecursoCO2, RecursoOxigeno, Recurso
 from .import models, serializers
