@@ -55,7 +55,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(self.style.SUCCESS("Recurso 'Oxígeno' ya existe."))
 
-        self.stdout.write(self.style.SUCCESS(f"Iniciando simulador O₂ en modo: {mode}"))
+        self.stdout.write(self.style.SUCCESS(f"Iniciando simulador Oxigeno en modo: {mode}"))
         
         if mode == 'aleatorio':
             self.stdout.write("Modo aleatorio: Se alternará entre diferentes estados")
@@ -167,7 +167,7 @@ class Command(BaseCommand):
                 i += 1
                 time.sleep(intervalo)
 
-            self.stdout.write(self.style.SUCCESS("Simulador O₂ finalizado."))
+            self.stdout.write(self.style.SUCCESS("Simulador Oxigeno finalizado."))
         except KeyboardInterrupt:
             self.stdout.write("Simulación detenida.")
 

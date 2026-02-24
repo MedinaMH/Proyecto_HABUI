@@ -51,9 +51,9 @@ class Command(BaseCommand):
         )
 
         if creado:
-            self.stdout.write(self.style.SUCCESS("Recurso 'Sensor de Temperatura (°C)' creado automáticamente."))
+            self.stdout.write(self.style.SUCCESS("Recurso 'Sensor de Temperatura' creado automáticamente."))
         else:
-            self.stdout.write(self.style.SUCCESS("Recurso 'Sensor de Temperatura (°C)' ya existe."))
+            self.stdout.write(self.style.SUCCESS("Recurso 'Sensor de Temperatura' ya existe."))
 
         self.stdout.write(self.style.SUCCESS(f"Iniciando simulador Temperatura en modo: {mode}"))
         
@@ -64,10 +64,10 @@ class Command(BaseCommand):
             self.stdout.write(f"Deriva configurada: {drift_rate} °C por minuto")
         
         self.stdout.write(f"Nivel de ruido: ±{noise_level} °C")
-        self.stdout.write("\n📊 Rangos de referencia:")
-        self.stdout.write("  🟢 ÓPTIMO: 20.0 - 24.0 °C (Zona de confort)")
-        self.stdout.write("  🟡 ADVERTENCIA: 18.0 - 20.0 °C o 24.0 - 26.0 °C (Leve incomodidad)")
-        self.stdout.write("  🔴 CRÍTICO: < 18.0 °C o > 26.0 °C (Riesgo fisiológico)")
+        self.stdout.write("\nRangos de referencia:")
+        self.stdout.write(" ÓPTIMO: 20.0 - 24.0 °C (Zona de confort)")
+        self.stdout.write(" ADVERTENCIA: 18.0 - 20.0 °C o 24.0 - 26.0 °C (Leve incomodidad)")
+        self.stdout.write(" CRÍTICO: < 18.0 °C o > 26.0 °C (Riesgo fisiológico)")
 
         i = 1
         base_value = 22.0  # Valor inicial (dentro del rango óptimo)

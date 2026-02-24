@@ -2024,13 +2024,13 @@ function inicializarWebSockets() {
         wsBateria = new WebSocket("ws://" + window.location.host + "/ws/energia/");
         
         wsBateria.onopen = function() {
-            console.log("✅ WebSocket Batería conectado");
+            console.log("WebSocket Batería conectado");
             connectionStatus.bateria = true;
             actualizarEstadoConexion();
         };
         
         wsBateria.onmessage = function(e) {
-            console.log("📥 Datos recibidos de batería:", e.data);
+            console.log("Datos recibidos de batería:", e.data);
             try {
                 const data = JSON.parse(e.data);
                 const soc = parseFloat(data.battery);
@@ -2096,13 +2096,13 @@ function inicializarWebSockets() {
         wsAgua = new WebSocket("ws://" + window.location.host + "/ws/agua/");
         
         wsAgua.onopen = function() {
-            console.log("✅ WebSocket Agua conectado");
+            console.log("WebSocket Agua conectado");
             connectionStatus.agua = true;
             actualizarEstadoConexion();
         };
         
         wsAgua.onmessage = function(e) {
-            console.log("📥 Datos recibidos de agua:", e.data);
+            console.log("Datos recibidos de agua:", e.data);
             try {
                 const data = JSON.parse(e.data);
                 const valor = parseFloat(data.nivel);
@@ -2163,13 +2163,13 @@ function inicializarWebSockets() {
         wsO2 = new WebSocket(`${protocol}//${host}/ws/oxigeno/`);
         
         wsO2.onopen = function() {
-            console.log("✅ WebSocket Oxígeno conectado");
+            console.log("WebSocket Oxígeno conectado");
             connectionStatus.oxigeno = true;
             actualizarEstadoConexion();
         };
         
         wsO2.onmessage = function(e) {
-            console.log("📥 Datos recibidos de oxígeno:", e.data);
+            console.log("Datos recibidos de oxígeno:", e.data);
             try {
                 const data = JSON.parse(e.data);
                 if (gaugeO2Instancia) {

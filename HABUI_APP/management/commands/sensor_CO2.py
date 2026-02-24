@@ -51,11 +51,11 @@ class Command(BaseCommand):
         )
 
         if creado:
-            self.stdout.write(self.style.SUCCESS("Recurso 'Dióxido de Carbono (CO₂)' creado automáticamente."))
+            self.stdout.write(self.style.SUCCESS("Recurso 'Dióxido de Carbono' creado automáticamente."))
         else:
-            self.stdout.write(self.style.SUCCESS("Recurso 'Dióxido de Carbono (CO₂)' ya existe."))
+            self.stdout.write(self.style.SUCCESS("Recurso 'Dióxido de Carbono' ya existe."))
 
-        self.stdout.write(self.style.SUCCESS(f"Iniciando simulador CO₂ en modo: {mode}"))
+        self.stdout.write(self.style.SUCCESS(f"Iniciando simulador CO2 en modo: {mode}"))
         
         if mode == 'aleatorio':
             self.stdout.write("Modo aleatorio: Se alternará entre diferentes estados cada 15 segundos")
@@ -204,7 +204,7 @@ class Command(BaseCommand):
                 i += 1
                 time.sleep(intervalo)
 
-            self.stdout.write(self.style.SUCCESS("Simulador CO₂ finalizado."))
+            self.stdout.write(self.style.SUCCESS("Simulador CO2 finalizado."))
             
         except KeyboardInterrupt:
             self.stdout.write("Simulación detenida.")

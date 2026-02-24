@@ -1,4 +1,5 @@
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.admin.views.decorators import staff_member_required
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -10,8 +11,9 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
 from django.utils import timezone
 from django.db import transaction
+from HABUI_APP.management.process_manager import process_manager
 # from .utils.data_simulator import DataSimulator
-# import json
+import json
 from .models import RecursoAgua, RecursoCO2, RecursoOxigeno, Recurso
 from .import models, serializers
 # Create your views here.
@@ -665,3 +667,195 @@ def control_inicial(request):
 
 def control_alimentos(request):
     return render(request, 'modulo_control/control_alimentos.html')
+
+
+# ================motor de simulacion =======================
+def control_sensores(request):
+    """Vista principal del panel de control de simulaciones"""
+    context = {
+        'comandos_disponibles': [
+            {
+                'nombre': 'sensor_agua',
+                'descripcion': 'Simulador de Agua',
+                'modos': [
+                    {'valor': 'normal', 'nombre': 'Normal'},
+                    {'valor': 'llenado', 'nombre': 'Llenado'},
+                    {'valor': 'consumo', 'nombre': 'Consumo'},
+                    {'valor': 'critico', 'nombre': 'Crítico'},
+                ],
+                'requiere_id': True,  # --recurso-id es required=True
+                'parametros_extra': ['interval', 'count']
+            },
+            {
+                'nombre': 'sensor_CO2',
+                'descripcion': 'Simulador de CO2',
+                'modos': [
+                    {'valor': 'normal', 'nombre': 'Normal'},
+                    {'valor': 'optimo', 'nombre': 'Óptimo'},
+                    {'valor': 'advertencia', 'nombre': 'Advertencia'},
+                    {'valor': 'critico', 'nombre': 'Crítico'},
+                    {'valor': 'aleatorio', 'nombre': 'Aleatorio'},
+                    {'valor': 'variacion', 'nombre': 'Variación'},
+                ],
+                'requiere_id': False,
+                'parametros_extra': ['interval', 'count', 'drift', 'noise']
+            },
+            {
+                'nombre': 'sensor_oxigeno',
+                'descripcion': 'Simulador de Oxígeno',
+                'modos': [
+                    {'valor': 'normal', 'nombre': 'Normal'},
+                    {'valor': 'optimo', 'nombre': 'Óptimo'},
+                    {'valor': 'critico_bajo', 'nombre': 'Crítico Bajo'},
+                    {'valor': 'critico_alto', 'nombre': 'Crítico Alto'},
+                    {'valor': 'advertencia_baja', 'nombre': 'Advertencia Baja'},
+                    {'valor': 'advertencia_alta', 'nombre': 'Advertencia Alta'},
+                    {'valor': 'aleatorio', 'nombre': 'Aleatorio'},
+                ],
+                'requiere_id': False,
+                'parametros_extra': ['interval', 'count', 'drift']
+            },
+            {
+                'nombre': 'sensor_humedad',
+                'descripcion': 'Simulador de Humedad',
+                'modos': [
+                    {'valor': 'normal', 'nombre': 'Normal'},
+                    {'valor': 'optimo', 'nombre': 'Óptimo'},
+                    {'valor': 'advertencia', 'nombre': 'Advertencia'},
+                    {'valor': 'critico', 'nombre': 'Crítico'},
+                    {'valor': 'aleatorio', 'nombre': 'Aleatorio'},
+                    {'valor': 'variacion', 'nombre': 'Variación'},
+                ],
+                'requiere_id': False,
+                'parametros_extra': ['interval', 'count', 'drift', 'noise']
+            },
+            {
+                'nombre': 'sensor_temperatura',
+                'descripcion': 'Simulador de Temperatura',
+                'modos': [
+                    {'valor': 'normal', 'nombre': 'Normal'},
+                    {'valor': 'optimo', 'nombre': 'Óptimo'},
+                    {'valor': 'advertencia', 'nombre': 'Advertencia'},
+                    {'valor': 'critico', 'nombre': 'Crítico'},
+                    {'valor': 'aleatorio', 'nombre': 'Aleatorio'},
+                    {'valor': 'variacion', 'nombre': 'Variación'},
+                ],
+                'requiere_id': False,
+                'parametros_extra': ['interval', 'count', 'drift', 'noise']
+            },
+            {
+                'nombre': 'simulador_fallar_energia',
+                'descripcion': 'Simulador de Energía',
+                'modos': [
+                    {'valor': 'normal', 'nombre': 'Normal'},
+                ],
+                'requiere_id': False,
+                'parametros_extra': ['interval', 'capacity', 'initial_soc', 'low_energy_mode']
+            },
+        ],
+    }
+    return render(request, 'modulo_control/sensores.html', context)
+
+
+@csrf_exempt
+def api_iniciar_simulacion(request):
+    """API para iniciar una simulación (sin BD)"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            comando = data.get('comando')
+            argumentos = data.get('argumentos', {})
+            
+            # Validar comando existente
+            comandos_validos = [
+                'sensor_agua', 'sensor_CO2', 'sensor_oxigeno', 
+                'sensor_humedad', 'sensor_temperatura', 'simulador_fallar_energia'
+            ]
+            
+            if comando not in comandos_validos:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Comando no válido'
+                }, status=400)
+            
+            # Validaciones específicas por comando
+            if comando == 'sensor_agua' and 'recurso-id' not in argumentos:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'El simulador de agua requiere --recurso-id'
+                }, status=400)
+            
+            # Iniciar proceso
+            simulacion_id = process_manager.iniciar_simulacion(comando, argumentos)
+            
+            return JsonResponse({
+                'status': 'success',
+                'simulacion_id': simulacion_id,
+                'message': f'Simulación {comando} iniciada'
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+    
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+def api_detener_simulacion(request, simulacion_id):
+    """API para detener una simulación"""
+    if request.method == 'POST':
+        try:
+            detenido = process_manager.detener_simulacion(simulacion_id)
+            
+            if detenido:
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Simulación detenida'
+                })
+            else:
+                return JsonResponse({
+                    'status': 'warning',
+                    'message': 'La simulación no existe o ya terminó'
+                })
+                
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+    
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+def api_listar_simulaciones(request):
+    """API para listar simulaciones (activas e históricas)"""
+    simulaciones = process_manager.listar_simulaciones()
+    
+    return JsonResponse({
+        'simulaciones': simulaciones
+    })
+
+
+def api_detalle_simulacion(request, simulacion_id):
+    """API para obtener detalles de una simulación"""
+    simulacion = process_manager.obtener_simulacion(simulacion_id)
+    
+    if not simulacion:
+        return JsonResponse({'error': 'Simulación no encontrada'}, status=404)
+    
+    # Obtener logs
+    logs = process_manager.obtener_logs(simulacion_id, 100)
+    
+    data = {
+        'id': simulacion['id'],
+        'comando': simulacion['comando'],
+        'argumentos': simulacion['argumentos'],
+        'estado': simulacion['estado'],
+        'inicio': simulacion['inicio'],
+        'pid': simulacion['pid'],
+        'logs': logs
+    }
+    
+    return JsonResponse(data)

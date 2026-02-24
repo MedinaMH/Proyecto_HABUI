@@ -1,6 +1,7 @@
 # HABUI_APP/consumers.py
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from HABUI_APP.management.process_manager import process_manager 
 
 class AguaConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -115,3 +116,78 @@ class TemperaturaAlimentosConsumer(AsyncWebsocketConsumer):
         # El motor de simulación envía {"type": "enviar_dato", "data": {...}}
         data = event["data"]
         await self.send(text_data=json.dumps(data))
+
+class SimulacionConsumer(AsyncWebsocketConsumer):
+    """WebSocket para monitorear simulaciones"""
+    
+    async def connect(self):
+        self.simulacion_id = self.scope['url_route']['kwargs']['simulacion_id']
+        self.group_name = f'simulacion_{self.simulacion_id}'
+        
+        # Verificar que la simulación existe
+        simulacion = process_manager.obtener_simulacion(self.simulacion_id)
+        
+        if simulacion:
+            await self.channel_layer.group_add(
+                self.group_name,
+                self.channel_name
+            )
+            await self.accept()
+            
+            # Enviar logs históricos al conectar
+            await self.enviar_logs_historicos()
+        else:
+            await self.close()
+    
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.group_name,
+            self.channel_name
+        )
+    
+    async def receive(self, text_data):
+        """Recibe comandos desde el frontend"""
+        try:
+            data = json.loads(text_data)
+            comando = data.get('comando')
+            
+            if comando == 'detener':
+                await self.detener_simulacion()
+        except:
+            pass
+    
+    async def log_message(self, event):
+        """Envía logs al cliente"""
+        await self.send(text_data=json.dumps({
+            'tipo': 'log',
+            'message': event['message'],
+            'timestamp': event.get('timestamp', '')
+        }))
+    
+    async def estado_update(self, event):
+        """Envía actualización de estado"""
+        await self.send(text_data=json.dumps({
+            'tipo': 'estado',
+            'estado': event['estado']
+        }))
+    
+    async def enviar_logs_historicos(self):
+        """Envía logs históricos al cliente"""
+        logs = process_manager.obtener_logs(self.simulacion_id, 50)
+        
+        if logs:
+            await self.send(text_data=json.dumps({
+                'tipo': 'logs_historicos',
+                'logs': logs
+            }))
+    
+    async def detener_simulacion(self):
+        """Detiene la simulación"""
+        detenido = process_manager.detener_simulacion(self.simulacion_id)
+        
+        if detenido:
+            await self.send(text_data=json.dumps({
+                'tipo': 'estado',
+                'estado': 'detenida',
+                'message': 'Simulación detenida'
+            }))

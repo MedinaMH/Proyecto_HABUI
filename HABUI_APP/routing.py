@@ -11,4 +11,5 @@ websocket_urlpatterns = [
     re_path(r"ws/temperatura/$", consumers.TemperaturaConsumer.as_asgi()),
     re_path(r"ws/humedad/$", consumers.HumedadConsumer.as_asgi()),
     re_path(r"ws/temperatura_alimentos/$", consumers.TemperaturaAlimentosConsumer.as_asgi()),
+    re_path(r'ws/simulacion/(?P<simulacion_id>\w+)/$', consumers.SimulacionConsumer.as_asgi()),
 ]

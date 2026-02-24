@@ -32,7 +32,7 @@ class Command(BaseCommand):
                             help='Intervalo entre lecturas en segundos')
         parser.add_argument('--count', type=int, default=0,
                             help='Número total de lecturas (0 = infinito)')
-        parser.add_argument('--modo', type=str, default='normal',
+        parser.add_argument('--mode', type=str, default='normal',
                             choices=['normal', 'llenado', 'consumo', 'critico'],
                             help='Modo de simulación: normal, llenado, consumo, critico')
 
@@ -40,7 +40,7 @@ class Command(BaseCommand):
         recurso_id = options['recurso_id']
         intervalo = options['interval']
         max_count = options['count']
-        modo = options['modo']
+        modo = options['mode']
 
         # ------------------ AUTO-CREAR / OBTENER RECURSO ------------------
         recurso, creado = Recurso.objects.get_or_create(
@@ -70,9 +70,9 @@ class Command(BaseCommand):
         i = 0
         llenando = False
         
-        self.stdout.write(self.style.SUCCESS(f"💧 Iniciando simulador de tanque de agua"))
-        self.stdout.write(f"📊 Tanque: {self.TANK_CAPACITY} L | Recurso: {recurso.nombre}")
-        self.stdout.write(f"⚙️  Modo: {modo} | Intervalo: {intervalo}s")
+        self.stdout.write(self.style.SUCCESS(f"Iniciando simulador de tanque de agua"))
+        self.stdout.write(f"Tanque: {self.TANK_CAPACITY} L | Recurso: {recurso.nombre}")
+        self.stdout.write(f"Modo: {modo} | Intervalo: {intervalo}s")
 
         try:
             while True:

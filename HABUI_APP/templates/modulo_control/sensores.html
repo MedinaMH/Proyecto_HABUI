@@ -1,0 +1,658 @@
+{% extends "modulo_control/estructura_base_control.html" %}
+
+{% block titulo %} Panel de Control de Simulaciones {% endblock %}
+
+{% block contenido %} 
+{% load static %}
+
+<!-- Estilos adicionales -->
+<style>
+    .terminal {
+        background: #1e1e1e;
+        color: #0f0;
+        font-family: 'Courier New', monospace;
+        padding: 15px;
+        border-radius: 5px;
+        height: 300px;
+        overflow-y: auto;
+        font-size: 13px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    .simulacion-card {
+        border-left: 4px solid #28a745;
+        margin-bottom: 15px;
+        transition: all 0.3s;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .simulacion-card.detenida {
+        border-left-color: #dc3545;
+        opacity: 0.8;
+    }
+    
+    .simulacion-card.finalizada {
+        border-left-color: #6c757d;
+        opacity: 0.7;
+    }
+    
+    .badge-activa {
+        background-color: #28a745;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: normal;
+    }
+    
+    .badge-detenida {
+        background-color: #6c757d;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: normal;
+    }
+    
+    .badge-finalizada {
+        background-color: #17a2b8;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: normal;
+    }
+    
+    .parametro-tag {
+        background: #e9ecef;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        font-size: 12px;
+        display: inline-block;
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 500;
+    }
+    
+    .btn-simulacion {
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .logs-preview {
+        background: #1e1e1e;
+        color: #0f0;
+        padding: 8px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 11px;
+        height: 80px;
+        overflow-y: auto;
+        margin-top: 10px;
+    }
+    
+    .fecha-simulacion {
+        font-size: 12px;
+        color: #6c757d;
+    }
+</style>
+
+<div class="container-fluid" style="padding: 20px;">
+    <h1 class="mb-4">Panel de Control de Simulaciones</h1>
+    <p class="text-muted mb-4"></p>
+    
+    <!-- Tarjeta para nueva simulación -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Iniciar Nueva Simulación</h5>
+        </div>
+        <div class="card-body">
+            <form id="form-nueva-simulacion" onsubmit="event.preventDefault(); iniciarSimulacion();">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Comando</label>
+                        <select class="form-control" id="comando" required>
+                            <option value="">Seleccionar...</option>
+                            {% for cmd in comandos_disponibles %}
+                            <option value="{{ cmd.nombre }}">{{ cmd.descripcion }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Intervalo (seg)</label>
+                        <input type="number" class="form-control" id="intervalo" value="2" min="0.5" step="0.5">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Modo</label>
+                        <select class="form-control" id="modo">
+                            <!-- Los modos se llenarán dinámicamente según el comando seleccionado -->
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Deriva</label>
+                        <input type="number" class="form-control" id="drift" value="0" step="0.1" placeholder="%/min">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Count</label>
+                        <input type="number" class="form-control" id="count" value="0" placeholder="0 = infinito">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-success form-control">
+                            ▶ Iniciar
+                        </button>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-3">
+                        <label class="form-label">Recurso ID</label>
+                        <input type="number" class="form-control" id="recurso-id" placeholder="Auto">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Simulaciones Activas -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Simulaciones Activas</h5>
+        </div>
+        <div class="card-body" id="activas-container">
+            <div class="text-center text-muted py-3">Cargando simulaciones activas...</div>
+        </div>
+    </div>
+    
+    <!-- Historial de Simulaciones -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Historial Reciente</h5>
+        </div>
+        <div class="card-body" id="historicas-container">
+            <div class="text-center text-muted py-3">Cargando historial...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver detalles de simulación -->
+<div class="modal fade" id="modalSimulacion" tabindex="-1" aria-labelledby="modalSimulacionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSimulacionLabel">Detalles de Simulación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-info" class="mb-3 p-3 bg-light rounded"></div>
+                <div class="terminal" id="modal-logs" style="height: 400px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" id="btn-detener-modal" style="display: none;">⏹ Detener</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{ comandos_disponibles|json_script:"comandos-data" }}
+<script>
+    const comandosDisponibles = JSON.parse(document.getElementById('comandos-data').textContent);
+    const WS_BASE = 'ws://' + window.location.host + '/ws/simulacion/';
+    const connections = {};
+    let modalSimulacionId = null;
+    let modalInstance = null;
+    
+    // ===========================================
+    // DATOS DE COMANDOS DESDE DJANGO
+    // ===========================================
+    // const comandosDisponibles = {{ comandos_disponibles|safe }};
+    
+    // ===========================================
+    // FUNCIÓN PARA ACTUALIZAR MODOS SEGÚN COMANDO
+    // ===========================================
+    function actualizarModosPorComando() {
+        const comandoSelect = document.getElementById('comando');
+        const modoSelect = document.getElementById('modo');
+        const recursoIdGroup = document.getElementById('recurso-id').closest('.col-md-3');
+        
+        if (!comandoSelect || !modoSelect) return;
+        
+        const comandoSeleccionado = comandoSelect.value;
+        
+        // Si no hay comando seleccionado, limpiar modos
+        if (!comandoSeleccionado) {
+            modoSelect.innerHTML = '<option value="">Primero selecciona un comando</option>';
+            return;
+        }
+        
+        // Buscar el comando seleccionado
+        const comandoData = comandosDisponibles.find(c => c.nombre === comandoSeleccionado);
+        
+        if (comandoData) {
+            // Limpiar opciones actuales
+            modoSelect.innerHTML = '';
+            
+            // Agregar nuevas opciones
+            comandoData.modos.forEach(modo => {
+                const option = document.createElement('option');
+                option.value = modo.valor;
+                option.textContent = modo.nombre;
+                modoSelect.appendChild(option);
+            });
+            
+            // Mostrar/ocultar y requerir campo recurso-id según corresponda
+            if (recursoIdGroup) {
+                if (comandoData.requiere_id) {
+                    recursoIdGroup.style.display = 'block';
+                    document.getElementById('recurso-id').required = true;
+                    document.getElementById('recurso-id').placeholder = 'Requerido';
+                } else {
+                    recursoIdGroup.style.display = 'block'; // Lo mantenemos visible pero opcional
+                    document.getElementById('recurso-id').required = false;
+                    document.getElementById('recurso-id').placeholder = 'Opcional';
+                }
+            }
+        }
+    }
+    
+    // Inicializar cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarListado();
+        // Actualizar cada 5 segundos
+        setInterval(actualizarListado, 5000);
+        
+        // Configurar modal
+        modalInstance = new bootstrap.Modal(document.getElementById('modalSimulacion'));
+        
+        // Botón detener en modal
+        document.getElementById('btn-detener-modal').addEventListener('click', function() {
+            if (modalSimulacionId) {
+                detenerSimulacion(modalSimulacionId);
+            }
+        });
+        
+        // Configurar evento change para el select de comandos
+        const comandoSelect = document.getElementById('comando');
+        if (comandoSelect) {
+            comandoSelect.addEventListener('change', actualizarModosPorComando);
+            // Ejecutar una vez al inicio para el valor por defecto
+            setTimeout(actualizarModosPorComando, 100);
+        }
+    });
+    
+    // Iniciar simulación
+    async function iniciarSimulacion() {
+        const comando = document.getElementById('comando').value;
+        if (!comando) {
+            alert('Selecciona un comando');
+            return;
+        }
+        
+        const argumentos = {
+            interval: document.getElementById('intervalo').value,
+            mode: document.getElementById('modo').value
+        };
+        
+        // Buscar el comando seleccionado para saber qué argumentos extra enviar
+        const comandoData = comandosDisponibles.find(c => c.nombre === comando);
+        
+        // Argumentos opcionales según el tipo de comando
+        if (comandoData) {
+            // Drift (para CO2, oxígeno, humedad, temperatura)
+            if (comandoData.parametros_extra.includes('drift')) {
+                const drift = document.getElementById('drift').value;
+                if (drift != 0) argumentos.drift = drift;
+            }
+            
+            // Noise (para CO2, humedad, temperatura)
+            if (comandoData.parametros_extra.includes('noise')) {
+                const noise = document.getElementById('noise')?.value;
+                if (noise && noise != 0) argumentos.noise = noise;
+            }
+            
+            // Capacidad y SoC inicial (para energía)
+            if (comando === 'simulador_fallar_energia') {
+                const capacity = document.getElementById('capacity')?.value;
+                if (capacity) argumentos.capacity = capacity;
+                
+                const initial_soc = document.getElementById('initial_soc')?.value;
+                if (initial_soc) argumentos.initial_soc = initial_soc;
+                
+                const low_energy_mode = document.getElementById('low_energy_mode')?.checked;
+                if (low_energy_mode) argumentos.low_energy_mode = low_energy_mode;
+            }
+        }
+        
+        const count = document.getElementById('count').value;
+        if (count > 0) argumentos.count = count;
+        
+        const recursoId = document.getElementById('recurso-id').value;
+        if (recursoId) argumentos['recurso-id'] = recursoId;
+        
+        const data = {
+            comando: comando,
+            argumentos: argumentos
+        };
+        
+        try {
+            const response = await fetch('/api/simulaciones/iniciar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                mostrarNotificacion('✅ ' + result.message, 'success');
+                actualizarListado();
+                conectarWebSocket(result.simulacion_id);
+                
+                // Limpiar formulario
+                // document.getElementById('comando').value = '';
+            } else {
+                mostrarNotificacion('❌ ' + result.message, 'error');
+            }
+        } catch (error) {
+            mostrarNotificacion('Error: ' + error, 'error');
+        }
+    }
+    
+    // Conectar WebSocket para una simulación
+    function conectarWebSocket(simulacionId) {
+        if (connections[simulacionId]) return;
+        
+        const ws = new WebSocket(WS_BASE + simulacionId + '/');
+        connections[simulacionId] = ws;
+        
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            if (data.tipo === 'log') {
+                // Actualizar logs en la UI si es la simulación activa en modal
+                if (modalSimulacionId == simulacionId) {
+                    const logsDiv = document.getElementById('modal-logs');
+                    logsDiv.innerHTML += `<div>${data.message}</div>`;
+                    logsDiv.scrollTop = logsDiv.scrollHeight;
+                }
+                
+                // Actualizar preview en tarjeta
+                const previewDiv = document.getElementById(`logs-preview-${simulacionId}`);
+                if (previewDiv) {
+                    previewDiv.innerHTML += `<div>${data.message}</div>`;
+                    // Mantener solo últimas 5 líneas
+                    const lines = previewDiv.innerHTML.split('<div>');
+                    if (lines.length > 6) {
+                        previewDiv.innerHTML = lines.slice(-5).join('<div>');
+                    }
+                }
+            } else if (data.tipo === 'logs_historicos') {
+                // Cargar logs históricos en modal
+                if (modalSimulacionId == simulacionId) {
+                    const logsDiv = document.getElementById('modal-logs');
+                    logsDiv.innerHTML = '';
+                    data.logs.forEach(linea => {
+                        logsDiv.innerHTML += `<div>${linea}</div>`;
+                    });
+                    logsDiv.scrollTop = logsDiv.scrollHeight;
+                }
+            } else if (data.tipo === 'estado') {
+                // Actualizar UI según estado
+                const card = document.getElementById(`card-${simulacionId}`);
+                if (card) {
+                    // Quitar clases existentes
+                    card.classList.remove('simulacion-card', 'detenida', 'finalizada');
+                    
+                    if (data.estado === 'activa') {
+                        card.classList.add('simulacion-card');
+                    } else if (data.estado === 'detenida') {
+                        card.classList.add('simulacion-card', 'detenida');
+                    } else if (data.estado === 'finalizada') {
+                        card.classList.add('simulacion-card', 'finalizada');
+                    }
+                }
+                
+                // Ocultar botón detener en modal si ya no está activa
+                if (modalSimulacionId == simulacionId && data.estado !== 'activa') {
+                    document.getElementById('btn-detener-modal').style.display = 'none';
+                }
+            }
+        };
+        
+        ws.onclose = function() {
+            delete connections[simulacionId];
+        };
+    }
+    
+    // Actualizar listado de simulaciones
+    async function actualizarListado() {
+        try {
+            const response = await fetch('/api/simulaciones/listar/');
+            const data = await response.json();
+            
+            // Separar activas e inactivas
+            const activas = data.simulaciones.filter(s => s.estado === 'activa');
+            const historicas = data.simulaciones.filter(s => s.estado !== 'activa').slice(0, 6);
+            
+            // Actualizar activas
+            const activasContainer = document.getElementById('activas-container');
+            if (activas.length === 0) {
+                activasContainer.innerHTML = '<p class="text-muted text-center py-3">No hay simulaciones activas</p>';
+            } else {
+                let html = '<div class="row">';
+                activas.forEach(sim => {
+                    html += `<div class="col-md-6 mb-3">${generarTarjetaSimulacion(sim, true)}</div>`;
+                    if (!connections[sim.id]) {
+                        conectarWebSocket(sim.id);
+                    }
+                });
+                html += '</div>';
+                activasContainer.innerHTML = html;
+            }
+            
+            // Actualizar históricas
+            const historicasContainer = document.getElementById('historicas-container');
+            if (historicas.length === 0) {
+                historicasContainer.innerHTML = '<p class="text-muted text-center py-3">Sin historial</p>';
+            } else {
+                let html = '<div class="row">';
+                historicas.forEach(sim => {
+                    html += `<div class="col-md-4 mb-3">${generarTarjetaSimulacion(sim, false)}</div>`;
+                });
+                html += '</div>';
+                historicasContainer.innerHTML = html;
+            }
+        } catch (error) {
+            console.error('Error actualizando listado:', error);
+        }
+    }
+    
+    // Generar HTML para tarjeta de simulación
+    function generarTarjetaSimulacion(sim, activa) {
+        const fecha = new Date(sim.inicio).toLocaleString();
+        
+        let badgeClass = 'badge-activa';
+        let badgeText = 'ACTIVA';
+        
+        if (!activa) {
+            if (sim.estado === 'detenida') {
+                badgeClass = 'badge-detenida';
+                badgeText = 'DETENIDA';
+            } else {
+                badgeClass = 'badge-finalizada';
+                badgeText = 'FINALIZADA';
+            }
+        }
+        
+        // Argumentos como tags
+        let argsHtml = '';
+        for (let [key, value] of Object.entries(sim.argumentos || {})) {
+            argsHtml += `<span class="parametro-tag">--${key} ${value}</span>`;
+        }
+        
+        const cardClass = activa ? 'simulacion-card' : `simulacion-card ${sim.estado}`;
+        
+        return `
+            <div class="card ${cardClass}" id="card-${sim.id}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="mb-0">${sim.comando}</h6>
+                        <span class="${badgeClass}">${badgeText}</span>
+                    </div>
+                    <div class="mb-2">
+                        ${argsHtml || '<span class="text-muted">Sin argumentos</span>'}
+                    </div>
+                    <div class="fecha-simulacion mb-2">
+                        <i class="fas fa-clock"></i> ${fecha}
+                        ${sim.pid ? ` | PID: ${sim.pid}` : ''}
+                    </div>
+                    
+                    ${activa ? `
+                        <div class="logs-preview" id="logs-preview-${sim.id}">
+                            <!-- Logs aparecerán aquí -->
+                        </div>
+                    ` : ''}
+                    
+                    <div class="mt-3">
+                        <button onclick="verDetalle('${sim.id}')" class="btn btn-sm btn-info btn-simulacion">
+                            👁 Ver detalles
+                        </button>
+                        ${activa ? `
+                            <button onclick="detenerSimulacion('${sim.id}')" class="btn btn-sm btn-danger btn-simulacion">
+                                ⏹ Detener
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Ver detalle en modal
+    async function verDetalle(simulacionId) {
+        modalSimulacionId = simulacionId;
+        
+        try {
+            const response = await fetch(`/api/simulaciones/${simulacionId}/`);
+            
+            if (!response.ok) {
+                throw new Error('Simulación no encontrada');
+            }
+            
+            const data = await response.json();
+            
+            // Info básica
+            const fechaInicio = new Date(data.inicio).toLocaleString();
+            document.getElementById('modal-info').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Comando:</strong> ${data.comando}<br>
+                        <strong>Estado:</strong> <span class="badge-${data.estado === 'activa' ? 'activa' : 'detenida'}">${data.estado.toUpperCase()}</span><br>
+                        <strong>PID:</strong> ${data.pid || 'N/A'}<br>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Inicio:</strong> ${fechaInicio}<br>
+                        <strong>Argumentos:</strong><br>
+                        ${Object.entries(data.argumentos || {}).map(([k,v]) => 
+                            `<span class="parametro-tag">--${k} ${v}</span>`
+                        ).join('') || 'Ninguno'}
+                    </div>
+                </div>
+            `;
+            
+            // Logs
+            const logsDiv = document.getElementById('modal-logs');
+            logsDiv.innerHTML = '';
+            data.logs.forEach(linea => {
+                if (linea.trim()) {
+                    logsDiv.innerHTML += `<div>${linea}</div>`;
+                }
+            });
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            
+            // Mostrar/ocultar botón detener según estado
+            document.getElementById('btn-detener-modal').style.display = 
+                data.estado === 'activa' ? 'inline-block' : 'none';
+            
+            // Mostrar modal
+            modalInstance.show();
+            
+            // Asegurar WebSocket conectado
+            if (data.estado === 'activa' && !connections[simulacionId]) {
+                conectarWebSocket(simulacionId);
+            }
+            
+        } catch (error) {
+            mostrarNotificacion('Error cargando detalles: ' + error, 'error');
+        }
+    }
+    
+    // Detener simulación
+    async function detenerSimulacion(simulacionId) {
+        if (!confirm('¿Detener esta simulación?')) return;
+        
+        try {
+            const response = await fetch(`/api/simulaciones/detener/${simulacionId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+            
+            const result = await response.json();
+            mostrarNotificacion(result.message, result.status);
+            
+            // Cerrar WebSocket si existe
+            if (connections[simulacionId]) {
+                connections[simulacionId].close();
+                delete connections[simulacionId];
+            }
+            
+            // Cerrar modal si estaba abierto
+            if (modalSimulacionId == simulacionId) {
+                modalInstance.hide();
+            }
+            
+            actualizarListado();
+            
+        } catch (error) {
+            mostrarNotificacion('Error: ' + error, 'error');
+        }
+    }
+    
+    // Utilidad para CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Mostrar notificaciones
+    function mostrarNotificacion(mensaje, tipo) {
+        alert(mensaje);
+    }
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+{% endblock %}

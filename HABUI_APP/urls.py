@@ -4,6 +4,7 @@ from .import views
 urlpatterns = [
     path('control_inicial', views.control_inicial, name='control_inicial'),
     path('control_alimentos', views.control_alimentos, name='control_alimentos'),
+    path('control_sensores', views.control_sensores, name='control_sensores'),
 
     path('', views.panel_principal, name='panel_principal'),
     path('todos_los_recursos', views.panel_all_resources, name='all_resources'),
@@ -38,5 +39,11 @@ urlpatterns = [
     path('api/temperatura/', views.api_temperatura_get, name='api_temperatura_get'),# GET
     path('humedad_rems', views.panel_humedad_rems, name='humedad_rems'),
     path('api/humedad/', views.api_humedad_get, name='api_humedad_get'),# GET
+
+    #========apis motor de simulacion ============
+    path('api/simulaciones/iniciar/', views.api_iniciar_simulacion, name='api_iniciar_simulacion'),
+    path('api/simulaciones/listar/', views.api_listar_simulaciones, name='api_listar_simulaciones'),
+    path('api/simulaciones/detener/<str:simulacion_id>/', views.api_detener_simulacion, name='api_detener_simulacion'),
+    path('api/simulaciones/<str:simulacion_id>/', views.api_detalle_simulacion, name='api_detalle_simulacion'),
 
 ]
