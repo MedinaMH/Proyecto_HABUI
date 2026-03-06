@@ -103,6 +103,14 @@
         font-size: 12px;
         color: #6c757d;
     }
+    
+    .campo-energia {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        border-radius: 5px;
+        padding: 10px;
+        margin-top: 10px;
+    }
 </style>
 
 <div class="container-fluid" style="padding: 20px;">
@@ -131,20 +139,21 @@
                         <label class="form-label">Intervalo (seg)</label>
                         <input type="number" class="form-control" id="intervalo" value="2" min="0.5" step="0.5">
                     </div>
-                    <div class="col-md-2">
+                    
+                    <!-- Campo MODO (visible solo para no-energía) -->
+                    <div class="col-md-2" id="modo-container">
                         <label class="form-label">Modo</label>
                         <select class="form-control" id="modo">
-                            <!-- Los modos se llenarán dinámicamente según el comando seleccionado -->
+                            <!-- Los modos se llenarán dinámicamente -->
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Deriva</label>
-                        <input type="number" class="form-control" id="drift" value="0" step="0.1" placeholder="%/min">
-                    </div>
-                    <div class="col-md-2">
+                    
+                    <!-- Campo COUNT (visible solo para no-energía) -->
+                    <div class="col-md-2" id="count-container">
                         <label class="form-label">Count</label>
                         <input type="number" class="form-control" id="count" value="0" placeholder="0 = infinito">
                     </div>
+                    
                     <div class="col-md-1">
                         <label class="form-label">&nbsp;</label>
                         <button type="submit" class="btn btn-success form-control">
@@ -152,10 +161,42 @@
                         </button>
                     </div>
                 </div>
-                <div class="row mt-2">
+                
+                <!-- Contenedor para parámetros específicos de energía -->
+                <div class="row mt-3" id="parametros-energia-container" style="display: none;">
+                    <div class="col-12">
+                        <div class="campo-energia">
+                            <h6 class="mb-3">⚡ Parámetros del Sistema de Energía</h6>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Capacidad (Wh)</label>
+                                    <input type="number" class="form-control" id="capacity" value="6500" step="100" min="100">
+                                    <small class="text-muted">Capacidad del banco de baterías</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Carga inicial</label>
+                                    <input type="number" class="form-control" id="initial_soc" value="0.9" step="0.01" min="0" max="1">
+                                    <small class="text-muted">0.0 = 0%, 0.5 = 50%, 1.0 = 100%</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Modo baja energía</label>
+                                    <div class="form-check mt-2">
+                                        <input type="checkbox" class="form-check-input" id="low_energy_mode">
+                                        <label class="form-check-label" for="low_energy_mode">
+                                            Activar protocolos de emergencia
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Campo Recurso ID (visible solo para no-energía) -->
+                <div class="row mt-2" id="recurso-id-container">
                     <div class="col-md-3">
                         <label class="form-label">Recurso ID</label>
-                        <input type="number" class="form-control" id="recurso-id" placeholder="Auto">
+                        <input type="number" class="form-control" id="recurso-id" placeholder="Opcional">
                     </div>
                 </div>
             </form>
@@ -202,7 +243,10 @@
         </div>
     </div>
 </div>
+
+<!-- Pasar datos de Django a JavaScript -->
 {{ comandos_disponibles|json_script:"comandos-data" }}
+
 <script>
     const comandosDisponibles = JSON.parse(document.getElementById('comandos-data').textContent);
     const WS_BASE = 'ws://' + window.location.host + '/ws/simulacion/';
@@ -211,55 +255,54 @@
     let modalInstance = null;
     
     // ===========================================
-    // DATOS DE COMANDOS DESDE DJANGO
+    // FUNCIÓN PARA ACTUALIZAR CAMPOS SEGÚN COMANDO
     // ===========================================
-    // const comandosDisponibles = {{ comandos_disponibles|safe }};
-    
-    // ===========================================
-    // FUNCIÓN PARA ACTUALIZAR MODOS SEGÚN COMANDO
-    // ===========================================
-    function actualizarModosPorComando() {
+    function actualizarCamposPorComando() {
         const comandoSelect = document.getElementById('comando');
+        const modoContainer = document.getElementById('modo-container');
+        const countContainer = document.getElementById('count-container');
+        const recursoIdContainer = document.getElementById('recurso-id-container');
+        const energiaContainer = document.getElementById('parametros-energia-container');
         const modoSelect = document.getElementById('modo');
-        const recursoIdGroup = document.getElementById('recurso-id').closest('.col-md-3');
         
-        if (!comandoSelect || !modoSelect) return;
+        if (!comandoSelect) return;
         
         const comandoSeleccionado = comandoSelect.value;
+        const esEnergia = comandoSeleccionado === 'simulador_fallas_energia';
         
-        // Si no hay comando seleccionado, limpiar modos
-        if (!comandoSeleccionado) {
-            modoSelect.innerHTML = '<option value="">Primero selecciona un comando</option>';
-            return;
-        }
-        
-        // Buscar el comando seleccionado
-        const comandoData = comandosDisponibles.find(c => c.nombre === comandoSeleccionado);
-        
-        if (comandoData) {
-            // Limpiar opciones actuales
-            modoSelect.innerHTML = '';
+        if (esEnergia) {
+            // MODO ENERGÍA: ocultar campos no necesarios, mostrar campos de energía
+            modoContainer.style.display = 'none';
+            countContainer.style.display = 'none';
+            recursoIdContainer.style.display = 'none';
+            energiaContainer.style.display = 'block';
+        } else if (comandoSeleccionado) {
+            // MODO OTROS COMANDOS: mostrar campos normales, ocultar energía
+            modoContainer.style.display = 'block';
+            countContainer.style.display = 'block';
+            recursoIdContainer.style.display = 'block';
+            energiaContainer.style.display = 'none';
             
-            // Agregar nuevas opciones
-            comandoData.modos.forEach(modo => {
-                const option = document.createElement('option');
-                option.value = modo.valor;
-                option.textContent = modo.nombre;
-                modoSelect.appendChild(option);
-            });
+            // Buscar el comando seleccionado para llenar modos
+            const comandoData = comandosDisponibles.find(c => c.nombre === comandoSeleccionado);
             
-            // Mostrar/ocultar y requerir campo recurso-id según corresponda
-            if (recursoIdGroup) {
-                if (comandoData.requiere_id) {
-                    recursoIdGroup.style.display = 'block';
-                    document.getElementById('recurso-id').required = true;
-                    document.getElementById('recurso-id').placeholder = 'Requerido';
-                } else {
-                    recursoIdGroup.style.display = 'block'; // Lo mantenemos visible pero opcional
-                    document.getElementById('recurso-id').required = false;
-                    document.getElementById('recurso-id').placeholder = 'Opcional';
-                }
+            if (comandoData) {
+                // Limpiar y llenar opciones de modo
+                modoSelect.innerHTML = '';
+                comandoData.modos.forEach(modo => {
+                    const option = document.createElement('option');
+                    option.value = modo.valor;
+                    option.textContent = modo.nombre;
+                    modoSelect.appendChild(option);
+                });
             }
+        } else {
+            // No hay comando seleccionado
+            modoContainer.style.display = 'block';
+            countContainer.style.display = 'block';
+            recursoIdContainer.style.display = 'block';
+            energiaContainer.style.display = 'none';
+            modoSelect.innerHTML = '<option value="">Primero selecciona un comando</option>';
         }
     }
     
@@ -282,9 +325,9 @@
         // Configurar evento change para el select de comandos
         const comandoSelect = document.getElementById('comando');
         if (comandoSelect) {
-            comandoSelect.addEventListener('change', actualizarModosPorComando);
-            // Ejecutar una vez al inicio para el valor por defecto
-            setTimeout(actualizarModosPorComando, 100);
+            comandoSelect.addEventListener('change', actualizarCamposPorComando);
+            // Ejecutar una vez al inicio
+            setTimeout(actualizarCamposPorComando, 100);
         }
     });
     
@@ -297,45 +340,35 @@
         }
         
         const argumentos = {
-            interval: document.getElementById('intervalo').value,
-            mode: document.getElementById('modo').value
+            interval: document.getElementById('intervalo').value
         };
         
-        // Buscar el comando seleccionado para saber qué argumentos extra enviar
-        const comandoData = comandosDisponibles.find(c => c.nombre === comando);
+        const esEnergia = comando === 'simulador_fallas_energia';
         
-        // Argumentos opcionales según el tipo de comando
-        if (comandoData) {
-            // Drift (para CO2, oxígeno, humedad, temperatura)
-            if (comandoData.parametros_extra.includes('drift')) {
-                const drift = document.getElementById('drift').value;
-                if (drift != 0) argumentos.drift = drift;
-            }
+        if (esEnergia) {
+            // Para energía: solo interval y campos específicos
+            const capacity = document.getElementById('capacity').value;
+            if (capacity) argumentos.capacity = parseFloat(capacity);
             
-            // Noise (para CO2, humedad, temperatura)
-            if (comandoData.parametros_extra.includes('noise')) {
-                const noise = document.getElementById('noise')?.value;
-                if (noise && noise != 0) argumentos.noise = noise;
-            }
+            const initial_soc = document.getElementById('initial_soc').value;
+            if (initial_soc) argumentos.initial_soc = parseFloat(initial_soc);
             
-            // Capacidad y SoC inicial (para energía)
-            if (comando === 'simulador_fallar_energia') {
-                const capacity = document.getElementById('capacity')?.value;
-                if (capacity) argumentos.capacity = capacity;
-                
-                const initial_soc = document.getElementById('initial_soc')?.value;
-                if (initial_soc) argumentos.initial_soc = initial_soc;
-                
-                const low_energy_mode = document.getElementById('low_energy_mode')?.checked;
-                if (low_energy_mode) argumentos.low_energy_mode = low_energy_mode;
+            const lowEnergyChecked = document.getElementById('low_energy_mode').checked;
+            if (lowEnergyChecked) {
+                argumentos.low_energy_mode = '';  // Flag sin valor
             }
+        } else {
+            // Para otros comandos: mode, count, recurso-id
+            argumentos.mode = document.getElementById('modo').value;
+            
+            const count = document.getElementById('count').value;
+            if (count > 0) argumentos.count = count;
+            
+            const recursoId = document.getElementById('recurso-id').value;
+            if (recursoId) argumentos['recurso-id'] = recursoId;
         }
         
-        const count = document.getElementById('count').value;
-        if (count > 0) argumentos.count = count;
-        
-        const recursoId = document.getElementById('recurso-id').value;
-        if (recursoId) argumentos['recurso-id'] = recursoId;
+        console.log('Enviando argumentos:', argumentos);
         
         const data = {
             comando: comando,
@@ -358,9 +391,6 @@
                 mostrarNotificacion('✅ ' + result.message, 'success');
                 actualizarListado();
                 conectarWebSocket(result.simulacion_id);
-                
-                // Limpiar formulario
-                // document.getElementById('comando').value = '';
             } else {
                 mostrarNotificacion('❌ ' + result.message, 'error');
             }
@@ -380,25 +410,21 @@
             const data = JSON.parse(event.data);
             
             if (data.tipo === 'log') {
-                // Actualizar logs en la UI si es la simulación activa en modal
                 if (modalSimulacionId == simulacionId) {
                     const logsDiv = document.getElementById('modal-logs');
                     logsDiv.innerHTML += `<div>${data.message}</div>`;
                     logsDiv.scrollTop = logsDiv.scrollHeight;
                 }
                 
-                // Actualizar preview en tarjeta
                 const previewDiv = document.getElementById(`logs-preview-${simulacionId}`);
                 if (previewDiv) {
                     previewDiv.innerHTML += `<div>${data.message}</div>`;
-                    // Mantener solo últimas 5 líneas
                     const lines = previewDiv.innerHTML.split('<div>');
                     if (lines.length > 6) {
                         previewDiv.innerHTML = lines.slice(-5).join('<div>');
                     }
                 }
             } else if (data.tipo === 'logs_historicos') {
-                // Cargar logs históricos en modal
                 if (modalSimulacionId == simulacionId) {
                     const logsDiv = document.getElementById('modal-logs');
                     logsDiv.innerHTML = '';
@@ -408,10 +434,8 @@
                     logsDiv.scrollTop = logsDiv.scrollHeight;
                 }
             } else if (data.tipo === 'estado') {
-                // Actualizar UI según estado
                 const card = document.getElementById(`card-${simulacionId}`);
                 if (card) {
-                    // Quitar clases existentes
                     card.classList.remove('simulacion-card', 'detenida', 'finalizada');
                     
                     if (data.estado === 'activa') {
@@ -423,7 +447,6 @@
                     }
                 }
                 
-                // Ocultar botón detener en modal si ya no está activa
                 if (modalSimulacionId == simulacionId && data.estado !== 'activa') {
                     document.getElementById('btn-detener-modal').style.display = 'none';
                 }
@@ -441,11 +464,9 @@
             const response = await fetch('/api/simulaciones/listar/');
             const data = await response.json();
             
-            // Separar activas e inactivas
             const activas = data.simulaciones.filter(s => s.estado === 'activa');
             const historicas = data.simulaciones.filter(s => s.estado !== 'activa').slice(0, 6);
             
-            // Actualizar activas
             const activasContainer = document.getElementById('activas-container');
             if (activas.length === 0) {
                 activasContainer.innerHTML = '<p class="text-muted text-center py-3">No hay simulaciones activas</p>';
@@ -461,7 +482,6 @@
                 activasContainer.innerHTML = html;
             }
             
-            // Actualizar históricas
             const historicasContainer = document.getElementById('historicas-container');
             if (historicas.length === 0) {
                 historicasContainer.innerHTML = '<p class="text-muted text-center py-3">Sin historial</p>';
@@ -495,10 +515,13 @@
             }
         }
         
-        // Argumentos como tags
         let argsHtml = '';
         for (let [key, value] of Object.entries(sim.argumentos || {})) {
-            argsHtml += `<span class="parametro-tag">--${key} ${value}</span>`;
+            if (key === 'low_energy_mode' && value === '') {
+                argsHtml += `<span class="parametro-tag">--${key}</span>`;
+            } else {
+                argsHtml += `<span class="parametro-tag">--${key} ${value}</span>`;
+            }
         }
         
         const cardClass = activa ? 'simulacion-card' : `simulacion-card ${sim.estado}`;
@@ -552,7 +575,6 @@
             
             const data = await response.json();
             
-            // Info básica
             const fechaInicio = new Date(data.inicio).toLocaleString();
             document.getElementById('modal-info').innerHTML = `
                 <div class="row">
@@ -564,14 +586,17 @@
                     <div class="col-md-6">
                         <strong>Inicio:</strong> ${fechaInicio}<br>
                         <strong>Argumentos:</strong><br>
-                        ${Object.entries(data.argumentos || {}).map(([k,v]) => 
-                            `<span class="parametro-tag">--${k} ${v}</span>`
-                        ).join('') || 'Ninguno'}
+                        ${Object.entries(data.argumentos || {}).map(([k,v]) => {
+                            if (k === 'low_energy_mode' && v === '') {
+                                return `<span class="parametro-tag">--${k}</span>`;
+                            } else {
+                                return `<span class="parametro-tag">--${k} ${v}</span>`;
+                            }
+                        }).join('') || 'Ninguno'}
                     </div>
                 </div>
             `;
             
-            // Logs
             const logsDiv = document.getElementById('modal-logs');
             logsDiv.innerHTML = '';
             data.logs.forEach(linea => {
@@ -581,14 +606,11 @@
             });
             logsDiv.scrollTop = logsDiv.scrollHeight;
             
-            // Mostrar/ocultar botón detener según estado
             document.getElementById('btn-detener-modal').style.display = 
                 data.estado === 'activa' ? 'inline-block' : 'none';
             
-            // Mostrar modal
             modalInstance.show();
             
-            // Asegurar WebSocket conectado
             if (data.estado === 'activa' && !connections[simulacionId]) {
                 conectarWebSocket(simulacionId);
             }
@@ -613,13 +635,11 @@
             const result = await response.json();
             mostrarNotificacion(result.message, result.status);
             
-            // Cerrar WebSocket si existe
             if (connections[simulacionId]) {
                 connections[simulacionId].close();
                 delete connections[simulacionId];
             }
             
-            // Cerrar modal si estaba abierto
             if (modalSimulacionId == simulacionId) {
                 modalInstance.hide();
             }

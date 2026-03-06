@@ -38,7 +38,7 @@ class ProcessManager:
             # Añadir argumentos
             for key, value in argumentos.items():
                 cmd.append(f'--{key}')
-                if value is not None:
+                if value != '':
                     cmd.append(str(value))
             
             # Iniciar proceso

@@ -84,7 +84,7 @@ class Command(BaseCommand):
         # =========================
         if LOW_ENERGY_MODE:
             self.stdout.write(self.style.WARNING(
-                "⚠ MODO ENERGÍA BAJA ACTIVADO"
+                "MODO ENERGÍA BAJA ACTIVADO"
             ))
             P_SOLAR_MAX = 800.0          # Muy baja generación
             FACTOR_CONSUMO = 1.4         # Mayor demanda
@@ -200,4 +200,4 @@ class Command(BaseCommand):
                     time.sleep(intervalo)
 
         except KeyboardInterrupt:
-            self.stdout.write(self.style.SUCCESS("⏹ Simulación detenida por el usuario."))
+            self.stdout.write(self.style.SUCCESS("Simulación detenida por el usuario."))

@@ -683,7 +683,7 @@ def control_sensores(request):
                     {'valor': 'consumo', 'nombre': 'Consumo'},
                     {'valor': 'critico', 'nombre': 'Crítico'},
                 ],
-                'requiere_id': True,  # --recurso-id es required=True
+                'requiere_id': True,
                 'parametros_extra': ['interval', 'count']
             },
             {
@@ -744,13 +744,41 @@ def control_sensores(request):
                 'parametros_extra': ['interval', 'count', 'drift', 'noise']
             },
             {
-                'nombre': 'simulador_fallar_energia',
+                'nombre': 'simulador_fallas_energia',
                 'descripcion': 'Simulador de Energía',
                 'modos': [
                     {'valor': 'normal', 'nombre': 'Normal'},
                 ],
                 'requiere_id': False,
-                'parametros_extra': ['interval', 'capacity', 'initial_soc', 'low_energy_mode']
+                'parametros_extra': ['interval', 'capacity', 'initial_soc', 'low_energy'],
+                'campos_extra': [
+                    {
+                        'nombre': 'capacity',
+                        'tipo': 'number',
+                        'label': 'Capacidad (Wh)',
+                        'default': 6500,
+                        'step': 100,
+                        'min': 100,
+                        'descripcion': 'Capacidad del banco de baterías'
+                    },
+                    {
+                        'nombre': 'initial_soc',
+                        'tipo': 'number',
+                        'label': 'Carga inicial',
+                        'default': 0.9,
+                        'step': 0.01,
+                        'min': 0,
+                        'max': 1,
+                        'descripcion': '0.0 = 0%, 0.5 = 50%, 1.0 = 100%'
+                    },
+                    {
+                        'nombre': 'low_energy',
+                        'tipo': 'checkbox',
+                        'label': 'Baja energía',
+                        'default': False,
+                        'descripcion': 'Activar protocolos de emergencia'
+                    }
+                ]
             },
         ],
     }
@@ -769,7 +797,7 @@ def api_iniciar_simulacion(request):
             # Validar comando existente
             comandos_validos = [
                 'sensor_agua', 'sensor_CO2', 'sensor_oxigeno', 
-                'sensor_humedad', 'sensor_temperatura', 'simulador_fallar_energia'
+                'sensor_humedad', 'sensor_temperatura', 'simulador_fallas_energia'
             ]
             
             if comando not in comandos_validos:
