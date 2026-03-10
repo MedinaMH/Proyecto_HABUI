@@ -13,9 +13,10 @@ from django.utils import timezone
 from django.db import transaction
 from HABUI_APP.management.process_manager import process_manager
 # from .utils.data_simulator import DataSimulator
-import json
+import json, os
 from .models import RecursoAgua, RecursoCO2, RecursoOxigeno, Recurso
 from .import models, serializers
+from django.conf import settings
 # Create your views here.
 
 def panel_principal(request):
@@ -672,6 +673,18 @@ def control_alimentos(request):
 # ================motor de simulacion =======================
 def control_sensores(request):
     """Vista principal del panel de control de simulaciones"""
+    # Cargar escenarios desde el JSON
+    escenarios = []
+    json_path = os.path.join(settings.BASE_DIR, 'HABUI_APP', 'static', 'data', 'escenarios_simulacion.json')
+    
+    try:
+        with open(json_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            escenarios = data.get('escenarios', [])
+    except FileNotFoundError:
+        print(f"Archivo no encontrado: {json_path}")
+    except json.JSONDecodeError:
+        print(f"Error al decodificar JSON: {json_path}")
     context = {
         'comandos_disponibles': [
             {
@@ -781,6 +794,7 @@ def control_sensores(request):
                 ]
             },
         ],
+        'escenarios_disponibles': escenarios,
     }
     return render(request, 'modulo_control/sensores.html', context)
 

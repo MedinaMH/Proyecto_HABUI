@@ -111,6 +111,14 @@
         padding: 10px;
         margin-top: 10px;
     }
+    
+    .escenario-section {
+        background-color: #e8f4f8;
+        border: 1px solid #b8e0f0;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
 </style>
 
 <div class="container-fluid" style="padding: 20px;">
@@ -123,6 +131,30 @@
             <h5 class="mb-0">Iniciar Nueva Simulación</h5>
         </div>
         <div class="card-body">
+            
+            <!-- =========================================== -->
+            <!-- NUEVO: Selector de Escenarios Preconfigurados -->
+            <!-- =========================================== -->
+            <div class="escenario-section mb-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold">Cargar escenario preconfigurado</label>
+                        <div class="input-group">
+                            <select class="form-control" id="escenario-select">
+                                <option value="">-- Seleccionar escenario --</option>
+                                {% for esc in escenarios_disponibles %}
+                                <option value="{{ esc.id }}">{{ esc.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-primary" type="button" id="btn-cargar-escenario">
+                                <i class="fas fa-download"></i> Cargar
+                            </button>
+                        </div>
+                        <small class="text-muted">Selecciona un escenario para cargar automáticamente los parámetros</small>
+                    </div>
+                </div>
+            </div>
+            
             <form id="form-nueva-simulacion" onsubmit="event.preventDefault(); iniciarSimulacion();">
                 {% csrf_token %}
                 <div class="row">
@@ -166,7 +198,7 @@
                 <div class="row mt-3" id="parametros-energia-container" style="display: none;">
                     <div class="col-12">
                         <div class="campo-energia">
-                            <h6 class="mb-3">⚡ Parámetros del Sistema de Energía</h6>
+                            <h6 class="mb-3">Parámetros del Sistema de Energía</h6>
                             <div class="row">
                                 <div class="col-md-3">
                                     <label class="form-label">Capacidad (Wh)</label>
@@ -246,9 +278,11 @@
 
 <!-- Pasar datos de Django a JavaScript -->
 {{ comandos_disponibles|json_script:"comandos-data" }}
+{{ escenarios_disponibles|json_script:"escenarios-data" }}
 
 <script>
     const comandosDisponibles = JSON.parse(document.getElementById('comandos-data').textContent);
+    const escenariosDisponibles = JSON.parse(document.getElementById('escenarios-data').textContent);
     const WS_BASE = 'ws://' + window.location.host + '/ws/simulacion/';
     const connections = {};
     let modalSimulacionId = null;
@@ -306,6 +340,76 @@
         }
     }
     
+    // ===========================================
+    // FUNCIÓN PARA CARGAR ESCENARIO PRECONFIGURADO
+    // ===========================================
+    function cargarEscenario() {
+        const select = document.getElementById('escenario-select');
+        const selectedIndex = select.selectedIndex;
+        
+        if (selectedIndex === 0) {
+            alert('Selecciona un escenario');
+            return;
+        }
+        
+        // Obtener el escenario seleccionado del array de JavaScript
+        const escenario = escenariosDisponibles[selectedIndex - 1];  // -1 porque el primero es "Seleccionar..."
+        
+        if (!escenario) return;
+        
+        const comando = escenario.comando;
+        const params = escenario.parametros;
+        
+        // Seleccionar el comando en el select
+        const comandoSelect = document.getElementById('comando');
+        comandoSelect.value = comando;
+        
+        // Disparar el evento change para actualizar la interfaz
+        comandoSelect.dispatchEvent(new Event('change'));
+        
+        // Esperar un momento a que la UI se actualice
+        setTimeout(() => {
+            const esEnergia = comando === 'simulador_fallas_energia';
+            
+            // Cargar interval
+            if (params.interval) {
+                document.getElementById('intervalo').value = params.interval;
+            }
+            
+            if (esEnergia) {
+                // Cargar campos de energía
+                if (params.capacity) {
+                    document.getElementById('capacity').value = params.capacity;
+                }
+                if (params.initial_soc) {
+                    document.getElementById('initial_soc').value = params.initial_soc;
+                }
+                // Asegurar que low_energy_mode esté desmarcado por defecto
+                document.getElementById('low_energy_mode').checked = false;
+            } else {
+                // Cargar modo para otros sensores
+                if (params.mode) {
+                    const modoSelect = document.getElementById('modo');
+                    
+                    // Buscar si existe el modo en las opciones
+                    for (let i = 0; i < modoSelect.options.length; i++) {
+                        if (modoSelect.options[i].value === params.mode) {
+                            modoSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+                
+                // Cargar count
+                if (params.count !== undefined) {
+                    document.getElementById('count').value = params.count;
+                }
+            }
+            
+            mostrarNotificacion(`✅ Escenario "${escenario.nombre}" cargado`, 'success');
+        }, 300);
+    }
+    
     // Inicializar cuando el DOM esté listo
     document.addEventListener('DOMContentLoaded', function() {
         actualizarListado();
@@ -329,6 +433,9 @@
             // Ejecutar una vez al inicio
             setTimeout(actualizarCamposPorComando, 100);
         }
+        
+        // Configurar botón de escenario
+        document.getElementById('btn-cargar-escenario').addEventListener('click', cargarEscenario);
     });
     
     // Iniciar simulación
