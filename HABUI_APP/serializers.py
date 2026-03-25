@@ -1,6 +1,6 @@
 # HABUI_APP/serializers.py
 from rest_framework import serializers
-from .models import RecursoAgua, RecursoAlimentos, ConsumoAlimentos, RecursoCO2, RecursoOxigeno
+from .models import RecursoAgua, RecursoAlimentos, ConsumoAlimentos, RecursoCO2, RecursoOxigeno, MetricaMonitoreo
 from .import models
 
 class RecursoAguaSerializer(serializers.ModelSerializer):
@@ -62,3 +62,29 @@ class RecursoAlimentosSerializer(serializers.ModelSerializer):
     
     def get_consumo_diario_estimado(self, obj):
         return obj.num_tripulantes * obj.porciones_por_persona_dia
+    
+
+class MetricaMonitoreoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MetricaMonitoreo
+        fields = [
+            'id',
+            'recurso',
+            'escenario',
+            'sample_id',
+            'valor',
+            'estado_esperado',
+            'estado_clasificado',
+            'clasificacion_correcta',
+            'alerta_esperada',
+            'alerta_activada',
+            'alerta_correcta',
+            'tstart',
+            'tgen',
+            'tsync',
+            'lp_ms',
+            'lcr_ms',
+            'trs_ms',
+            'cliente',
+            'fecha_registro',
+        ]

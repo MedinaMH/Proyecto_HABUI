@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RecursoAguaSerializer, RecursoAlimentosSerializer, ConsumoAlimentosSerializer, RecursoCO2Serializer, RecursoO2Serializer
-from .models import RecursoAlimentos, ConsumoAlimentos
+from .serializers import RecursoAguaSerializer, RecursoAlimentosSerializer, ConsumoAlimentosSerializer, RecursoCO2Serializer, RecursoO2Serializer, MetricaMonitoreoSerializer
+from .models import RecursoAlimentos, ConsumoAlimentos, MetricaMonitoreo
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
@@ -901,3 +901,10 @@ def api_detalle_simulacion(request, simulacion_id):
     }
     
     return JsonResponse(data)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_metricas_get(request):
+    datos = MetricaMonitoreo.objects.all().order_by('-fecha_registro')[:1200]
+    serializer = MetricaMonitoreoSerializer(datos, many=True)
+    return Response(serializer.data)

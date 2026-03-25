@@ -1,6 +1,7 @@
 # HABUI_APP/consumers.py
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
 from HABUI_APP.management.process_manager import process_manager 
 
 class AguaConsumer(AsyncWebsocketConsumer):
@@ -9,7 +10,6 @@ class AguaConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
         print("WebSocket conectado al grupo:", self.group_name)
-        print("Channel layer:", self.channel_layer)
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
@@ -18,8 +18,42 @@ class AguaConsumer(AsyncWebsocketConsumer):
     async def enviar_dato(self, event):
         data = event["data"]
         await self.send(text_data=json.dumps(data))
-        print("Enviado al WebSocket:", data)
-        print("Evento recibido en enviar_dato:", event)
+        print("Enviado al WebSocket agua:", data.get("sample_id"), data.get("nivel"))
+
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+            print("AguaConsumer recibio mensaje del cliente:", data)
+
+            if data.get("type") == "ack_metric":
+                sample_id = data.get("sample_id")
+                cliente = data.get("cliente", "web")
+                await self.registrar_ack(sample_id, cliente)
+
+        except Exception as e:
+            print(f"Error al procesar ACK de agua: {str(e)}")
+
+    @database_sync_to_async
+    def registrar_ack(self, sample_id, cliente):
+        from django.utils import timezone
+        from HABUI_APP.models import MetricaMonitoreo
+
+        try:
+            metrica = MetricaMonitoreo.objects.get(sample_id=sample_id)
+
+            tsync = timezone.now()
+            metrica.tsync = tsync
+            metrica.cliente = cliente
+            metrica.lcr_ms = (tsync - metrica.tgen).total_seconds() * 1000.0 if metrica.tgen else None
+            metrica.trs_ms = (tsync - metrica.tstart).total_seconds() * 1000.0 if metrica.tstart else None
+            metrica.save()
+
+            print(f"ACK guardado correctamente para agua: {sample_id} desde {cliente}")
+
+        except MetricaMonitoreo.DoesNotExist:
+            print(f"No se encontro metrica de agua para sample_id={sample_id}")
+        except Exception as e:
+            print(f"Error al registrar ACK en metricas de agua: {str(e)}")
 
 class EnergiaConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -35,25 +69,141 @@ class EnergiaConsumer(AsyncWebsocketConsumer):
     async def enviar_dato(self, event):
         data = event["data"]
         await self.send(text_data=json.dumps(data))
-        print("Enviado dato de energía:", data)
+        print("Enviado dato de energia:", data.get("sample_id"), data.get("battery"))
+
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+            print("EnergiaConsumer recibio mensaje del cliente:", data)
+
+            if data.get("type") == "ack_metric":
+                sample_id = data.get("sample_id")
+                cliente = data.get("cliente", "web")
+                await self.registrar_ack(sample_id, cliente)
+
+        except Exception as e:
+            print(f"Error al procesar ACK de energia: {str(e)}")
+
+    @database_sync_to_async
+    def registrar_ack(self, sample_id, cliente):
+        from django.utils import timezone
+        from HABUI_APP.models import MetricaMonitoreo
+
+        try:
+            metrica = MetricaMonitoreo.objects.get(sample_id=sample_id)
+
+            tsync = timezone.now()
+            metrica.tsync = tsync
+            metrica.cliente = cliente
+            metrica.lcr_ms = (tsync - metrica.tgen).total_seconds() * 1000.0 if metrica.tgen else None
+            metrica.trs_ms = (tsync - metrica.tstart).total_seconds() * 1000.0 if metrica.tstart else None
+            metrica.save()
+
+            print(f"ACK guardado correctamente para energia: {sample_id} desde {cliente}")
+
+        except MetricaMonitoreo.DoesNotExist:
+            print(f"No se encontro metrica de energia para sample_id={sample_id}")
+        except Exception as e:
+            print(f"Error al registrar ACK en metricas de energia: {str(e)}")
 
 class OxigenoConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         await self.channel_layer.group_add("oxigeno", self.channel_name)
         await self.accept()
-        print("Cliente conectado al canal O₂")
+        print("Cliente conectado al canal oxigeno")
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard("oxigeno", self.channel_name)
-        print("Cliente desconectado del canal O₂")
+        print("Cliente desconectado del canal oxigeno")
 
     async def enviar_dato(self, event):
-        # El motor de simulación envía {"type": "enviar_dato", "data": {...}}
+        data = event["data"]
+        await self.send(text_data=json.dumps(data))
+        print("Enviado al WebSocket oxigeno:", data.get("sample_id"), data.get("nivel"))
+
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+            print("OxigenoConsumer recibio mensaje del cliente:", data)
+
+            if data.get("type") == "ack_metric":
+                sample_id = data.get("sample_id")
+                cliente = data.get("cliente", "web")
+                await self.registrar_ack(sample_id, cliente)
+
+        except Exception as e:
+            print(f"Error al procesar ACK de oxigeno: {str(e)}")
+
+    @database_sync_to_async
+    def registrar_ack(self, sample_id, cliente):
+        from django.utils import timezone
+        from HABUI_APP.models import MetricaMonitoreo
+
+        try:
+            metrica = MetricaMonitoreo.objects.get(sample_id=sample_id)
+
+            tsync = timezone.now()
+            metrica.tsync = tsync
+            metrica.cliente = cliente
+            metrica.lcr_ms = (tsync - metrica.tgen).total_seconds() * 1000.0 if metrica.tgen else None
+            metrica.trs_ms = (tsync - metrica.tstart).total_seconds() * 1000.0 if metrica.tstart else None
+            metrica.save()
+
+            print(f"ACK guardado correctamente para oxigeno: {sample_id} desde {cliente}")
+
+        except MetricaMonitoreo.DoesNotExist:
+            print(f"No se encontro metrica de oxigeno para sample_id={sample_id}")
+        except Exception as e:
+            print(f"Error al registrar ACK en metricas de oxigeno: {str(e)}")
+
+class CO2Consumer(AsyncWebsocketConsumer):
+
+    async def connect(self):
+        await self.channel_layer.group_add("co2", self.channel_name)
+        await self.accept()
+        print("Cliente conectado al canal CO₂")
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard("co2", self.channel_name)
+        print("Cliente desconectado del canal CO₂")
+
+    async def enviar_dato(self, event):
         data = event["data"]
         await self.send(text_data=json.dumps(data))
 
-class CO2Consumer(AsyncWebsocketConsumer):
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+
+            if data.get("type") == "ack_metric":
+                sample_id = data.get("sample_id")
+                cliente = data.get("cliente", "web")
+
+                await self.registrar_ack(sample_id, cliente)
+
+        except Exception as e:
+            print(f"Error al procesar ACK de CO₂: {str(e)}")
+
+    @database_sync_to_async
+    def registrar_ack(self, sample_id, cliente):
+        from django.utils import timezone
+        from HABUI_APP.models import MetricaMonitoreo
+
+        try:
+            metrica = MetricaMonitoreo.objects.get(sample_id=sample_id)
+
+            tsync = timezone.now()
+            metrica.tsync = tsync
+            metrica.cliente = cliente
+            metrica.lcr_ms = (tsync - metrica.tgen).total_seconds() * 1000.0 if metrica.tgen else None
+            metrica.trs_ms = (tsync - metrica.tstart).total_seconds() * 1000.0 if metrica.tstart else None
+            metrica.save()
+
+        except MetricaMonitoreo.DoesNotExist:
+            print(f"No se encontró métrica para sample_id={sample_id}")
+        except Exception as e:
+            print(f"Error al registrar ACK en métricas CO₂: {str(e)}")
 
     async def connect(self):
         await self.channel_layer.group_add("co2", self.channel_name)
@@ -81,9 +231,44 @@ class TemperaturaConsumer(AsyncWebsocketConsumer):
         print("Cliente desconectado del canal temperatura")
 
     async def enviar_dato(self, event):
-        # El motor de simulación envía {"type": "enviar_dato", "data": {...}}
         data = event["data"]
         await self.send(text_data=json.dumps(data))
+        print("Enviado al WebSocket temperatura:", data.get("sample_id"), data.get("valor"))
+
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+            print("TemperaturaConsumer recibio mensaje del cliente:", data)
+
+            if data.get("type") == "ack_metric":
+                sample_id = data.get("sample_id")
+                cliente = data.get("cliente", "web")
+                await self.registrar_ack(sample_id, cliente)
+
+        except Exception as e:
+            print(f"Error al procesar ACK de temperatura: {str(e)}")
+
+    @database_sync_to_async
+    def registrar_ack(self, sample_id, cliente):
+        from django.utils import timezone
+        from HABUI_APP.models import MetricaMonitoreo
+
+        try:
+            metrica = MetricaMonitoreo.objects.get(sample_id=sample_id)
+
+            tsync = timezone.now()
+            metrica.tsync = tsync
+            metrica.cliente = cliente
+            metrica.lcr_ms = (tsync - metrica.tgen).total_seconds() * 1000.0 if metrica.tgen else None
+            metrica.trs_ms = (tsync - metrica.tstart).total_seconds() * 1000.0 if metrica.tstart else None
+            metrica.save()
+
+            print(f"ACK guardado correctamente para temperatura: {sample_id} desde {cliente}")
+
+        except MetricaMonitoreo.DoesNotExist:
+            print(f"No se encontro metrica de temperatura para sample_id={sample_id}")
+        except Exception as e:
+            print(f"Error al registrar ACK en metricas de temperatura: {str(e)}")
 
 class HumedadConsumer(AsyncWebsocketConsumer):
 
@@ -97,9 +282,44 @@ class HumedadConsumer(AsyncWebsocketConsumer):
         print("Cliente desconectado del canal humedad")
 
     async def enviar_dato(self, event):
-        # El motor de simulación envía {"type": "enviar_dato", "data": {...}}
         data = event["data"]
         await self.send(text_data=json.dumps(data))
+        print("Enviado al WebSocket humedad:", data.get("sample_id"), data.get("valor"))
+
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+            print("HumedadConsumer recibio mensaje del cliente:", data)
+
+            if data.get("type") == "ack_metric":
+                sample_id = data.get("sample_id")
+                cliente = data.get("cliente", "web")
+                await self.registrar_ack(sample_id, cliente)
+
+        except Exception as e:
+            print(f"Error al procesar ACK de humedad: {str(e)}")
+
+    @database_sync_to_async
+    def registrar_ack(self, sample_id, cliente):
+        from django.utils import timezone
+        from HABUI_APP.models import MetricaMonitoreo
+
+        try:
+            metrica = MetricaMonitoreo.objects.get(sample_id=sample_id)
+
+            tsync = timezone.now()
+            metrica.tsync = tsync
+            metrica.cliente = cliente
+            metrica.lcr_ms = (tsync - metrica.tgen).total_seconds() * 1000.0 if metrica.tgen else None
+            metrica.trs_ms = (tsync - metrica.tstart).total_seconds() * 1000.0 if metrica.tstart else None
+            metrica.save()
+
+            print(f"ACK guardado correctamente para humedad: {sample_id} desde {cliente}")
+
+        except MetricaMonitoreo.DoesNotExist:
+            print(f"No se encontro metrica de humedad para sample_id={sample_id}")
+        except Exception as e:
+            print(f"Error al registrar ACK en metricas de humedad: {str(e)}")
 
 class TemperaturaAlimentosConsumer(AsyncWebsocketConsumer):
 

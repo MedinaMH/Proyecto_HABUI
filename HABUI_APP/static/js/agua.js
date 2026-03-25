@@ -1007,44 +1007,51 @@ const actualizarSerieTemporal = crearSerieTemporalAgua();
 // ====================== WEBSOCKET AGUA ======================
 // ============================================================
 
-// Usar las instancias existentes
-const socket = new WebSocket("ws://" + window.location.host + "/ws/agua/");
+    const socket = new WebSocket("ws://" + window.location.host + "/ws/agua/");
 
-socket.onmessage = function(e) {
-    const mensaje = JSON.parse(e.data);
-    const valor = parseFloat(mensaje.nivel);
-    const fecha = mensaje.fecha_hora;
-    
-    // Actualizar el tanque usando la instancia existente
-    if (typeof actualizarTanque === 'function') {
-        actualizarTanque(valor);
-    }
-    
-    // Actualizar la serie temporal - usar .push() como CO₂ si está disponible
-    if (actualizarSerieTemporal && typeof actualizarSerieTemporal.push === 'function') {
-        // Si tiene método .push() (nueva versión)
-        actualizarSerieTemporal.push(valor, fecha);
-    } else if (typeof actualizarSerieTemporal === 'function') {
-        // Si es la función antigua (compatibilidad)
-        actualizarSerieTemporal(valor);
-    }
-    
-    console.log('Datos WebSocket agua recibidos:', { valor, fecha });
-};
+    socket.onmessage = function(e) {
+        const mensaje = JSON.parse(e.data);
+        const valor = parseFloat(mensaje.nivel);
+        const fecha = mensaje.fecha_hora;
 
-socket.onopen = function() {
-    console.log("WebSocket Tanque de Agua conectado");
-};
+        // Actualizar el tanque usando la instancia existente
+        if (typeof actualizarTanque === 'function') {
+            actualizarTanque(valor);
+        }
 
-socket.onerror = function(error) {
-    console.error("Error en conexión WebSocket agua:", error);
-};
+        // Actualizar la serie temporal
+        if (actualizarSerieTemporal && typeof actualizarSerieTemporal.push === 'function') {
+            actualizarSerieTemporal.push(valor, fecha);
+        } else if (typeof actualizarSerieTemporal === 'function') {
+            actualizarSerieTemporal(valor);
+        }
 
-socket.onclose = function() {
-    console.warn("Conexión WebSocket agua cerrada");
-    // Reconectar después de 3 segundos
-    setTimeout(() => {
-        location.reload();
-    }, 3000);
-};
+        // Enviar ACK para completar metricas
+        if (mensaje.sample_id) {
+            socket.send(JSON.stringify({
+                type: "ack_metric",
+                sample_id: mensaje.sample_id,
+                cliente: "web"
+            }));
+
+            console.log("ACK agua enviado para:", mensaje.sample_id);
+        }
+
+        console.log('Datos WebSocket agua recibidos:', { valor, fecha, sample_id: mensaje.sample_id });
+    };
+
+    socket.onopen = function() {
+        console.log("WebSocket Tanque de Agua conectado");
+    };
+
+    socket.onerror = function(error) {
+        console.error("Error en conexion WebSocket agua:", error);
+    };
+
+    socket.onclose = function() {
+        console.warn("Conexion WebSocket agua cerrada");
+        setTimeout(() => {
+            location.reload();
+        }, 3000);
+    };
 });

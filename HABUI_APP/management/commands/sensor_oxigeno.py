@@ -1,164 +1,232 @@
 import random
 import time
-from datetime import datetime
+import uuid
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from HABUI_APP.models import Recurso, RecursoOxigeno
+from HABUI_APP.models import Recurso, RecursoOxigeno, MetricaMonitoreo
 
 
 class Command(BaseCommand):
-    help = "Simula lecturas del sensor de Oxígeno (O₂) y envía datos por WebSocket."
+    help = "Simula lecturas del sensor de Oxigeno (O2) y guarda metricas por WebSocket."
 
     def add_arguments(self, parser):
         parser.add_argument('--interval', type=float, default=2.0,
                             help='Tiempo entre lecturas (segundos)')
         parser.add_argument('--count', type=int, default=0,
-                            help='Número de lecturas (0 = infinito)')
+                            help='Numero de lecturas (0 = infinito)')
         parser.add_argument('--recurso-id', type=int, required=False,
-                            help='ID del recurso tipo oxígeno (opcional)')
+                            help='ID del recurso tipo oxigeno (opcional)')
         parser.add_argument('--mode', type=str, default='normal',
-                            choices=['normal', 'critico_bajo', 'critico_alto', 'advertencia_baja', 
-                                'advertencia_alta', 'optimo', 'aleatorio'],
-                            help='Modo de simulación: normal, critico_bajo, critico_alto, advertencia_baja, advertencia_alta, optimo, aleatorio')
+                            choices=['normal', 'critico_bajo', 'critico_alto', 'advertencia_baja',
+                                     'advertencia_alta', 'optimo', 'aleatorio'],
+                            help='Modo de simulacion: normal, critico_bajo, critico_alto, advertencia_baja, advertencia_alta, optimo, aleatorio')
         parser.add_argument('--drift', type=float, default=0.0,
                             help='Deriva gradual del valor por minuto (positivo/negativo)')
 
-    def handle(self, *args, **options):
+    # ========================= HELPERS =========================
 
+    def obtener_escenario(self, mode, drift_rate):
+        if mode == "optimo":
+            return "S1"
+        elif mode in ["advertencia_baja", "advertencia_alta"]:
+            return "S3"
+        elif mode in ["critico_bajo", "critico_alto"]:
+            return "S4"
+        elif mode == "normal" and drift_rate != 0:
+            return "S3"
+        else:
+            return "S0"
+
+    def clasificar_estado_o2(self, valor):
+        if valor < 17.0:
+            return "CRITICO_BAJO", "rojo", "Nivel critico bajo de oxigeno"
+        elif valor <= 19.4:
+            return "ADVERTENCIA_BAJA", "amarillo", "Nivel bajo de oxigeno"
+        elif valor <= 23.5:
+            return "OPTIMO", "verde", "Nivel optimo de oxigeno"
+        elif valor <= 25.0:
+            return "ADVERTENCIA_ALTA", "amarillo", "Nivel alto de oxigeno"
+        else:
+            return "CRITICO_ALTO", "rojo", "Nivel critico alto de oxigeno"
+
+    def obtener_estado_esperado(self, valor):
+        if valor < 17.0:
+            return "CRITICO_BAJO"
+        elif valor <= 19.4:
+            return "ADVERTENCIA_BAJA"
+        elif valor <= 23.5:
+            return "OPTIMO"
+        elif valor <= 25.0:
+            return "ADVERTENCIA_ALTA"
+        else:
+            return "CRITICO_ALTO"
+
+    def alerta_para_estado(self, estado):
+        return estado in ["ADVERTENCIA_BAJA", "ADVERTENCIA_ALTA", "CRITICO_BAJO", "CRITICO_ALTO"]
+
+    # ========================= MAIN =========================
+
+    def handle(self, *args, **options):
         intervalo = options['interval']
         max_count = options['count']
         recurso_id = options['recurso_id']
         mode = options['mode']
-        drift_rate = options['drift']  # Cambio por minuto
+        drift_rate = options['drift']
 
-        # Rangos según la especificación
         RANGOS = {
-            'critico_bajo': {'min': 15.0, 'max': 16.9, 'color': '🔴'},
-            'critico_alto': {'min': 25.1, 'max': 30.0, 'color': '🔴'},
-            'advertencia_baja': {'min': 17.0, 'max': 19.4, 'color': '🟡'},
-            'advertencia_alta': {'min': 23.6, 'max': 25.0, 'color': '🟡'},
-            'optimo': {'min': 19.5, 'max': 23.5, 'color': '🟢'},
-            'normal': {'min': 20.0, 'max': 21.5, 'color': '🟢'},  # Subconjunto del óptimo
+            'critico_bajo': {'min': 15.0, 'max': 16.9, 'color': 'rojo'},
+            'critico_alto': {'min': 25.1, 'max': 30.0, 'color': 'rojo'},
+            'advertencia_baja': {'min': 17.0, 'max': 19.4, 'color': 'amarillo'},
+            'advertencia_alta': {'min': 23.6, 'max': 25.0, 'color': 'amarillo'},
+            'optimo': {'min': 19.5, 'max': 23.5, 'color': 'verde'},
+            'normal': {'min': 20.0, 'max': 21.5, 'color': 'verde'},
         }
 
         channel_layer = get_channel_layer()
 
-        # ------------------ AUTO-CREAR / OBTENER RECURSO ------------------
         recurso, creado = Recurso.objects.get_or_create(
             tipo='oxigeno',
-            defaults={'nombre': 'Oxígeno'}
+            defaults={'nombre': 'Oxigeno'}
         )
 
         if creado:
-            self.stdout.write(self.style.SUCCESS("Recurso 'Oxígeno' creado automáticamente."))
+            self.stdout.write(self.style.SUCCESS("Recurso 'Oxigeno' creado automaticamente."))
         else:
-            self.stdout.write(self.style.SUCCESS("Recurso 'Oxígeno' ya existe."))
+            self.stdout.write(self.style.SUCCESS("Recurso 'Oxigeno' ya existe."))
+
+        escenario = self.obtener_escenario(mode, drift_rate)
 
         self.stdout.write(self.style.SUCCESS(f"Iniciando simulador Oxigeno en modo: {mode}"))
-        
+        self.stdout.write(self.style.SUCCESS(f"Escenario asignado automaticamente: {escenario}"))
+
         if mode == 'aleatorio':
-            self.stdout.write("Modo aleatorio: Se alternará entre diferentes estados")
-        
+            self.stdout.write("Modo aleatorio: Se alternara entre diferentes estados")
+
         if drift_rate != 0:
             self.stdout.write(f"Deriva configurada: {drift_rate}% por minuto")
 
         i = 1
-        base_value = 20.5  # Valor inicial
+        base_value = 20.5
         start_time = time.time()
-        
+        current_mode = mode
+
         try:
             while True:
-                # Si hay limite de envíos
                 if max_count and i > max_count:
                     break
 
-                # Calcular deriva temporal
+                tstart = timezone.now()
+
                 elapsed_minutes = (time.time() - start_time) / 60.0
                 drift = elapsed_minutes * drift_rate
-                
-                # Seleccionar modo si es aleatorio
+
                 current_mode = mode
                 if mode == 'aleatorio':
                     modes = ['critico_bajo', 'advertencia_baja', 'normal', 'advertencia_alta', 'critico_alto']
-                    # Cambiar modo cada 10 lecturas
                     if i % 10 == 0:
                         current_mode = random.choice(modes)
                         self.stdout.write(f"Cambiando a modo: {current_mode}")
 
-                # Generar valor según el modo
                 if current_mode in RANGOS:
                     rango = RANGOS[current_mode]
                     valor = round(
                         random.uniform(rango['min'], rango['max']) +
-                        random.uniform(-0.05, 0.05) + drift,  # Ruido pequeño + deriva
+                        random.uniform(-0.05, 0.05) + drift,
                         4
                     )
-                    # Asegurar que no salga del rango por la deriva
                     if current_mode != 'normal':
                         valor = max(rango['min'], min(rango['max'], valor))
                 elif current_mode == 'normal':
-                    # Modo normal con tendencia realista (ligeras variaciones)
                     if i == 1:
                         base_value = 20.5
                     else:
-                        # Pequeña variación aleatoria
                         variation = random.uniform(-0.1, 0.1)
                         base_value += variation
-                        # Mantener en rango óptimo
                         base_value = max(19.5, min(23.5, base_value + drift))
                     valor = round(base_value + random.uniform(-0.05, 0.05), 4)
                 else:
                     valor = round(20.5 + random.uniform(-0.1, 0.1), 4)
 
-                timestamp = datetime.now()
+                valor = round(valor, 2)
 
-                # Determinar estado actual
-                estado = "Desconocido"
-                color = "⚪"
-                if valor < 17.0:
-                    estado = "CRÍTICO (BAJO)"
-                    color = "🔴"
-                elif valor <= 19.4:
-                    estado = "ADVERTENCIA (BAJA)"
-                    color = "🟡"
-                elif valor <= 23.5:
-                    estado = "ÓPTIMO"
-                    color = "🟢"
-                elif valor <= 25.0:
-                    estado = "ADVERTENCIA (ALTA)"
-                    color = "🟡"
-                else:
-                    estado = "CRÍTICO (ALTO)"
-                    color = "🔴"
+                estado, color, descripcion = self.clasificar_estado_o2(valor)
+                estado_esperado = self.obtener_estado_esperado(valor)
 
-                # ------------ GUARDAR EN BD ------------
+                alerta_activada = self.alerta_para_estado(estado)
+                alerta_esperada = self.alerta_para_estado(estado_esperado)
+
+                clasificacion_correcta = (estado == estado_esperado)
+                alerta_correcta = (alerta_activada == alerta_esperada)
+
                 try:
-                    # Crear registro en RecursoOxigeno
                     reading = RecursoOxigeno.objects.create(
                         recurso_id=recurso_id if recurso_id else recurso.id,
-                        nivel=round(valor, 2)
+                        nivel=valor
                     )
-                    
-                    self.stdout.write(
-                        f"[{i}] {color} {estado} - O₂: {valor:.2f}% "
-                        f"(BD ID: {reading.id})"
-                    )
-                    
-                except Exception as e:
-                    self.stdout.write(self.style.ERROR(f"Error al guardar en BD: {str(e)}"))
-                    reading = None
 
-                # Preparar datos para WebSocket
+                    tgen = timezone.now()
+                    sample_id = f"oxigeno-{reading.id}-{uuid.uuid4().hex[:8]}"
+
+                    metrica = MetricaMonitoreo.objects.create(
+                        recurso="oxigeno",
+                        escenario=escenario,
+                        sample_id=sample_id,
+                        valor=valor,
+                        estado_esperado=estado_esperado,
+                        estado_clasificado=estado,
+                        clasificacion_correcta=clasificacion_correcta,
+                        alerta_esperada=alerta_esperada,
+                        alerta_activada=alerta_activada,
+                        alerta_correcta=alerta_correcta,
+                        tstart=tstart,
+                        tgen=tgen,
+                        lp_ms=(tgen - tstart).total_seconds() * 1000.0
+                    )
+
+                    lp_ms = metrica.lp_ms if metrica.lp_ms is not None else 0.0
+
+                    if "OPTIMO" in estado:
+                        style = self.style.SUCCESS
+                    elif "ADVERTENCIA" in estado:
+                        style = self.style.WARNING
+                    else:
+                        style = self.style.ERROR
+
+                    self.stdout.write(
+                        style(
+                            f"[{i}] Esc:{escenario} | Estado:{estado} | Esperado:{estado_esperado} | "
+                            f"O2:{valor:.2f}% | LP:{lp_ms:.2f} ms | "
+                            f"ClasOK:{clasificacion_correcta} | AlertOK:{alerta_correcta} | "
+                            f"(BD ID:{reading.id})"
+                        )
+                    )
+
+                except Exception as e:
+                    self.stdout.write(self.style.ERROR(f"Error al guardar oxigeno/metricas: {str(e)}"))
+                    tgen = timezone.now()
+                    sample_id = f"oxigeno-error-{uuid.uuid4().hex[:8]}"
+
                 data = {
-                    "nivel": round(valor, 2),
-                    "fecha_hora": timestamp.isoformat(),
+                    "type": "oxigeno_data",
+                    "sample_id": sample_id,
+                    "escenario": escenario,
+                    "nivel": valor,
+                    "fecha_hora": tgen.isoformat(),
                     "estado": estado,
+                    "estado_esperado": estado_esperado,
                     "color": color,
+                    "descripcion": descripcion,
+                    "alerta_activada": alerta_activada,
+                    "alerta_esperada": alerta_esperada,
+                    "clasificacion_correcta": clasificacion_correcta,
+                    "alerta_correcta": alerta_correcta,
                     "modo_simulacion": current_mode,
+                    "tstart": tstart.isoformat(),
+                    "tgen": tgen.isoformat(),
                 }
 
-                # Enviar a WebSocket
                 async_to_sync(channel_layer.group_send)(
                     "oxigeno",
                     {"type": "enviar_dato", "data": data}
@@ -168,14 +236,8 @@ class Command(BaseCommand):
                 time.sleep(intervalo)
 
             self.stdout.write(self.style.SUCCESS("Simulador Oxigeno finalizado."))
+
         except KeyboardInterrupt:
-            self.stdout.write("Simulación detenida.")
-
-
-# Ejemplos de uso:
-# python manage.py simular_o2 --mode normal --interval 2
-# python manage.py simular_o2 --mode critico_bajo --interval 1
-# python manage.py simular_o2 --mode advertencia_alta --interval 3
-# python manage.py simular_o2 --mode aleatorio --interval 2 --count 50
-# python manage.py simular_o2 --mode normal --drift -0.5  # Disminución gradual
-# python manage.py simular_o2 --mode normal --drift 0.3   # Aumento gradual
+            self.stdout.write("Simulacion detenida.")
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"Error en simulacion: {str(e)}"))

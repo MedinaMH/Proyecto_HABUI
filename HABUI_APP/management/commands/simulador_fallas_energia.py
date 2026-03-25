@@ -1,96 +1,146 @@
 import csv
 import time
 import random
+import uuid
+from pathlib import Path
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from pathlib import Path
+from HABUI_APP.models import Recurso, RecursoEnergia, MetricaMonitoreo
 
 
 class Command(BaseCommand):
     help = (
-        "Lee datos del CSV de energía y los envía por WebSocket al grupo 'energia'. "
-        "Incluye simulación de energía baja y gestión de áreas."
+        "Lee datos del CSV de energia y los envia por WebSocket al grupo 'energia'. "
+        "Incluye simulacion de energia baja, drift de SoC y metricas."
     )
 
     def add_arguments(self, parser):
         parser.add_argument('--interval', type=float, default=3.0,
-                            help="Intervalo en segundos entre envíos")
+                            help="Intervalo en segundos entre envios")
         parser.add_argument('--capacity', type=float, default=12000.0,
                             help="Capacidad del banco en Wh")
         parser.add_argument('--initial_soc', type=float, default=0.6,
                             help="SoC inicial (0..1)")
         parser.add_argument('--low_energy_mode', action='store_true',
-                            help="Activa simulación forzada de energía baja")
+                            help="Activa simulacion forzada de energia baja")
+        parser.add_argument('--soc_drift', type=float, default=0.0,
+                            help="Cambio forzado del SoC en puntos porcentuales por minuto. Ej: -5 baja 5 puntos por minuto")
+
+    # ========================= HELPERS =========================
+
+    def clasificar_estado_energia(self, soc):
+        if soc <= 0.15:
+            return "critical", "rojo", "Nivel critico de energia"
+        elif soc <= 0.30:
+            return "warning", "amarillo", "Nivel de advertencia de energia"
+        else:
+            return "normal", "verde", "Sistema energetico operativo"
+
+    def obtener_estado_esperado(self, soc):
+        if soc <= 0.15:
+            return "critical"
+        elif soc <= 0.30:
+            return "warning"
+        else:
+            return "normal"
+
+    def alerta_para_estado(self, estado):
+        # Conservamos la logica original: alerta visible solo en CRITICAL
+        return estado == "critical"
+
+    def obtener_escenario(self, low_energy_mode, soc_drift):
+        if low_energy_mode or soc_drift < 0:
+            return "S5"
+        return "S1"
+
+    # ========================= MAIN =========================
 
     def handle(self, *args, **options):
         intervalo = options['interval']
-        CAPACIDAD_BATERIA_WH = options['capacity']
-        SOC_INICIAL = options['initial_soc']
-        LOW_ENERGY_MODE = options['low_energy_mode']
+        capacidad_bateria_wh = options['capacity']
+        soc_inicial = options['initial_soc']
+        low_energy_mode = options['low_energy_mode']
+        soc_drift = options['soc_drift']  # puntos porcentuales por minuto
 
         channel_layer = get_channel_layer()
         data_file = Path(__file__).resolve().parent.parent.parent / "data" / "energia.csv"
 
         if not data_file.exists():
-            self.stderr.write(f"No se encontró el archivo: {data_file}")
+            self.stderr.write(f"No se encontro el archivo: {data_file}")
             return
 
-        # =========================
-        # Estado inicial de batería
-        # =========================
-        bateria_wh = CAPACIDAD_BATERIA_WH * SOC_INICIAL
+        # ------------------ AUTO-CREAR / OBTENER RECURSO ------------------
+        recurso, creado = Recurso.objects.get_or_create(
+            tipo='energia',
+            defaults={'nombre': 'Banco de Energia'}
+        )
+
+        if creado:
+            self.stdout.write(self.style.SUCCESS("Recurso 'Banco de Energia' creado automaticamente."))
+        else:
+            self.stdout.write(self.style.SUCCESS("Recurso 'Banco de Energia' ya existe."))
 
         # =========================
-        # Umbrales de energía
+        # Estado inicial de bateria
         # =========================
-        SOC_WARNING = 0.30
-        SOC_CRITICAL = 0.15
+        bateria_wh = capacidad_bateria_wh * soc_inicial
 
         # =========================
-        # Áreas del hábitat
+        # Umbrales de energia
         # =========================
-        AREAS_NO_CRITICAS = [
+        soc_warning = 0.30
+        soc_critical = 0.15
+
+        # =========================
+        # Areas del habitat
+        # =========================
+        areas_no_criticas = [
             "area.dormitorios",
             "area.bano",
             "area.pasillo",
             "area.exteriores"
         ]
 
-        AREAS_CRITICAS = [
+        areas_criticas = [
             "area.sala_monitoreo"
         ]
 
         # =========================
         # Sugerencias ante falla
         # =========================
-        SUGERENCIAS_CRITICAS = [
-            "Revisar estado del banco de baterías",
-            "Verificar conexión y rendimiento de paneles solares",
+        sugerencias_criticas = [
+            "Revisar estado del banco de baterias",
+            "Verificar conexion y rendimiento de paneles solares",
             "Reducir consumo en sistemas no esenciales",
             "Comprobar inversor y regulador de carga",
             "Evaluar posible sobreconsumo inesperado"
         ]
 
         # =========================
-        # Parámetros base simulación
+        # Parametros base simulacion
         # =========================
-        P_SOLAR_MAX_NORMAL = 3000.0
+        p_solar_max_normal = 3000.0
         eficiencia_bateria = 0.95
         ruido_wh = 5.0
 
         # =========================
-        # Ajustes modo energía baja
+        # Ajustes modo energia baja
         # =========================
-        if LOW_ENERGY_MODE:
-            self.stdout.write(self.style.WARNING(
-                "MODO ENERGÍA BAJA ACTIVADO"
-            ))
-            P_SOLAR_MAX = 800.0          # Muy baja generación
-            FACTOR_CONSUMO = 1.4         # Mayor demanda
+        if low_energy_mode:
+            self.stdout.write(self.style.WARNING("MODO ENERGIA BAJA ACTIVADO"))
+            p_solar_max = 800.0
+            factor_consumo = 1.4
         else:
-            P_SOLAR_MAX = P_SOLAR_MAX_NORMAL
-            FACTOR_CONSUMO = 1.0
+            p_solar_max = p_solar_max_normal
+            factor_consumo = 1.0
+
+        escenario = self.obtener_escenario(low_energy_mode, soc_drift)
+
+        self.stdout.write(self.style.SUCCESS(f"Iniciando simulador Energia | Escenario: {escenario}"))
+        self.stdout.write(f"Capacidad: {capacidad_bateria_wh} Wh | SoC inicial: {soc_inicial:.2f}")
+        self.stdout.write(f"Intervalo: {intervalo}s | SoC drift: {soc_drift} puntos/min")
 
         try:
             with open(data_file, newline='', encoding='utf-8') as csvfile:
@@ -98,26 +148,28 @@ class Command(BaseCommand):
                 i = 0
 
                 for row in reader:
+                    tstart = timezone.now()
+
                     try:
-                        tension = float(row.get("Tensión/L1", 0))
+                        tension = float(row.get("Tension/L1", row.get("Tensión/L1", 0)))
                         corriente = float(row.get("Corriente/L1", 0))
-                        potencia = float(row.get("P. Activa/L1 +", 0)) * FACTOR_CONSUMO
+                        potencia = float(row.get("P. Activa/L1 +", 0)) * factor_consumo
                     except ValueError:
-                        self.stderr.write(f"Fila {i+1}: valor inválido, se omite.")
+                        self.stderr.write(f"Fila {i+1}: valor invalido, se omite.")
                         continue
 
                     # =========================
-                    # Generación solar estimada
+                    # Generacion solar estimada
                     # =========================
-                    potencia_norm = max(0.0, min(1.0, potencia / (P_SOLAR_MAX + 1e-6)))
+                    potencia_norm = max(0.0, min(1.0, potencia / (p_solar_max + 1e-6)))
                     potencia_solar_estim = (
-                        potencia_norm * P_SOLAR_MAX * random.uniform(0.4, 0.8)
-                        if LOW_ENERGY_MODE
-                        else potencia_norm * P_SOLAR_MAX * random.uniform(0.6, 1.0)
+                        potencia_norm * p_solar_max * random.uniform(0.4, 0.8)
+                        if low_energy_mode
+                        else potencia_norm * p_solar_max * random.uniform(0.6, 1.0)
                     )
 
                     # =========================
-                    # Flujo energético
+                    # Flujo energetico
                     # =========================
                     p_bateria = potencia_solar_estim - potencia
                     delta_wh = (p_bateria * intervalo) / 3600.0
@@ -130,61 +182,124 @@ class Command(BaseCommand):
                     delta_wh += random.uniform(-ruido_wh, ruido_wh)
 
                     # =========================
-                    # Actualizar batería
+                    # Drift forzado de SoC
                     # =========================
-                    bateria_wh = max(0.0, min(CAPACIDAD_BATERIA_WH, bateria_wh + delta_wh))
-                    soc = bateria_wh / CAPACIDAD_BATERIA_WH
+                    # soc_drift esta en puntos porcentuales por minuto
+                    # Ejemplo: -5 => -0.05 de SoC por minuto
+                    delta_soc_drift = (soc_drift / 100.0) * (intervalo / 60.0)
+                    delta_wh_drift = delta_soc_drift * capacidad_bateria_wh
 
                     # =========================
-                    # Estado energético
+                    # Actualizar bateria
                     # =========================
-                    if soc <= SOC_CRITICAL:
-                        energy_status = "critical"
-                    elif soc <= SOC_WARNING:
-                        energy_status = "warning"
-                    else:
-                        energy_status = "normal"
+                    bateria_wh = max(
+                        0.0,
+                        min(capacidad_bateria_wh, bateria_wh + delta_wh + delta_wh_drift)
+                    )
+                    soc = bateria_wh / capacidad_bateria_wh
 
                     # =========================
-                    # Paquete de datos WS
+                    # Estado energetico
                     # =========================
+                    estado, color, descripcion = self.clasificar_estado_energia(soc)
+                    estado_esperado = self.obtener_estado_esperado(soc)
+
+                    alerta_activada = self.alerta_para_estado(estado)
+                    alerta_esperada = self.alerta_para_estado(estado_esperado)
+
+                    clasificacion_correcta = (estado == estado_esperado)
+                    alerta_correcta = (alerta_activada == alerta_esperada)
+
+                    try:
+                        reading = RecursoEnergia.objects.create(
+                            recurso=recurso,
+                            voltaje=round(tension, 4),
+                            corriente=round(corriente, 4),
+                            potencia=round(potencia, 4),
+                            factor_potencia=None,
+                            frecuencia=None
+                        )
+
+                        tgen = timezone.now()
+                        sample_id = f"energia-{reading.id}-{uuid.uuid4().hex[:8]}"
+
+                        metrica = MetricaMonitoreo.objects.create(
+                            recurso="energia",
+                            escenario=escenario,
+                            sample_id=sample_id,
+                            valor=round(soc * 100.0, 2),  # SoC en porcentaje para analisis
+                            estado_esperado=estado_esperado,
+                            estado_clasificado=estado,
+                            clasificacion_correcta=clasificacion_correcta,
+                            alerta_esperada=alerta_esperada,
+                            alerta_activada=alerta_activada,
+                            alerta_correcta=alerta_correcta,
+                            tstart=tstart,
+                            tgen=tgen,
+                            lp_ms=(tgen - tstart).total_seconds() * 1000.0
+                        )
+
+                        lp_ms = metrica.lp_ms if metrica.lp_ms is not None else 0.0
+
+                    except Exception as e:
+                        self.stdout.write(self.style.ERROR(f"Error al guardar energia/metricas: {str(e)}"))
+                        tgen = timezone.now()
+                        sample_id = f"energia-error-{uuid.uuid4().hex[:8]}"
+                        reading = None
+                        lp_ms = 0.0
+
                     data = {
+                        "type": "energia_data",
+                        "sample_id": sample_id,
+                        "escenario": escenario,
+
                         "tension": round(tension, 4),
                         "corriente": round(corriente, 4),
                         "potencia": round(potencia, 4),
 
                         "battery": round(soc, 4),
                         "battery_wh": round(bateria_wh, 2),
-                        "capacity_wh": CAPACIDAD_BATERIA_WH,
+                        "capacity_wh": capacidad_bateria_wh,
 
                         "solar_estimated_w": round(potencia_solar_estim, 2),
 
-                        "energy_status": energy_status,
-                        "low_energy_mode": LOW_ENERGY_MODE,
+                        "energy_status": estado,
+                        "estado": estado,
+                        "estado_esperado": estado_esperado,
+                        "descripcion": descripcion,
+                        "color": color,
+
+                        "low_energy_mode": low_energy_mode,
+                        "soc_drift": soc_drift,
                         "timestamp": time.time(),
 
                         "areas": {
-                            "critical": AREAS_CRITICAS,
-                            "non_critical": AREAS_NO_CRITICAS,
-                            "shutdown": AREAS_NO_CRITICAS if energy_status == "critical" else []
+                            "critical": areas_criticas,
+                            "non_critical": areas_no_criticas,
+                            "shutdown": areas_no_criticas if estado == "critical" else []
                         },
 
                         "alerts": {
-                            "show_alert": energy_status == "critical",
-                            "level": energy_status,
+                            "show_alert": estado == "critical",
+                            "level": estado,
                             "message": (
-                                "Protocolo de mantenimiento energético - Hábitat Análogo"
-                                if energy_status == "critical"
-                                else "Sistema energético operativo."
+                                "Protocolo de mantenimiento energetico - Habitat Analogo"
+                                if estado == "critical"
+                                else "Sistema energetico operativo."
                             ),
                             "suggestions": (
-                                SUGERENCIAS_CRITICAS
-                                if energy_status == "critical"
-                                else []
+                                sugerencias_criticas if estado == "critical" else []
                             )
                         },
 
-                        "interval": intervalo
+                        "alerta_activada": alerta_activada,
+                        "alerta_esperada": alerta_esperada,
+                        "clasificacion_correcta": clasificacion_correcta,
+                        "alerta_correcta": alerta_correcta,
+
+                        "interval": intervalo,
+                        "tstart": tstart.isoformat(),
+                        "tgen": tgen.isoformat(),
                     }
 
                     async_to_sync(channel_layer.group_send)(
@@ -193,11 +308,12 @@ class Command(BaseCommand):
                     )
 
                     self.stdout.write(
-                        f"[{i+1}] SoC={soc:.2f} | Estado={energy_status} | LowMode={LOW_ENERGY_MODE}"
+                        f"[{i+1}] Esc:{escenario} | SoC={soc:.2f} | Estado={estado} | "
+                        f"LowMode={low_energy_mode} | Drift={soc_drift} | LP={lp_ms:.2f} ms"
                     )
 
                     i += 1
                     time.sleep(intervalo)
 
         except KeyboardInterrupt:
-            self.stdout.write(self.style.SUCCESS("Simulación detenida por el usuario."))
+            self.stdout.write(self.style.SUCCESS("Simulacion detenida por el usuario."))

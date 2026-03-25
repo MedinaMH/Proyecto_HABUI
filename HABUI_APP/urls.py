@@ -46,4 +46,7 @@ urlpatterns = [
     path('api/simulaciones/detener/<str:simulacion_id>/', views.api_detener_simulacion, name='api_detener_simulacion'),
     path('api/simulaciones/<str:simulacion_id>/', views.api_detalle_simulacion, name='api_detalle_simulacion'),
 
+    #===========metricas=========
+    path('api/metricas_monitoreo/', views.api_metricas_get, name='api_metricas_get'),# GET
+
 ]

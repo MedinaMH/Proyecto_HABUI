@@ -2035,12 +2035,17 @@ function inicializarWebSockets() {
                 const data = JSON.parse(e.data);
                 const soc = parseFloat(data.battery);
                 const fecha = data.fecha_hora || new Date().toISOString();
-                
+                if (data.sample_id) {
+                    wsBateria.send(JSON.stringify({
+                        type: "ack_metric",
+                        sample_id: data.sample_id,
+                        cliente: "web"
+                    }));
+                }
                 if (batteryActualizar) {
                     batteryActualizar(soc);
                 }
                 lastUpdate.bateria = fecha;
-                
                 // Actualizar estado
                 const statusElement = document.getElementById('battery-status');
                 const timeElement = document.getElementById('battery-time');
@@ -2107,12 +2112,17 @@ function inicializarWebSockets() {
                 const data = JSON.parse(e.data);
                 const valor = parseFloat(data.nivel);
                 const fecha = data.fecha_hora;
-                
+                if (data.sample_id) {
+                    wsAgua.send(JSON.stringify({
+                        type: "ack_metric",
+                        sample_id: data.sample_id,
+                        cliente: "web"
+                    }));
+                }
                 if (tanqueAguaActualizar) {
                     tanqueAguaActualizar(valor);
                 }
                 lastUpdate.agua = fecha;
-                
                 // Actualizar estado
                 const statusElement = document.getElementById('agua-status');
                 const timeElement = document.getElementById('agua-time');
@@ -2176,6 +2186,13 @@ function inicializarWebSockets() {
                     gaugeO2Instancia.update(data.nivel);
                 }
                 lastUpdate.oxigeno = data.fecha_hora;
+                if (data.sample_id) {
+                    wsO2.send(JSON.stringify({
+                        type: "ack_metric",
+                        sample_id: data.sample_id,
+                        cliente: "web"
+                    }));
+                }
                 // ACTUALIZAR EL TIEMPO EN EL FOOTER
                 const timeElement = document.getElementById('oxigeno-time');
                 if (timeElement && data.fecha_hora) {
@@ -2223,6 +2240,13 @@ function inicializarWebSockets() {
                     gaugeCO2Instancia.update(data.valor);
                 }
                 lastUpdate.co2 = data.fecha_hora;
+                if (data.sample_id) {
+                    wsCO2.send(JSON.stringify({
+                        type: "ack_metric",
+                        sample_id: data.sample_id,
+                        cliente: "web"
+                    }));
+                }
                 const timeElement = document.getElementById('co2-time');
                 if (timeElement && data.fecha_hora) {
                     timeElement.textContent = new Date(data.fecha_hora).toLocaleTimeString();
@@ -2263,12 +2287,17 @@ function inicializarWebSockets() {
             try {
                 const data = JSON.parse(e.data);
                 const valor = data.valor;
-                
+                if (data.sample_id) {
+                    wsTemp.send(JSON.stringify({
+                        type: "ack_metric",
+                        sample_id: data.sample_id,
+                        cliente: "web"
+                    }));
+                }
                 if (gaugeTempInstancia) {
                     gaugeTempInstancia.update(valor);
                 }
                 lastUpdate.temperatura = data.fecha_hora;
-                
                 // Actualizar sensación térmica
                 const feelingElement = document.getElementById('temp-feeling');
                 if (feelingElement) {
@@ -2329,12 +2358,17 @@ function inicializarWebSockets() {
             try {
                 const data = JSON.parse(e.data);
                 const valor = data.valor;
-                
+                if (data.sample_id) {
+                    wsHum.send(JSON.stringify({
+                        type: "ack_metric",
+                        sample_id: data.sample_id,
+                        cliente: "web"
+                    }));
+                }
                 if (gaugeHumInstancia) {
                     gaugeHumInstancia.update(valor);
                 }
                 lastUpdate.humedad = data.fecha_hora;
-                
                 // Actualizar condición de humedad
                 const conditionElement = document.getElementById('humidity-condition');
                 if (conditionElement) {

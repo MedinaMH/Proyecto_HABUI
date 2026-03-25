@@ -904,6 +904,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         gauge.update(valor);
         series.push(valor, fecha);
+
+        if (mensaje.sample_id) {
+        socket.send(JSON.stringify({
+            type: "ack_metric",
+            sample_id: mensaje.sample_id,
+            cliente: "web"
+        }));
+    }
     };
 
     socket.onopen = function() {

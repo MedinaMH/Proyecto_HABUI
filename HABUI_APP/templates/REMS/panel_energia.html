@@ -790,7 +790,14 @@ document.addEventListener("DOMContentLoaded", function() {
       const data = JSON.parse(event.data);
       const now = new Date();
       lastDataTime = now;
-      
+      // ===================== ACK MÉTRICAS =====================
+      if (data.sample_id) {
+        ws.send(JSON.stringify({
+          type: "ack_metric",
+          sample_id: data.sample_id,
+          cliente: "web"
+        }));
+      }
       console.log("Datos WebSocket recibidos:", data);
       
       // 1. Actualizar métricas principales

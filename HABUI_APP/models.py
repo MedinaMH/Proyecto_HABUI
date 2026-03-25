@@ -90,3 +90,33 @@ class TemperaturaAlimentos(models.Model):
     recurso = models.ForeignKey(Recurso, on_delete=models.CASCADE, limit_choices_to={'tipo': 'temperatura_alimentos'})
     valor = models.FloatField(help_text="Temperatura en °C")
     fecha_hora = models.DateTimeField(auto_now_add=True)
+
+class MetricaMonitoreo(models.Model):
+    recurso = models.CharField(max_length=50)  # co2, energia, agua, etc.
+    escenario = models.CharField(max_length=10)  # S1, S2, S3...
+    sample_id = models.CharField(max_length=120, unique=True)
+
+    valor = models.FloatField(null=True, blank=True)
+
+    estado_esperado = models.CharField(max_length=30, null=True, blank=True)
+    estado_clasificado = models.CharField(max_length=30, null=True, blank=True)
+
+    clasificacion_correcta = models.BooleanField(default=False)
+
+    alerta_esperada = models.BooleanField(default=False)
+    alerta_activada = models.BooleanField(default=False)
+    alerta_correcta = models.BooleanField(default=False)
+
+    tstart = models.DateTimeField()
+    tgen = models.DateTimeField(null=True, blank=True)
+    tsync = models.DateTimeField(null=True, blank=True)
+
+    lp_ms = models.FloatField(null=True, blank=True)
+    lcr_ms = models.FloatField(null=True, blank=True)
+    trs_ms = models.FloatField(null=True, blank=True)
+
+    cliente = models.CharField(max_length=50, null=True, blank=True)  # web / unity
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.escenario} - {self.recurso} - {self.sample_id}"

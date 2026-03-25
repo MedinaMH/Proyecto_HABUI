@@ -1028,11 +1028,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const socket = new WebSocket("ws://" + window.location.host + "/ws/co2/");
 
     socket.onmessage = function(e) {
-        const mensaje = JSON.parse(e.data);
-        const valor = mensaje.valor;
-        const fecha = mensaje.fecha_hora;
+    const mensaje = JSON.parse(e.data);
+    const valor = mensaje.valor;
+    const fecha = mensaje.fecha_hora;
 
-        gauge.update(valor);
-        series.push(valor, fecha);
+    gauge.update(valor);
+    series.push(valor, fecha);
+
+    // Confirmación de recepción/render al backend
+    if (mensaje.sample_id) {
+        socket.send(JSON.stringify({
+            type: "ack_metric",
+            sample_id: mensaje.sample_id,
+            cliente: "web"
+        }));
+    }
     };
 });
