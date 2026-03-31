@@ -1,199 +1,49 @@
-{% extends 'PWMS/dashboard.html' %}
+{% extends 'PWMS/estructura_base_PWMS.html' %}
 
 {% block titulo %}Historial Fisiológico - PWMS{% endblock %}
 
 {% block contenido %}
-<div class="container-fluid py-4">
+<div class="container mt-4">
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h2 mb-1">Historial Fisiológico</h1>
-                    <p class="text-muted mb-0">Tus registros de signos vitales y actividad</p>
-                </div>
-                <div>
-                    <a href="{% url 'PWMS:pwms_dashboard' %}" class="btn btn-outline-secondary me-2">
-                        <i class="bi bi-arrow-left me-1"></i>Dashboard
-                    </a>
-                    <a href="{% url 'PWMS:nuevo_registro_fisiologico' %}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-1"></i>Nuevo Registro
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {% if registros %}
-    <div class="row">
-        <div class="col-12">
+        <div class="col-md-12">
             <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th><i class="bi bi-calendar-event me-1"></i>Fecha</th>
-                                    <th><i class="bi bi-heart text-danger me-1"></i>FC</th>
-                                    <th><i class="bi bi-speedometer text-primary me-1"></i>Presión</th>
-                                    <th><i class="bi bi-thermometer text-warning me-1"></i>Temp</th>
-                                    <th><i class="bi bi-droplet text-info me-1"></i>SpO2</th>
-                                    <th><i class="bi bi-moon text-secondary me-1"></i>Sueño</th>
-                                    <th><i class="bi bi-footsteps text-success me-1"></i>Actividad</th>
-                                    <th><i class="bi bi-clipboard-data me-1"></i>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for registro in registros %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ registro.fecha|date:"d/m/Y" }}</strong><br>
-                                        <small class="text-muted">{{ registro.fecha|date:"H:i" }}</small>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="me-2">
-                                                <i class="bi bi-heart-fill text-danger"></i>
-                                            </div>
-                                            <div>
-                                                <strong>{{ registro.frecuencia_cardiaca }}</strong> lpm<br>
-                                                <small class="{% if registro.frecuencia_cardiaca > 100 or registro.frecuencia_cardiaca < 60 %}text-danger{% else %}text-success{% endif %}">
-                                                    {% if registro.frecuencia_cardiacao > 100 %}
-                                                    <i class="bi bi-exclamation-triangle"></i> Alta
-                                                    {% elif registro.frecuencia_cardiacao < 60 %}
-                                                    <i class="bi bi-exclamation-triangle"></i> Baja
-                                                    {% else %}
-                                                    <i class="bi bi-check-circle"></i> Normal
-                                                    {% endif %}
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <strong>{{ registro.presion_arterial_sistolica }}/{{ registro.presion_arterial_diastolica }}</strong><br>
-                                        <small class="{% if registro.presion_arterial_sistolica > 140 or registro.presion_arterial_diastolica > 90 %}text-danger{% else %}text-success{% endif %}">
-                                            mmHg
-                                        </small>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-thermometer-half text-warning me-1"></i>
-                                            <strong>{{ registro.temperatura }}°C</strong>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-droplet-half text-info me-1"></i>
-                                            <strong>{{ registro.oxigenacion_sangre }}%</strong>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-moon-stars text-secondary me-1"></i>
-                                            <div>
-                                                <strong>{{ registro.horas_sueno }}h</strong><br>
-                                                <small class="{% if registro.horas_sueno < 6 %}text-warning{% else %}text-success{% endif %}">
-                                                    {% if registro.horas_sueno < 6 %}
-                                                    <i class="bi bi-exclamation-triangle"></i> Insuficiente
-                                                    {% elif registro.horas_sueno > 9 %}
-                                                    <i class="bi bi-info-circle"></i> Excesivo
-                                                    {% else %}
-                                                    <i class="bi bi-check-circle"></i> Adecuado
-                                                    {% endif %}
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <div class="small">
-                                                <i class="bi bi-footsteps text-success me-1"></i>
-                                                {{ registro.pasos_diarios|default:0 }} pasos
-                                            </div>
-                                            <div class="small">
-                                                <i class="bi bi-fire text-danger me-1"></i>
-                                                {{ registro.calorias_quemadas|default:0 }} cal
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% with 
-                                            fc_normal=registro.frecuencia_cardiaca >= 60 and registro.frecuencia_cardiaca <= 100,
-                                            pa_normal=registro.presion_arterial_sistolica <= 140 and registro.presion_arterial_diastolica <= 90,
-                                            temp_normal=registro.temperatura >= 36.5 and registro.temperatura <= 37.2,
-                                            spo2_normal=registro.oxigenacion_sangre >= 95,
-                                            sueno_normal=registro.horas_sueno >= 6 and registro.horas_sueno <= 9
-                                        %}
-                                            {% if fc_normal and pa_normal and temp_normal and spo2_normal and sueno_normal %}
-                                                <span class="badge bg-success">
-                                                    <i class="bi bi-check-circle me-1"></i>Óptimo
-                                                </span>
-                                            {% elif not fc_normal or not pa_normal %}
-                                                <span class="badge bg-danger">
-                                                    <i class="bi bi-exclamation-triangle me-1"></i>Alerta
-                                                </span>
-                                            {% else %}
-                                                <span class="badge bg-warning">
-                                                    <i class="bi bi-info-circle me-1"></i>Regular
-                                                </span>
-                                            {% endif %}
-                                        {% endwith %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="card-header">
+                    <h5 class="mb-0">Resumen General</h5>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-clipboard-data text-primary me-2"></i>Promedios
-                    </h5>
-                    <div class="row text-center">
-                        <div class="col-3">
-                            <div class="small text-muted">FC</div>
-                            <div class="h5 text-danger">{{ promedio_fc|default:"--" }} lpm</div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h6 class="card-title">Total Registros</h6>
+                                    <h1 class="display-4">{{ total_registros|default:"0" }}</h1>
+                                    <p class="text-muted">desde {{ primer_registro.fecha|date:"d/m/Y"|default:"—" }}</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-3">
-                            <div class="small text-muted">Presión</div>
-                            <div class="h5 text-primary">{{ promedio_pa_sis|default:"--" }}/{{ promedio_pa_dia|default:"--" }}</div>
-                        </div>
-                        <div class="col-3">
-                            <div class="small text-muted">Temp</div>
-                            <div class="h5 text-warning">{{ promedio_temp|default:"--" }}°C</div>
-                        </div>
-                        <div class="col-3">
-                            <div class="small text-muted">SpO2</div>
-                            <div class="h5 text-info">{{ promedio_spo2|default:"--" }}%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-activity text-success me-2"></i>Actividad
-                    </h5>
-                    <div class="row text-center">
-                        <div class="col-4">
-                            <div class="small text-muted">Pasos/Día</div>
-                            <div class="h5 text-success">{{ promedio_pasos|default:"0" }}</div>
-                        </div>
-                        <div class="col-4">
-                            <div class="small text-muted">Calorías/Día</div>
-                            <div class="h5 text-danger">{{ promedio_calorias|default:"0" }}</div>
-                        </div>
-                        <div class="col-4">
-                            <div class="small text-muted">Sueño</div>
-                            <div class="h5 text-secondary">{{ promedio_sueno|default:"0.0" }}h</div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-3 text-center">
+                                    <h6>Frec. Cardíaca</h6>
+                                    <h3>{{ promedios.frecuencia_cardiaca|floatformat:1|default:"—" }}</h3>
+                                    <small class="text-muted">lpm promedio</small>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <h6>Pasos Diarios</h6>
+                                    <h3>{{ promedios.pasos_diarios|floatformat:0|default:"—" }}</h3>
+                                    <small class="text-muted">pasos promedio</small>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <h6>Nivel de Estrés</h6>
+                                    <h3>{{ promedios.nivel_estres|floatformat:1|default:"—" }}</h3>
+                                    <small class="text-muted">puntos promedio</small>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <h6>Oxigenación</h6>
+                                    <h3>{{ promedios.oxigenacion|floatformat:1|default:"—" }}%</h3>
+                                    <small class="text-muted">SpO₂ promedio</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -201,43 +51,105 @@
         </div>
     </div>
 
-    {% else %}
-    <div class="row">
-        <div class="col-12">
+    {% if ultimo_registro %}
+    <div class="row mb-4">
+        <div class="col-md-12">
             <div class="card">
-                <div class="card-body text-center py-5">
-                    <i class="bi bi-heart-pulse display-1 text-muted mb-3"></i>
-                    <h3 class="text-muted">No hay registros fisiológicos aún</h3>
-                    <p class="text-muted mb-4">
-                        Comienza tu seguimiento registrando tus signos vitales
-                    </p>
-                    <a href="{% url 'PWMS:nuevo_registro_fisiologico' %}" class="btn btn-primary btn-lg">
-                        <i class="bi bi-plus-circle me-2"></i>Crear Primer Registro
-                    </a>
+                <div class="card-header">
+                    <h5 class="mb-0">Último Registro</h5>
+                    <small class="text-muted">{{ ultimo_registro.fecha|date:"d/m/Y H:i" }}</small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <strong>Frec. Cardíaca:</strong><br>
+                            <span class="h4">{{ ultimo_registro.frecuencia_cardiaca }} lpm</span>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Presión:</strong><br>
+                            <span class="h4">{{ ultimo_registro.presion_arterial_sistolica }}/{{ ultimo_registro.presion_arterial_diastolica }}</span>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Temperatura:</strong><br>
+                            <span class="h4">{{ ultimo_registro.temperatura|floatformat:1 }}°C</span>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Pasos:</strong><br>
+                            <span class="h4">{{ ultimo_registro.pasos_diarios }}</span>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Estrés:</strong><br>
+                            <span class="h4">{{ ultimo_registro.nivel_estres }}</span>
+                        </div>
+                        <div class="col-md-2">
+                            <strong>Oxigenación:</strong><br>
+                            <span class="h4">{{ ultimo_registro.oxigenacion_sangre }}%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     {% endif %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Todos los Registros</h5>
+                </div>
+                <div class="card-body">
+                    {% if registros %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Frec. Cardíaca</th>
+                                    <th>Presión</th>
+                                    <th>Temp.</th>
+                                    <th>Pasos</th>
+                                    <th>Estrés</th>
+                                    <th>Oxigenación</th>
+                                    <th>Dispositivo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reg in registros %}
+                                <tr>
+                                    <td>{{ reg.fecha|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ reg.frecuencia_cardiaca }}</td>
+                                    <td>{{ reg.presion_arterial_sistolica }}/{{ reg.presion_arterial_diastolica }}</td>
+                                    <td>{{ reg.temperatura|floatformat:1 }}</td>
+                                    <td>{{ reg.pasos_diarios }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if reg.nivel_estres < 25 %}bg-success
+                                            {% elif reg.nivel_estres < 50 %}bg-info
+                                            {% elif reg.nivel_estres < 75 %}bg-warning
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ reg.nivel_estres }}
+                                        </span>
+                                    </td>
+                                    <td>{{ reg.oxigenacion_sangre }}%</td>
+                                    <td><small class="text-muted">{{ reg.dispositivo_origen }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-database fa-3x text-muted mb-3"></i>
+                        <h4>No hay registros fisiológicos</h4>
+                        <p class="text-muted">Envía datos desde tu app Android para verlos aquí.</p>
+                        <a href="{% url 'PWMS:nuevo_registro_fisiologico' %}" class="btn btn-primary">Agregar manual</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<style>
-    .table th {
-        font-weight: 600;
-        background-color: #f8f9fa;
-    }
-    
-    .table td {
-        vertical-align: middle;
-    }
-    
-    .badge {
-        font-size: 0.75em;
-        padding: 4px 8px;
-    }
-    
-    .small {
-        font-size: 0.85em;
-    }
-</style>
 {% endblock %}

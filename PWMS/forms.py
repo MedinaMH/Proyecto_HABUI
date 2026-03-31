@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import PerfilPWMS, RegistroPsicologico, RegistroFisiologico
+from .models import PerfilPWMS, RegistroPsicologico, RegistroFisiologico, EvaluacionNASATLX
 
 class RegistroUsuarioForm(UserCreationForm):
     """
@@ -58,6 +58,7 @@ class PerfilPWMSForm(forms.ModelForm):
     class Meta:
         model = PerfilPWMS
         fields = [
+            'nombre_completo',
             'fecha_nacimiento', 'genero', 'telefono', 
             'grupo_sanguineo', 'alergias', 'medicamentos',
             'condiciones_medicas', 'psicologo_asignado',
@@ -65,6 +66,7 @@ class PerfilPWMSForm(forms.ModelForm):
             'recibir_recordatorios'
         ]
         widgets = {
+            'nombre_completo': forms.TextInput(attrs={'placeholder': 'Tu nombre completo'}),
             'fecha_nacimiento': forms.DateInput(attrs={'type': 'date'}),
             'alergias': forms.Textarea(attrs={'rows': 3}),
             'medicamentos': forms.Textarea(attrs={'rows': 3}),
@@ -88,6 +90,278 @@ class RegistroPsicologicoForm(forms.ModelForm):
             'pensamientos_recurrentes': forms.Textarea(attrs={'rows': 3}),
         }
 
+class NASATLXForm(forms.ModelForm):
+    """
+    Formulario para evaluación NASA TLX (Carga mental de trabajo)
+    """
+    # Diccionario para etiquetas de dimensiones
+    DIMENSIONES_CHOICES = {
+        'demanda_mental': 'Demanda Mental',
+        'demanda_fisica': 'Demanda Física', 
+        'demanda_temporal': 'Demanda Temporal',
+        'rendimiento': 'Rendimiento',
+        'esfuerzo': 'Esfuerzo',
+        'frustracion': 'Frustración',
+    }
+    
+    # Campos para las 15 comparaciones por pares
+    # Comparación 1
+    comparacion_1 = forms.ChoiceField(
+        choices=[
+            ('demanda_mental', 'Demanda Mental'),
+            ('demanda_fisica', 'Demanda Física')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="1. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 2
+    comparacion_2 = forms.ChoiceField(
+        choices=[
+            ('demanda_mental', 'Demanda Mental'),
+            ('demanda_temporal', 'Demanda Temporal')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="2. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 3
+    comparacion_3 = forms.ChoiceField(
+        choices=[
+            ('demanda_mental', 'Demanda Mental'),
+            ('rendimiento', 'Rendimiento')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="3. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 4
+    comparacion_4 = forms.ChoiceField(
+        choices=[
+            ('demanda_mental', 'Demanda Mental'),
+            ('esfuerzo', 'Esfuerzo')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="4. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 5
+    comparacion_5 = forms.ChoiceField(
+        choices=[
+            ('demanda_mental', 'Demanda Mental'),
+            ('frustracion', 'Frustración')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="5. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 6
+    comparacion_6 = forms.ChoiceField(
+        choices=[
+            ('demanda_fisica', 'Demanda Física'),
+            ('demanda_temporal', 'Demanda Temporal')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="6. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 7
+    comparacion_7 = forms.ChoiceField(
+        choices=[
+            ('demanda_fisica', 'Demanda Física'),
+            ('rendimiento', 'Rendimiento')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="7. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 8
+    comparacion_8 = forms.ChoiceField(
+        choices=[
+            ('demanda_fisica', 'Demanda Física'),
+            ('esfuerzo', 'Esfuerzo')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="8. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 9
+    comparacion_9 = forms.ChoiceField(
+        choices=[
+            ('demanda_fisica', 'Demanda Física'),
+            ('frustracion', 'Frustración')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="9. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 10
+    comparacion_10 = forms.ChoiceField(
+        choices=[
+            ('demanda_temporal', 'Demanda Temporal'),
+            ('rendimiento', 'Rendimiento')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="10. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 11
+    comparacion_11 = forms.ChoiceField(
+        choices=[
+            ('demanda_temporal', 'Demanda Temporal'),
+            ('esfuerzo', 'Esfuerzo')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="11. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 12
+    comparacion_12 = forms.ChoiceField(
+        choices=[
+            ('demanda_temporal', 'Demanda Temporal'),
+            ('frustracion', 'Frustración')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="12. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 13
+    comparacion_13 = forms.ChoiceField(
+        choices=[
+            ('rendimiento', 'Rendimiento'),
+            ('esfuerzo', 'Esfuerzo')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="13. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 14
+    comparacion_14 = forms.ChoiceField(
+        choices=[
+            ('rendimiento', 'Rendimiento'),
+            ('frustracion', 'Frustración')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="14. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    # Comparación 15
+    comparacion_15 = forms.ChoiceField(
+        choices=[
+            ('esfuerzo', 'Esfuerzo'),
+            ('frustracion', 'Frustración')
+        ],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="15. ¿Qué contribuyó más?",
+        required=True
+    )
+    
+    class Meta:
+        model = EvaluacionNASATLX
+        fields = [
+            'tarea_descripcion',
+            'demanda_mental', 'demanda_fisica', 'demanda_temporal',
+            'rendimiento', 'esfuerzo', 'frustracion',
+            'notas_adicionales'
+        ]
+        widgets = {
+            'tarea_descripcion': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Ej: Realizar informe mensual, Reunión de equipo, Manejar situación de crisis...'
+            }),
+            'demanda_mental': forms.NumberInput(attrs={
+                'type': 'range',
+                'min': '1',
+                'max': '20',
+                'step': '1',
+                'class': 'form-range tlx-slider',
+                'id': 'demanda_mental_slider'
+            }),
+            'demanda_fisica': forms.NumberInput(attrs={
+                'type': 'range',
+                'min': '0',
+                'max': '100',
+                'step': '5',
+                'class': 'form-range tlx-slider',
+                'id': 'demanda_fisica_slider'
+            }),
+            'demanda_temporal': forms.NumberInput(attrs={
+                'type': 'range',
+                'min': '0',
+                'max': '100',
+                'step': '5',
+                'class': 'form-range tlx-slider',
+                'id': 'demanda_temporal_slider'
+            }),
+            'rendimiento': forms.NumberInput(attrs={
+                'type': 'range',
+                'min': '0',
+                'max': '100',
+                'step': '5',
+                'class': 'form-range tlx-slider',
+                'id': 'rendimiento_slider'
+            }),
+            'esfuerzo': forms.NumberInput(attrs={
+                'type': 'range',
+                'min': '0',
+                'max': '100',
+                'step': '5',
+                'class': 'form-range tlx-slider',
+                'id': 'esfuerzo_slider'
+            }),
+            'frustracion': forms.NumberInput(attrs={
+                'type': 'range',
+                'min': '0',
+                'max': '100',
+                'step': '5',
+                'class': 'form-range tlx-slider',
+                'id': 'frustracion_slider'
+            }),
+            'notas_adicionales': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Observaciones adicionales sobre tu experiencia...'
+            }),
+        }
+        labels = {
+            'demanda_mental': 'Demanda Mental (0-100)',
+            'demanda_fisica': 'Demanda Física (0-100)',
+            'demanda_temporal': 'Demanda Temporal (0-100)',
+            'rendimiento': 'Rendimiento (0-100)',
+            'esfuerzo': 'Esfuerzo (0-100)',
+            'frustracion': 'Frustración (0-100)',
+        }
+        help_texts = {
+            'rendimiento': 'NOTA: Una puntuación ALTA en Rendimiento significa BUEN rendimiento (menor carga)',
+        }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # Validar que todos los campos de rango estén entre 0 y 100
+        dimension_fields = ['demanda_mental', 'demanda_fisica', 'demanda_temporal', 'rendimiento', 'esfuerzo', 'frustracion']
+        
+        for field in dimension_fields:
+            value = cleaned_data.get(field)
+            if value is not None and (value < 0 or value > 100):
+                self.add_error(field, 'El valor debe estar entre 0 y 100')
+        
+        return cleaned_data
 class RegistroFisiologicoForm(forms.ModelForm):
     """
     Formulario para registro fisiológico
@@ -100,3 +374,83 @@ class RegistroFisiologicoForm(forms.ModelForm):
             'pasos_diarios', 'calorias_quemadas', 'horas_sueno',
             'dispositivo_origen'
         ]
+        
+# ============================================
+# FORMULARIO PARA ESCALA DE ANSIEDAD DE ZUNG
+# ============================================
+
+from django import forms
+from .models import ZungAnxietyScale
+
+class ZungAnxietyScaleForm(forms.ModelForm):
+    """
+    Formulario para la Escala de Ansiedad de Zung
+    """
+    
+    class Meta:
+        model = ZungAnxietyScale
+        fields = [
+            'p01_me_siento_mas_nervioso',
+            'p02_siento_miedo_sin_razon',
+            'p03_me_siento_alterado',
+            'p04_siento_que_me_desmorono',
+            'p05_siento_que_todo_bien',
+            'p06_temblor_sacudidas',
+            'p07_dolores_cabeza_cuello',
+            'p08_debilidad_fatiga',
+            'p09_siento_calma_tranquilidad',
+            'p10_siento_latidos_corazon',
+            'p11_mareos',
+            'p12_desmayos',
+            'p13_respiracion_normal',
+            'p14_entumecimiento_hormigueo',
+            'p15_dolores_estomacales',
+            'p16_necesidad_orinar',
+            'p17_manos_calidas_secas',
+            'p18_sonrojo_bochorno',
+            'p19_duermo_bien_descanso',
+            'p20_pesadillas',
+            'observaciones',
+        ]
+        widgets = {
+            'observaciones': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Observaciones adicionales (opcional)'
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Configurar widgets para todas las preguntas
+        for field_name, field in self.fields.items():
+            if field_name.startswith('p'):
+                field.widget = forms.Select(choices=field.choices, attrs={
+                    'class': 'form-select',
+                    'required': True,
+                })
+                field.required = True
+        
+        # Textos personalizados para las preguntas
+        self.fields['p01_me_siento_mas_nervioso'].label = "1. Me siento más nervioso y ansioso que de costumbre"
+        self.fields['p02_siento_miedo_sin_razon'].label = "2. Siento miedo sin razón"
+        self.fields['p03_me_siento_alterado'].label = "3. Me siento alterado o agitado"
+        self.fields['p04_siento_que_me_desmorono'].label = "4. Siento que me estoy desmoronando"
+        self.fields['p05_siento_que_todo_bien'].label = "5. Siento que todo está bien y no pasará nada malo"
+        self.fields['p06_temblor_sacudidas'].label = "6. Tiemblan mis manos, brazos o piernas"
+        self.fields['p07_dolores_cabeza_cuello'].label = "7. Tengo dolores de cabeza, cuello o espalda"
+        self.fields['p08_debilidad_fatiga'].label = "8. Me siento débil y me canso fácilmente"
+        self.fields['p09_siento_calma_tranquilidad'].label = "9. Me siento calmado y puedo permanecer en calma fácilmente"
+        self.fields['p10_siento_latidos_corazon'].label = "10. Siento latidos del corazón rápidos"
+        self.fields['p11_mareos'].label = "11. Tengo mareos o vértigo"
+        self.fields['p12_desmayos'].label = "12. Siento que me voy a desmayar"
+        self.fields['p13_respiracion_normal'].label = "13. Puedo respirar normal"
+        self.fields['p14_entumecimiento_hormigueo'].label = "14. Tengo entumecimiento u hormigueo en dedos, manos o pies"
+        self.fields['p15_dolores_estomacales'].label = "15. Tengo dolores de estómago o indigestión"
+        self.fields['p16_necesidad_orinar'].label = "16. Tengo necesidad frecuente de orinar"
+        self.fields['p17_manos_calidas_secas'].label = "17. Mis manos están normalmente calientes y secas"
+        self.fields['p18_sonrojo_bochorno'].label = "18. Mi cara se sonroja y siento bochornos"
+        self.fields['p19_duermo_bien_descanso'].label = "19. Duermo bien y descanso"
+        self.fields['p20_pesadillas'].label = "20. Tengo pesadillas"
+        self.fields['observaciones'].label = "Observaciones"

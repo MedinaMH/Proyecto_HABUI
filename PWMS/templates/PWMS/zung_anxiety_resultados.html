@@ -1,0 +1,63 @@
+{% extends 'PWMS/estructura_base_PWMS.html' %}
+{% load static %}
+
+{% block titulo %}Resultados Zung Anxiety - PWMS{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4>Resultados de la Escala de Ansiedad de Zung</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Fecha:</strong> {{ evaluacion.fecha_registro|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Puntuación bruta:</strong> {{ puntuacion_bruta }}</p>
+                    <p><strong>Índice de ansiedad:</strong> {{ puntuacion_indice }}</p>
+                    <p><strong>Nivel de ansiedad:</strong> 
+                        <span class="badge 
+                            {% if evaluacion.nivel_ansiedad == 'normal' %}bg-success
+                            {% elif evaluacion.nivel_ansiedad == 'minima' %}bg-warning text-dark
+                            {% elif evaluacion.nivel_ansiedad == 'marcada' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ nivel_ansiedad }}
+                        </span>
+                    </p>
+                    
+                    {% if evaluacion.video_path %}
+                    <hr>
+                    <h5>Video de la sesión</h5>
+                    <div class="mt-3">
+                        <p><strong>Ruta:</strong> {{ evaluacion.video_path }}</p>
+                        {% if evaluacion.video_metadata %}
+                            <p><strong>Resolución:</strong> 
+                                {{ evaluacion.video_metadata.width }}x{{ evaluacion.video_metadata.height }}
+                            </p>
+                            <p><strong>FPS:</strong> {{ evaluacion.video_metadata.frameRate }}</p>
+                        {% endif %}
+                        {% if evaluacion.video_size %}
+                            <p><strong>Tamaño:</strong> {{ evaluacion.video_size|filesizeformat }}</p>
+                        {% endif %}
+                        {% if evaluacion.video_duration %}
+                            <p><strong>Duración:</strong> {{ evaluacion.video_duration }} segundos</p>
+                        {% endif %}
+                        <a href="{{ evaluacion.video_path }}" target="_blank" class="btn btn-sm btn-primary">
+                            Ver video
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    <hr>
+                    <a href="{% url 'PWMS:zung_anxiety_historial' %}" class="btn btn-secondary">
+                        Ver historial
+                    </a>
+                    <a href="{% url 'PWMS:zung_anxiety_nuevo' %}" class="btn btn-primary">
+                        Nueva evaluación
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

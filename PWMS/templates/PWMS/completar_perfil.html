@@ -1,82 +1,168 @@
-{% extends 'PWMS/estructura_base_PWMS.html' %}
+{% extends "PWMS/estructura_base_PWMS.html" %}
 {% load static %}
 
-{% block title %}Completar Perfil - PWMS{% endblock %}
+{% block titulo %}Completar Perfil - PWMS{% endblock %}
 
-{% block content %}
+{% block contenido %}
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">
                         <i class="bi bi-person-fill me-2"></i>
                         Completar Información del Perfil
                     </h4>
                 </div>
-                
+
                 <div class="card-body">
-                    {% if messages %}
-                    <div class="mb-3">
-                        {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
-                            <i class="bi bi-info-circle me-2"></i>
-                            {{ message }}
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    
-                    <form method="post">
+                    <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        
+                        {% if perfil.foto %}
+                            <div class="mb-3">
+                                <img src="{{ perfil.foto.url }}" alt="Foto de perfil" class="img-thumbnail" style="max-width: 150px;">
+                            </div>
+                        {% endif %}
+
+
+                        <!-- ================= DATOS PERSONALES ================= -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Foto de Perfil</label>
+                            <input type="file" name="foto" class="form-control" accept="image/*">
+                        </div>
+
+                        <h5 class="mb-3 text-primary">
+                            <i class=""></i>
+                            Datos Personales
+                        </h5>                      
+
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Nombre Completo</label>
+                                <input type="text" name="nombre_completo" class="form-control"
+                                    value="{{ perfil.nombre_completo|default:'' }}">
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Teléfono</label>
-                                <input type="tel" name="telefono" class="form-control form-control-lg" value="{{ perfil.telefono|default:'' }}" placeholder="Ej: 555-1234567"required>
+                                <input type="tel" name="telefono" class="form-control"
+                                    value="{{ perfil.telefono|default:'' }}">
                             </div>
-                            
-                            <div class="col-md-6 mb-3">
+
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Fecha de Nacimiento</label>
-                                <input type="date" name="fecha_nacimiento" class="form-control form-control-lg" value="{{ perfil.fecha_nacimiento|date:'Y-m-d'|default:'' }}" required>
+                                <input type="date" name="fecha_nacimiento" class="form-control"
+                                    value="{{ perfil.fecha_nacimiento|date:'Y-m-d' }}">
                             </div>
-                            
-                            <div class="col-md-6 mb-4">
+
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Género</label>
-                                <select name="genero" class="form-select form-select-lg" required>
+                                <select name="genero" class="form-select">
                                     <option value="">Seleccionar...</option>
-                                    <option value="masculino" {% if perfil.genero == 'masculino' %}selected{% endif %}>
-                                        Masculino
-                                    </option>
-                                    <option value="femenino" {% if perfil.genero == 'femenino' %}selected{% endif %}>
-                                        Femenino
-                                    </option>
-                                    <option value="otro" {% if perfil.genero == 'otro' %}selected{% endif %}>
-                                        Otro
-                                    </option>
-                                    <option value="prefiero_no_decirlo" {% if perfil.genero == 'prefiero_no_decirlo' %}selected{% endif %}>
-                                        Prefiero no decirlo
-                                    </option>
+                                    <option value="masculino" {% if perfil.genero == 'masculino' %}selected{% endif %}>Masculino</option>
+                                    <option value="femenino" {% if perfil.genero == 'femenino' %}selected{% endif %}>Femenino</option>
+                                    <option value="otro" {% if perfil.genero == 'otro' %}selected{% endif %}>Otro</option>
+                                    <option value="prefiero_no_decirlo" {% if perfil.genero == 'prefiero_no_decirlo' %}selected{% endif %}>Prefiero no decirlo</option>
                                 </select>
                             </div>
-                            
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label fw-bold">PIN Actual</label>
-                                <input type="text" class="form-control form-control-lg" value="{{ perfil.pin|default:'0000' }}" readonly>
-                                <small class="text-muted">El PIN de 4 dígitos se puede cambiar en Configuración</small>
+                        </div>
+
+                        <!-- ================= PIN ================= -->
+                        <div class="row mt-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">PIN de 4 dígitos</label>
+                                <input type="text" name="pin" maxlength="4" pattern="\d{4}"
+                                    class="form-control"
+                                    value="{{ perfil.pin|default:'' }}"
+                                    placeholder="Ej: 1234" required>
+                                <small class="text-muted">Solo números (4 dígitos)</small>
                             </div>
                         </div>
-                        
+
+                        <hr class="my-4">
+
+                        <!-- ================= DATOS MÉDICOS ================= -->
+                        <h5 class="mb-3 text-danger">
+                            <i class="bi bi-heart-pulse me-2"></i>
+                            Información Médica
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label fw-bold">Grupo Sanguíneo</label>
+                                <input type="text" name="grupo_sanguineo" class="form-control"
+                                    value="{{ perfil.grupo_sanguineo|default:'' }}"
+                                    placeholder="Ej: O+">
+                            </div>
+
+                            <div class="col-md-9 mb-3">
+                                <label class="form-label fw-bold">Alergias</label>
+                                <textarea name="alergias" rows="2" class="form-control">{{ perfil.alergias|default:'' }}</textarea>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Medicamentos</label>
+                                <textarea name="medicamentos" rows="2" class="form-control">{{ perfil.medicamentos|default:'' }}</textarea>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Condiciones Médicas</label>
+                                <textarea name="condiciones_medicas" rows="2" class="form-control">{{ perfil.condiciones_medicas|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- ================= DATOS PSICOLÓGICOS ================= -->
+                        <h5 class="mb-3 text-info">
+                            <i class="bi bi-brain me-2"></i>
+                            Seguimiento Psicológico
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Psicólogo Asignado</label>
+                                <input type="text" name="psicologo_asignado" class="form-control"
+                                    value="{{ perfil.psicologo_asignado|default:'' }}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Motivo de Consulta</label>
+                                <textarea name="motivo_consulta" rows="2" class="form-control">{{ perfil.motivo_consulta|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- ================= PRIVACIDAD ================= -->
+                        <h5 class="mb-3 text-secondary">
+                            <i class="bi bi-gear me-2"></i>
+                            Configuración de Privacidad
+                        </h5>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="compartir_datos_medicos"
+                                {% if perfil.compartir_datos_medicos %}checked{% endif %}>
+                            <label class="form-check-label">
+                                Compartir datos médicos
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" name="recibir_recordatorios"
+                                {% if perfil.recibir_recordatorios %}checked{% endif %}>
+                            <label class="form-check-label">
+                                Recibir recordatorios
+                            </label>
+                        </div>
+
+                        <!-- ================= BOTONES ================= -->
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="bi bi-check-circle me-2"></i>
                                 Guardar Perfil
                             </button>
-                            
-                            <a href="{% url 'PWMS:pwms_dashboard' %}" class="btn btn-outline-secondary btn-lg">
-                                <i class="bi bi-arrow-left me-2"></i>
-                                Volver al Dashboard
-                            </a>
                         </div>
                     </form>
                 </div>

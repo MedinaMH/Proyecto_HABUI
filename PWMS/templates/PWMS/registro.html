@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Registro Completo - Sistema PWMS</title>
+    <title>Registro - Sistema PWMS</title>
     
     <!-- Bootstrap local -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
@@ -13,188 +13,303 @@
     <!-- Estilos generales para formularios -->
     <link rel="stylesheet" href="{% static 'css/formularios.css' %}">
     
-    <!-- Estilos específicos para el registro de dos pasos -->
-    <link rel="stylesheet" href="{% static 'css/registro.css' %}">
+    <!-- Estilos específicos para el registro de dos pasos (se integra con el formal) -->
+    <style>
+        /* Estilos para el indicador de pasos, coherentes con formularios.css */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+            background: var(--form-gray-light);
+            border-radius: 50px;
+            padding: 0.5rem;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            transition: all var(--transition-speed) ease;
+        }
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid var(--form-border);
+            color: var(--form-gray);
+            transition: all var(--transition-speed) ease;
+        }
+        .step-label {
+            font-weight: 500;
+            color: var(--form-gray);
+        }
+        .step.active .step-number {
+            background-color: var(--form-primary);
+            border-color: var(--form-primary);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(20, 92, 163, 0.2);
+        }
+        .step.active .step-label {
+            color: var(--form-primary);
+            font-weight: 600;
+        }
+        .step.completed .step-number {
+            background-color: var(--form-success);
+            border-color: var(--form-success);
+            color: white;
+        }
+        .step.completed .step-number::after {
+            content: "✓";
+            font-size: 1.2rem;
+        }
+        .step.completed .step-number span {
+            display: none;
+        }
+        .step.completed .step-label {
+            color: var(--form-success);
+        }
+        .pin-display-container {
+            background-color: var(--form-gray-light);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid var(--form-border);
+        }
+        .pin-display-label {
+            font-size: 0.875rem;
+            color: var(--form-gray);
+            margin-bottom: 0.5rem;
+        }
+        .pin-display-value {
+            font-size: 1.75rem;
+            font-weight: bold;
+            letter-spacing: 0.5rem;
+            color: var(--form-primary);
+            background: white;
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            transition: transform 0.2s ease;
+        }
+        /* Ocultar contenido de pasos */
+        .step-content {
+            display: none;
+        }
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Ajustes de botones */
+        .form-buttons-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--form-border);
+        }
+        .spacer {
+            flex: 1;
+        }
+        /* Validación personalizada para campos */
+        .is-invalid {
+            border-color: var(--form-danger) !important;
+        }
+        .invalid-feedback {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <div class="registration-container">
-        <div class="registration-card">
-            <div class="registration-header">
-                <h1>
-                    <i class="bi bi-person-plus-fill me-2"></i>
-                    Registro Completo - Sistema PWMS
-                </h1>
-                <p class="subtitle">Monitoreo del Bienestar Psicológico</p>
+    <div class="form-container" style="max-width: 900px; margin: 2rem auto;">
+        <!-- Encabezado formal -->
+        <div class="form-section-header">
+            <i class="bi bi-person-plus-fill"></i>
+            Registro Completo - Sistema de Monitoreo del Bienestar Psicológico PWMS
+        </div>
+        
+        <!-- Indicador de pasos -->
+        <div class="step-indicator">
+            <div class="step active" data-step="1">
+                <div class="step-number"><span>1</span></div>
+                <div class="step-label">Cuenta</div>
             </div>
-            
-            <div class="registration-body">
-                <!-- Indicador de pasos -->
-                <div class="step-indicator">
-                    <div class="step active">
-                        <div class="step-number">1</div>
-                        <div class="step-label">Cuenta</div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <div class="step-label">Perfil</div>
-                    </div>
-                </div>
-                
-                <!-- Mensajes del sistema -->
-                {% if messages %}
-                <div class="registration-messages">
-                    {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show d-flex align-items-center">
-                        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% elif message.tags == 'danger' %}x-circle{% else %}info-circle{% endif %}-fill me-2"></i>
-                        <div class="flex-grow-1">{{ message }}</div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
-                
-                <!-- Formulario de registro -->
-                <form method="post" id="registrationForm" class="form-container">
-                    {% csrf_token %}
-                    
-                    <!-- Paso 1: Información de la cuenta -->
-                    <div class="step-content active" id="step1">
-                        <div class="form-section">
-                            <h3 class="form-section-title">
-                                <i class="bi bi-shield-lock-fill"></i>
-                                Información de la Cuenta
-                            </h3>
-                            
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        <i class="bi bi-person-badge"></i>
-                                        Nombre de Usuario *
-                                    </label>
-                                    <input type="text" name="username" class="form-control form-control-lg" placeholder="Ingrese su usuario" required pattern=".{3,}" title="Mínimo 3 caracteres">
-                                    <div class="form-text">Este será tu nombre para iniciar sesión (mínimo 3 caracteres)</div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        <i class="bi bi-envelope"></i>
-                                        Correo Electrónico
-                                    </label>
-                                    <input type="email" name="email" class="form-control form-control-lg" placeholder="ejemplo@email.com">
-                                    <div class="form-text">Opcional - Para recuperación de cuenta</div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        <i class="bi bi-key-fill"></i>
-                                        Contraseña *
-                                    </label>
-                                    <input type="password" name="password" class="form-control form-control-lg" 
-                                           placeholder="••••••••" required
-                                           pattern=".{8,}" title="Mínimo 8 caracteres">
-                                    <div class="form-text">Mínimo 8 caracteres</div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        <i class="bi bi-lock-fill"></i>
-                                        PIN de Seguridad *
-                                    </label>
-                                    <input type="text" name="pin" id="pinInput" class="form-control form-control-lg" 
-                                           maxlength="4" placeholder="0000" pattern="\d{4}" required
-                                           title="4 dígitos numéricos">
-                                    <div class="form-text">4 dígitos numéricos para acceso rápido</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Paso 2: Información del perfil -->
-                    <div class="step-content" id="step2">
-                        <div class="form-section">
-                            <h3 class="form-section-title">
-                                <i class="bi bi-person-badge-fill"></i>
-                                Información Personal
-                            </h3>
-                            
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        <i class="bi bi-telephone-fill"></i>
-                                        Teléfono *
-                                    </label>
-                                    <input type="tel" name="telefono" class="form-control form-control-lg" 
-                                           placeholder="Ej: 555-1234567" required>
-                                    <div class="form-text">Para contacto y notificaciones</div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        <i class="bi bi-calendar-heart"></i>
-                                        Fecha de Nacimiento *
-                                    </label>
-                                    <input type="date" name="fecha_nacimiento" class="form-control form-control-lg" 
-                                           max="{% now 'Y-m-d' %}" required>
-                                    <div class="form-text">Selecciona tu fecha de nacimiento</div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        <i class="bi bi-gender-ambiguous"></i>
-                                        Género *
-                                    </label>
-                                    <select name="genero" class="form-select form-select-lg" required>
-                                        <option value="">Seleccionar...</option>
-                                        <option value="masculino">Masculino</option>
-                                        <option value="femenino">Femenino</option>
-                                        <option value="otro">Otro</option>
-                                        <option value="prefiero_no_decirlo">Prefiero no decirlo</option>
-                                    </select>
-                                    <div class="form-text">Información para personalización</div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        <i class="bi bi-shield-check"></i>
-                                        Tu PIN de Seguridad
-                                    </label>
-                                    <div class="pin-display-container">
-                                        <div class="pin-display-label">PIN Configurado:</div>
-                                        <div class="pin-display-value" id="pinDisplay">----</div>
-                                        <small class="text-muted">Este es el PIN que configuraste en el paso anterior</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Botones de navegación -->
-                    <div class="form-button-group">
-                        <button type="button" id="prevBtn" class="btn btn-outline-secondary" style="display: none;">
-                            <i class="bi bi-arrow-left me-2"></i>
-                            Anterior
-                        </button>
-                        
-                        <div class="spacer"></div>
-                        
-                        <button type="button" id="nextBtn" class="btn btn-primary">
-                            Siguiente
-                            <i class="bi bi-arrow-right ms-2"></i>
-                        </button>
-                        
-                        <button type="submit" id="submitBtn" class="btn btn-primary" style="display: none;">
-                            <i class="bi bi-check-circle me-2"></i>
-                            Completar Registro
-                        </button>
-                        
-                        <a href="{% url 'PWMS:panel_login' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-x-circle me-2"></i>
-                            Cancelar
-                        </a>
-                    </div>
-                </form>
+            <div class="step" data-step="2">
+                <div class="step-number"><span>2</span></div>
+                <div class="step-label">Perfil</div>
             </div>
         </div>
+        
+        <!-- Mensajes del sistema -->
+        {% if messages %}
+        <div class="registration-messages">
+            {% for message in messages %}
+            <div class="form-alert form-alert-{% if message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% elif message.tags == 'danger' %}danger{% else %}info{% endif %} alert-dismissible fade show d-flex align-items-center">
+                <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}exclamation-triangle{% elif message.tags == 'danger' %}x-circle{% else %}info-circle{% endif %}-fill me-2"></i>
+                <div class="flex-grow-1">{{ message }}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Formulario de registro -->
+        <form method="post" id="registrationForm">
+            {% csrf_token %}
+            
+            <!-- Paso 1: Información de la cuenta -->
+            <div class="step-content active" id="step1">
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="bi bi-shield-lock-fill"></i>
+                        Información de la Cuenta
+                    </h3>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-person-badge"></i>
+                                Nombre de Usuario *
+                            </label>
+                            <input type="text" name="username" class="form-control" placeholder="Ingrese su usuario" required pattern=".{3,}" title="Mínimo 3 caracteres">
+                            <div class="form-text">Este será tu nombre para iniciar sesión (Compuesto por las 3 primeras letras de tu nombre, un guión bajo, tres primeras letras de tu primer apellido y primera letra del segundo nombre. Todo en minúsculas)</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                Correo Electrónico
+                            </label>
+                            <input type="email" name="email" class="form-control" placeholder="ejemplo@email.com">
+                            <div class="form-text">Opcional - Para recuperación de cuenta</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-key-fill"></i>
+                                Contraseña *
+                            </label>
+                            <input type="password" name="password" class="form-control" 
+                                   placeholder="••••••••" required
+                                   pattern=".{8,}" title="Mínimo 8 caracteres">
+                            <div class="form-text">Mínimo 8 caracteres</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-lock-fill"></i>
+                                PIN de Seguridad *
+                            </label>
+                            <input type="text" name="pin" id="pinInput" class="form-control" 
+                                   maxlength="4" placeholder="0000" pattern="\d{4}" required
+                                   title="4 dígitos numéricos">
+                            <div class="form-text">4 dígitos numéricos para acceso rápido</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Paso 2: Información del perfil -->
+            <div class="step-content" id="step2">
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="bi bi-person-badge-fill"></i>
+                        Información Personal
+                    </h3>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-telephone-fill"></i>
+                                Teléfono *
+                            </label>
+                            <input type="tel" name="telefono" class="form-control" 
+                                   placeholder="Ej: 555-1234567" required>
+                            <div class="form-text">Para contacto y notificaciones</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-calendar-heart"></i>
+                                Fecha de Nacimiento *
+                            </label>
+                            <input type="date" name="fecha_nacimiento" class="form-control" 
+                                   max="{% now 'Y-m-d' %}" required>
+                            <div class="form-text">Selecciona tu fecha de nacimiento</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-gender-ambiguous"></i>
+                                Género *
+                            </label>
+                            <select name="genero" class="form-select" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="femenino">Femenino</option>
+                                <option value="otro">Otro</option>
+                                <option value="prefiero_no_decirlo">Prefiero no decirlo</option>
+                            </select>
+                            <div class="form-text">Información para personalización</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-shield-check"></i>
+                                Tu PIN de Seguridad
+                            </label>
+                            <div class="pin-display-container">
+                                <div class="pin-display-label">PIN Configurado:</div>
+                                <div class="pin-display-value" id="pinDisplay">----</div>
+                                <small class="text-muted">Este es el PIN que configuraste en el paso anterior</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de navegación -->
+            <div class="form-buttons-container">
+                <button type="button" id="prevBtn" class="form-button form-button-secondary" style="display: none;">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Anterior
+                </button>
+                
+                <div class="spacer"></div>
+                
+                <button type="button" id="nextBtn" class="form-button form-button-primary">
+                    Siguiente
+                    <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+                
+                <button type="submit" id="submitBtn" class="form-button form-button-primary" style="display: none;">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Completar Registro
+                </button>
+                
+                <a href="{% url 'PWMS:panel_login' %}" class="form-button form-button-outline">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Cancelar
+                </a>
+            </div>
+        </form>
     </div>
     
     <!-- Bootstrap JS -->
@@ -202,7 +317,6 @@
     
     <!-- JavaScript para el formulario multi-paso -->
     <script>
-        // ... (el mismo script de antes, pero sin los estilos)
         document.addEventListener('DOMContentLoaded', function() {
             let currentStep = 1;
             const totalSteps = 2;
@@ -355,27 +469,24 @@
                 return isValid;
             }
             
-            // Mostrar mensaje de error
+            // Mostrar mensaje de error con estilo formal
             function showValidationError(message) {
                 // Crear o actualizar alerta de error
-                let errorAlert = document.querySelector('.alert-danger');
+                let errorAlert = document.querySelector('.form-alert-danger');
                 if (!errorAlert) {
                     errorAlert = document.createElement('div');
-                    errorAlert.className = 'alert alert-danger alert-dismissible fade show';
+                    errorAlert.className = 'form-alert form-alert-danger alert-dismissible fade show d-flex align-items-center';
                     errorAlert.innerHTML = `
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <span>${message}</span>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <span class="flex-grow-1">${message}</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                     `;
                     
                     const messagesContainer = document.querySelector('.registration-messages');
                     if (messagesContainer) {
                         messagesContainer.prepend(errorAlert);
                     } else {
-                        document.querySelector('.registration-body').insertBefore(
-                            errorAlert, 
-                            document.querySelector('.step-indicator')
-                        );
+                        document.querySelector('.step-indicator').insertAdjacentElement('afterend', errorAlert);
                     }
                 } else {
                     errorAlert.querySelector('span').textContent = message;

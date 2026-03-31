@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ======================================================== -->
+<!-- DTD for Analog Crewmember Stress Vocabulary               -->
+<!-- Based on: ISO 10075-1:2017, NASA HFBP-EM,                -->
+<!-- Bell et al. (2024), Nelson (2025), Barros-Delben (2026)   -->
+<!-- ======================================================== -->
+
+<!-- Root element -->
+<!ELEMENT AnalogCrewStudy (Mission, CrewMember+, Assessment*)>
+
+<!-- ========== Mission (context) ========== -->
+<!ELEMENT Mission (MissionName, HabitatType, Duration, Phase*)>
+<!ELEMENT MissionName (#PCDATA)>
+<!ELEMENT HabitatType (#PCDATA)>
+<!ELEMENT Duration (#PCDATA)>
+<!ELEMENT Phase (PhaseName, DayStart, DayEnd)>
+<!ELEMENT PhaseName (#PCDATA)>
+<!ELEMENT DayStart (#PCDATA)>
+<!ELEMENT DayEnd (#PCDATA)>
+
+<!-- ========== Crew Member ========== -->
+<!ELEMENT CrewMember (CrewID, Demographics, BaselineMeasures, PsychologicalProfile*)>
+<!ATTLIST CrewMember
+    role (Commander | Pilot | Scientist | Engineer | MedicalOfficer | PayloadSpecialist) #REQUIRED
+>
+<!ELEMENT CrewID (#PCDATA)>
+<!ELEMENT Demographics (Age, Gender, ExperienceLevel)>
+<!ELEMENT Age (#PCDATA)>
+<!ELEMENT Gender (#PCDATA)>
+<!ELEMENT ExperienceLevel (#PCDATA)>
+<!ELEMENT BaselineMeasures (BaselineStress, BaselineFatigue, BaselineCognitive)>
+<!ELEMENT BaselineStress (#PCDATA)>
+<!ELEMENT BaselineFatigue (#PCDATA)>
+<!ELEMENT BaselineCognitive (#PCDATA)>
+
+<!-- ========== Psychological Profile (Barros-Delben, 2026) ========== -->
+<!ELEMENT PsychologicalProfile (ProfileID, TimeSegment, ProfileData)>
+<!ATTLIST PsychologicalProfile
+    type (Individualized | Group | Standardized) #REQUIRED
+>
+<!ELEMENT ProfileID (#PCDATA)>
+<!ELEMENT TimeSegment (#PCDATA)>
+<!ELEMENT ProfileData ANY>
+
+<!-- ========== Assessment ========== -->
+<!ELEMENT Assessment (AssessmentID, CrewIDRef, MissionDay, PsychologicalState, WorkloadMetrics, SocialFactors, HabitatPerception, PhysiologicalData?)>
+<!ATTLIST Assessment
+    type (Daily | Weekly | PrePostTask | Emergency) #REQUIRED
+    timestamp CDATA #REQUIRED
+>
+<!ELEMENT AssessmentID (#PCDATA)>
+<!ELEMENT CrewIDRef (#PCDATA)>
+<!ELEMENT MissionDay (#PCDATA)>
+
+<!-- ========== Psychological State (ISO 10075-1, Nelson, 2025) ========== -->
+<!ELEMENT PsychologicalState (MentalStress, MentalStrain, PositiveAffect, NegativeAffect, FatigueLevel, Anxiety)>
+<!ELEMENT MentalStress (#PCDATA)>
+<!ELEMENT MentalStrain (#PCDATA)>
+<!ELEMENT PositiveAffect (#PCDATA)>
+<!ELEMENT NegativeAffect (#PCDATA)>
+<!ELEMENT FatigueLevel (#PCDATA)>
+<!ELEMENT Anxiety (#PCDATA)>
+
+<!-- ========== Workload Metrics (Bell et al., 2024 – NASA-TLX) ========== -->
+<!ELEMENT WorkloadMetrics (MentalWorkload, PhysicalWorkload, TaskDifficulty, CognitivePerformance)>
+<!ELEMENT MentalWorkload (#PCDATA)>
+<!ELEMENT PhysicalWorkload (#PCDATA)>
+<!ELEMENT TaskDifficulty (#PCDATA)>
+<!ELEMENT CognitivePerformance (#PCDATA)>
+
+<!-- ========== Social Factors (Bell et al., 2024 – HFBP-EM) ========== -->
+<!ELEMENT SocialFactors (SocialSupport, TeamCohesion, Conflict, IsolationPerception)>
+<!ELEMENT SocialSupport (#PCDATA)>
+<!ELEMENT TeamCohesion (#PCDATA)>
+<!ELEMENT Conflict (#PCDATA)>
+<!ELEMENT IsolationPerception (#PCDATA)>
+
+<!-- ========== Habitat Perception (NASA, 2025 – iSHORT/SHAQ/SHU) ========== -->
+<!ELEMENT HabitatPerception (Privacy, Comfort, Control, SocialDensity, HabitabilityScore)>
+<!ELEMENT Privacy (#PCDATA)>
+<!ELEMENT Comfort (#PCDATA)>
+<!ELEMENT Control (#PCDATA)>
+<!ELEMENT SocialDensity (#PCDATA)>
+<!ELEMENT HabitabilityScore (#PCDATA)>
+
+<!-- ========== Physiological Data (HFBP-EM + optional) ========== -->
+<!ELEMENT PhysiologicalData (HeartRate, SleepHours, SleepQuality, CortisolLevel?)>
+<!ELEMENT HeartRate (#PCDATA)>
+<!ELEMENT SleepHours (#PCDATA)>
+<!ELEMENT SleepQuality (#PCDATA)>
+<!ELEMENT CortisolLevel (#PCDATA)>

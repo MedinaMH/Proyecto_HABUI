@@ -1,24 +1,12 @@
-<!-- dashboard.html - VERSIÓN SIN JAVASCRIPT -->
 {% extends "PWMS/estructura_base_PWMS.html" %}
 
-{% block title %}Dashboard - PWMS{% endblock %}
+{% block titulo %}Dashboard - PWMS{% endblock %}
 
-{% block content %}
+{% block contenido %}
 <div class="dashboard-container">
-    <header class="dashboard-header">
-        <h1>Panel de Control PWMS</h1>
-        <div class="dashboard-actions">
-            <!-- Botón sin funcionalidad JS -->
-            <button class="btn-refresh" disabled>Actualizar</button>
-            <span class="last-update">Última actualización: {% now "d/m/Y H:i" %}</span>
-        </div>
-    </header>
-    
     <div class="dashboard-grid">
-        <!-- Mensaje de bienvenida -->
         <div class="welcome-card">
-            <h2><i class="bi bi-heart-pulse"></i> Bienvenido al Sistema PWMS</h2>
-            <p>Monitoreo del Bienestar Psicológico y Fisiológico</p>
+            <h2><i class="bi bi-heart-pulse"></i> Monitoreo del Bienestar Psicológico y Fisiológico</h2>
             
             <div class="welcome-features">
                 <div class="feature">
@@ -50,7 +38,7 @@
                 <h4><i class="bi bi-info-circle"></i> Cómo usar el sistema:</h4>
                 <ol>
                     <li>Usa el menú lateral para navegar</li>
-                    <li>Ve a tu aplicacion Android HealthSync Pro para añadir un registro con datos fisiológicos</li>
+                    <li>Ve a tu aplicación Android HealthSync Pro para añadir un registro con datos fisiológicos</li>
                     <li>Visita las gráficas para ver tu evolución</li>
                     <li>Revisa tu historial para análisis a largo plazo</li>
                 </ol>
@@ -61,5 +49,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- NO HAY JAVASCRIPT - solo CSS -->
+<!-- Sin JavaScript -->
 {% endblock %}

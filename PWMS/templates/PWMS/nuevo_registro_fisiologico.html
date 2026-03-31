@@ -1,33 +1,19 @@
-{% extends 'PWMS/dashboard.html' %}
+{% extends 'PWMS/estructura_base_PWMS.html' %}
 
 {% block titulo %}Registro Fisiológico - PWMS{% endblock %}
 
 {% block contenido %}
-<div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="h2 mb-1">Registro de Signos Vitales</h1>
-                    <p class="text-muted mb-0">Registra tus datos fisiológicos diarios</p>
-                </div>
-                <a href="{% url 'PWMS:pwms_dashboard' %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>Volver al Dashboard
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
+<div class="dashboard-container">
+    <div class="dashboard-grid">
+        <div class="welcome-card">
+            <h2><i class="bi bi-clipboard-plus"></i> Registro de Signos Vitales</h2>
             <div class="card">
                 <div class="card-body">
                     <div class="alert alert-primary mb-4">
-                        <i class="bi bi-heart-pulse me-2"></i>
-                        <strong>Importante:</strong> Registra estos datos preferiblemente en reposo, 
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <strong>Importante:</strong> Registra estos datos cada dos horas preferiblemente en reposo, 
                         después de 5 minutos de descanso para obtener medidas más precisas.
                     </div>
-                    
                     <form method="post" novalidate>
                         {% csrf_token %}
                         
@@ -166,14 +152,6 @@
                             <a href="{% url 'PWMS:historial_fisiologico' %}" class="btn btn-outline-info">
                                 <i class="bi bi-graph-up me-1"></i>Ver Historial
                             </a>
-                            <div>
-                                <button type="reset" class="btn btn-outline-secondary me-2">
-                                    <i class="bi bi-x-circle me-1"></i>Limpiar
-                                </button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-save me-1"></i>Guardar Registro
-                                </button>
-                            </div>
                         </div>
                     </form>
                 </div>
@@ -217,28 +195,4 @@
     </div>
 </div>
 
-<style>
-    input, select, textarea {
-        width: 100%;
-        padding: 8px 12px;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        margin-bottom: 5px;
-    }
-    
-    textarea {
-        min-height: 80px;
-        resize: vertical;
-    }
-    
-    select {
-        height: 38px;
-    }
-    
-    .card-title {
-        border-bottom: 2px solid #e9ecef;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-    }
-</style>
 {% endblock %}

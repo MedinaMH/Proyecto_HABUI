@@ -1,0 +1,215 @@
+{% extends 'PWMS/estructura_base_PWMS.html' %}
+{% load static %}
+
+{% block titulo %}Resultado NASA TLX - PWMS{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">Resultado NASA TLX</h1>
+                    <p class="text-muted mb-0">{{ evaluacion.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                </div>
+                <div>
+                    <a href="{% url 'PWMS:nasa_tlx_historial' %}" class="btn btn-outline-info me-2">
+                        <i class="bi bi-clock-history me-1"></i>Historial
+                    </a>
+                    <a href="{% url 'PWMS:nasa_tlx_create' %}" class="btn btn-primary me-2">
+                        <i class="bi bi-plus-circle me-1"></i>Nueva Evaluación
+                    </a>
+                    <a href="{% url 'PWMS:pwms_dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Tarjeta de Resultado Principal -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <div class="alert alert-{{ color }} d-inline-block p-4 mb-3" style="border-radius: 50%;">
+                        <i class="bi {{ icono }} display-3"></i>
+                    </div>
+                    <h2 class="text-{{ color }} mb-3">{{ interpretacion }}</h2>
+                    <h1 class="display-1 fw-bold">{{ evaluacion.puntuacion_total }}</h1>
+                    <p class="text-muted lead">Puntuación NASA TLX (0-100)</p>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="text-muted mb-2">Tarea Evaluada</h5>
+                            <p class="lead fw-normal">{{ evaluacion.tarea_descripcion }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dimensiones NASA TLX -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart-steps me-2"></i>
+                        Dimensiones de Carga Mental
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 35%;">Dimensión</th>
+                                    <th style="width: 20%;">Puntuación</th>
+                                    <th style="width: 15%;">Peso</th>
+                                    <th style="width: 30%;">Contribución</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dim in dimensiones %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ dim.dimension }}</strong>
+                                        {% if dim.dimension == 'Rendimiento' %}
+                                            <i class="bi bi-info-circle-fill text-info ms-1" data-bs-toggle="tooltip" title="Alta puntuación = Buen rendimiento = Menor carga"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary fs-6">{{ dim.puntuacion }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-dark">{{ dim.peso }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 25px;">
+                                            <div class="progress-bar 
+                                                {% if dim.dimension == 'Demanda Mental' %}bg-info
+                                                {% elif dim.dimension == 'Demanda Física' %}bg-success
+                                                {% elif dim.dimension == 'Demanda Temporal' %}bg-warning
+                                                {% elif dim.dimension == 'Rendimiento' %}bg-primary
+                                                {% elif dim.dimension == 'Esfuerzo' %}bg-danger
+                                                {% else %}bg-secondary{% endif %}" 
+                                                role="progressbar" 
+                                                style="width: {{ dim.puntuacion }}%;"
+                                                aria-valuenow="{{ dim.puntuacion }}" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100">
+                                                {{ dim.puntuacion }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notas Adicionales -->
+            {% if evaluacion.notas_adicionales %}
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-journal-text me-2"></i>
+                        Notas Adicionales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ evaluacion.notas_adicionales|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Escala de Interpretación -->
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Escala de Interpretación NASA TLX
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-success h-100">
+                                <div class="card-body text-center">
+                                    <div class="display-6 text-success mb-2">0-30</div>
+                                    <h6 class="fw-bold text-success">Carga Mental BAJA</h6>
+                                    <p class="small text-muted mb-0">La tarea fue fácil y poco demandante</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-warning h-100">
+                                <div class="card-body text-center">
+                                    <div class="display-6 text-warning mb-2">31-60</div>
+                                    <h6 class="fw-bold text-warning">Carga Mental MODERADA</h6>
+                                    <p class="small text-muted mb-0">Tarea manejable con esfuerzo significativo</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-danger h-100">
+                                <div class="card-body text-center">
+                                    <div class="display-6 text-danger mb-2">61-100</div>
+                                    <h6 class="fw-bold text-danger">Carga Mental ALTA</h6>
+                                    <p class="small text-muted mb-0">Tarea muy demandante, requiere ajustes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .display-1 {
+        font-size: 5rem;
+        font-weight: 700;
+    }
+    .display-6 {
+        font-size: 2rem;
+        font-weight: 600;
+    }
+    .progress {
+        border-radius: 15px;
+        background-color: #e9ecef;
+    }
+    .progress-bar {
+        border-radius: 15px;
+        line-height: 25px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .alert {
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    @media (max-width: 768px) {
+        .display-1 {
+            font-size: 3.5rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}

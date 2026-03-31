@@ -2,19 +2,19 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from .models import PerfilPWMS, RegistroPsicologico, RegistroFisiologico
+from django.utils import timezone
 
-# ===== SERIALIZERS DE USUARIO =====
+# ===== SERIALIZADORES DE USUARIO =====
 
 class UserSerializer(serializers.ModelSerializer):
+    """Serializer básico de usuario - ACTUALMENTE NO USADO"""
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
         read_only_fields = ['id']
 
 class LoginSerializer(serializers.Serializer):
-    """
-    Serializer para login con usuario y PIN
-    """
+    """Serializer para login con usuario y PIN - EN USO"""
     username = serializers.CharField(max_length=150, required=True)
     pin = serializers.CharField(max_length=4, min_length=4, required=True)
     
@@ -26,9 +26,7 @@ class LoginSerializer(serializers.Serializer):
         return value
 
 class RegisterSerializer(serializers.ModelSerializer):
-    """
-    Serializer para registro de usuario
-    """
+    """Serializer para registro - ACTUALMENTE NO USADO (se usa HealthSyncRegisterAPI)"""
     password = serializers.CharField(
         write_only=True, 
         required=True, 
@@ -60,19 +58,16 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         
-        # Guardar PIN en el perfil
         perfil = user.perfil_pwms
         perfil.pin = validated_data['pin']
         perfil.save()
         
         return user
 
-# ===== SERIALIZERS DE PERFIL =====
+# ===== SERIALIZADORES DE PERFIL =====
 
 class PerfilSerializer(serializers.ModelSerializer):
-    """
-    Serializer para el perfil PWMS
-    """
+    """Serializer para el perfil PWMS - EN USO"""
     usuario = serializers.StringRelatedField(read_only=True)
     
     class Meta:
@@ -96,12 +91,10 @@ class PerfilSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Grupo sanguíneo no válido")
         return value.upper() if value else value
 
-# ===== SERIALIZERS DE REGISTROS =====
+# ===== SERIALIZADORES DE REGISTROS =====
 
 class RegistroPsicologicoSerializer(serializers.ModelSerializer):
-    """
-    Serializer para registros psicológicos
-    """
+    """Serializer para registros psicológicos - EN USO"""
     usuario = serializers.StringRelatedField(read_only=True)
     
     class Meta:
@@ -128,9 +121,16 @@ class RegistroPsicologicoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("El estado de ánimo debe estar entre 1 y 10")
         return value
 
+
 class RegistroFisiologicoSerializer(serializers.ModelSerializer):
+    """
+    Serializer para registros fisiológicos - EN USO
+    Maneja campos de Android y los convierte al formato de Django
+    """
     usuario = serializers.StringRelatedField(read_only=True)
+    fechaHora = serializers.DateTimeField(write_only=True, required=False)
     
+    # Campos para estrés (mapeo desde Android)
     stress_relaxed = serializers.IntegerField(
         source='estres_relajado',
         required=False,
@@ -159,6 +159,8 @@ class RegistroFisiologicoSerializer(serializers.ModelSerializer):
         max_value=100,
         default=0
     )
+    
+    # Campos para sueño (procesamiento)
     horas_sueno_horas = serializers.IntegerField(
         write_only=True,
         required=False,
@@ -177,71 +179,158 @@ class RegistroFisiologicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = RegistroFisiologico
         fields = [
-            'id', 'usuario', 'fecha', 'frecuencia_cardiaca',
-            'presion_arterial_sistolica', 'presion_arterial_diastolica',
-            'temperatura', 'oxigenacion_sangre', 'pasos_diarios',
-            'calorias_quemadas', 'horas_sueno', 'horas_sueno_horas', 'horas_sueno_minutos',
-            'dispositivo_origen', 'puntuacion_sueno', 'notas_adicionales',
-            'stress_relaxed', 'stress_low', 'stress_moderate', 'stress_high'
+            'id', 'usuario', 'fecha', 'fechaHora', 
+            'frecuencia_cardiaca', 'presion_arterial_sistolica', 
+            'presion_arterial_diastolica', 'temperatura', 
+            'oxigenacion_sangre', 'pasos_diarios', 'calorias_quemadas',
+            'horas_sueno', 'horas_sueno_horas', 'horas_sueno_minutos',
+            'puntuacion_sueno', 'nivel_estres',
+            'estres_relajado', 'estres_bajo', 'estres_moderado', 'estres_alto',
+            'stress_relaxed', 'stress_low', 'stress_moderate', 'stress_high',
+            'dispositivo_origen', 'notas_adicionales'
         ]
-        read_only_fields = ['id', 'usuario', 'fecha']
+        read_only_fields = ['id', 'usuario', 'nivel_estres']
+        extra_kwargs = {
+            'fecha': {'required': False},
+            'frecuencia_cardiaca': {'required': False, 'default': 0},
+            'presion_arterial_sistolica': {'required': False, 'default': 0},
+            'presion_arterial_diastolica': {'required': False, 'default': 0},
+            'temperatura': {'required': False, 'default': 0},
+            'oxigenacion_sangre': {'required': False, 'default': 0},
+            'pasos_diarios': {'required': False, 'default': 0},
+            'calorias_quemadas': {'required': False, 'default': 0},
+            'estres_relajado': {'required': False, 'default': 0},
+            'estres_bajo': {'required': False, 'default': 0},
+            'estres_moderado': {'required': False, 'default': 0},
+            'estres_alto': {'required': False, 'default': 0},
+        }
     
     def validate(self, data):
-        # Validar que los 4 porcentajes sumen 100%
+        """
+        Validación personalizada de todos los campos
+        """
+        print("\n🔍 SERIALIZER: validate")
+        
+        # ===== 1. PROCESAR HORAS DE SUEÑO =====
+        horas = data.pop('horas_sueno_horas', None)
+        minutos = data.pop('horas_sueno_minutos', None)
+        
+        if horas is not None and minutos is not None:
+            data['horas_sueno'] = horas + (minutos / 60.0)
+            print(f"   ⏰ Sueño calculado: {horas}h {minutos}m = {data['horas_sueno']}h")
+        elif horas is not None:
+            data['horas_sueno'] = horas
+        elif minutos is not None:
+            data['horas_sueno'] = minutos / 60.0
+        
+        # ===== 2. PROCESAR PORCENTAJES DE ESTRÉS =====
+        # Mapear stress_* a estres_*
+        mapeo_stress = {
+            'stress_relaxed': 'estres_relajado',
+            'stress_low': 'estres_bajo',
+            'stress_moderate': 'estres_moderado',
+            'stress_high': 'estres_alto'
+        }
+        
+        for android_field, django_field in mapeo_stress.items():
+            if android_field in data:
+                data[django_field] = data.pop(android_field)
+        
+        # Obtener valores
         estres_relajado = data.get('estres_relajado', 0)
         estres_bajo = data.get('estres_bajo', 0)
         estres_moderado = data.get('estres_moderado', 0)
         estres_alto = data.get('estres_alto', 0)
         
+        # Calcular total
         total = estres_relajado + estres_bajo + estres_moderado + estres_alto
         
+        # Normalizar si es necesario
         if total > 0 and total != 100:
+            print(f"   ⚠️ Porcentajes de estrés suman {total}%, normalizando...")
+            factor = 100 / total
+            data['estres_relajado'] = round(estres_relajado * factor)
+            data['estres_bajo'] = round(estres_bajo * factor)
+            data['estres_moderado'] = round(estres_moderado * factor)
+            data['estres_alto'] = round(estres_alto * factor)
+            
+            # Ajustar por errores de redondeo
+            nuevo_total = (data['estres_relajado'] + data['estres_bajo'] + 
+                          data['estres_moderado'] + data['estres_alto'])
+            
+            if nuevo_total != 100:
+                diff = 100 - nuevo_total
+                campos = ['estres_alto', 'estres_moderado', 'estres_bajo', 'estres_relajado']
+                for campo in campos:
+                    if diff != 0:
+                        data[campo] = data[campo] + diff
+                        diff = 0
+                        break
+            
+            print(f"   ✅ Porcentajes normalizados: {data['estres_relajado']}/{data['estres_bajo']}/{data['estres_moderado']}/{data['estres_alto']}")
+        
+        # ===== 3. VALIDAR RANGOS DE SIGNOS VITALES =====
+        if data.get('frecuencia_cardiaca', 0) < 30 or data.get('frecuencia_cardiaca', 0) > 250:
             raise serializers.ValidationError({
-                "estres": f"Los porcentajes de estrés deben sumar 100% (actual: {total}%)"
+                "frecuencia_cardiaca": "Debe estar entre 30 y 250 latidos por minuto"
             })
         
-        # Validar y calcular horas de sueño
-        horas = data.get('horas_sueno_horas')
-        minutos = data.get('horas_sueno_minutos')
+        if data.get('presion_arterial_sistolica', 0) < 50 or data.get('presion_arterial_sistolica', 0) > 250:
+            raise serializers.ValidationError({
+                "presion_arterial_sistolica": "Debe estar entre 50 y 250 mmHg"
+            })
         
-        if horas is not None and minutos is not None:
-            # Calcular el valor decimal: 6h 25m = 6 + 25/60 = 6.4167
-            data['horas_sueno'] = horas + (minutos / 60.0)
+        if data.get('presion_arterial_diastolica', 0) < 30 or data.get('presion_arterial_diastolica', 0) > 150:
+            raise serializers.ValidationError({
+                "presion_arterial_diastolica": "Debe estar entre 30 y 150 mmHg"
+            })
         
-        # Eliminar los campos de horas y minutos para que no se pasen al modelo
-        if 'horas_sueno_horas' in data:
-            del data['horas_sueno_horas']
-        if 'horas_sueno_minutos' in data:
-            del data['horas_sueno_minutos']
+        if data.get('temperatura', 0) < 35 or data.get('temperatura', 0) > 42:
+            raise serializers.ValidationError({
+                "temperatura": "Debe estar entre 35 y 42 °C"
+            })
         
+        if data.get('oxigenacion_sangre', 0) < 70 or data.get('oxigenacion_sangre', 0) > 100:
+            raise serializers.ValidationError({
+                "oxigenacion_sangre": "Debe estar entre 70 y 100%"
+            })
+        
+        if 'puntuacion_sueno' in data and data['puntuacion_sueno'] is not None:
+            if data['puntuacion_sueno'] < 0 or data['puntuacion_sueno'] > 100:
+                raise serializers.ValidationError({
+                    "puntuacion_sueno": "Debe estar entre 0 y 100"
+                })
+        
+        print("   ✅ Validaciones pasadas exitosamente")
         return data
     
-    def validate_frecuencia_cardiaca(self, value):
-        if value < 30 or value > 250:
-            raise serializers.ValidationError("Frecuencia cardíaca fuera de rango válido (30-250)")
-        return value
+    def create(self, validated_data):
+        """Crear un nuevo registro fisiológico"""
+        print("\n💾 SERIALIZER: create")
+        print("   Datos validados recibidos:", list(validated_data.keys()))
+        
+        # Eliminar campo temporal si existe
+        validated_data.pop('fechaHora', None)
+        
+        # Verificar que fecha esté presente
+        if 'fecha' not in validated_data or validated_data['fecha'] is None:
+            validated_data['fecha'] = timezone.now()
+            print("   ⚠️ fecha era None, usando timezone.now()")
+        
+        print("   Datos finales para crear:", list(validated_data.keys()))
+        
+        # Crear el registro
+        registro = super().create(validated_data)
+        print(f"   ✅ Registro creado con ID: {registro.id}")
+        print(f"   📅 Fecha guardada: {registro.fecha}")
+        
+        return registro
     
-    def validate_presion_arterial_sistolica(self, value):
-        if value < 50 or value > 250:
-            raise serializers.ValidationError("Presión sistólica fuera de rango válido (50-250)")
-        return value
-    
-    def validate_presion_arterial_diastolica(self, value):
-        if value < 30 or value > 150:
-            raise serializers.ValidationError("Presión diastólica fuera de rango válido (30-150)")
-        return value
-    
-    def validate_temperatura(self, value):
-        if value < 35 or value > 42:
-            raise serializers.ValidationError("Temperatura fuera de rango válido (35-42 °C)")
-        return value
-    
-    def validate_oxigenacion_sangre(self, value):
-        if value < 70 or value > 100:
-            raise serializers.ValidationError("Oxigenación fuera de rango válido (70-100%)")
-        return value    
-    
-    def validate_puntuacion_sueno(self, value):
-        if value is not None and (value < 0 or value > 100):
-            raise serializers.ValidationError("La puntuación de sueño debe estar entre 0 y 100")
-        return value
+    def update(self, instance, validated_data):
+        """Actualizar un registro existente"""
+        print("\n🔄 SERIALIZER: update")
+        print("   Actualizando registro ID:", instance.id)
+        
+        validated_data.pop('fechaHora', None)
+        
+        return super().update(instance, validated_data)

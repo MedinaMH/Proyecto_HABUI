@@ -3,218 +3,154 @@
 <html lang="es">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, #145ca3" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{% block titulo %}Sistema PWMS{% endblock %}</title>
 
         <!-- Bootstrap local -->
         <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-
-        <!-- Bootstrap Icons local -->
         <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
 
         <!-- Estilos personalizados PWMS -->
-        <link rel="stylesheet" href="{% static 'css/estilos_panel_pwms.css' %}">
-        
-        <!-- Estilos adicionales específicos -->
-        {% block extra_css %}{% endblock %}
+        <link rel="stylesheet" href="{% static 'css/estilos_panel_pwms.css' %}?v=2">
     </head>
 
     <body>
         <!-- Header superior -->
         <header class="navbar navbar-dark bg-primary fixed-top d-flex justify-content-between align-items-center px-3" style="height: 85px;">
-        <a href="{% url 'panel_principal' %}" class="btn btn-outline-light d-flex align-items-center gap-2">
-            <i class="bi bi-arrow-left-circle-fill fs-5"></i>
-            <span class="d-none d-sm-inline">Panel principal</span>
-        </a>
-        <div class="text-center flex-grow-1">
-            <span class="encabezado">Sistema de Monitoreo del Bienestar Psicológico PWMS</span>
-        </div>
-        <div class="d-flex align-items-center" style="width: 110px;">
-            {% if user.is_authenticated %}
-            <span class="text-light me-2 small d-none d-sm-inline">{{ user.username }}</span>
-            {% endif %}
-        </div>
-
-        <button 
-            class="navbar-toggler d-md-none" 
-            type="button" 
-            data-bs-toggle="collapse" 
-            data-bs-target="#sidebarMenu" 
-            aria-controls="sidebarMenu" 
-            aria-expanded="false" 
-            aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+            <a href="{% url 'panel_principal' %}" class="btn btn-outline-light d-flex align-items-center gap-2">
+                <i class="bi bi-arrow-left-circle-fill fs-5"></i>
+                <span class="d-none d-sm-inline">Panel principal</span>
+            </a>
+            <div class="text-center flex-grow-1">
+                <span class="encabezado">Sistema de Monitoreo del Bienestar Psicológico PWMS</span>
+            </div>
+            <div class="d-flex align-items-center" style="width: 110px;">
+                {% if user.is_authenticated %}
+                <span class="text-light me-2 small d-none d-sm-inline">{{ user.username }}</span>
+                {% endif %}
+            </div>
         </header>
 
-        <div class="container-fluid">
-        <div class="row">
+        <div style="display: flex; width: 100%;">
             <!-- Sidebar -->
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-            <div class="position-sticky pt-3">
-                <ul class="nav flex-column">
-
-                <!-- Dashboard -->
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/pwms/dashboard/' %}active{% endif %}" href="{% url 'PWMS:pwms_dashboard' %}">
-                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                    </a>
-                </li>
-
-                <!-- Registros Psicológicos (submenu) -->
-                <li class="nav-item">
-                    <a 
-                    class="nav-link d-flex justify-content-between align-items-center" 
-                    data-bs-toggle="collapse" 
-                    href="#submenuPsico" 
-                    role="button" 
-                    aria-expanded="false" 
-                    aria-controls="submenuPsico">
-                    <span><i class="bi bi-heart-pulse me-2"></i>Registros Psicológicos</span>
-                    <i class="bi bi-caret-down-fill small"></i>
-                    </a>
-                    <div class="collapse ps-4 {% if 'psicologico' in request.path %}show{% endif %}" id="submenuPsico">
+            <nav class="sidebar" style="width: 260px; min-width: 260px; max-width: 260px;">
+                <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/pwms/nuevo_registro_psicologico/' %}active{% endif %}" href="{% url 'PWMS:nuevo_registro_psicologico' %}">
-                            <i class="bi bi-plus-circle me-2"></i>Nuevo Registro
-                        </a>
+                            <a class="nav-link {% if request.path == '/pwms/dashboard/' %}active{% endif %}" href="{% url 'PWMS:pwms_dashboard' %}">
+                                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                            </a>
                         </li>
+                        <!-- Registros Psicológicos -->
                         <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/pwms/historial_psicologico/' %}active{% endif %}" href="{% url 'PWMS:historial_psicologico' %}">
-                            <i class="bi bi-clock-history me-2"></i>Historial
-                        </a>
+                            <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuPsico">
+                                <span><i class="bi bi-clipboard-plus"></i>Registros Psicológicos</span>
+                                <i class="bi bi-caret-down-fill small"></i>
+                            </a>
+                            <div class="collapse ps-4" id="submenuPsico">
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'PWMS:nuevo_registro_psicologico' %}">
+                                            <i class="bi bi-plus-circle me-2"></i>Nuevo Registro
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'PWMS:historial_psicologico' %}">
+                                            <i class="bi bi-clock-history me-2"></i>Historial
+                                        </a>
+                                        <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'PWMS:historial_psic_integrado' %}">
+                                            <i class="bi bi-clock-history me-2"></i>Historial integrado
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- Registros Fisiológicos -->
+                        <li class="nav-item">
+                            <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuFisio">
+                                <span><i class="bi bi-activity me-2"></i>Registros Fisiológicos</span>
+                                <i class="bi bi-caret-down-fill small"></i>
+                            </a>
+                            <div class="collapse ps-4" id="submenuFisio">
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'PWMS:nuevo_registro_fisiologico' %}">
+                                            <i class="bi bi-plus-circle me-2"></i>Nuevo Registro
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'PWMS:historial_fisiologico' %}">
+                                            <i class="bi bi-clock-history me-2"></i>Historial
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- Gráficas -->
+                        <li class="nav-item">
+                            <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuGraficas">
+                                <span><i class="bi bi-graph-up me-2"></i>Gráficas</span>
+                                <i class="bi bi-caret-down-fill small"></i>
+                            </a>
+                            <div class="collapse ps-4" id="submenuGraficas">
+                                <ul class="nav flex-column">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'PWMS:grafica_presion_arterial' %}">Presión Arterial</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'PWMS:grafica_frecuencia_cardiaca' %}">Frecuencia Cardíaca</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'PWMS:grafica_temperatura' %}">Temperatura</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- Perfil -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'PWMS:perfil' %}">
+                                <i class="bi bi-person-circle me-2"></i>Mi Perfil
+                            </a>
+                        </li>
+                        <!-- Cerrar Sesión -->
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="{% url 'PWMS:panel_logout' %}">
+                                <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                            </a>
                         </li>
                     </ul>
-                    </div>
-                </li>
-
-                <!-- Registros Fisiológicos (submenu) -->
-                <li class="nav-item">
-                    <a 
-                    class="nav-link d-flex justify-content-between align-items-center" 
-                    data-bs-toggle="collapse" 
-                    href="#submenuFisio" 
-                    role="button" 
-                    aria-expanded="false" 
-                    aria-controls="submenuFisio">
-                    <span><i class="bi bi-activity me-2"></i>Registros Fisiológicos</span>
-                    <i class="bi bi-caret-down-fill small"></i>
-                    </a>
-                    <div class="collapse ps-4 {% if 'fisiologico' in request.path %}show{% endif %}" id="submenuFisio">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/pwms/nuevo_registro_fisiologico/' %}active{% endif %}" href="{% url 'PWMS:nuevo_registro_fisiologico' %}">
-                            <i class="bi bi-plus-circle me-2"></i>Nuevo Registro
-                        </a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/pwms/historial_fisiologico/' %}active{% endif %}" href="{% url 'PWMS:historial_fisiologico' %}">
-                            <i class="bi bi-clock-history me-2"></i>Historial
-                        </a>
-                        </li>
-                    </ul>
-                    </div>
-                </li>
-
-                <!-- Gráficas (submenu) -->
-                <li class="nav-item">
-                    <a 
-                    class="nav-link d-flex justify-content-between align-items-center" 
-                    data-bs-toggle="collapse" 
-                    href="#submenuGraficas" 
-                    role="button" 
-                    aria-expanded="false" 
-                    aria-controls="submenuGraficas">
-                    <span><i class="bi bi-graph-up me-2"></i>Gráficas</span>
-                    <i class="bi bi-caret-down-fill small"></i>
-                    </a>
-                    <div class="collapse ps-4 {% if 'graficas' in request.path %}show{% endif %}" id="submenuGraficas">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/pwms/graficas/presion-arterial/' %}active{% endif %}" href="{% url 'PWMS:grafica_presion_arterial' %}">
-                            <i class="bi bi-heart me-2"></i>Presión Arterial
-                        </a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/pwms/graficas/frecuencia-cardiaca/' %}active{% endif %}" href="{% url 'PWMS:grafica_frecuencia_cardiaca' %}">
-                            <i class="bi bi-heart-pulse me-2"></i>Frecuencia Cardíaca
-                        </a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/pwms/graficas/temperatura/' %}active{% endif %}" href="{% url 'PWMS:grafica_temperatura' %}">
-                            <i class="bi bi-thermometer me-2"></i>Temperatura
-                        </a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/pwms/graficas/pasos-actividad/' %}active{% endif %}" href="{% url 'PWMS:grafica_pasos_actividad' %}">
-                            <i class="bi bi-person-walking me-2"></i>Actividad Física
-                        </a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/pwms/graficas/sueno/' %}active{% endif %}" href="{% url 'PWMS:grafica_sueno' %}">
-                            <i class="bi bi-moon me-2"></i>Sueño
-                        </a>
-                        </li>
-                    </ul>
-                    </div>
-                </li>
-
-                <!-- Perfil -->
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/pwms/perfil/' %}active{% endif %}" href="{% url 'PWMS:perfil' %}">
-                    <i class="bi bi-person-circle me-2"></i>Mi Perfil
-                    </a>
-                </li>
-
-                <!-- Cerrar Sesión -->
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'PWMS:panel_logout' %}">
-                    <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-                    </a>
-                </li>
-
-                </ul>
-            </div>
+                </div>
             </nav>
 
             <!-- Contenido -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-4">
-            <!-- Mensajes -->
-            {% if messages %}
-            <div class="mb-4">
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                <i class="bi 
-                    {% if message.tags == 'success' %}bi-check-circle-fill
-                    {% elif message.tags == 'error' or message.tags == 'danger' %}bi-exclamation-triangle-fill
-                    {% elif message.tags == 'warning' %}bi-exclamation-circle-fill
-                    {% else %}bi-info-circle-fill{% endif %} 
-                    me-2"></i>
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <main style="background-color: #f0f2f5; min-height: calc(100vh - 85px); width: calc(100% - 260px); padding: 2rem;">
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        <i class="bi 
+                            {% if message.tags == 'success' %}bi-check-circle-fill
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}bi-exclamation-triangle-fill
+                            {% elif message.tags == 'warning' %}bi-exclamation-circle-fill
+                            {% else %}bi-info-circle-fill{% endif %} 
+                            me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            
-            {% block contenido %}
-            {% endblock %}
+                {% endif %}
+                
+                {% block contenido %}
+                {% endblock %}
             </main>
-        </div>
         </div>
 
         <footer class="text-center py-3 bg-light border-top mt-auto">
-        <small>&copy; 2025 MACII CREDES</small>
+            <small>&copy; 2025 MACII CREDES</small>
         </footer>
 
-        <!-- Bootstrap JS local (incluye Popper) -->
         <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
-        
-        <!-- Scripts para sidebar activo (EXTERNO) -->
-        <script src="{% static 'js/pwms_sidebar.js' %}"></script>
-        
-        <!-- Scripts adicionales específicos -->
-        {% block extra_js %}{% endblock %}
     </body>
 </html>
