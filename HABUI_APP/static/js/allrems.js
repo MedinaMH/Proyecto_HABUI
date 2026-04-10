@@ -89,7 +89,7 @@ function updateBattery(soc) {
     statusText = TRANSLATIONS.low || "BAJO";
     } else if (socPercent < 70) {
     color = "#3b82f6";
-    statusText = TRANSLATIONS.normal || "NORMAL";
+    statusText = TRANSLATIONS.moderate || "MODERADO";
     } else {
     color = "#10b981";
     statusText = TRANSLATIONS.optimal || "ÓPTIMO";
@@ -106,11 +106,6 @@ function updateBattery(soc) {
     const percentageLarge = document.getElementById('battery-percentage-large');
     if (percentageLarge) {
     percentageLarge.textContent = Math.round(socPercent) + '%';
-    // percentageLarge.style.color = color;
-    // percentageLarge.style.fontSize = '45px'; 
-    // percentageLarge.style.fontWeight = '850'; 
-    // percentageLarge.style.marginTop = '0px';
-    // percentageLarge.style.textShadow = '0 3px 8px rgba(0,0,0,0.4)';
     }
     
     // Actualizar estado en el footer 
@@ -118,8 +113,6 @@ function updateBattery(soc) {
     if (statusElement) {
     statusElement.textContent = statusText;
     statusElement.style.color = color;
-    // statusElement.style.fontSize = '2.0rem';
-    // statusElement.style.fontWeight = '700';
     }
     
     return socPercent;
@@ -197,17 +190,17 @@ const gradienteAgua = defs.append("linearGradient")
 
 gradienteAgua.append("stop")
     .attr("offset", "0%")
-    .attr("stop-color", "#1e90ff")  // Azul profundo
+    .attr("stop-color", "#1e90ff")
     .attr("stop-opacity", 0.9);
 
 gradienteAgua.append("stop")
     .attr("offset", "50%")
-    .attr("stop-color", "#00bfff")  // Azul medio
+    .attr("stop-color", "#00bfff")
     .attr("stop-opacity", 0.8);
 
 gradienteAgua.append("stop")
     .attr("offset", "100%")
-    .attr("stop-color", "#87ceeb")  // Azul claro
+    .attr("stop-color", "#87ceeb")
     .attr("stop-opacity", 0.7);
 
 // --- ESTRUCTURA DEL TANQUE ---
@@ -286,7 +279,6 @@ for (let i = 0; i <= 100; i += 25) {
     const y = tanqueY + tanqueHeight - (i / 100) * tanqueHeight;
     marcasY.push({ y, valor: i });
     
-    // Líneas grandes cada 25%
     svg.append("line")
     .attr("x1", tanqueX - 15)
     .attr("x2", tanqueX - 5)
@@ -295,7 +287,6 @@ for (let i = 0; i <= 100; i += 25) {
     .attr("stroke", "#00bfff")
     .attr("stroke-width", 4);
     
-    // Texto de porcentaje
     svg.append("text")
     .attr("x", tanqueX - 20)
     .attr("y", y + 4)
@@ -304,20 +295,6 @@ for (let i = 0; i <= 100; i += 25) {
     .attr("text-anchor", "end")
     .text(i + "%");
 }
-
-// Líneas pequeñas cada 10%
-// for (let i = 10; i < 100; i += 10) {
-//     if (i % 25 !== 0) {
-//     const y = tanqueY + tanqueHeight - (i / 100) * tanqueHeight;
-//     svg.append("line")
-//         .attr("x1", tanqueX - 10)
-//         .attr("x2", tanqueX - 5)
-//         .attr("y1", y)
-//         .attr("y2", y)
-//         .attr("stroke", "#00bfff")
-//         .attr("stroke-width", 2);
-//     }
-// }
 
 const textoNivel = svg.append("text")
     .attr("x", tanqueX + tanqueWidth - 100)
@@ -329,7 +306,6 @@ const textoNivel = svg.append("text")
     .style("font-family", "inherit")
     .text("00.0%");
 
-
 // --- ESCALA Y ANIMACIÓN ---
 const escala = d3.scaleLinear()
     .domain([0, 100])
@@ -340,47 +316,41 @@ function actualizar(valor) {
     const yAgua = escala(porcentaje);
     const alturaAgua = tanqueY + tanqueHeight - yAgua;
     
-    // Altura para el indicador de la barra lateral
     const yIndicador = escala(porcentaje);
     const alturaIndicador = tanqueY + tanqueHeight - yIndicador;
     
-    // Animación del agua
     agua.transition()
     .duration(800)
     .ease(d3.easeCubicOut)
     .attr("y", yAgua)
     .attr("height", alturaAgua);
     
-    // Animación de la superficie del agua
     superficieAgua.transition()
     .duration(800)
     .ease(d3.easeCubicOut)
     .attr("y", yAgua);
     
-    // Actualizar display numérico
     textoNivel.transition()
     .duration(400)
     .text(porcentaje.toFixed(1) + "%");
     
-    // Cambiar color según nivel
     let colorAgua;
     let colorIndicador;
     
     if (porcentaje < 20) {
-    colorAgua = "#ff4444";  // Rojo (crítico)
+    colorAgua = "#ff4444";
     colorIndicador = "#ff4444";
     } else if (porcentaje < 40) {
-    colorAgua = "#ffaa00";  // Naranja (bajo)
+    colorAgua = "#ffaa00";
     colorIndicador = "#ffaa00";
     } else if (porcentaje < 70) {
-    colorAgua = "#00bfff";  // Azul (normal)
+    colorAgua = "#00bfff";
     colorIndicador = "#00bfff";
     } else {
-    colorAgua = "#00cc66";  // Verde (óptimo)
+    colorAgua = "#00cc66";
     colorIndicador = "#00cc66";
     }
     
-    // Actualizar gradiente del agua dinámicamente
     defs.select("#gradAgua").remove();
     const nuevoGradiente = defs.append("linearGradient")
     .attr("id", "gradAgua")
@@ -403,9 +373,7 @@ function actualizar(valor) {
     .attr("stop-opacity", 0.7);
     
     agua.attr("fill", "url(#gradAgua)");
-    // indicadorNivel.attr("fill", colorIndicador);
     
-    // Efecto de llenado
     if (porcentaje > 90) {
     for (let i = 0; i < 3; i++) {
         const bubbleX = tanqueX + Math.random() * tanqueWidth * 0.8 + tanqueWidth * 0.1;
@@ -433,92 +401,80 @@ function actualizar(valor) {
     return porcentaje;
 }
 
-// Inicializar con el valor inicial
 actualizar(valorInicial);
-// return actualizar;
-// =================== CARGAR ÚLTIMO DATO DE LA BD ===================
-    async function cargarUltimoDatoBD() {
-        try {
-            console.log('Cargando datos de agua desde BD para obtener el último...');
-            const response = await fetch('/api/agua/');
+
+async function cargarUltimoDatoBD() {
+    try {
+        console.log('Cargando datos de agua desde BD para obtener el último...');
+        const response = await fetch('/api/agua/');
+        
+        if (!response.ok) {
+            console.log('No se pudieron obtener datos de agua de la BD');
+            return;
+        }
+        
+        const datos = await response.json();
+        
+        if (datos && Array.isArray(datos) && datos.length > 0) {
+            const ultimoDato = datos[0];
+            const ultimoNivel = parseFloat(ultimoDato.nivel);
             
-            if (!response.ok) {
-                console.log('No se pudieron obtener datos de agua de la BD');
-                return;
-            }
-            
-            const datos = await response.json();
-            
-            if (datos && Array.isArray(datos) && datos.length > 0) {
-                // Tomar el primer elemento (el más reciente según tu estructura)
-                const ultimoDato = datos[0];
-                const ultimoNivel = parseFloat(ultimoDato.nivel);
-                
-                console.log('Último dato de agua encontrado:', ultimoNivel, 'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora);
-                
-                // Actualizar el tanque con el último valor de la BD
-                actualizar(ultimoNivel);
-                
-                return ultimoNivel;
-            } else {
-                console.log('No hay datos de agua en la BD');
-                return null;
-            }
-        } catch (error) {
-            console.log('Error al cargar datos de agua:', error);
+            console.log('Último dato de agua encontrado:', ultimoNivel, 'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora);
+            actualizar(ultimoNivel);
+            return ultimoNivel;
+        } else {
+            console.log('No hay datos de agua en la BD');
             return null;
         }
+    } catch (error) {
+        console.log('Error al cargar datos de agua:', error);
+        return null;
     }
+}
 
-    // =================== FUNCIÓN PARA OBTENER MÚLTIPLES DATOS ===================
-    async function cargarDatosRecientesBD(limite = 10) {
-        try {
-            const response = await fetch('/api/agua/');
-            
-            if (!response.ok) {
-                console.log('No se pudieron obtener datos de agua de la BD');
-                return [];
-            }
-            
-            const datos = await response.json();
-            
-            if (datos && Array.isArray(datos)) {
-                // Tomar los primeros 'limite' elementos (los más recientes)
-                const datosRecientes = datos.slice(0, limite);
-                console.log(`Cargados ${datosRecientes.length} datos recientes de agua`);
-                return datosRecientes;
-            }
-            
-            return [];
-        } catch (error) {
-            console.log('Error al cargar datos recientes:', error);
+async function cargarDatosRecientesBD(limite = 10) {
+    try {
+        const response = await fetch('/api/agua/');
+        
+        if (!response.ok) {
+            console.log('No se pudieron obtener datos de agua de la BD');
             return [];
         }
+        
+        const datos = await response.json();
+        
+        if (datos && Array.isArray(datos)) {
+            const datosRecientes = datos.slice(0, limite);
+            console.log(`Cargados ${datosRecientes.length} datos recientes de agua`);
+            return datosRecientes;
+        }
+        
+        return [];
+    } catch (error) {
+        console.log('Error al cargar datos recientes:', error);
+        return [];
     }
+}
 
-    // Cargar el último dato al iniciar (con un pequeño retraso para asegurar que el DOM esté listo)
-    setTimeout(() => {
-        cargarUltimoDatoBD();
-    }, 500);
+setTimeout(() => {
+    cargarUltimoDatoBD();
+}, 500);
 
-    // =================== RETORNO DE FUNCIONES ===================
-    // Para mantener compatibilidad con tu código existente
-    const funcionActualizar = function(valor) {
-        return actualizar(valor);
-    };
-    
-    // Añadir funciones adicionales al objeto retornado
-    funcionActualizar.cargarUltimoDato = cargarUltimoDatoBD;
-    funcionActualizar.cargarDatosRecientes = cargarDatosRecientesBD;
-    funcionActualizar.actualizar = actualizar;
-    
-    return funcionActualizar;
+const funcionActualizar = function(valor) {
+    return actualizar(valor);
+};
+
+funcionActualizar.cargarUltimoDato = cargarUltimoDatoBD;
+funcionActualizar.cargarDatosRecientes = cargarDatosRecientesBD;
+funcionActualizar.actualizar = actualizar;
+
+return funcionActualizar;
 }
 
 // ===================== GAUGE VERTICAL (Oxígeno %) =====================
 function gaugeO2(containerId, initial) {
     const container = d3.select(containerId);
-    container.html(""); // Limpiar contenedor
+    container.html("");
 
     const width = 300;
     const height = 520;
@@ -529,31 +485,16 @@ function gaugeO2(containerId, initial) {
         .attr("width", width)
         .attr("height", height);
 
-    // Paleta de colores
     const colorPalette = {
-        // Óptimo: 19.5 – 23.5%
-        green: "#10b981",     // Verde
-        // Advertencia: 17 – 19.4% o 23.6 – 25%
-        yellow: "#fbbf24",    // Amarillo
-        // Crítico: < 17% o > 25%
-        red: "#ef4444",       // Rojo
-        // Colores adicionales
+        green: "#10b981",
+        yellow: "#fbbf24",
+        red: "#ef4444",
         lightGreen: "#34d399",
         darkGreen: "#059669",
         lightRed: "#f87171",
         white: "#ffffff"
     };
 
-    // svg.append("text")
-    //     .attr("x", width/2)
-    //     .attr("y", 32)
-    //     .attr("fill", colorPalette.white)
-    //     .attr("font-size", "22px")
-    //     .attr("font-weight", "700")
-    //     .attr("text-anchor", "middle")
-    //     .text("O₂ (%)");
-
-    // outer frame
     const frameX = 85;
     const frameY = 15;
     const frameW = 180;
@@ -569,34 +510,29 @@ function gaugeO2(containerId, initial) {
         .attr("stroke", colorPalette.white)
         .attr("stroke-width", 3);
 
-    // fill rect
     const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
-    
-     // ===================== LÍNEAS DE NIVEL NUMÉRICAS =====================
-        for (let i = 0; i <= 100; i += 25) {
-            const y = scale(i);
-            
-            // Línea horizontal de nivel
-            svg.append("line")
-                .attr("x1", frameX - 10)
-                .attr("y1", y)
-                .attr("x2", frameX)
-                .attr("y2", y)
-                .attr("stroke", colorPalette.white)
-                .attr("stroke-width", 1.5);
-            
-            // Texto de valor
-            svg.append("text")
-                .attr("x", frameX - 20)
-                .attr("y", y + 4)
-                .attr("fill", colorPalette.white)
-                .attr("font-size", "28px")
-                .attr("font-weight", "500")
-                .attr("text-anchor", "end")
-                .text(i + "%");
-        }
 
-    // Crear y almacenar los elementos que se actualizarán
+    for (let i = 0; i <= 100; i += 25) {
+        const y = scale(i);
+        
+        svg.append("line")
+            .attr("x1", frameX - 10)
+            .attr("y1", y)
+            .attr("x2", frameX)
+            .attr("y2", y)
+            .attr("stroke", colorPalette.white)
+            .attr("stroke-width", 1.5);
+        
+        svg.append("text")
+            .attr("x", frameX - 20)
+            .attr("y", y + 4)
+            .attr("fill", colorPalette.white)
+            .attr("font-size", "28px")
+            .attr("font-weight", "500")
+            .attr("text-anchor", "end")
+            .text(i + "%");
+    }
+
     const fillRect = svg.append("rect")
         .attr("x", frameX)
         .attr("width", frameW)
@@ -614,7 +550,6 @@ function gaugeO2(containerId, initial) {
         .attr("text-anchor", "middle")
         .text(initial.toFixed(2) + " %");
 
-    // Indicador de calidad
     const qualityText = svg.append("text")
         .attr("x", width/2)
         .attr("y", frameY + frameH + 120)
@@ -624,53 +559,43 @@ function gaugeO2(containerId, initial) {
         .attr("text-anchor", "middle")
         .text(getQualityText(initial));
 
-    // Definir funciones auxiliares primero
     function colorFor(v) {
-        // Asegurar que el valor esté entre 0 y 100
         const valor = Math.max(0, Math.min(100, v));
         
-        // Rangos según la tabla proporcionada
         if (valor >= 19.5 && valor <= 23.5) {
-            return colorPalette.green;      // Óptimo (verde)
+            return colorPalette.green;
         } else if ((valor >= 17 && valor <= 19.4) || (valor >= 23.6 && valor <= 25)) {
-            return colorPalette.yellow;     // Advertencia (amarillo)
+            return colorPalette.yellow;
         } else {
-            return colorPalette.red;        // Crítico (rojo)
+            return colorPalette.red;
         }
     }
 
     function getQualityText(v) {
-        // Asegurar que el valor esté entre 0 y 100
         const valor = Math.max(0, Math.min(100, v));
         
-        // Rangos según la tabla proporcionada
         if (valor >= 19.5 && valor <= 23.5) {
-            return "ÓPTIMO";
+            return TRANSLATIONS.optimal || "ÓPTIMO";
         } else if ((valor >= 17 && valor <= 19.4) || (valor >= 23.6 && valor <= 25)) {
-            return "ADVERTENCIA";
+            return TRANSLATIONS.warning || "ADVERTENCIA";
         } else {
-            return "¡CRÍTICO!";
+            return TRANSLATIONS.critical || "CRÍTICO";
         }
     }
 
-    // Función para obtener texto corto para el footer
     function getFooterQualityText(v) {
-        // Asegurar que el valor esté entre 0 y 100
         const valor = Math.max(0, Math.min(100, v));
         
-        // Rangos
         if (valor >= 19.5 && valor <= 23.5) {
-            return "ÓPTIMO";
+            return TRANSLATIONS.optimal || "ÓPTIMO";
         } else if ((valor >= 17 && valor <= 19.4) || (valor >= 23.6 && valor <= 25)) {
-            return "ADVERTENCIA";
+            return TRANSLATIONS.warning || "ADVERTENCIA";
         } else {
-            return "CRÍTICO";
+            return TRANSLATIONS.critical || "CRÍTICO";
         }
     }
 
-    // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
     function actualizarGauge(newVal) {
-        // LIMITAR EL VALOR ENTRE 0 Y 100
         const valorLimitado = Math.max(0, Math.min(100, newVal));
         
         const y = scale(valorLimitado);
@@ -678,7 +603,6 @@ function gaugeO2(containerId, initial) {
         const newColor = colorFor(valorLimitado);
         const qualityTextValue = getQualityText(valorLimitado);
 
-        // Actualizar elementos SVG
         fillRect
             .transition().duration(300)
             .attr("y", y)
@@ -690,12 +614,11 @@ function gaugeO2(containerId, initial) {
             .text(valorLimitado.toFixed(2) + " %")
             .attr("fill", newColor);
 
-        // qualityText
-        //     .transition().duration(300)
-        //     .text(qualityTextValue)
-        //     .attr("fill", newColor);
+        qualityText
+            .transition().duration(300)
+            .text(qualityTextValue)
+            .attr("fill", newColor);
 
-        // Actualizar elementos HTML
         const qualityElement = document.getElementById('oxigeno-quality');
         const timeElement = document.getElementById('oxigeno-time');
         
@@ -715,7 +638,6 @@ function gaugeO2(containerId, initial) {
         return valorLimitado;
     }
 
-    // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
     async function cargarUltimoDatoBD() {
         try {
             console.log('Cargando datos de oxígeno desde BD para obtener el último...');
@@ -729,20 +651,15 @@ function gaugeO2(containerId, initial) {
             const datos = await response.json();
             
             if (datos && Array.isArray(datos) && datos.length > 0) {
-                // Tomar el primer elemento (el más reciente)
                 const ultimoDato = datos[0];
                 
-                // Extraer el valor de oxígeno
                 let ultimoValor;
                 ultimoValor = parseFloat(ultimoDato.nivel);
-                
-                // LIMITAR EL VALOR ENTRE 0 Y 100
                 ultimoValor = Math.max(0, Math.min(100, ultimoValor));
                 
                 console.log('Último dato de oxígeno encontrado:', ultimoValor.toFixed(2) + '%', 
                         'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
                 
-                // Actualizar el gauge con el último valor de la BD
                 actualizarGauge(ultimoValor);
                 
                 return ultimoValor;
@@ -756,7 +673,6 @@ function gaugeO2(containerId, initial) {
         }
     }
 
-    // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
     async function cargarDatosRecientesBD(limite = 10) {
         try {
             console.log(`Cargando últimos ${limite} datos de oxígeno...`);
@@ -770,28 +686,23 @@ function gaugeO2(containerId, initial) {
             const datos = await response.json();
             
             if (datos && Array.isArray(datos)) {
-                // Tomar los primeros 'limite' elementos (los más recientes)
                 const datosRecientes = datos.slice(0, limite);
                 
-                // Procesar y formatear datos
                 const datosFormateados = datosRecientes.map(dato => {
                     let valor;
                     
                     valor = parseFloat(dato.nivel);
                     
                     if (isNaN(valor)) return null;
-                    
-                    // LIMITAR EL VALOR ENTRE 0 Y 100
                     valor = Math.max(0, Math.min(100, valor));
                     
-                    // Determinar calidad según rangos de oxígeno
                     let calidad;
                     if (valor >= 19.5 && valor <= 23.5) {
-                        calidad = "ÓPTIMO";
+                        calidad = TRANSLATIONS.optimal || "ÓPTIMO";
                     } else if ((valor >= 17 && valor <= 19.4) || (valor >= 23.6 && valor <= 25)) {
-                        calidad = "ADVERTENCIA";
+                        calidad = TRANSLATIONS.warning || "ADVERTENCIA";
                     } else {
-                        calidad = "CRÍTICO";
+                        calidad = TRANSLATIONS.critical || "CRÍTICO";
                     }
                     
                     return {
@@ -813,20 +724,14 @@ function gaugeO2(containerId, initial) {
         }
     }
 
-    // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
-    // Cargar el último dato al iniciar
     setTimeout(() => {
         cargarUltimoDatoBD();
     }, 500);
 
-    // =================== RETORNO DE FUNCIONES ===================
-    // Crear objeto de retorno con todas las funciones
     const gaugeObject = {
         update: function(newVal) {
-            // Versión pública de update que también actualiza elementos HTML
             const valorActualizado = actualizarGauge(newVal);
             
-            // Retornar información para usar en otros lugares
             return {
                 valor: valorActualizado,
                 calidad: getQualityText(valorActualizado),
@@ -841,14 +746,14 @@ function gaugeO2(containerId, initial) {
         obtenerTextoCalidad: getQualityText,
         obtenerRangos: function() {
             return {
-                optimo: { min: 19.5, max: 23.5, color: colorPalette.green, estado: "ÓPTIMO" },
+                optimo: { min: 19.5, max: 23.5, color: colorPalette.green, estado: TRANSLATIONS.optimal || "ÓPTIMO" },
                 advertencia: [
-                    { min: 17, max: 19.4, color: colorPalette.yellow, estado: "ADVERTENCIA" },
-                    { min: 23.6, max: 25, color: colorPalette.yellow, estado: "ADVERTENCIA" }
+                    { min: 17, max: 19.4, color: colorPalette.yellow, estado: TRANSLATIONS.warning || "ADVERTENCIA" },
+                    { min: 23.6, max: 25, color: colorPalette.yellow, estado: TRANSLATIONS.warning || "ADVERTENCIA" }
                 ],
                 critico: [
-                    { min: 0, max: 16.9, color: colorPalette.red, estado: "CRÍTICO" },
-                    { min: 25.1, max: 100, color: colorPalette.red, estado: "CRÍTICO" }
+                    { min: 0, max: 16.9, color: colorPalette.red, estado: TRANSLATIONS.critical || "CRÍTICO" },
+                    { min: 25.1, max: 100, color: colorPalette.red, estado: TRANSLATIONS.critical || "CRÍTICO" }
                 ]
             };
         }
@@ -860,42 +765,27 @@ function gaugeO2(containerId, initial) {
 // ===================== GAUGE VERTICAL (CO2 ppm) =====================
 function gaugeCO2(containerId, initial) {
     const container = d3.select(containerId);
-    container.html(""); // Limpiar contenedor
+    container.html("");
     
     const width = 300;
     const height = 520;
     const min = 0.0;
-    const max = 3000.0; // Máximo 3000 ppm para mejor visualización
+    const max = 3000.0;
 
     const svg = container.append("svg")
         .attr("width", width)
         .attr("height", height);
 
-    // Paleta de colores según los rangos especificados para CO2
     const colorPalette = {
-        // Óptimo: 400 – 1,000 ppm
-        green: "#10b981",     // Verde
-        // Advertencia: 1,000 – 2,000 ppm
-        yellow: "#fbbf24",    // Amarillo
-        // Crítico: > 2,000 ppm
-        red: "#ef4444",       // Rojo
-        // Colores adicionales
+        green: "#10b981",
+        yellow: "#fbbf24",
+        red: "#ef4444",
         lightGreen: "#34d399",
         darkGreen: "#059669",
         lightRed: "#f87171",
         white: "#ffffff"
     };
 
-    // svg.append("text")
-    //     .attr("x", width/2)
-    //     .attr("y", 32)
-    //     .attr("fill", colorPalette.white)
-    //     .attr("font-size", "22px")
-    //     .attr("font-weight", "700")
-    //     .attr("text-anchor", "middle")
-    //     .text("CO₂ (ppm)");
-
-    // outer frame
     const frameX = 85;
     const frameY = 15;
     const frameW = 180;
@@ -911,16 +801,12 @@ function gaugeCO2(containerId, initial) {
         .attr("stroke", colorPalette.white)
         .attr("stroke-width", 3);
 
-    // fill rect
     const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
-    
-    // ===================== LÍNEAS DE NIVEL PARA CO2 (0-3000 ppm) =====================
     const nivelesCO2 = [0, 600, 1200, 1800, 2400, 3000];
     
     nivelesCO2.forEach(ppm => {
         const y = scale(ppm);
         
-        // Línea horizontal de nivel
         svg.append("line")
             .attr("x1", frameX - 10)
             .attr("y1", y)
@@ -939,12 +825,11 @@ function gaugeCO2(containerId, initial) {
             .text(formatPPM(ppm));
     });
     
-    // Función para formatear valores de ppm
     function formatPPM(ppm) {
         if (ppm >= 1000) {
-            return (ppm / 1000).toFixed(1) + 'k';  // Ej: 1000 → "1.0k", 2400 → "2.4k"
+            return (ppm / 1000).toFixed(1) + 'k';
         }
-        return ppm.toString();  // Ej: 0 → "0", 600 → "600"
+        return ppm.toString();
     }
 
     const fillRect = svg.append("rect")
@@ -964,7 +849,6 @@ function gaugeCO2(containerId, initial) {
         .attr("text-anchor", "middle")
         .text(initial.toFixed(0) + " ppm");
 
-    // Indicador de calidad
     const qualityText = svg.append("text")
         .attr("x", width/2)
         .attr("y", frameY + frameH + 130)
@@ -974,50 +858,42 @@ function gaugeCO2(containerId, initial) {
         .attr("text-anchor", "middle")
         .text(getQualityText(initial));
 
-    // Definir funciones auxiliares primero
     function colorFor(v) {
-        // Asegurar que el valor esté entre 0 y max (3000 ppm)
         const valor = Math.max(min, Math.min(max, v));
         
-        // Rangos
         if (valor >= 400 && valor <= 1000) {
-            return colorPalette.green;      // Óptimo (verde)
+            return colorPalette.green;
         } else if (valor > 1000 && valor <= 2000) {
-            return colorPalette.yellow;     // Advertencia (amarillo)
+            return colorPalette.yellow;
         } else {
-            return colorPalette.red;        // Crítico (rojo)
+            return colorPalette.red;
         }
     }
 
     function getQualityText(v) {
-        // Asegurar que el valor esté entre 0 y max (3000 ppm)
         const valor = Math.max(min, Math.min(max, v));
         
         if (valor >= 400 && valor <= 1000) {
-            return "ÓPTIMO";
+            return TRANSLATIONS.optimal || "ÓPTIMO";
         } else if (valor > 1000 && valor <= 2000) {
-            return "ADVERTENCIA";
+            return TRANSLATIONS.warning || "ADVERTENCIA";
         } else {
-            return "¡CRÍTICO!";
+            return TRANSLATIONS.critical || "CRÍTICO";
         }
     }
 
-    // Función para obtener texto corto para el footer
     function getFooterQualityText(v) {
-        // Asegurar que el valor esté entre 0 y max (3000 ppm)
         const valor = Math.max(min, Math.min(max, v));
         if (valor >= 400 && valor <= 1000) {
-            return "ÓPTIMO";
+            return TRANSLATIONS.optimal || "ÓPTIMO";
         } else if (valor > 1000 && valor <= 2000) {
-            return "ADVERTENCIA";
+            return TRANSLATIONS.warning || "ADVERTENCIA";
         } else {
-            return "CRÍTICO";
+            return TRANSLATIONS.critical || "CRÍTICO";
         }
     }
 
-    // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
     function actualizarGauge(newVal) {
-        // LIMITAR EL VALOR ENTRE min y max
         const valorLimitado = Math.max(min, Math.min(max, newVal));
         
         const y = scale(valorLimitado);
@@ -1025,7 +901,6 @@ function gaugeCO2(containerId, initial) {
         const newColor = colorFor(valorLimitado);
         const qualityTextValue = getQualityText(valorLimitado);
 
-        // Actualizar elementos SVG
         fillRect
             .transition().duration(300)
             .attr("y", y)
@@ -1042,7 +917,6 @@ function gaugeCO2(containerId, initial) {
             .text(qualityTextValue)
             .attr("fill", newColor);
 
-        // Actualizar elementos HTML
         const qualityElement = document.getElementById('co2-concentration');
         const timeElement = document.getElementById('co2-time');
         
@@ -1062,7 +936,6 @@ function gaugeCO2(containerId, initial) {
         return valorLimitado;
     }
 
-    // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
     async function cargarUltimoDatoBD() {
         try {
             console.log('Cargando datos de CO₂ desde BD para obtener el último...');
@@ -1076,10 +949,8 @@ function gaugeCO2(containerId, initial) {
             const datos = await response.json();
             
             if (datos && Array.isArray(datos) && datos.length > 0) {
-                // Tomar el primer elemento (el más reciente)
                 const ultimoDato = datos[0];
                 
-                // Extraer el valor de CO₂
                 let ultimoValor = null;
                 
                 if (ultimoDato.concentracion !== undefined && ultimoDato.concentracion !== null) {
@@ -1101,7 +972,6 @@ function gaugeCO2(containerId, initial) {
                 console.log('Último dato de CO₂ encontrado:', ultimoValor.toFixed(0) + ' ppm', 
                         'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
                 
-                // Actualizar el gauge con el último valor de la BD
                 actualizarGauge(ultimoValor);
                 
                 return ultimoValor;
@@ -1115,7 +985,6 @@ function gaugeCO2(containerId, initial) {
         }
     }
 
-    // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
     async function cargarDatosRecientesBD(limite = 10) {
         try {
             console.log(`Cargando últimos ${limite} datos de CO₂...`);
@@ -1129,10 +998,8 @@ function gaugeCO2(containerId, initial) {
             const datos = await response.json();
             
             if (datos && Array.isArray(datos)) {
-                // Tomar los primeros 'limite' elementos (los más recientes)
                 const datosRecientes = datos.slice(0, limite);
                 
-                // Procesar y formatear datos
                 const datosFormateados = datosRecientes.map(dato => {
                     let valor;
                     
@@ -1148,14 +1015,13 @@ function gaugeCO2(containerId, initial) {
                     
                     if (isNaN(valor)) return null;
                     
-                    // Determinar calidad según rangos de CO2
                     let calidad;
                     if (valor >= 400 && valor <= 1000) {
-                        calidad = "ÓPTIMO";
+                        calidad = TRANSLATIONS.optimal || "ÓPTIMO";
                     } else if (valor > 1000 && valor <= 2000) {
-                        calidad = "ADVERTENCIA";
+                        calidad = TRANSLATIONS.warning || "ADVERTENCIA";
                     } else {
-                        calidad = "CRÍTICO";
+                        calidad = TRANSLATIONS.critical || "CRÍTICO";
                     }
                     
                     return {
@@ -1177,20 +1043,14 @@ function gaugeCO2(containerId, initial) {
         }
     }
 
-    // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
-    // Cargar el último dato al iniciar
     setTimeout(() => {
         cargarUltimoDatoBD();
     }, 500);
 
-    // =================== RETORNO DE FUNCIONES ===================
-    // Crear objeto de retorno con todas las funciones
     const gaugeObject = {
         update: function(newVal) {
-            // Versión pública de update que también actualiza elementos HTML
             const valorActualizado = actualizarGauge(newVal);
             
-            // Retornar información para usar en otros lugares
             return {
                 valor: valorActualizado,
                 calidad: getQualityText(valorActualizado),
@@ -1205,9 +1065,9 @@ function gaugeCO2(containerId, initial) {
         obtenerTextoCalidad: getQualityText,
         obtenerRangos: function() {
             return {
-                optimo: { min: 400, max: 1000, color: colorPalette.green, estado: "ÓPTIMO" },
-                advertencia: { min: 1000, max: 2000, color: colorPalette.yellow, estado: "ADVERTENCIA" },
-                critico: { min: 2000, max: 3000, color: colorPalette.red, estado: "CRÍTICO" }
+                optimo: { min: 400, max: 1000, color: colorPalette.green, estado: TRANSLATIONS.optimal || "ÓPTIMO" },
+                advertencia: { min: 1000, max: 2000, color: colorPalette.yellow, estado: TRANSLATIONS.warning || "ADVERTENCIA" },
+                critico: { min: 2000, max: 3000, color: colorPalette.red, estado: TRANSLATIONS.critical || "CRÍTICO" }
             };
         }
     };
@@ -1218,31 +1078,29 @@ function gaugeCO2(containerId, initial) {
 // ===================== GAUGE TERMÓMETRO =====================
 function gaugeTemperatura(containerId, initial) {
     const container = d3.select(containerId);
-    container.html(""); // Limpiar contenedor
+    container.html("");
 
     const width = 280;
     const height = 420;
-    const min = 0;      // °C mínimo visual
-    const max = 45;     // °C máximo visual
+    const min = 0;
+    const max = 45;
 
     const svg = container.append("svg")
         .attr("width", width)
         .attr("height", height);
 
     const tempPalette = {
-        critico: "#ff6b6b",      // Rojo para CRÍTICO (<18°C o >26°C)
-        advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA (18-20°C o 24-26°C)
-        optimo: "#69db7c",        // Verde para ÓPTIMO (20-24°C)
+        critico: "#ff6b6b",
+        advertencia: "#ffd43b",
+        optimo: "#69db7c",
         contorno: "#ffffff"
     };
 
-    // Diseño tipo termómetro
     const termometroX = width/2 - 15;
     const termometroY = 15;
     const termometroH = 280;
     const bulboRadio = 28;
 
-    // Bulbo inferior
     svg.append("circle")
         .attr("cx", width/2 + 15)
         .attr("cy", termometroY + termometroH + bulboRadio)
@@ -1251,7 +1109,6 @@ function gaugeTemperatura(containerId, initial) {
         .attr("stroke", tempPalette.contorno)
         .attr("stroke-width", 4);
 
-    // Tubo del termómetro
     svg.append("rect")
         .attr("x", termometroX)
         .attr("y", termometroY)
@@ -1262,12 +1119,10 @@ function gaugeTemperatura(containerId, initial) {
         .attr("stroke", tempPalette.contorno)
         .attr("stroke-width", 3);
 
-    // Escala para el mercurio
     const scale = d3.scaleLinear()
         .domain([min, max])
         .range([termometroY + termometroH, termometroY]);
 
-    // Mercurio (líquido del termómetro)
     const mercurio = svg.append("rect")
         .attr("x", termometroX + 4)
         .attr("width", 52)
@@ -1276,14 +1131,12 @@ function gaugeTemperatura(containerId, initial) {
         .attr("fill", tempPalette.critico)
         .attr("rx", 11);
 
-    // Mercurio en el bulbo
     const mercurioBulbo = svg.append("circle")
         .attr("cx", width/2 + 15)
         .attr("cy", termometroY + termometroH + bulboRadio)
         .attr("r", bulboRadio - 5)
         .attr("fill", tempPalette.critico);
 
-    // Valor numérico (justo arriba del texto del nivel)
     const valueText = svg.append("text")
         .attr("x", width/2 + 15)
         .attr("y", termometroY + termometroH + bulboRadio + 85)
@@ -1293,35 +1146,32 @@ function gaugeTemperatura(containerId, initial) {
         .attr("text-anchor", "middle")
         .text(initial.toFixed(1) + " °C");
 
-    // FUNCIÓN para determinar nivel de temperatura
     function getTempLevel(v) {
         if (v < 18 || v > 26) return {
-            nivel: "CRÍTICO", 
+            nivel: TRANSLATIONS.critical || "CRÍTICO", 
             emoji: "⚠️",
             color: tempPalette.critico,
             estado: "critico"
         };
         if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return {
-            nivel: "ADVERTENCIA", 
+            nivel: TRANSLATIONS.warning || "ADVERTENCIA", 
             emoji: "⚠️",
             color: tempPalette.advertencia,
             estado: "advertencia"
         };
         return {
-            nivel: "ÓPTIMO", 
+            nivel: TRANSLATIONS.optimal || "ÓPTIMO", 
             emoji: "✅",
             color: tempPalette.optimo,
             estado: "optimo"
         };
     }
 
-    // Función para determinar color según temperatura
     function colorFor(v) {
         const level = getTempLevel(v);
         return level.color;
     }
 
-    // TEXTO DE NIVEL
     const levelText = svg.append("text")
         .attr("x", width/2 + 15)
         .attr("y", termometroY + termometroH + bulboRadio + 130) 
@@ -1331,24 +1181,21 @@ function gaugeTemperatura(containerId, initial) {
         .attr("text-anchor", "middle")
         .text(getTempLevel(initial).nivel);
 
-    // TEXTO DESCRIPTIVO 
     const descText = svg.append("text")
         .attr("x", width/2 + 15)
         .attr("y", termometroY + termometroH + bulboRadio + 125)
-        .attr("fill", "#94a3b8")  // Color gris para contraste
+        .attr("fill", "#94a3b8")
         .attr("font-size", "14px")
         .attr("font-weight", "500")
         .attr("text-anchor", "middle")
         .text(getTempDescription(initial));
 
-    // Función para obtener descripción según el nivel
     function getTempDescription(v) {
-        if (v < 18 || v > 26) return "Riesgo fisiológico, estrés térmico";
-        if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return "Leve incomodidad térmica";
-        return "Zona de confort térmico humano óptimo";
+        if (v < 18 || v > 26) return TRANSLATIONS.thermal_stress_risk || "Riesgo fisiológico, estrés térmico";
+        if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return TRANSLATIONS.mild_thermal_discomfort || "Leve incomodidad térmica";
+        return TRANSLATIONS.optimal_thermal_zone || "Zona de confort térmico humano óptimo";
     }
 
-    // Marcas de escala
     for (let temp = min; temp <= max; temp += 5) {
         const y = scale(temp);
         svg.append("line")
@@ -1368,7 +1215,6 @@ function gaugeTemperatura(containerId, initial) {
             .text(temp + "°");
     }
 
-    // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
     async function cargarUltimoDatoBD() {
         try {
             console.log('Cargando datos de Temperatura desde BD para obtener el último...');
@@ -1382,10 +1228,8 @@ function gaugeTemperatura(containerId, initial) {
             const datos = await response.json();
             
             if (datos && Array.isArray(datos) && datos.length > 0) {
-                // Tomar el primer elemento (el más reciente)
                 const ultimoDato = datos[0];
                 
-                // Extraer el valor de Temperatura - COMO LO HACE CO2
                 let ultimoValor = null;
                 
                 if (ultimoDato.temperatura !== undefined && ultimoDato.temperatura !== null) {
@@ -1407,7 +1251,6 @@ function gaugeTemperatura(containerId, initial) {
                 console.log('Último dato de Temperatura encontrado:', ultimoValor.toFixed(1) + ' °C', 
                         'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
                 
-                // Actualizar el gauge con el último valor de la BD
                 actualizarGauge(ultimoValor);
                 
                 return ultimoValor;
@@ -1421,7 +1264,6 @@ function gaugeTemperatura(containerId, initial) {
         }
     }
 
-    // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
     async function cargarDatosRecientesBD(limite = 10) {
         try {
             console.log(`Cargando últimos ${limite} datos de Temperatura...`);
@@ -1435,10 +1277,8 @@ function gaugeTemperatura(containerId, initial) {
             const datos = await response.json();
             
             if (datos && Array.isArray(datos)) {
-                // Tomar los primeros 'limite' elementos (los más recientes)
                 const datosRecientes = datos.slice(0, limite);
                 
-                // Procesar y formatear datos
                 const datosFormateados = datosRecientes.map(dato => {
                     let valor;
                     
@@ -1478,7 +1318,6 @@ function gaugeTemperatura(containerId, initial) {
         }
     }
 
-    // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
     function actualizarGauge(newVal) {
         const y = scale(newVal);
         const h = Math.max(2, (termometroY + termometroH) - y);
@@ -1500,19 +1339,16 @@ function gaugeTemperatura(containerId, initial) {
             .text(newVal.toFixed(1) + " °C")
             .attr("fill", newColor);
 
-        // Actualizar texto del nivel
         levelText
             .transition().duration(300)
             .text(newLevel.nivel)
             .attr("fill", newColor);
 
-        // Actualizar texto descriptivo
         descText
             .transition().duration(300)
             .text(getTempDescription(newVal))
             .attr("fill", "#94a3b8");
             
-        // ACTUALIZAR ELEMENTOS HTML DEL FOOTER
         const feelingElement = document.getElementById('temp-feeling') || 
                                 document.getElementById('temp-quality');
         const timeElement = document.getElementById('temp-time');
@@ -1530,8 +1366,6 @@ function gaugeTemperatura(containerId, initial) {
         }
     }
 
-    // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
-    // Cargar el último dato al iniciar (con un pequeño retraso para asegurar que el DOM esté listo)
     setTimeout(() => {
         cargarUltimoDatoBD().then(ultimoValor => {
             if (ultimoValor !== null) {
@@ -1540,7 +1374,6 @@ function gaugeTemperatura(containerId, initial) {
         });
     }, 500);
 
-    // =================== RETORNO DE FUNCIONES ===================
     const gaugeObject = {
         update: function(newVal) {
             actualizarGauge(newVal);
@@ -1556,11 +1389,9 @@ function gaugeTemperatura(containerId, initial) {
         obtenerTextoFooter: function(v) {
             return getTempLevel(v).nivel;
         },
-        // Función para obtener el nivel actual
         getNivelActual: function() {
             return getTempLevel(parseFloat(valueText.text().replace(' °C', '')));
         },
-        // Función para forzar actualización desde BD
         actualizarDesdeBD: function() {
             return cargarUltimoDatoBD().then(valor => {
                 if (valor !== null) {
@@ -1577,7 +1408,7 @@ function gaugeTemperatura(containerId, initial) {
 // ===================== GAUGE VERTICAL (HUMEDAD %) =====================
 function gaugeHumedad(containerId, initial) {
     const container = d3.select(containerId);
-    container.html(""); // Limpiar contenedor
+    container.html("");
 
     const width = 300;
     const height = 520;
@@ -1588,13 +1419,12 @@ function gaugeHumedad(containerId, initial) {
         .style("border-radius", "8px");
 
     const humPalette = {
-        critico: "#ff6b6b",      // Rojo para CRÍTICO (<30% o >70%)
-        advertencia: "#ffd43b",  // Amarillo para ADVERTENCIA (30-40% o 60-70%)
-        optimo: "#69db7c",        // Verde para ÓPTIMO (40-60%)
+        critico: "#ff6b6b",
+        advertencia: "#ffd43b",
+        optimo: "#69db7c",
         contorno: "#ffffff"
     };
 
-    // outer frame
     const frameX = 85;
     const frameY = 15;
     const frameW = 180;
@@ -1610,16 +1440,13 @@ function gaugeHumedad(containerId, initial) {
         .attr("stroke", humPalette.contorno)
         .attr("stroke-width", 3);
 
-    // fill rect
     const min = 0;
     const max = 100;
     const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
     
-    // ===================== LÍNEAS DE NIVEL =====================
     for (let i = 0; i <= 100; i += 25) {
         const y = scale(i);
         
-        // Línea horizontal de nivel
         svg.append("line")
             .attr("x1", frameX - 10)
             .attr("y1", y)
@@ -1628,7 +1455,6 @@ function gaugeHumedad(containerId, initial) {
             .attr("stroke", "#ffffff")
             .attr("stroke-width", 1.5);
         
-        // Texto de valor
         svg.append("text")
             .attr("x", frameX - 20)
             .attr("y", y + 4)
@@ -1656,7 +1482,6 @@ function gaugeHumedad(containerId, initial) {
         .attr("text-anchor", "middle")
         .text(initial.toFixed(1) + " %");
 
-    // Indicador de nivel
     const levelText = svg.append("text")
         .attr("x", width/2+30)
         .attr("y", frameY + frameH + 130)
@@ -1667,31 +1492,29 @@ function gaugeHumedad(containerId, initial) {
         .text(getNivelTexto(initial));
 
     function colorFor(v) {
-        if (v < 30 || v > 70) return humPalette.critico;        // CRÍTICO (rojo)
-        if ((v >= 30 && v < 40) || (v >= 60 && v <= 70)) return humPalette.advertencia; // ADVERTENCIA (amarillo)
-        return humPalette.optimo;                                // ÓPTIMO (verde)
+        if (v < 30 || v > 70) return humPalette.critico;
+        if ((v >= 30 && v < 40) || (v >= 60 && v <= 70)) return humPalette.advertencia;
+        return humPalette.optimo;
     }
 
     function getNivelTexto(v) {
-        if (v < 30 || v > 70) return "CRÍTICO";
-        if ((v >= 30 && v < 40) || (v >= 60 && v <= 70)) return "ADVERTENCIA";
-        return "ÓPTIMO";
+        if (v < 30 || v > 70) return TRANSLATIONS.critical || "CRÍTICO";
+        if ((v >= 30 && v < 40) || (v >= 60 && v <= 70)) return TRANSLATIONS.warning || "ADVERTENCIA";
+        return TRANSLATIONS.optimal || "ÓPTIMO";
     }
 
     function getDescripcionNivel(v) {
-        if (v < 30) return "Irritación respiratoria por sequedad extrema";
-        if (v < 40) return "Riesgo de sequedad respiratoria";
-        if (v < 60) return "Minimiza patógenos, maximiza confort respiratorio";
-        if (v <= 70) return "Riesgo de proliferación microbiana";
-        return "Riesgo de crecimiento de moho e irritación respiratoria";
+        if (v < 30) return TRANSLATIONS.extreme_dryness_irritation || "Irritación respiratoria por sequedad extrema";
+        if (v < 40) return TRANSLATIONS.respiratory_dryness_risk || "Riesgo de sequedad respiratoria";
+        if (v < 60) return TRANSLATIONS.pathogen_comfort_balance || "Minimiza patógenos, maximiza confort respiratorio";
+        if (v <= 70) return TRANSLATIONS.microbial_growth_risk || "Riesgo de proliferación microbiana";
+        return TRANSLATIONS.mold_growth_risk || "Riesgo de crecimiento de moho e irritación respiratoria";
     }
 
-    // Función para obtener texto corto para el footer
     function getFooterTexto(v) {
         return getNivelTexto(v);
     }
 
-    // Estadísticas
     const stats = {
         current: initial,
         min: initial,
@@ -1699,7 +1522,6 @@ function gaugeHumedad(containerId, initial) {
         history: []
     };
 
-    // Actualizar estadísticas
     function updateStats(newVal) {
         stats.current = newVal;
         stats.min = Math.min(stats.min, newVal);
@@ -1711,13 +1533,11 @@ function gaugeHumedad(containerId, initial) {
             color: colorFor(newVal)
         });
         
-        // Mantener solo los últimos 100 valores en el historial
         if (stats.history.length > 100) {
             stats.history.shift();
         }
     }
 
-    // =================== FUNCIÓN PARA CARGAR ÚLTIMO DATO DE LA BD ===================
     async function cargarUltimoDatoBD() {
         try {
             console.log('Cargando datos de Humedad desde BD para obtener el último...');
@@ -1731,10 +1551,8 @@ function gaugeHumedad(containerId, initial) {
             const datos = await response.json();
             
             if (datos && Array.isArray(datos) && datos.length > 0) {
-                // Tomar el primer elemento (el más reciente)
                 const ultimoDato = datos[0];
                 
-                // Extraer el valor de Humedad - COMO LO HACE CO2 Y TEMPERATURA
                 let ultimoValor = null;
                 
                 if (ultimoDato.humedad !== undefined && ultimoDato.humedad !== null) {
@@ -1756,7 +1574,6 @@ function gaugeHumedad(containerId, initial) {
                 console.log('Último dato de Humedad encontrado:', ultimoValor.toFixed(1) + ' %', 
                         'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
                 
-                // Actualizar el gauge con el último valor de la BD
                 actualizarGauge(ultimoValor);
                 
                 return ultimoValor;
@@ -1770,7 +1587,6 @@ function gaugeHumedad(containerId, initial) {
         }
     }
 
-    // =================== FUNCIÓN PARA CARGAR MÚLTIPLES DATOS ===================
     async function cargarDatosRecientesBD(limite = 10) {
         try {
             console.log(`Cargando últimos ${limite} datos de Humedad...`);
@@ -1784,10 +1600,8 @@ function gaugeHumedad(containerId, initial) {
             const datos = await response.json();
             
             if (datos && Array.isArray(datos)) {
-                // Tomar los primeros 'limite' elementos (los más recientes)
                 const datosRecientes = datos.slice(0, limite);
                 
-                // Procesar y formatear datos - COMO LO HACE CO2 Y TEMPERATURA
                 const datosFormateados = datosRecientes.map(dato => {
                     let valor;
                     
@@ -1802,13 +1616,22 @@ function gaugeHumedad(containerId, initial) {
                     }
                     
                     if (isNaN(valor)) return null;
+
+                    let estadoInterno;
+                    if (valor < 30 || valor > 70) {
+                        estadoInterno = "critico";
+                    } else if ((valor >= 30 && valor < 40) || (valor >= 60 && valor <= 70)) {
+                        estadoInterno = "advertencia";
+                    } else {
+                        estadoInterno = "optimo";
+                    }
                     
                     return {
                         id: dato.id,
                         valor: valor,
                         fecha: dato.fecha_hora || dato.timestamp,
                         nivel: getNivelTexto(valor),
-                        estado: getNivelTexto(valor).toLowerCase(),
+                        estado: estadoInterno,
                         color: colorFor(valor),
                         descripcion: getDescripcionNivel(valor)
                     };
@@ -1825,7 +1648,6 @@ function gaugeHumedad(containerId, initial) {
         }
     }
 
-    // =================== FUNCIÓN DE ACTUALIZACIÓN INTERNA ===================
     function actualizarGauge(newVal) {
         const y = scale(newVal);
         const h = Math.max(2, (frameY + frameH) - y);
@@ -1848,11 +1670,9 @@ function gaugeHumedad(containerId, initial) {
             .text(nivelTexto)
             .attr("fill", newColor);
         
-        // Actualizar estadísticas
         updateStats(newVal);
         
-        // ACTUALIZAR ELEMENTOS HTML DEL FOOTER
-        const feelingElement = document.getElementById('humidity-condition')
+        const feelingElement = document.getElementById('humidity-condition');
         const timeElement = document.getElementById('humidity-time');
         
         if (feelingElement) {
@@ -1868,7 +1688,6 @@ function gaugeHumedad(containerId, initial) {
         }
     }
 
-    // =================== CARGAR ÚLTIMO DATO AL INICIAR ===================
     setTimeout(() => {
         cargarUltimoDatoBD().then(ultimoValor => {
             if (ultimoValor !== null) {
@@ -1877,7 +1696,6 @@ function gaugeHumedad(containerId, initial) {
         });
     }, 500);
 
-    // =================== RETORNO DE FUNCIONES ===================
     const gaugeObject = {
         update: function(newVal) {
             actualizarGauge(newVal);
@@ -1896,7 +1714,6 @@ function gaugeHumedad(containerId, initial) {
         obtenerNivelTexto: getNivelTexto,
         obtenerDescripcionNivel: getDescripcionNivel,
         obtenerTextoFooter: getFooterTexto,
-        // Obtener estadísticas
         getStats: function() {
             return {
                 ...stats,
@@ -1905,13 +1722,11 @@ function gaugeHumedad(containerId, initial) {
                 descripcionActual: getDescripcionNivel(stats.current)
             };
         },
-        // Resetear estadísticas
         resetStats: function() {
             stats.min = stats.current;
             stats.max = stats.current;
             stats.history = [];
         },
-        // Función para forzar actualización desde BD
         actualizarDesdeBD: function() {
             return cargarUltimoDatoBD().then(valor => {
                 if (valor !== null) {
@@ -1920,17 +1735,16 @@ function gaugeHumedad(containerId, initial) {
                 return null;
             });
         },
-        // Función para obtener rangos
         obtenerRangos: function() {
             return {
-                optimo: { min: 40, max: 60, color: humPalette.optimo, estado: "ÓPTIMO", descripcion: "Minimiza patógenos, maximiza confort respiratorio" },
+                optimo: { min: 40, max: 60, color: humPalette.optimo, estado: TRANSLATIONS.optimal || "ÓPTIMO", descripcion: TRANSLATIONS.pathogen_comfort_balance || "Minimiza patógenos, maximiza confort respiratorio" },
                 advertencia: [
-                    { min: 30, max: 40, color: humPalette.advertencia, estado: "ADVERTENCIA", descripcion: "Riesgo de sequedad respiratoria" },
-                    { min: 60, max: 70, color: humPalette.advertencia, estado: "ADVERTENCIA", descripcion: "Riesgo de proliferación microbiana" }
+                    { min: 30, max: 40, color: humPalette.advertencia, estado: TRANSLATIONS.warning || "ADVERTENCIA", descripcion: TRANSLATIONS.respiratory_dryness_risk || "Riesgo de sequedad respiratoria" },
+                    { min: 60, max: 70, color: humPalette.advertencia, estado: TRANSLATIONS.warning || "ADVERTENCIA", descripcion: TRANSLATIONS.microbial_growth_risk || "Riesgo de proliferación microbiana" }
                 ],
                 critico: [
-                    { min: 0, max: 30, color: humPalette.critico, estado: "CRÍTICO", descripcion: "Irritación respiratoria por sequedad extrema" },
-                    { min: 70, max: 100, color: humPalette.critico, estado: "CRÍTICO", descripcion: "Riesgo de crecimiento de moho e irritación respiratoria" }
+                    { min: 0, max: 30, color: humPalette.critico, estado: TRANSLATIONS.critical || "CRÍTICO", descripcion: TRANSLATIONS.extreme_dryness_irritation || "Irritación respiratoria por sequedad extrema" },
+                    { min: 70, max: 100, color: humPalette.critico, estado: TRANSLATIONS.critical || "CRÍTICO", descripcion: TRANSLATIONS.mold_growth_risk || "Riesgo de crecimiento de moho e irritación respiratoria" }
                 ]
             };
         }
@@ -1940,7 +1754,6 @@ function gaugeHumedad(containerId, initial) {
 }
 
 // ===================== SISTEMA PRINCIPAL =====================
-// Instancias de gráficos
 let batteryActualizar = null;
 let tanqueAguaActualizar = null;
 let gaugeO2Instancia = null;
@@ -1976,11 +1789,9 @@ let lastUpdate = {
     humedad: null
 };
 
-// Inicializar todas las visualizaciones
 function inicializarVisualizaciones() {
     console.log("Inicializando visualizaciones...");
 
-    // Inicializar con valores por defecto
     batteryActualizar = initBatteryVisualization("#battery-svg", 0.65);
     tanqueAguaActualizar = crearTanqueAguaRealista("#tanque-agua", 65);
     gaugeO2Instancia = gaugeO2("#oxigeno-gauge", 21.5);
@@ -1988,21 +1799,18 @@ function inicializarVisualizaciones() {
     gaugeTempInstancia = gaugeTemperatura("#temperatura-gauge", 22.5);
     gaugeHumInstancia = gaugeHumedad("#humedad-gauge", 55.0);
 
-    // Inicializar WebSockets
     inicializarWebSockets();
 
-    // Actualizar timestamp global
     setInterval(() => {
         const now = new Date();
         const lastUpdateElement = document.getElementById('last-update');
         if (lastUpdateElement) {
-            lastUpdateElement.textContent = 
-                `Última actualización: ${now.toLocaleTimeString()}`;
+            lastUpdateElement.textContent =
+                `${TRANSLATIONS.last_update || "Última actualización"}: ${now.toLocaleTimeString()}`;
         }
     }, 1000);
 }
 
-// Función para inicializar todos los WebSocket
 function inicializarWebSockets() {
     const host = window.location.host;
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -2011,12 +1819,10 @@ function inicializarWebSockets() {
     console.log("Host:", host);
     console.log("Protocol:", protocol);
 
-    // Mostrar estado de conexión
     const connectionElement = document.getElementById('connection-status');
     if (connectionElement) {
-        // connectionElement.style.display = 'flex';
         connectionElement.className = 'connection-status connected';
-        connectionElement.innerHTML = '<i class="fas fa-circle"></i><span>Conectando WebSockets...</span>';
+        connectionElement.innerHTML = `<i class="fas fa-circle"></i><span>${TRANSLATIONS.connecting_websockets || "Conectando WebSockets..."}</span>`;
     }
 
     // ========== WEBSOCKET PARA BATERÍA ==========
@@ -2046,7 +1852,7 @@ function inicializarWebSockets() {
                     batteryActualizar(soc);
                 }
                 lastUpdate.bateria = fecha;
-                // Actualizar estado
+
                 const statusElement = document.getElementById('battery-status');
                 const timeElement = document.getElementById('battery-time');
                 
@@ -2060,7 +1866,7 @@ function inicializarWebSockets() {
                         statusElement.style.color = "#f59e0b";
                         agregarAlerta(TRANSLATIONS.low_battery || "Nivel de batería bajo", "warning");
                     } else if (soc < 0.7) {
-                        statusElement.textContent = TRANSLATIONS.normal || "NORMAL";
+                        statusElement.textContent = TRANSLATIONS.moderate || "MODERADO";
                         statusElement.style.color = "#3b82f6";
                     } else {
                         statusElement.textContent = TRANSLATIONS.optimal || "ÓPTIMO";
@@ -2123,20 +1929,23 @@ function inicializarWebSockets() {
                     tanqueAguaActualizar(valor);
                 }
                 lastUpdate.agua = fecha;
-                // Actualizar estado
+
                 const statusElement = document.getElementById('agua-status');
                 const timeElement = document.getElementById('agua-time');
                 
                 if (statusElement) {
                     if (valor < 20) {
-                        statusElement.textContent = TRANSLATIONS.agua_critical || "CRÍTICO";
+                        statusElement.textContent = TRANSLATIONS.critical || "CRÍTICO";
                         statusElement.style.color = "#ef4444";
                         agregarAlerta(TRANSLATIONS.critical_water || "Nivel de agua crítico", "critical");
                     } else if (valor < 40) {
-                        statusElement.textContent = TRANSLATIONS.agua_low || "BAJO";
+                        statusElement.textContent = TRANSLATIONS.low || "BAJO";
                         statusElement.style.color = "#f59e0b";
+                    } else if (valor < 70) {
+                        statusElement.textContent = TRANSLATIONS.moderate || "MODERADO";
+                        statusElement.style.color = "#00bfff";
                     } else {
-                        statusElement.textContent = TRANSLATIONS.agua_normal || "NORMAL";
+                        statusElement.textContent = TRANSLATIONS.optimal || "ÓPTIMO";
                         statusElement.style.color = "#22c55e";
                     }
                 }
@@ -2193,7 +2002,7 @@ function inicializarWebSockets() {
                         cliente: "web"
                     }));
                 }
-                // ACTUALIZAR EL TIEMPO EN EL FOOTER
+
                 const timeElement = document.getElementById('oxigeno-time');
                 if (timeElement && data.fecha_hora) {
                     timeElement.textContent = new Date(data.fecha_hora).toLocaleTimeString();
@@ -2298,24 +2107,24 @@ function inicializarWebSockets() {
                     gaugeTempInstancia.update(valor);
                 }
                 lastUpdate.temperatura = data.fecha_hora;
-                // Actualizar sensación térmica
+
                 const feelingElement = document.getElementById('temp-feeling');
                 if (feelingElement) {
                     if (valor >= 20 && valor <= 24) {
-                        feelingElement.textContent = "ÓPTIMO";
-                        feelingElement.style.color = "#10b981"; // Verde
+                        feelingElement.textContent = TRANSLATIONS.optimal || "ÓPTIMO";
+                        feelingElement.style.color = "#10b981";
                     } else if ((valor >= 18 && valor < 20) || (valor > 24 && valor <= 26)) {
-                        feelingElement.textContent = "ADVERTENCIA";
-                        feelingElement.style.color = "#fbbf24"; // Amarillo
-                        agregarAlerta("Leve incomodidad térmica", "warning");
+                        feelingElement.textContent = TRANSLATIONS.warning || "ADVERTENCIA";
+                        feelingElement.style.color = "#fbbf24";
+                        agregarAlerta(TRANSLATIONS.mild_thermal_discomfort || "Leve incomodidad térmica", "warning");
                     } else if (valor < 18) {
-                        feelingElement.textContent = "CRÍTICO";
-                        feelingElement.style.color = "#ef4444"; // Azul para frío
-                        agregarAlerta("Riesgo fisiológico por frío", "critical");
-                    } else { // valor > 26
-                        feelingElement.textContent = "CRÍTICO";
-                        feelingElement.style.color = "#ef4444"; // Rojo para calor
-                        agregarAlerta("Riesgo fisiológico por calor", "critical");
+                        feelingElement.textContent = TRANSLATIONS.critical || "CRÍTICO";
+                        feelingElement.style.color = "#ef4444";
+                        agregarAlerta(TRANSLATIONS.cold_risk || "Riesgo fisiológico por frío", "critical");
+                    } else {
+                        feelingElement.textContent = TRANSLATIONS.critical || "CRÍTICO";
+                        feelingElement.style.color = "#ef4444";
+                        agregarAlerta(TRANSLATIONS.heat_risk || "Riesgo fisiológico por calor", "critical");
                     }
                 }
                 
@@ -2369,26 +2178,24 @@ function inicializarWebSockets() {
                     gaugeHumInstancia.update(valor);
                 }
                 lastUpdate.humedad = data.fecha_hora;
-                // Actualizar condición de humedad
+
                 const conditionElement = document.getElementById('humidity-condition');
                 if (conditionElement) {
                     if (valor >= 40 && valor <= 60) {
-                        conditionElement.textContent = "ÓPTIMO";
-                        conditionElement.style.color = "#10b981"; // Verde
+                        conditionElement.textContent = TRANSLATIONS.optimal || "ÓPTIMO";
+                        conditionElement.style.color = "#10b981";
                     } else if ((valor >= 30 && valor < 40) || (valor > 60 && valor <= 70)) {
-                        conditionElement.textContent = "ADVERTENCIA";
-                        conditionElement.style.color = "#fbbf24"; // Amarillo
-                        
-                        // Opcional: agregar alerta para advertencia
-                        agregarAlerta("Leve incomodidad térmica", "warning");
+                        conditionElement.textContent = TRANSLATIONS.warning || "ADVERTENCIA";
+                        conditionElement.style.color = "#fbbf24";
+                        agregarAlerta(TRANSLATIONS.humidity_warning || "Humedad fuera del rango ideal", "warning");
                     } else if (valor < 30) {
-                        conditionElement.textContent = "CRÍTICO";
-                        conditionElement.style.color = "#ef4444"; // Azul para frío
-                        agregarAlerta("Riesgo fisiológico por frío", "critical");
-                    } else { // valor > 26
-                        conditionElement.textContent = "CRÍTICO";
-                        conditionElement.style.color = "#ef4444"; // Rojo para calor
-                        agregarAlerta("Riesgo fisiológico por calor", "critical");
+                        conditionElement.textContent = TRANSLATIONS.critical || "CRÍTICO";
+                        conditionElement.style.color = "#ef4444";
+                        agregarAlerta(TRANSLATIONS.low_humidity || "Humedad muy baja", "critical");
+                    } else {
+                        conditionElement.textContent = TRANSLATIONS.critical || "CRÍTICO";
+                        conditionElement.style.color = "#ef4444";
+                        agregarAlerta(TRANSLATIONS.high_humidity || "Humedad muy alta", "critical");
                     }
                 }
                 
@@ -2418,7 +2225,6 @@ function inicializarWebSockets() {
     }
 }
 
-// Función para actualizar el estado de conexión
 function actualizarEstadoConexion() {
     const connectionElement = document.getElementById('connection-status');
     if (!connectionElement) return;
@@ -2428,37 +2234,34 @@ function actualizarEstadoConexion() {
 
     if (conexionesActivas === totalConexiones) {
         connectionElement.className = 'connection-status connected';
-        connectionElement.innerHTML = `<i class="fas fa-circle"></i><span>Todos los sensores conectados (${conexionesActivas}/${totalConexiones})</span>`;
+        connectionElement.innerHTML = `<i class="fas fa-circle"></i><span>${TRANSLATIONS.all_sensors_connected || "Todos los sensores conectados"} (${conexionesActivas}/${totalConexiones})</span>`;
     } else if (conexionesActivas > 0) {
         connectionElement.className = 'connection-status connected';
-        connectionElement.innerHTML = `<i class="fas fa-circle"></i><span>Sensores parcialmente conectados (${conexionesActivas}/${totalConexiones})</span>`;
+        connectionElement.innerHTML = `<i class="fas fa-circle"></i><span>${TRANSLATIONS.partially_connected_sensors || "Sensores parcialmente conectados"} (${conexionesActivas}/${totalConexiones})</span>`;
         
-        // Mostrar alerta de sensores desconectados
         const sensoresDesconectados = [];
-        if (!connectionStatus.bateria) sensoresDesconectados.push("Batería");
-        if (!connectionStatus.agua) sensoresDesconectados.push("Agua");
-        if (!connectionStatus.oxigeno) sensoresDesconectados.push("Oxígeno");
-        if (!connectionStatus.co2) sensoresDesconectados.push("CO2");
-        if (!connectionStatus.temperatura) sensoresDesconectados.push("Temperatura");
-        if (!connectionStatus.humedad) sensoresDesconectados.push("Humedad");
+        if (!connectionStatus.bateria) sensoresDesconectados.push(TRANSLATIONS.sensor_battery || "Batería");
+        if (!connectionStatus.agua) sensoresDesconectados.push(TRANSLATIONS.sensor_water || "Agua");
+        if (!connectionStatus.oxigeno) sensoresDesconectados.push(TRANSLATIONS.sensor_oxygen || "Oxígeno");
+        if (!connectionStatus.co2) sensoresDesconectados.push(TRANSLATIONS.sensor_co2 || "CO2");
+        if (!connectionStatus.temperatura) sensoresDesconectados.push(TRANSLATIONS.sensor_temperature || "Temperatura");
+        if (!connectionStatus.humedad) sensoresDesconectados.push(TRANSLATIONS.sensor_humidity || "Humedad");
         
         if (sensoresDesconectados.length > 0) {
             agregarAlerta(`${TRANSLATIONS.disconnected_sensors || "Sensores desconectados"}: ${sensoresDesconectados.join(", ")}`, "warning");
         }
     } else {
         connectionElement.className = 'connection-status disconnected';
-        connectionElement.innerHTML = `<i class="fas fa-circle"></i><span>Todos los sensores desconectados</span>`;
+        connectionElement.innerHTML = `<i class="fas fa-circle"></i><span>${TRANSLATIONS.all_sensors_disconnected || "Todos los sensores desconectados"}</span>`;
     }
 }
 
-// Función para actualizar la calidad general del aire
 function actualizarCalidadAire() {
     if (!lastUpdate.oxigeno || !lastUpdate.co2) return;
 
     const qualityElement = document.getElementById('aire-quality');
     const timeElement = document.getElementById('aire-time');
 
-    // Obtener valores actuales
     const o2Element = d3.select("#oxigeno-gauge").select("text:nth-child(2)");
     const co2Element = d3.select("#co2-gauge").select("text:nth-child(2)");
 
@@ -2470,15 +2273,15 @@ function actualizarCalidadAire() {
     const o2 = parseFloat(o2Text) || 21.0;
     const co2 = parseInt(co2Text) || 600;
 
-    let calidad = "BUENA";
+    let calidad = TRANSLATIONS.air_quality_good || "BUENA";
     let color = "#22c55e";
 
     if (o2 < 19.5 || co2 > 1200) {
-        calidad = "CRÍTICA";
+        calidad = TRANSLATIONS.air_quality_critical || "CRÍTICA";
         color = "#ef4444";
         agregarAlerta(TRANSLATIONS.critical_air || "Calidad del aire crítica", "critical");
     } else if (o2 < 21.0 || co2 > 800) {
-        calidad = "MODERADA";
+        calidad = TRANSLATIONS.air_quality_moderate || "MODERADA";
         color = "#f59e0b";
     }
 
@@ -2487,7 +2290,6 @@ function actualizarCalidadAire() {
         qualityElement.style.color = color;
     }
 
-    // Usar el timestamp más reciente
     const latestTime = new Date(Math.max(
         new Date(lastUpdate.oxigeno || 0),
         new Date(lastUpdate.co2 || 0)
@@ -2498,7 +2300,6 @@ function actualizarCalidadAire() {
     }
 }
 
-// Función para agregar alertas al panel
 function agregarAlerta(mensaje, tipo = "info") {
     const container = document.getElementById('alerts-container');
     if (!container) return;
@@ -2517,12 +2318,10 @@ function agregarAlerta(mensaje, tipo = "info") {
 
     container.insertBefore(alerta, container.firstChild);
 
-    // Limitar a 5 alertas
     if (container.children.length > 5) {
         container.removeChild(container.lastChild);
     }
 
-    // Auto-remover después de 30 segundos
     setTimeout(() => {
         if (alerta.parentNode) {
             alerta.remove();
@@ -2530,10 +2329,8 @@ function agregarAlerta(mensaje, tipo = "info") {
     }, 30000);
 }
 
-// Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', inicializarVisualizaciones);
 
-// Manejar recarga de página
 window.addEventListener('beforeunload', function() {
     [wsBateria, wsAgua, wsO2, wsCO2, wsTemp, wsHum].forEach(ws => {
         if (ws && ws.readyState === WebSocket.OPEN) {
@@ -2542,7 +2339,6 @@ window.addEventListener('beforeunload', function() {
     });
 });
 
-// Debug: Verificar si hay errores en la consola
 window.addEventListener('error', function(e) {
     console.error("Error global detectado:", e.error);
 });

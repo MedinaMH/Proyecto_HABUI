@@ -6,60 +6,60 @@
 <link rel="stylesheet" href="{% static 'css/estilos_view_all.css' %}">
 <script src="{% static 'js/d3.js' %}"></script>
 <script>
-    // Objeto global con todas las traducciones para JavaScript
     const TRANSLATIONS = {
-        // Estados de batería
-        critical: "{% trans 'CRÍTICO' %}",
-        low: "{% trans 'BAJO' %}",
-        normal: "{% trans 'NORMAL' %}",
+        // Estados genéricos para oxígeno, CO2, temperatura y humedad
         optimal: "{% trans 'ÓPTIMO' %}",
-        
-        // Estados de oxígeno
-        optimal_level: "{% trans 'NIVEL ÓPTIMO' %}",
-        acceptable_level: "{% trans 'NIVEL ACEPTABLE' %}",
-        low_level: "{% trans 'NIVEL BAJO' %}",
-        optimal_o2: "{% trans 'ÓPTIMO' %}",
-        acceptable_o2: "{% trans 'ACEPTABLE' %}",
-        low_o2: "{% trans 'BAJO' %}",
-        
-        // Estados de CO2
-        normal_level: "{% trans 'NIVEL NORMAL' %}",
-        moderate_level: "{% trans 'NIVEL MODERADO' %}",
-        high_level: "{% trans 'NIVEL ALTO' %}",
-        normal_co2: "{% trans 'NORMAL' %}",
-        moderate_co2: "{% trans 'MODERADO' %}",
-        high_co2: "{% trans 'ALTO' %}",
-        
-        // Estados de temperatura
-        cold: "{% trans 'FRÍO' %}",
-        fresh: "{% trans 'FRESCO' %}",
-        warm: "{% trans 'CÁLIDO' %}",
-        hot: "{% trans 'CALIENTE' %}",
-        very_hot: "{% trans 'MUY CALIENTE' %}",
-        pleasant: "{% trans 'AGRADABLE' %}",
-        
-        // Estados de humedad
-        very_dry: "{% trans 'MUY SECO' %}",
-        dry: "{% trans 'SECO' %}",
-        ideal: "{% trans 'IDEAL' %}",
-        humid: "{% trans 'HÚMEDO' %}",
-        very_humid: "{% trans 'MUY HÚMEDO' %}",
-        
-        // Estados de agua
-        agua_critical: "{% trans 'CRÍTICO' %}",
-        agua_low: "{% trans 'BAJO' %}",
-        agua_normal: "{% trans 'NORMAL' %}",
-        
-        // Alertas y mensajes
+        warning: "{% trans 'ADVERTENCIA' %}",
+        critical: "{% trans 'CRÍTICO' %}",
+
+        // Estados para agua y energía
+        moderate: "{% trans 'MODERADO' %}",
+        low: "{% trans 'BAJO' %}",
+
+        // Alertas
         critical_battery: "{% trans 'Nivel de batería crítico' %}",
         low_battery: "{% trans 'Nivel de batería bajo' %}",
+        moderate_battery: "{% trans 'Nivel de batería moderado' %}",
+
         critical_water: "{% trans 'Nivel de agua crítico' %}",
-        high_temp: "{% trans 'Temperatura alta' %}",
-        very_high_temp: "{% trans 'Temperatura muy alta' %}",
+        low_water: "{% trans 'Nivel de agua bajo' %}",
+        moderate_water: "{% trans 'Nivel de agua moderado' %}",
+
+        critical_air: "{% trans 'Calidad del aire crítica' %}",
+        disconnected_sensors: "{% trans 'Sensores desconectados' %}",
+
+        mild_thermal_discomfort: "{% trans 'Leve incomodidad térmica' %}",
+        cold_risk: "{% trans 'Riesgo fisiológico por frío' %}",
+        heat_risk: "{% trans 'Riesgo fisiológico por calor' %}",
+        humidity_warning: "{% trans 'Humedad fuera del rango ideal' %}",
         low_humidity: "{% trans 'Humedad muy baja' %}",
         high_humidity: "{% trans 'Humedad muy alta' %}",
-        critical_air: "{% trans 'Calidad del aire crítica' %}",
-        disconnected_sensors: "{% trans 'Sensores desconectados' %}"
+
+        connecting_websockets: "{% trans 'Conectando WebSockets...' %}",
+        all_sensors_connected: "{% trans 'Todos los sensores conectados' %}",
+        partially_connected_sensors: "{% trans 'Sensores parcialmente conectados' %}",
+        all_sensors_disconnected: "{% trans 'Todos los sensores desconectados' %}",
+        last_update: "{% trans 'Última actualización' %}",
+
+        sensor_battery: "{% trans 'Batería' %}",
+        sensor_water: "{% trans 'Agua' %}",
+        sensor_oxygen: "{% trans 'Oxígeno' %}",
+        sensor_co2: "{% trans 'CO2' %}",
+        sensor_temperature: "{% trans 'Temperatura' %}",
+        sensor_humidity: "{% trans 'Humedad' %}",
+        
+        thermal_stress_risk: "{% trans 'Riesgo fisiológico, estrés térmico' %}",
+        optimal_thermal_zone: "{% trans 'Zona de confort térmico humano óptimo' %}",
+
+        extreme_dryness_irritation: "{% trans 'Irritación respiratoria por sequedad extrema' %}",
+        respiratory_dryness_risk: "{% trans 'Riesgo de sequedad respiratoria' %}",
+        pathogen_comfort_balance: "{% trans 'Minimiza patógenos, maximiza confort respiratorio' %}",
+        microbial_growth_risk: "{% trans 'Riesgo de proliferación microbiana' %}",
+        mold_growth_risk: "{% trans 'Riesgo de crecimiento de moho e irritación respiratoria' %}",
+
+        air_quality_good: "{% trans 'BUENA' %}",
+        air_quality_moderate: "{% trans 'MODERADA' %}",
+        air_quality_critical: "{% trans 'CRÍTICA' %}"
     };
 </script>
 

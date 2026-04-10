@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 estado: "critico"
             };
             if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return {
-                nivel: "ADVERTENCIA", 
+                nivel: TRANSLATIONS.advertencia || "ADVERTENCIA", 
                 emoji: "⚠️",
                 color: tempPalette.advertencia,
                 estado: "advertencia"
@@ -350,7 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("font-weight", "700")
             .attr("text-anchor", "middle")
             .style("letter-spacing", "0.5px")
-            .text(TRANSLATIONS.history_temperatura || "HISTÓRICO DE TEMPERATURA (°C)");
+            .text(TRANSLATIONS.history_temperatura || "HISTÓRICO DE TEMPERATURA");
 
         const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -493,7 +493,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("font-size", "22px")
             .attr("font-weight", "600")
             .attr("text-anchor", "middle")
-            .text("TEMPERATURA (°C)");
+            .text(TRANSLATIONS.temperatura || "Temperatura (°C)");
         
         g.append("text")
             .attr("x", width/2)
@@ -579,7 +579,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 estado: "critico"
             };
             if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return {
-                level: "ADVERTENCIA", 
+                level: TRANSLATIONS.advertencia || "ADVERTENCIA", 
                 color: tempColors.advertencia, 
                 emoji: "⚠️",
                 estado: "advertencia"
