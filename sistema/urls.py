@@ -33,7 +33,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Manejadores de error
-handler404 = 'PWMS.views.pagina_no_encontrada'
-handler500 = 'PWMS.views.error_servidor'
-handler403 = 'PWMS.views.permiso_denegado'
-handler400 = 'PWMS.views.solicitud_erronea'
+# handler404 = 'PWMS.views.pagina_no_encontrada'
+# handler500 = 'PWMS.views.error_servidor'
+# handler403 = 'PWMS.views.permiso_denegado'
+# handler400 = 'PWMS.views.solicitud_erronea'

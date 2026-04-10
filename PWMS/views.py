@@ -20,7 +20,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import NASATLXForm
+from .forms import NASATLXForm, ZungAnxietyScaleForm
 from .models import PerfilPWMS, RegistroPsicologico, RegistroFisiologico, SesionGrabacionNASATLX, FrameNASATLX, EvaluacionNASATLX, Mission, ZungAnxietyScale
 from .serializers import (UserSerializer, PerfilSerializer, LoginSerializer, RegistroPsicologicoSerializer,
     RegistroFisiologicoSerializer)
