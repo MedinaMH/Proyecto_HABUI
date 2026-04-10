@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-24 16:28-0600\n"
+"POT-Creation-Date: 2026-04-09 18:24-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,9 +20,12 @@ msgstr ""
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:12
 #: .\HABUI_APP\templates\REMS\all_resources.html:49
+#: .\HABUI_APP\templates\REMS\panel_CO2.html:92
 #: .\HABUI_APP\templates\REMS\panel_alimentos.html:623
 #: .\HABUI_APP\templates\REMS\panel_alimentos.html:631
 #: .\HABUI_APP\templates\REMS\panel_energia.html:295
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:67
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:60
 msgid "CRÍTICO"
 msgstr "CRITICAL"
 
@@ -45,27 +48,28 @@ msgstr "NORMAL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:15
 #: .\HABUI_APP\templates\REMS\all_resources.html:21
+#: .\HABUI_APP\templates\REMS\panel_CO2.html:60
 #: .\HABUI_APP\templates\REMS\panel_alimentos.html:635
 #: .\HABUI_APP\templates\REMS\panel_energia.html:297
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:90
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:83
 msgid "ÓPTIMO"
 msgstr "OPTIMUM"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:18
 #: .\HABUI_APP\templates\REMS\panel_agua.html:108
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:11
-#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:92
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:95
 msgid "NIVEL ÓPTIMO"
 msgstr "OPTIMAL LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:19
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:12
-#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:76
 msgid "NIVEL ACEPTABLE"
 msgstr "ACCEPTABLE LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:20
 #: .\HABUI_APP\templates\REMS\panel_agua.html:76
-#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:60
 msgid "NIVEL BAJO"
 msgstr "LOW LEVEL"
 
@@ -79,12 +83,10 @@ msgid "NIVEL NORMAL"
 msgstr "NORMAL LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:27
-#: .\HABUI_APP\templates\REMS\panel_CO2.html:76
 msgid "NIVEL MODERADO"
 msgstr "MODERATE LEVEL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:28
-#: .\HABUI_APP\templates\REMS\panel_CO2.html:92
 msgid "NIVEL ALTO"
 msgstr "HIGH LEVEL"
 
@@ -97,27 +99,22 @@ msgid "ALTO"
 msgstr "HIGH"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:34
-#: .\HABUI_APP\templates\REMS\panel_temperatura.html:57
 msgid "FRÍO"
 msgstr "COLD"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:35
-#: .\HABUI_APP\templates\REMS\panel_temperatura.html:67
 msgid "FRESCO"
 msgstr "COOL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:36
-#: .\HABUI_APP\templates\REMS\panel_temperatura.html:77
 msgid "CÁLIDO"
 msgstr "WARM"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:37
-#: .\HABUI_APP\templates\REMS\panel_temperatura.html:87
 msgid "CALIENTE"
 msgstr "HOT"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:38
-#: .\HABUI_APP\templates\REMS\panel_temperatura.html:97
 msgid "MUY CALIENTE"
 msgstr "VERY HOT"
 
@@ -127,31 +124,26 @@ msgstr "PLEASANT"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:42
 #: .\HABUI_APP\templates\REMS\panel_humedad.html:13
-#: .\HABUI_APP\templates\REMS\panel_humedad.html:64
 msgid "MUY SECO"
 msgstr "VERY DRY"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:43
 #: .\HABUI_APP\templates\REMS\panel_humedad.html:14
-#: .\HABUI_APP\templates\REMS\panel_humedad.html:74
 msgid "SECO"
 msgstr "DRY"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:44
 #: .\HABUI_APP\templates\REMS\panel_humedad.html:15
-#: .\HABUI_APP\templates\REMS\panel_humedad.html:84
 msgid "IDEAL"
 msgstr "IDEAL"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:45
 #: .\HABUI_APP\templates\REMS\panel_humedad.html:16
-#: .\HABUI_APP\templates\REMS\panel_humedad.html:94
 msgid "HÚMEDO"
 msgstr "DAMP"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:46
 #: .\HABUI_APP\templates\REMS\panel_humedad.html:17
-#: .\HABUI_APP\templates\REMS\panel_humedad.html:104
 msgid "MUY HÚMEDO"
 msgstr "VERY HUMID"
 
@@ -214,13 +206,17 @@ msgstr "Battery Level"
 #: .\HABUI_APP\templates\REMS\all_resources.html:100
 #: .\HABUI_APP\templates\REMS\all_resources.html:119
 #: .\HABUI_APP\templates\REMS\all_resources.html:139
+#: .\HABUI_APP\templates\REMS\all_resources.html:159
+#: .\HABUI_APP\templates\REMS\all_resources.html:179
 #: .\HABUI_APP\templates\REMS\all_resources.html:199
 msgid "Estado:"
 msgstr "State:"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:101
 #: .\HABUI_APP\templates\REMS\all_resources.html:120
-#: .\HABUI_APP\templates\REMS\panel_energia.html:267
+#: .\HABUI_APP\templates\REMS\panel_energia.html:267 .\HABUI_APP\views.py:702
+#: .\HABUI_APP\views.py:714 .\HABUI_APP\views.py:728 .\HABUI_APP\views.py:743
+#: .\HABUI_APP\views.py:757 .\HABUI_APP\views.py:771
 msgid "Normal"
 msgstr "Normal"
 
@@ -241,7 +237,8 @@ msgstr "Water Level"
 msgid "Niveles de Oxígeno"
 msgstr "Oxygen Levels"
 
-#: .\HABUI_APP\templates\REMS\all_resources.html:140
+#: .\HABUI_APP\templates\REMS\all_resources.html:140 .\HABUI_APP\views.py:715
+#: .\HABUI_APP\views.py:729 .\HABUI_APP\views.py:744 .\HABUI_APP\views.py:758
 msgid "Óptimo"
 msgstr "Optimum"
 
@@ -249,27 +246,19 @@ msgstr "Optimum"
 msgid "Concentración de CO₂"
 msgstr "CO₂ concentration"
 
-#: .\HABUI_APP\templates\REMS\all_resources.html:159
-msgid "Concentración:"
-msgstr "Concentration"
-
 #: .\HABUI_APP\templates\REMS\all_resources.html:172
 msgid "Nivel de Temperatura"
 msgstr "Temperature Level"
-
-#: .\HABUI_APP\templates\REMS\all_resources.html:179
-msgid "Sensación:"
-msgstr "Sensation:"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:180
 msgid "Agradable"
 msgstr "Pleasant"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:192
-#, fuzzy, python-format
-#| msgid "%% de Humedad"
-msgid "%% de Humedad"
-msgstr "% Humidity"
+#, fuzzy
+#| msgid "Niveles de Referencia de Humedad"
+msgid "Niveles de Humedad"
+msgstr "Reference Humidity Levels"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:200
 msgid "Ideal"
@@ -279,38 +268,38 @@ msgstr "Ideal"
 msgid "Conectando..."
 msgstr "Connecting..."
 
-#: .\HABUI_APP\templates\REMS\estructura_base.html:26
+#: .\HABUI_APP\templates\REMS\estructura_base.html:28
 msgid "Panel principal"
 msgstr "Main panel"
 
-#: .\HABUI_APP\templates\REMS\estructura_base.html:29
+#: .\HABUI_APP\templates\REMS\estructura_base.html:31
 msgid "Sistema de Monitoreo de Recursos REMS"
 msgstr "REMS Resource Monitoring System"
 
-#: .\HABUI_APP\templates\REMS\estructura_base.html:55
+#: .\HABUI_APP\templates\REMS\estructura_base.html:57
 msgid "Todos los recursos"
 msgstr "All resources"
 
-#: .\HABUI_APP\templates\REMS\estructura_base.html:62
+#: .\HABUI_APP\templates\REMS\estructura_base.html:64
 #: .\HABUI_APP\templates\REMS\panel_energia.html:4
 #: .\HABUI_APP\templates\REMS\panel_energia.html:430
 #: .\HABUI_APP\templates\REMS\panel_energia.html:457
 msgid "Energía"
 msgstr "Energy"
 
-#: .\HABUI_APP\templates\REMS\estructura_base.html:69
+#: .\HABUI_APP\templates\REMS\estructura_base.html:71
 msgid "Agua"
 msgstr "Water"
 
-#: .\HABUI_APP\templates\REMS\estructura_base.html:82
+#: .\HABUI_APP\templates\REMS\estructura_base.html:83
 msgid "Calidad del aire"
 msgstr "Air quality"
 
-#: .\HABUI_APP\templates\REMS\estructura_base.html:89
+#: .\HABUI_APP\templates\REMS\estructura_base.html:90
 msgid "Oxígeno (O₂)"
 msgstr "Oxygen (O₂)"
 
-#: .\HABUI_APP\templates\REMS\estructura_base.html:94
+#: .\HABUI_APP\templates\REMS\estructura_base.html:95
 msgid "Dióxido de carbono (CO₂)"
 msgstr "Carbon dioxide (CO₂)"
 
@@ -352,19 +341,21 @@ msgstr "CO₂ monitoring (ppm)"
 msgid "Niveles de Referencia de CO₂"
 msgstr "Reference levels of CO₂"
 
-#: .\HABUI_APP\templates\REMS\panel_CO2.html:60
-msgid "CALIDAD ÓPTIMA"
-msgstr "OPTIMAL QUALITY"
-
-#: .\HABUI_APP\templates\REMS\panel_CO2.html:108
-msgid "NIVEL PELIGROSO"
-msgstr "DANGEROUS LEVEL"
+#: .\HABUI_APP\templates\REMS\panel_CO2.html:76
+#: .\HABUI_APP\templates\REMS\panel_energia.html:300
+#: .\HABUI_APP\templates\REMS\panel_humedad.html:80
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:79
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:73
+msgid "ADVERTENCIA"
+msgstr "WARNING"
 
 #: .\HABUI_APP\templates\REMS\panel_agua.html:12
 msgid "HISTÓRICO DE NIVELES"
 msgstr "HISTORICAL LEVELS"
 
 #: .\HABUI_APP\templates\REMS\panel_agua.html:13
+#, fuzzy, python-format
+#| msgid "Nivel (%%)"
 msgid "Nivel (%%)"
 msgstr "Level (%)"
 
@@ -1093,11 +1084,13 @@ msgstr "Hallway"
 msgid "Exteriores"
 msgstr "Exteriors"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:268
+#: .\HABUI_APP\templates\REMS\panel_energia.html:268 .\HABUI_APP\views.py:716
+#: .\HABUI_APP\views.py:745 .\HABUI_APP\views.py:759
 msgid "Advertencia"
 msgstr "Warning"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:269
+#: .\HABUI_APP\templates\REMS\panel_energia.html:269 .\HABUI_APP\views.py:705
+#: .\HABUI_APP\views.py:717 .\HABUI_APP\views.py:746 .\HABUI_APP\views.py:760
 #, fuzzy
 #| msgid "Área Crítica:"
 msgid "Crítico"
@@ -1175,10 +1168,6 @@ msgstr "Non-essential system"
 msgid "EMERGENCIA"
 msgstr "EMERGENCY"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:300
-msgid "ADVERTENCIA"
-msgstr "WARNING"
-
 #: .\HABUI_APP\templates\REMS\panel_energia.html:302
 msgid "CARGANDO"
 msgstr "CHARGING"
@@ -1251,23 +1240,25 @@ msgstr "POWER SYSTEM FAILURE"
 msgid "No hay áreas configuradas"
 msgstr "There are no configured areas"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1034
+#: .\HABUI_APP\templates\REMS\panel_energia.html:1041
 msgid "Tensión"
 msgstr "Voltage"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1035
+#: .\HABUI_APP\templates\REMS\panel_energia.html:1042
 msgid "Corriente"
 msgstr "Current"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1036
+#: .\HABUI_APP\templates\REMS\panel_energia.html:1043
 msgid "Potencia"
 msgstr "Power"
 
-#: .\HABUI_APP\templates\REMS\panel_energia.html:1037
+#: .\HABUI_APP\templates\REMS\panel_energia.html:1044
 msgid "Solar"
 msgstr "Solar"
 
 #: .\HABUI_APP\templates\REMS\panel_humedad.html:12
+#, fuzzy, python-format
+#| msgid "HUMEDAD (%%)"
 msgid "HUMEDAD (%%)"
 msgstr "HUMIDITY (%)"
 
@@ -1294,6 +1285,10 @@ msgstr "Monitoring of Oxygen Levels"
 #: .\HABUI_APP\templates\REMS\panel_oxigeno.html:52
 msgid "Niveles de Referencia de Oxígeno"
 msgstr "Oxygen Reference Levels"
+
+#: .\HABUI_APP\templates\REMS\panel_oxigeno.html:60
+msgid "ESTADO CRÍTICO"
+msgstr "CRITICAL STATE"
 
 #: .\HABUI_APP\templates\REMS\panel_temperatura.html:10
 msgid "TEMPERATURA (°C)"
@@ -1322,53 +1317,289 @@ msgid "Proyecto HABUI"
 msgstr "HABUI Proyect"
 
 #: .\HABUI_APP\templates\modulo_control\control_inicial.html:21
-#: .\HABUI_APP\templates\panel_principal.html:21
+#: .\HABUI_APP\templates\panel_principal.html:23
 msgid "Idioma"
 msgstr "Language"
 
 #: .\HABUI_APP\templates\modulo_control\control_inicial.html:33
-#: .\HABUI_APP\templates\panel_principal.html:33
+#: .\HABUI_APP\templates\panel_principal.html:36
 msgid "PROYECTO HABUI"
 msgstr "HABUI PROJECT"
 
 #: .\HABUI_APP\templates\modulo_control\control_inicial.html:40
-#: .\HABUI_APP\templates\panel_principal.html:56
+#: .\HABUI_APP\templates\panel_principal.html:65
 msgid "Módulo de Control"
 msgstr "Control Module"
 
 #: .\HABUI_APP\templates\modulo_control\control_inicial.html:42
-#: .\HABUI_APP\templates\panel_principal.html:58
+#: .\HABUI_APP\templates\panel_principal.html:67
 msgid "GIF del panel de control"
 msgstr ""
 
 #: .\HABUI_APP\templates\modulo_control\control_inicial.html:44
-#: .\HABUI_APP\templates\panel_principal.html:60
+#: .\HABUI_APP\templates\panel_principal.html:69
 msgid "Simula escenarios de riesgo, supervisa actividades y comunicación"
 msgstr "It simulates risk scenarios, monitors activities and communication"
 
-#: .\HABUI_APP\templates\panel_principal.html:40
+#: .\HABUI_APP\templates\modulo_control\sensores.html:125
+msgid "Panel de simulación paramétrica"
+msgstr "Parametric simulation panel"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:131
+msgid "Configurar Ejecución Experimental"
+msgstr "Configure Experimental Execution"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:139
+msgid "Escenario Experimental Preconfigurado"
+msgstr "Preconfigured Experimental Scenario"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:142
+msgid "-- Seleccionar escenario --"
+msgstr "-- Select scenario --"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:148
+msgid "Cargar escenario"
+msgstr "Load scenario"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:151
+msgid "Cargar JSON de escenarios"
+msgstr "Load scenario JSON"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:154
+msgid "Restaurar predeterminados"
+msgstr "Restore defaults"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:157
+msgid "Selecciona un escenario para cargar automáticamente los parámetros"
+msgstr "Select a scenario to automatically load the parameters"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:168
+msgid "Módulo de Simulación"
+msgstr "Simulation Module"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:170
+msgid "Seleccionar..."
+msgstr "Select..."
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:178
+msgid "Periodo de muestreo de simulación (s)"
+msgstr "Simulation sampling period (s)"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:183
+msgid "Modo de variación"
+msgstr "Variation mode"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:190
+msgid "Número de iteraciones"
+msgstr "Number of iterations"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:191
+msgid "0 = infinito"
+msgstr "0 = infinity"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:197
+msgid "Ejecutar Simulación"
+msgstr "Run Simulation"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:206
+msgid "Configuración del Subsistema Energético"
+msgstr "Energy Subsystem Configuration"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:209
+msgid "Capacidad nominal del banco de baterías (Wh)"
+msgstr "Nominal capacity of the battery bank (Wh)"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:211
+msgid "Capacidad total de almacenamiento energético del sistema"
+msgstr "Total energy storage capacity of the system"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:215
+msgid "Estado inicial de carga (SOC)"
+msgstr "State of Charge (SOC)"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:217
+#, python-format
+msgid "0.0 = 0%% | 0.5 = 50%% | 1.0 = 100%%"
+msgstr ""
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:221
+msgid "Modo de contingencia energética"
+msgstr "Energy contingency mode"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:225
+msgid "Activar protocolo de contingencia energética"
+msgstr "Activate energy contingency protocol"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:237
+msgid "Identificador del módulo"
+msgstr "Module identifier"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:238
+msgid "Opcional"
+msgstr "Optional"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:248
+msgid "Simulaciones en curso"
+msgstr "Simulations in progress"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:251
+msgid "Cargando simulaciones activas..."
+msgstr "Loading active simulations..."
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:258
+msgid "Historial de simulaciones"
+msgstr "Simulation history"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:261
+msgid "Cargando historial..."
+msgstr "Loading history..."
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:271
+msgid "Detalles de Simulación"
+msgstr "Simulation Details"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:272
+#: .\HABUI_APP\templates\modulo_control\sensores.html:279
+msgid "Cerrar"
+msgstr "Close"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:280
+msgid "Detener"
+msgstr "Stop"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:292
+msgid "Primero selecciona un comando"
+msgstr "First, select a command"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:293
+msgid "No hay simulaciones activas"
+msgstr "There are no active simulations"
+
+#: .\HABUI_APP\templates\modulo_control\sensores.html:294
+msgid "Sin historial"
+msgstr "No history"
+
+#: .\HABUI_APP\templates\panel_principal.html:49
 msgid "Módulo REMS"
 msgstr "REMS Module"
 
-#: .\HABUI_APP\templates\panel_principal.html:42
+#: .\HABUI_APP\templates\panel_principal.html:51
 msgid "GIF del sistema REMS"
 msgstr ""
 
-#: .\HABUI_APP\templates\panel_principal.html:44
+#: .\HABUI_APP\templates\panel_principal.html:53
 msgid "Supervisa el estado de los recursos esenciales"
 msgstr "Monitor the status of essential resources"
 
-#: .\HABUI_APP\templates\panel_principal.html:48
+#: .\HABUI_APP\templates\panel_principal.html:57
 msgid "Módulo PWMS"
 msgstr "PWMS Module"
 
-#: .\HABUI_APP\templates\panel_principal.html:50
+#: .\HABUI_APP\templates\panel_principal.html:59
 msgid "GIF del sistema PWMS"
 msgstr ""
 
-#: .\HABUI_APP\templates\panel_principal.html:52
+#: .\HABUI_APP\templates\panel_principal.html:61
 msgid "Supervisa el bienestar psicológico de la tripulación"
 msgstr "Monitors the psychological well-being of the crew"
+
+#: .\HABUI_APP\views.py:700
+msgid "Simulador de Agua"
+msgstr "Water Level"
+
+#: .\HABUI_APP\views.py:703
+msgid "Llenado"
+msgstr "Filling"
+
+#: .\HABUI_APP\views.py:704
+msgid "Consumo"
+msgstr "Consumption"
+
+#: .\HABUI_APP\views.py:712
+msgid "Simulador de CO2"
+msgstr "CO2 Simulator"
+
+#: .\HABUI_APP\views.py:718 .\HABUI_APP\views.py:734 .\HABUI_APP\views.py:747
+#: .\HABUI_APP\views.py:761
+msgid "Aleatorio"
+msgstr "Random"
+
+#: .\HABUI_APP\views.py:719 .\HABUI_APP\views.py:748 .\HABUI_APP\views.py:762
+msgid "Variación"
+msgstr "Variation"
+
+#: .\HABUI_APP\views.py:726
+msgid "Simulador de Oxígeno"
+msgstr "Oxygen Simulator"
+
+#: .\HABUI_APP\views.py:730
+msgid "Crítico Bajo"
+msgstr "Critical Low"
+
+#: .\HABUI_APP\views.py:731
+msgid "Crítico Alto"
+msgstr "High Critical"
+
+#: .\HABUI_APP\views.py:732
+msgid "Advertencia Baja"
+msgstr "Low Warning"
+
+#: .\HABUI_APP\views.py:733
+msgid "Advertencia Alta"
+msgstr "High Warning"
+
+#: .\HABUI_APP\views.py:741
+msgid "Simulador de Humedad"
+msgstr "Humidity Simulator"
+
+#: .\HABUI_APP\views.py:755
+msgid "Simulador de Temperatura"
+msgstr "Temperature Simulator"
+
+#: .\HABUI_APP\views.py:769
+msgid "Simulador de Energía"
+msgstr "Energy Simulator"
+
+#: .\HABUI_APP\views.py:779
+msgid "Capacidad (Wh)"
+msgstr "Capacity (Wh)"
+
+#: .\HABUI_APP\views.py:783
+msgid "Capacidad del banco de baterías"
+msgstr "Battery bank capacity"
+
+#: .\HABUI_APP\views.py:788
+msgid "Carga inicial"
+msgstr "Initial charge"
+
+#: .\HABUI_APP\views.py:793
+msgid "0.0 = 0%, 0.5 = 50%, 1.0 = 100%"
+msgstr "0.0 = 0%, 0.5 = 50%, 1.0 = 100%"
+
+#: .\HABUI_APP\views.py:798
+msgid "Baja energía"
+msgstr "Low energy"
+
+#: .\HABUI_APP\views.py:800
+msgid "Activar protocolos de emergencia"
+msgstr "Activate emergency protocols"
+
+#~ msgid "Concentración:"
+#~ msgstr "Concentration"
+
+#~ msgid "Sensación:"
+#~ msgstr "Sensation:"
+
+#, fuzzy, python-format
+#~| msgid "%% de Humedad"
+#~ msgid "%% de Humedad"
+#~ msgstr "% Humidity"
+
+#~ msgid "CALIDAD ÓPTIMA"
+#~ msgstr "OPTIMAL QUALITY"
+
+#~ msgid "NIVEL PELIGROSO"
+#~ msgstr "DANGEROUS LEVEL"
 
 #~ msgid "ALERTA ENERGÉTICA"
 #~ msgstr "ENERGY ALERT"

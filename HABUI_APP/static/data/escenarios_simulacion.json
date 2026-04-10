@@ -2,7 +2,7 @@
 "escenarios": [
 {
     "id": "co2_optimo",
-    "nombre": "CO2 - Óptimo",
+    "nombre": "CO2 - Optimal",
     "comando": "sensor_CO2",
     "parametros": {
     "mode": "optimo",
@@ -12,7 +12,7 @@
 },
 {
     "id": "co2_advertencia",
-    "nombre": "CO2 - Advertencia",
+    "nombre": "CO2 - Warning",
     "comando": "sensor_CO2",
     "parametros": {
     "mode": "advertencia",
@@ -22,7 +22,7 @@
 },
 {
     "id": "co2_critico",
-    "nombre": "CO2 - Crítico",
+    "nombre": "CO2 - Critical",
     "comando": "sensor_CO2",
     "parametros": {
     "mode": "critico",
@@ -32,7 +32,7 @@
 },
 {
     "id": "humedad_optimo",
-    "nombre": "Humedad - Óptimo",
+    "nombre": "Humidity - Optimal",
     "comando": "sensor_humedad",
     "parametros": {
     "mode": "optimo",
@@ -42,7 +42,7 @@
 },
 {
     "id": "humedad_advertencia",
-    "nombre": "Humedad - Advertencia",
+    "nombre": "Humidity - Warning",
     "comando": "sensor_humedad",
     "parametros": {
     "mode": "advertencia",
@@ -52,7 +52,7 @@
 },
 {
     "id": "humedad_critico",
-    "nombre": "Humedad - Crítico",
+    "nombre": "Humidity - Critical",
     "comando": "sensor_humedad",
     "parametros": {
     "mode": "critico",
@@ -62,7 +62,7 @@
 },
 {
     "id": "temperatura_optimo",
-    "nombre": "Temperatura - Óptimo",
+    "nombre": "Temperature - Optimal",
     "comando": "sensor_temperatura",
     "parametros": {
     "mode": "optimo",
@@ -72,7 +72,7 @@
 },
 {
     "id": "temperatura_advertencia",
-    "nombre": "Temperatura - Advertencia",
+    "nombre": "Temperature - Warning",
     "comando": "sensor_temperatura",
     "parametros": {
     "mode": "advertencia",
@@ -82,7 +82,7 @@
 },
 {
     "id": "temperatura_critico",
-    "nombre": "Temperatura - Crítico",
+    "nombre": "Temperature - Critical",
     "comando": "sensor_temperatura",
     "parametros": {
     "mode": "critico",
@@ -92,7 +92,7 @@
 },
 {
     "id": "agua_normal",
-    "nombre": "Agua - Normal",
+    "nombre": "Water - Normal",
     "comando": "sensor_agua",
     "parametros": {
     "mode": "normal",
@@ -102,7 +102,7 @@
 },
 {
     "id": "agua_consumo",
-    "nombre": "Agua - Consumo",
+    "nombre": "Water - Consumption",
     "comando": "sensor_agua",
     "parametros": {
     "mode": "consumo",
@@ -112,7 +112,7 @@
 },
 {
     "id": "agua_critico",
-    "nombre": "Agua - Crítico",
+    "nombre": "Water - Critical",
     "comando": "sensor_agua",
     "parametros": {
     "mode": "critico",
@@ -122,7 +122,7 @@
 },
 {
     "id": "oxigeno_optimo",
-    "nombre": "Oxígeno - Óptimo",
+    "nombre": "Oxygen - Optimal",
     "comando": "sensor_oxigeno",
     "parametros": {
     "mode": "optimo",
@@ -132,7 +132,7 @@
 },
 {
     "id": "oxigeno_critico_alto",
-    "nombre": "Oxígeno - Crítico Alto",
+    "nombre": "Oxygen - High Critical",
     "comando": "sensor_oxigeno",
     "parametros": {
     "mode": "critico_alto",
@@ -142,7 +142,7 @@
 },
 {
     "id": "oxigeno_advertencia_baja",
-    "nombre": "Oxígeno - Advertencia Baja",
+    "nombre": "Oxygen - Low Warning",
     "comando": "sensor_oxigeno",
     "parametros": {
     "mode": "advertencia_baja",
@@ -152,7 +152,7 @@
 },
 {
     "id": "energia_optimo",
-    "nombre": "Energía - Óptimo",
+    "nombre": "Energy - Optimal",
     "comando": "simulador_fallas_energia",
     "parametros": {
     "interval": 3,
@@ -162,7 +162,7 @@
 },
 {
     "id": "energia_advertencia",
-    "nombre": "Energía - Advertencia",
+    "nombre": "Energy - Warning",
     "comando": "simulador_fallas_energia",
     "parametros": {
     "interval": 3,
@@ -172,7 +172,7 @@
 },
 {
     "id": "energia_critico",
-    "nombre": "Energía - Crítico",
+    "nombre": "Energy - Critical",
     "comando": "simulador_fallas_energia",
     "parametros": {
     "interval": 3,

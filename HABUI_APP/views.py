@@ -17,6 +17,8 @@ import json, os
 from .models import RecursoAgua, RecursoCO2, RecursoOxigeno, Recurso
 from .import models, serializers
 from django.conf import settings
+from django.utils.translation import gettext as _
+
 # Create your views here.
 
 def panel_principal(request):
@@ -673,10 +675,15 @@ def control_alimentos(request):
 # ================motor de simulacion =======================
 def control_sensores(request):
     """Vista principal del panel de control de simulaciones"""
-    # Cargar escenarios desde el JSON
     escenarios = []
-    json_path = os.path.join(settings.BASE_DIR, 'HABUI_APP', 'static', 'data', 'escenarios_simulacion.json')
-    
+    json_path = os.path.join(
+        settings.BASE_DIR,
+        'HABUI_APP',
+        'static',
+        'data',
+        'escenarios_simulacion.json'
+    )
+
     try:
         with open(json_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
@@ -685,82 +692,83 @@ def control_sensores(request):
         print(f"Archivo no encontrado: {json_path}")
     except json.JSONDecodeError:
         print(f"Error al decodificar JSON: {json_path}")
+
     context = {
         'comandos_disponibles': [
             {
                 'nombre': 'sensor_agua',
-                'descripcion': 'Simulador de Agua',
+                'descripcion': _('Simulador de Agua'),
                 'modos': [
-                    {'valor': 'normal', 'nombre': 'Normal'},
-                    {'valor': 'llenado', 'nombre': 'Llenado'},
-                    {'valor': 'consumo', 'nombre': 'Consumo'},
-                    {'valor': 'critico', 'nombre': 'Crítico'},
+                    {'valor': 'normal', 'nombre': _('Normal')},
+                    {'valor': 'llenado', 'nombre': _('Llenado')},
+                    {'valor': 'consumo', 'nombre': _('Consumo')},
+                    {'valor': 'critico', 'nombre': _('Crítico')},
                 ],
                 'requiere_id': True,
                 'parametros_extra': ['interval', 'count']
             },
             {
                 'nombre': 'sensor_CO2',
-                'descripcion': 'Simulador de CO2',
+                'descripcion': _('Simulador de CO2'),
                 'modos': [
-                    {'valor': 'normal', 'nombre': 'Normal'},
-                    {'valor': 'optimo', 'nombre': 'Óptimo'},
-                    {'valor': 'advertencia', 'nombre': 'Advertencia'},
-                    {'valor': 'critico', 'nombre': 'Crítico'},
-                    {'valor': 'aleatorio', 'nombre': 'Aleatorio'},
-                    {'valor': 'variacion', 'nombre': 'Variación'},
+                    {'valor': 'normal', 'nombre': _('Normal')},
+                    {'valor': 'optimo', 'nombre': _('Óptimo')},
+                    {'valor': 'advertencia', 'nombre': _('Advertencia')},
+                    {'valor': 'critico', 'nombre': _('Crítico')},
+                    {'valor': 'aleatorio', 'nombre': _('Aleatorio')},
+                    {'valor': 'variacion', 'nombre': _('Variación')},
                 ],
                 'requiere_id': False,
                 'parametros_extra': ['interval', 'count', 'drift', 'noise']
             },
             {
                 'nombre': 'sensor_oxigeno',
-                'descripcion': 'Simulador de Oxígeno',
+                'descripcion': _('Simulador de Oxígeno'),
                 'modos': [
-                    {'valor': 'normal', 'nombre': 'Normal'},
-                    {'valor': 'optimo', 'nombre': 'Óptimo'},
-                    {'valor': 'critico_bajo', 'nombre': 'Crítico Bajo'},
-                    {'valor': 'critico_alto', 'nombre': 'Crítico Alto'},
-                    {'valor': 'advertencia_baja', 'nombre': 'Advertencia Baja'},
-                    {'valor': 'advertencia_alta', 'nombre': 'Advertencia Alta'},
-                    {'valor': 'aleatorio', 'nombre': 'Aleatorio'},
+                    {'valor': 'normal', 'nombre': _('Normal')},
+                    {'valor': 'optimo', 'nombre': _('Óptimo')},
+                    {'valor': 'critico_bajo', 'nombre': _('Crítico Bajo')},
+                    {'valor': 'critico_alto', 'nombre': _('Crítico Alto')},
+                    {'valor': 'advertencia_baja', 'nombre': _('Advertencia Baja')},
+                    {'valor': 'advertencia_alta', 'nombre': _('Advertencia Alta')},
+                    {'valor': 'aleatorio', 'nombre': _('Aleatorio')},
                 ],
                 'requiere_id': False,
                 'parametros_extra': ['interval', 'count', 'drift']
             },
             {
                 'nombre': 'sensor_humedad',
-                'descripcion': 'Simulador de Humedad',
+                'descripcion': _('Simulador de Humedad'),
                 'modos': [
-                    {'valor': 'normal', 'nombre': 'Normal'},
-                    {'valor': 'optimo', 'nombre': 'Óptimo'},
-                    {'valor': 'advertencia', 'nombre': 'Advertencia'},
-                    {'valor': 'critico', 'nombre': 'Crítico'},
-                    {'valor': 'aleatorio', 'nombre': 'Aleatorio'},
-                    {'valor': 'variacion', 'nombre': 'Variación'},
+                    {'valor': 'normal', 'nombre': _('Normal')},
+                    {'valor': 'optimo', 'nombre': _('Óptimo')},
+                    {'valor': 'advertencia', 'nombre': _('Advertencia')},
+                    {'valor': 'critico', 'nombre': _('Crítico')},
+                    {'valor': 'aleatorio', 'nombre': _('Aleatorio')},
+                    {'valor': 'variacion', 'nombre': _('Variación')},
                 ],
                 'requiere_id': False,
                 'parametros_extra': ['interval', 'count', 'drift', 'noise']
             },
             {
                 'nombre': 'sensor_temperatura',
-                'descripcion': 'Simulador de Temperatura',
+                'descripcion': _('Simulador de Temperatura'),
                 'modos': [
-                    {'valor': 'normal', 'nombre': 'Normal'},
-                    {'valor': 'optimo', 'nombre': 'Óptimo'},
-                    {'valor': 'advertencia', 'nombre': 'Advertencia'},
-                    {'valor': 'critico', 'nombre': 'Crítico'},
-                    {'valor': 'aleatorio', 'nombre': 'Aleatorio'},
-                    {'valor': 'variacion', 'nombre': 'Variación'},
+                    {'valor': 'normal', 'nombre': _('Normal')},
+                    {'valor': 'optimo', 'nombre': _('Óptimo')},
+                    {'valor': 'advertencia', 'nombre': _('Advertencia')},
+                    {'valor': 'critico', 'nombre': _('Crítico')},
+                    {'valor': 'aleatorio', 'nombre': _('Aleatorio')},
+                    {'valor': 'variacion', 'nombre': _('Variación')},
                 ],
                 'requiere_id': False,
                 'parametros_extra': ['interval', 'count', 'drift', 'noise']
             },
             {
                 'nombre': 'simulador_fallas_energia',
-                'descripcion': 'Simulador de Energía',
+                'descripcion': _('Simulador de Energía'),
                 'modos': [
-                    {'valor': 'normal', 'nombre': 'Normal'},
+                    {'valor': 'normal', 'nombre': _('Normal')},
                 ],
                 'requiere_id': False,
                 'parametros_extra': ['interval', 'capacity', 'initial_soc', 'low_energy'],
@@ -768,28 +776,28 @@ def control_sensores(request):
                     {
                         'nombre': 'capacity',
                         'tipo': 'number',
-                        'label': 'Capacidad (Wh)',
+                        'label': _('Capacidad (Wh)'),
                         'default': 6500,
                         'step': 100,
                         'min': 100,
-                        'descripcion': 'Capacidad del banco de baterías'
+                        'descripcion': _('Capacidad del banco de baterías')
                     },
                     {
                         'nombre': 'initial_soc',
                         'tipo': 'number',
-                        'label': 'Carga inicial',
+                        'label': _('Carga inicial'),
                         'default': 0.9,
                         'step': 0.01,
                         'min': 0,
                         'max': 1,
-                        'descripcion': '0.0 = 0%, 0.5 = 50%, 1.0 = 100%'
+                        'descripcion': _('0.0 = 0%, 0.5 = 50%, 1.0 = 100%')
                     },
                     {
                         'nombre': 'low_energy',
                         'tipo': 'checkbox',
-                        'label': 'Baja energía',
+                        'label': _('Baja energía'),
                         'default': False,
-                        'descripcion': 'Activar protocolos de emergencia'
+                        'descripcion': _('Activar protocolos de emergencia')
                     }
                 ]
             },
@@ -797,7 +805,6 @@ def control_sensores(request):
         'escenarios_disponibles': escenarios,
     }
     return render(request, 'modulo_control/sensores.html', context)
-
 
 @csrf_exempt
 def api_iniciar_simulacion(request):

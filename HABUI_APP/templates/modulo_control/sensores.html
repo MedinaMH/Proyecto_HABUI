@@ -1,10 +1,10 @@
 {% extends "modulo_control/estructura_base_control.html" %}
 
-{% block titulo %} Panel de Control de Simulaciones {% endblock %}
+{% block titulo %} Simulation Control Panel {% endblock %}
 
 {% block contenido %} 
 {% load static %}
-
+{% load i18n %}
 <!-- Estilos adicionales -->
 <style>
     .terminal {
@@ -122,44 +122,42 @@
 </style>
 
 <div class="container-fluid" style="padding: 20px;">
-    <h1 class="mb-4">Panel de simulación paramétrica</h1>
+    <h1 class="mb-4">{% trans "Panel de simulación paramétrica" %}</h1>
     <p class="text-muted mb-4"></p>
     
     <!-- Tarjeta para nueva simulación -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Configurar Ejecución Experimental</h5>
+            <h5 class="mb-0">{% trans "Configurar Ejecución Experimental" %}</h5>
         </div>
         <div class="card-body">
             
-            <!-- =========================================== -->
             <!-- Selector de Escenarios Preconfigurados + Carga JSON + Restaurar -->
-            <!-- =========================================== -->
             <div class="escenario-section mb-4">
                 <div class="row">
                     <div class="col-md-8">
-                        <label class="form-label fw-bold">Escenario Experimental Preconfigurado</label>
+                        <label class="form-label fw-bold">{% trans "Escenario Experimental Preconfigurado" %}</label>
                         <div class="input-group">
                             <select class="form-control" id="escenario-select">
-                                <option value="">-- Seleccionar escenario --</option>
+                                <option value="">{% trans "-- Seleccionar escenario --" %}</option>
                                 {% for esc in escenarios_disponibles %}
                                 <option value="{{ esc.id }}">{{ esc.nombre }}</option>
                                 {% endfor %}
                             </select>
                             <button class="btn btn-primary" type="button" id="btn-cargar-escenario">
-                                <i class="fas fa-download"></i> Cargar escenario
+                                <i class="fas fa-download"></i> {% trans "Cargar escenario" %}
                             </button>
                             <button class="btn btn-secondary" type="button" id="btn-cargar-json">
-                                <i class="fas fa-upload"></i> Cargar JSON de escenarios
+                                <i class="fas fa-upload"></i> {% trans "Cargar JSON de escenarios" %}
                             </button>
                             <button class="btn btn-warning" type="button" id="btn-restaurar-escenarios">
-                                <i class="fas fa-undo-alt"></i> Restaurar predeterminados
+                                <i class="fas fa-undo-alt"></i> {% trans "Restaurar predeterminados" %}
                             </button>
                         </div>
-                        <small class="text-muted">Selecciona un escenario para cargar automáticamente los parámetros</small>
+                        <small class="text-muted">{% trans "Selecciona un escenario para cargar automáticamente los parámetros" %}</small>
                     </div>
                 </div>
-                <!-- Input oculto para seleccionar archivo JSON -->
+
                 <input type="file" id="json-file-input" accept=".json" style="display: none;">
             </div>
             
@@ -167,37 +165,36 @@
                 {% csrf_token %}
                 <div class="row">
                     <div class="col-md-3">
-                        <label class="form-label">Módulo de Simulación</label>
+                        <label class="form-label">{% trans "Módulo de Simulación" %}</label>
                         <select class="form-control" id="comando" required>
-                            <option value="">Seleccionar...</option>
+                            <option value="">{% trans "Seleccionar..." %}</option>
                             {% for cmd in comandos_disponibles %}
                             <option value="{{ cmd.nombre }}">{{ cmd.descripcion }}</option>
                             {% endfor %}
                         </select>
                     </div>
+
                     <div class="col-md-2">
-                        <label class="form-label">Periodo de muestreo de simulación (s)</label>
+                        <label class="form-label">{% trans "Periodo de muestreo de simulación (s)" %}</label>
                         <input type="number" class="form-control" id="intervalo" value="2" min="0.5" step="0.5">
                     </div>
                     
-                    <!-- Campo MODO (visible solo para no-energía) -->
                     <div class="col-md-2" id="modo-container">
-                        <label class="form-label">Modo de variación</label>
+                        <label class="form-label">{% trans "Modo de variación" %}</label>
                         <select class="form-control" id="modo">
                             <!-- Los modos se llenarán dinámicamente -->
                         </select>
                     </div>
                     
-                    <!-- Campo COUNT (visible solo para no-energía) -->
                     <div class="col-md-2" id="count-container">
-                        <label class="form-label">Número de iteraciones</label>
-                        <input type="number" class="form-control" id="count" value="0" placeholder="0 = infinito">
+                        <label class="form-label">{% trans "Número de iteraciones" %}</label>
+                        <input type="number" class="form-control" id="count" value="0" placeholder="{% trans '0 = infinito' %}">
                     </div>
                     
                     <div class="col-md-1">
                         <label class="form-label">&nbsp;</label>
                         <button type="submit" class="btn btn-success form-control">
-                            ▶ Ejecutar Simulación
+                            ▶ {% trans "Ejecutar Simulación" %}
                         </button>
                     </div>
                 </div>
@@ -206,24 +203,26 @@
                 <div class="row mt-3" id="parametros-energia-container" style="display: none;">
                     <div class="col-12">
                         <div class="campo-energia">
-                            <h6 class="mb-3">Configuración del Subsistema Energético</h6>
+                            <h6 class="mb-3">{% trans "Configuración del Subsistema Energético" %}</h6>
                             <div class="row">
                                 <div class="col-md-3">
-                                    <label class="form-label">Capacidad nominal del banco de baterías (Wh)</label>
+                                    <label class="form-label">{% trans "Capacidad nominal del banco de baterías (Wh)" %}</label>
                                     <input type="number" class="form-control" id="capacity" value="6500" step="100" min="100">
-                                    <small class="text-muted">Capacidad total de almacenamiento energético del sistema</small>
+                                    <small class="text-muted">{% trans "Capacidad total de almacenamiento energético del sistema" %}</small>
                                 </div>
+
                                 <div class="col-md-3">
-                                    <label class="form-label">Estado inicial de carga (SOC)</label>
+                                    <label class="form-label">{% trans "Estado inicial de carga (SOC)" %}</label>
                                     <input type="number" class="form-control" id="initial_soc" value="0.9" step="0.01" min="0" max="1">
-                                    <small class="text-muted">0.0 = 0%   |   0.5 = 50%   |   1.0 = 100%</small>
+                                    <small class="text-muted">{% trans "0.0 = 0% | 0.5 = 50% | 1.0 = 100%" %}</small>
                                 </div>
+
                                 <div class="col-md-3">
-                                    <label class="form-label">Modo de contingencia energética</label>
+                                    <label class="form-label">{% trans "Modo de contingencia energética" %}</label>
                                     <div class="form-check mt-2">
                                         <input type="checkbox" class="form-check-input" id="low_energy_mode">
                                         <label class="form-check-label" for="low_energy_mode">
-                                            Activar protocolo de contingencia energética
+                                            {% trans "Activar protocolo de contingencia energética" %}
                                         </label>
                                     </div>
                                 </div>
@@ -232,11 +231,11 @@
                     </div>
                 </div>
                 
-                <!-- Campo Recurso ID (visible solo para no-energía) -->
+                <!-- Campo Recurso ID -->
                 <div class="row mt-2" id="recurso-id-container">
                     <div class="col-md-3">
-                        <label class="form-label">Identificador del módulo</label>
-                        <input type="number" class="form-control" id="recurso-id" placeholder="Opcional">
+                        <label class="form-label">{% trans "Identificador del módulo" %}</label>
+                        <input type="number" class="form-control" id="recurso-id" placeholder="{% trans 'Opcional' %}">
                     </div>
                 </div>
             </form>
@@ -246,20 +245,20 @@
     <!-- Simulaciones Activas -->
     <div class="card mb-4">
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Simulaciones en curso</h5>
+            <h5 class="mb-0">{% trans "Simulaciones en curso" %}</h5>
         </div>
         <div class="card-body" id="activas-container">
-            <div class="text-center text-muted py-3">Cargando simulaciones activas...</div>
+            <div class="text-center text-muted py-3">{% trans "Cargando simulaciones activas..." %}</div>
         </div>
     </div>
     
     <!-- Historial de Simulaciones -->
     <div class="card">
         <div class="card-header bg-secondary text-white">
-            <h5 class="mb-0">Historial de simulaciones</h5>
+            <h5 class="mb-0">{% trans "Historial de simulaciones" %}</h5>
         </div>
         <div class="card-body" id="historicas-container">
-            <div class="text-center text-muted py-3">Cargando historial...</div>
+            <div class="text-center text-muted py-3">{% trans "Cargando historial..." %}</div>
         </div>
     </div>
 </div>
@@ -269,16 +268,16 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalSimulacionLabel">Detalles de Simulación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="modalSimulacionLabel">{% trans "Detalles de Simulación" %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans 'Cerrar' %}"></button>
             </div>
             <div class="modal-body">
                 <div id="modal-info" class="mb-3 p-3 bg-light rounded"></div>
                 <div class="terminal" id="modal-logs" style="height: 400px;"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-danger" id="btn-detener-modal" style="display: none;">⏹ Detener</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Cerrar" %}</button>
+                <button type="button" class="btn btn-danger" id="btn-detener-modal" style="display: none;">⏹ {% trans "Detener" %}</button>
             </div>
         </div>
     </div>
@@ -289,6 +288,11 @@
 {{ escenarios_disponibles|json_script:"escenarios-data" }}
 
 <script>
+    const TRANSLATIONS = {
+        select_comand: "{% trans 'Primero selecciona un comando' %}",
+        no_sim_activas: "{% trans 'No hay simulaciones activas' %}",
+        sin_historial: "{% trans 'Sin historial' %}",
+    };
     // Inicializar variables globales
     let comandosDisponibles = JSON.parse(document.getElementById('comandos-data').textContent);
     let escenariosPredeterminados = JSON.parse(document.getElementById('escenarios-data').textContent);
@@ -348,7 +352,7 @@
             countContainer.style.display = 'block';
             recursoIdContainer.style.display = 'block';
             energiaContainer.style.display = 'none';
-            modoSelect.innerHTML = '<option value="">Primero selecciona un comando</option>';
+            modoSelect.innerHTML = '<option value="">' + TRANSLATIONS.select_comand + '</option>';
         }
     }
     
@@ -682,7 +686,7 @@
             
             const activasContainer = document.getElementById('activas-container');
             if (activas.length === 0) {
-                activasContainer.innerHTML = '<p class="text-muted text-center py-3">No hay simulaciones activas</p>';
+                activasContainer.innerHTML = '<p class="text-muted text-center py-3">' + TRANSLATIONS.no_sim_activas + '</p>';
             } else {
                 let html = '<div class="row">';
                 activas.forEach(sim => {
@@ -697,7 +701,7 @@
             
             const historicasContainer = document.getElementById('historicas-container');
             if (historicas.length === 0) {
-                historicasContainer.innerHTML = '<p class="text-muted text-center py-3">Sin historial</p>';
+                historicasContainer.innerHTML = '<p class="text-muted text-center py-3">' + TRANSLATIONS.sin_historial + '</p>';
             } else {
                 let html = '<div class="row">';
                 historicas.forEach(sim => {
