@@ -290,6 +290,129 @@
                     </div>
                 </div>
             </div>
+                        <!-- ================= HISTORIAL ZUNG ANXIETY ================= -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-clipboard-heart me-2 text-danger"></i> Escala de Ansiedad de Zung
+                            </h5>
+                            <a href="{% url 'PWMS:zung_anxiety_nuevo' %}" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-plus-circle me-1"></i> Nueva evaluación
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            {% if pruebas_zung %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th><i class="bi bi-calendar-event"></i> Fecha</th>
+                                            <th><i class="bi bi-percent"></i> Índice Zung</th>
+                                            <th><i class="bi bi-emoji-frown"></i> Nivel de ansiedad</th>
+                                            <th><i class="bi bi-journal-text"></i> Observaciones</th>
+                                            <th><i class="bi bi-eye"></i> Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for prueba in pruebas_zung %}
+                                        <tr>
+                                            <td>{{ prueba.fecha_registro|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if prueba.puntuacion_indice <= 44 %}bg-success
+                                                    {% elif prueba.puntuacion_indice <= 59 %}bg-warning text-dark
+                                                    {% elif prueba.puntuacion_indice <= 74 %}bg-danger
+                                                    {% else %}bg-dark{% endif %}
+                                                    fs-6 px-3 py-2">
+                                                    {{ prueba.puntuacion_indice }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if prueba.nivel_ansiedad == 'normal' %}
+                                                    <span class="text-success">Normal (25-44)</span>
+                                                {% elif prueba.nivel_ansiedad == 'minima' %}
+                                                    <span class="text-warning">Mínima a moderada (45-59)</span>
+                                                {% elif prueba.nivel_ansiedad == 'marcada' %}
+                                                    <span class="text-danger">Marcada a severa (60-74)</span>
+                                                {% else %}
+                                                    <span class="text-dark">Extrema (75-100)</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="small">{{ prueba.observaciones|truncatechars:80 }}</td>
+                                            <td>
+                                                <a href="{% url 'PWMS:zung_anxiety_resultados' prueba.id %}" 
+                                                   class="btn btn-sm btn-outline-info"
+                                                   data-bs-toggle="tooltip"
+                                                   title="Ver detalles">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title"><i class="bi bi-bar-chart-fill me-2"></i>Estadísticas Zung</h6>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="display-6">{{ total_zung|default:"0" }}</div>
+                                                    <small>Total evaluaciones</small>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="display-6">{{ promedio_indice_zung|default:"0" }}</div>
+                                                    <small>Índice promedio</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h6 class="card-title"><i class="bi bi-pie-chart me-2"></i>Distribución de niveles</h6>
+                                            <div class="row text-center small">
+                                                <div class="col-3">
+                                                    <span class="badge bg-success">Normal</span><br>
+                                                    {{ distribucion_zung.normal|default:0 }}
+                                                </div>
+                                                <div class="col-3">
+                                                    <span class="badge bg-warning text-dark">Mínima</span><br>
+                                                    {{ distribucion_zung.minima|default:0 }}
+                                                </div>
+                                                <div class="col-3">
+                                                    <span class="badge bg-danger">Marcada</span><br>
+                                                    {{ distribucion_zung.marcada|default:0 }}
+                                                </div>
+                                                <div class="col-3">
+                                                    <span class="badge bg-dark">Extrema</span><br>
+                                                    {{ distribucion_zung.extrema|default:0 }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-clipboard-x display-1 text-muted"></i>
+                                <h4 class="mt-3">No hay evaluaciones Zung registradas</h4>
+                                <p class="text-muted">Realiza tu primera escala de ansiedad de Zung</p>
+                                <a href="{% url 'PWMS:zung_anxiety_nuevo' %}" class="btn btn-danger mt-2">
+                                    <i class="bi bi-plus-circle me-1"></i> Comenzar evaluación Zung
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

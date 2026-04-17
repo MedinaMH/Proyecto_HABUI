@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <!doctype html>
 <html lang="es">
     <head>
@@ -22,7 +23,7 @@
                 <span class="d-none d-sm-inline">Panel principal</span>
             </a>
             <div class="text-center flex-grow-1">
-                <span class="encabezado">Sistema de Monitoreo del Bienestar Psicológico PWMS</span>
+                <span class="encabezado">{% trans "Sistema de Monitoreo del Bienestar Psicológico PWMS" %}</span>
             </div>
             <div class="d-flex align-items-center" style="width: 110px;">
                 {% if user.is_authenticated %}
@@ -57,10 +58,6 @@
                                     <li class="nav-item">
                                         <a class="nav-link" href="{% url 'PWMS:historial_psicologico' %}">
                                             <i class="bi bi-clock-history me-2"></i>Historial
-                                        </a>
-                                        <li class="nav-item">
-                                        <a class="nav-link" href="{% url 'PWMS:historial_psic_integrado' %}">
-                                            <i class="bi bi-clock-history me-2"></i>Historial integrado
                                         </a>
                                     </li>
                                 </ul>

@@ -8,15 +8,17 @@ from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.db.models import Avg
 from django.utils import timezone
 from datetime import datetime, timedelta
-import json
+import json, shutil
 import os
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.conf import settings
 from django.http import JsonResponse
-
+from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -27,7 +29,8 @@ from .serializers import (UserSerializer, PerfilSerializer, LoginSerializer, Reg
 from django.views.decorators.csrf import csrf_exempt
 import xml.etree.ElementTree as ET
 from django.http import HttpResponse
-from datetime import date
+from datetime import date, timedelta
+
 
 
 # ===== API DE AUTENTICACIÓN =====
@@ -350,244 +353,16 @@ class HealthSyncRegistroPsicologicoAPI(APIView):
             'total': registros.count()
         }, status=status.HTTP_200_OK)
 
-
-@login_required
-def nasa_tlx_create(request):
-    if request.method == 'POST':
-        form = NASATLXForm(request.POST)
-        if form.is_valid():
-            evaluacion = form.save(commit=False)
-            evaluacion.usuario = request.user
-            evaluacion.save()
-            
-            # Procesar video si se recibió
-            video_path = request.POST.get('video_path')
-            if video_path and SesionGrabacionNASATLX is not None:
-                try:
-                    SesionGrabacionNASATLX.objects.create(
-                        evaluacion=evaluacion,
-                        usuario=request.user,
-                        archivo_video=video_path,
-                        nombre_video=os.path.basename(video_path),
-                        duracion_segundos=120,
-                        completada=True
-                    )
-                except Exception as e:
-                    print(f"Error al guardar sesión de video: {e}")
-            
-            return redirect('PWMS:nasa_tlx_resultado', pk=evaluacion.id)
-        else:
-            print("Errores del formulario:", form.errors)
-    else:
-        form = NASATLXForm()
-    
-    return render(request, 'PWMS/nasa_tlx_form.html', {'form': form})
-
-@login_required
-@csrf_exempt
-def guardar_video_nasa_tlx(request):
-    """
-    Vista para guardar videos de las sesiones NASA TLX
-    """
-    if request.method == 'POST':
-        try:
-            if not request.FILES.get('video'):
-                return JsonResponse({'success': False, 'error': 'No se recibió video'}, status=400)
-            
-            video = request.FILES['video']
-            timestamp = int(timezone.now().timestamp())
-            username = request.user.username
-            filename = f"videos_nasa_tlx/{username}_{timestamp}.webm"
-            
-            # Crear directorio si no existe
-            upload_dir = os.path.join(settings.MEDIA_ROOT, 'videos_nasa_tlx')
-            os.makedirs(upload_dir, exist_ok=True)
-            
-            # Guardar archivo
-            path = default_storage.save(filename, ContentFile(video.read()))
-            file_url = default_storage.url(path)
-            
-            return JsonResponse({
-                'success': True,
-                'video_path': file_url,
-                'message': 'Video guardado correctamente'
-            })
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
-    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
-@login_required
-def nasa_tlx_resultado(request, pk):
-    evaluacion = get_object_or_404(EvaluacionNASATLX, pk=pk, usuario=request.user)
-    
-    # Interpretación NASA TLX
-    if evaluacion.puntuacion_total < 30:
-        color = "success"
-        icono = "bi-emoji-smile"
-        interpretacion = "Carga Mental BAJA"
-    elif evaluacion.puntuacion_total < 60:
-        color = "warning"
-        icono = "bi-emoji-neutral"
-        interpretacion = "Carga Mental MODERADA"
-    else:
-        color = "danger"
-        icono = "bi-emoji-frown"
-        interpretacion = "Carga Mental ALTA"
-    
-    # Preparar datos para la tabla de dimensiones
-    dimensiones = [
-        {'dimension': 'Demanda Mental', 'puntuacion': evaluacion.demanda_mental, 'peso': evaluacion.peso_demanda_mental},
-        {'dimension': 'Demanda Física', 'puntuacion': evaluacion.demanda_fisica, 'peso': evaluacion.peso_demanda_fisica},
-        {'dimension': 'Demanda Temporal', 'puntuacion': evaluacion.demanda_temporal, 'peso': evaluacion.peso_demanda_temporal},
-        {'dimension': 'Rendimiento', 'puntuacion': evaluacion.rendimiento, 'peso': evaluacion.peso_rendimiento},
-        {'dimension': 'Esfuerzo', 'puntuacion': evaluacion.esfuerzo, 'peso': evaluacion.peso_esfuerzo},
-        {'dimension': 'Frustración', 'puntuacion': evaluacion.frustracion, 'peso': evaluacion.peso_frustracion},
-    ]
-    
-    context = {
-        'evaluacion': evaluacion,
-        'dimensiones': dimensiones,
-        'color': color,
-        'icono': icono,
-        'interpretacion': interpretacion,
-    }
-    
-    return render(request, 'PWMS/nasa_tlx_resultado.html', context)
-
-@login_required
-def nasa_tlx_historial(request):
-    # Obtener todas las evaluaciones del usuario
-    evaluaciones = EvaluacionNASATLX.objects.filter(
-        usuario=request.user
-    ).order_by('-fecha_creacion')
-    
-    # Estadísticas generales
-    total_evaluaciones = evaluaciones.count()
-    
-    # Promedio de carga mental
-    if total_evaluaciones > 0:
-        promedio_carga = round(sum(e.puntuacion_total for e in evaluaciones) / total_evaluaciones, 1)
-    else:
-        promedio_carga = 0
-    
-    # Días con registros (únicos)
-    dias_con_registros = EvaluacionNASATLX.objects.filter(
-        usuario=request.user
-    ).dates('fecha_creacion', 'day').count()
-    
-    context = {
-        'evaluaciones': evaluaciones,
-        'total_evaluaciones': total_evaluaciones,
-        'promedio_carga': promedio_carga,
-        'dias_con_registros': dias_con_registros,
-    }
+def get_fisiologicos_previos(evaluacion, horas=2):
+    timestamp = evaluacion.fecha_inicio or evaluacion.fecha_creacion
+    limite = timestamp - timedelta(hours=horas)
+    return RegistroFisiologico.objects.filter(
+        usuario=evaluacion.usuario,
+        fecha__gte=limite,
+        fecha__lte=timestamp
+    ).order_by('fecha')
     
     return render(request, 'PWMS/nasa_tlx_historial.html', context)
-
-@login_required
-def zung_anxiety_nuevo(request):
-    if request.method == 'POST':
-        form = ZungAnxietyScaleForm(request.POST)
-        if form.is_valid():
-            evaluacion = form.save(commit=False)
-            evaluacion.usuario = request.user
-            evaluacion.save()
-            
-            # ===== GUARDAR DATOS DEL VIDEO =====
-            video_path = request.POST.get('video_path')
-            if video_path:
-                evaluacion.video_path = video_path
-                
-                # Metadatos (vienen como JSON string)
-                metadata_str = request.POST.get('video_metadata')
-                if metadata_str:
-                    try:
-                        evaluacion.video_metadata = json.loads(metadata_str)
-                    except:
-                        pass
-                
-                # Tamaño del video
-                size_str = request.POST.get('video_size')
-                if size_str:
-                    try:
-                        evaluacion.video_size = int(size_str)
-                    except:
-                        pass
-                
-                # Duración (siempre 120 segundos por ahora)
-                evaluacion.video_duration = 120
-                
-                evaluacion.save()
-            
-            return redirect('PWMS:zung_anxiety_resultados', pk=evaluacion.id)
-        else:
-            print("Errores:", form.errors)
-    else:
-        form = ZungAnxietyScaleForm()
-    
-    return render(request, 'PWMS/zung_anxiety_nuevo.html', {'form': form})
-
-# ===== VISTA PARA RESULTADOS (MODIFICADA PARA MOSTRAR VIDEO) =====
-@login_required
-def zung_anxiety_resultados(request, pk):
-    evaluacion = get_object_or_404(ZungAnxietyScale, pk=pk, usuario=request.user)
-    
-    context = {
-        'evaluacion': evaluacion,
-        'puntuacion_bruta': evaluacion.puntuacion_bruta,
-        'puntuacion_indice': evaluacion.puntuacion_indice,
-        'nivel_ansiedad': evaluacion.get_nivel_ansiedad_display(),
-    }
-    return render(request, 'PWMS/zung_anxiety_resultados.html', context)
-
-# ===== VISTA PARA GUARDAR VIDEO (SIN LOGGER, CON PRINTS) =====
-@login_required
-@csrf_exempt
-def guardar_video_zung(request):
-    if request.method == 'POST':
-        try:
-            if not request.FILES.get('video'):
-                return JsonResponse({'success': False, 'error': 'No se recibió video'}, status=400)
-            
-            video = request.FILES['video']
-            timestamp = int(timezone.now().timestamp())
-            username = request.user.username
-            filename = f"videos_zung/{username}_{timestamp}.webm"
-            
-            upload_dir = os.path.join(settings.MEDIA_ROOT, 'videos_zung')
-            os.makedirs(upload_dir, exist_ok=True)
-            
-            path = default_storage.save(filename, ContentFile(video.read()))
-            file_url = default_storage.url(path)
-            
-            # Obtener metadatos
-            metadata = None
-            if request.POST.get('metadata'):
-                try:
-                    metadata = json.loads(request.POST.get('metadata'))
-                except:
-                    metadata = {'error': 'No se pudo parsear'}
-            
-            # Tamaño del archivo
-            file_path = os.path.join(settings.MEDIA_ROOT, path)
-            file_size = os.path.getsize(file_path) if os.path.exists(file_path) else 0
-            
-            print(f"✅ Video Zung guardado: {path}, tamaño: {file_size} bytes, usuario: {request.user.username}")
-            if metadata:
-                print(f"📷 Metadatos: {metadata}")
-            
-            return JsonResponse({
-                'success': True,
-                'video_path': file_url,
-                'file_name': os.path.basename(path),
-                'file_size': file_size,
-                'metadata': metadata,
-                'message': 'Video guardado correctamente'
-            })
-        except Exception as e:
-            print(f"❌ Error: {str(e)}")
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
-    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
-
 
 # ===== API DE REGISTROS =====
 class HealthSyncRegistroFisiologicoAPI(APIView):
@@ -602,7 +377,6 @@ class HealthSyncRegistroFisiologicoAPI(APIView):
         data = request.data.copy()
         
         # ⭐⭐ ELIMINAR CAMPOS TEMPORALES DE SUEÑO ⭐⭐
-        # Estos campos NO existen en el modelo y causan error
         horas = None
         minutos = None
         
@@ -616,14 +390,14 @@ class HealthSyncRegistroFisiologicoAPI(APIView):
             print(f"   🕐 Horas sueño (minutos): {minutos}")
             del data['horas_sueno_minutos']
         
-        # Calcular horas de sueño totales
+        # ===== CORREGIDO: Redondear a 2 decimales =====
         if horas is not None and minutos is not None:
-            data['horas_sueno'] = horas + (minutos / 60.0)
+            data['horas_sueno'] = round(horas + (minutos / 60.0), 2)
             print(f"   ⏰ Total horas sueño: {data['horas_sueno']}")
         elif horas is not None:
-            data['horas_sueno'] = horas
+            data['horas_sueno'] = round(horas, 2)
         elif minutos is not None:
-            data['horas_sueno'] = minutos / 60.0
+            data['horas_sueno'] = round(minutos / 60.0, 2)
         
         print("\n" + "="*80)
         print("📱 DATOS RECIBIDOS DESDE ANDROID:")
@@ -633,29 +407,23 @@ class HealthSyncRegistroFisiologicoAPI(APIView):
         for key, value in request.data.items():
             print(f"   {key}: {value}")
         
-        # ⭐⭐ 1. PROCESAR FECHA - VERSIÓN CORREGIDA ⭐⭐
+        # ⭐⭐ 1. PROCESAR FECHA ⭐⭐
         if 'fecha_hora' in data:
             fecha_str = data['fecha_hora']
             print(f"\n📅 FECHA RECIBIDA: {fecha_str}")
             
             try:
-                # Parsear la fecha
                 fecha_parsed = datetime.strptime(fecha_str, '%Y-%m-%dT%H:%M:%S')
                 print(f"⏰ Hora parseada: {fecha_parsed.hour:02d}:{fecha_parsed.minute:02d}")
                 
-                # Asignar zona horaria de México (NO UTC)
                 import pytz
                 mexico_tz = pytz.timezone('America/Mexico_City')
-                
-                # La fecha del Android es hora local de México
                 fecha_local = mexico_tz.localize(fecha_parsed)
                 
-                # Guardar en el campo 'fecha' del modelo
                 data['fecha'] = fecha_local
                 print(f"✅ Fecha guardada (local México): {fecha_local.strftime('%Y-%m-%d %H:%M:%S')}")
                 print(f"   En UTC (BD): {fecha_local.astimezone(pytz.UTC).strftime('%Y-%m-%d %H:%M:%S')}")
                 
-                # Eliminar el campo original
                 del data['fecha_hora']
                 
             except Exception as e:
@@ -677,7 +445,7 @@ class HealthSyncRegistroFisiologicoAPI(APIView):
                 print(f"   ❌ {campo}: AUSENTE (usando 0)")
                 data[campo] = 0
         
-        # ⭐⭐ 3. MAPEAR CAMPOS DE ESTRÉS (de stress_* a estres_*) ⭐⭐
+        # ⭐⭐ 3. MAPEAR CAMPOS DE ESTRÉS ⭐⭐
         mapeo_estres = {
             'stress_relaxed': 'estres_relajado',
             'stress_low': 'estres_bajo',
@@ -689,7 +457,6 @@ class HealthSyncRegistroFisiologicoAPI(APIView):
             if android_field in data:
                 data[django_field] = data[android_field]
                 print(f"   🔄 Mapeado: {android_field} → {django_field} = {data[android_field]}")
-                # No eliminamos el original por si acaso
         
         print("\n📋 DATOS FINALES PARA SERIALIZADOR:")
         for key in sorted(data.keys()):

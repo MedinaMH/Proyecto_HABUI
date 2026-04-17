@@ -61,6 +61,7 @@ class PerfilPWMS(models.Model):
     baseline_stress = models.FloatField(null=True, blank=True, help_text="Baseline stress (1-10)")
     baseline_fatigue = models.FloatField(null=True, blank=True, help_text="Baseline fatigue (1-10)")
     baseline_cognitive = models.FloatField(null=True, blank=True, help_text="Baseline cognitive (0-100)")
+    
     def __str__(self):
         return f"Perfil PWMS - {self.usuario.username}"
     
@@ -73,10 +74,6 @@ class PerfilPWMS(models.Model):
 def crear_perfil_pwms(sender, instance, created, **kwargs):
     if created:
         PerfilPWMS.objects.create(usuario=instance)
-
-#@receiver(post_save, sender=User)
-#def guardar_perfil_pwms(sender, instance, **kwargs):
-#    instance.perfil_pwms.save()
 
 class RegistroPsicologico(models.Model):
     """
@@ -109,132 +106,64 @@ class RegistroPsicologico(models.Model):
         verbose_name_plural = "Registros Psicológicos"
 
 class EvaluacionNASATLX(models.Model):
-    """
-    Modelo para evaluaciones NASA TLX (Carga mental de trabajo)
-    """
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuario")
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de evaluación")
-    tarea_descripcion = models.TextField(
-        verbose_name="Descripción de la tarea evaluada", 
-        help_text="Describa la tarea específica que realizó",
-        blank=True
-    )
-    
-    # Puntuaciones de las dimensiones (0-100)
-    demanda_mental = models.IntegerField(
-        verbose_name="Demanda Mental",
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-        default=50,
-        help_text="¿Cuánta actividad mental requirió la tarea? (0=Mínima, 100=Máxima)"
-    )
-    demanda_fisica = models.IntegerField(
-        verbose_name="Demanda Física",
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-        default=50,
-        help_text="¿Cuánta actividad física requirió la tarea? (0=Mínima, 100=Máxima)"
-    )
-    demanda_temporal = models.IntegerField(
-        verbose_name="Demanda Temporal",
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-        default=50,
-        help_text="¿Qué presión de tiempo sentiste? (0=Ninguna, 100=Máxima)"
-    )
-    rendimiento = models.IntegerField(
-        verbose_name="Rendimiento",
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-        default=50,
-        help_text="¿Cómo valoras tu éxito en la tarea? (0=Muy insatisfecho, 100=Muy satisfecho)"
-    )
-    esfuerzo = models.IntegerField(
-        verbose_name="Esfuerzo",
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-        default=50,
-        help_text="¿Cuánto esfuerzo invertiste? (0=Mínimo, 100=Máximo)"
-    )
-    frustracion = models.IntegerField(
-        verbose_name="Frustración",
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-        default=50,
-        help_text="¿Cuánta frustración sentiste? (0=Ninguna, 100=Máxima)"
-    )
-    
-    # Pesos de cada dimensión (0-5)
-    peso_demanda_mental = models.IntegerField(
-        verbose_name="Peso Demanda Mental",
-        validators=[MinValueValidator(0), MaxValueValidator(5)],
-        default=0
-    )
-    peso_demanda_fisica = models.IntegerField(
-        verbose_name="Peso Demanda Física",
-        validators=[MinValueValidator(0), MaxValueValidator(5)],
-        default=0
-    )
-    peso_demanda_temporal = models.IntegerField(
-        verbose_name="Peso Demanda Temporal",
-        validators=[MinValueValidator(0), MaxValueValidator(5)],
-        default=0
-    )
-    peso_rendimiento = models.IntegerField(
-        verbose_name="Peso Rendimiento",
-        validators=[MinValueValidator(0), MaxValueValidator(5)],
-        default=0
-    )
-    peso_esfuerzo = models.IntegerField(
-        verbose_name="Peso Esfuerzo",
-        validators=[MinValueValidator(0), MaxValueValidator(5)],
-        default=0
-    )
-    peso_frustracion = models.IntegerField(
-        verbose_name="Peso Frustración",
-        validators=[MinValueValidator(0), MaxValueValidator(5)],
-        default=0
-    )
-    
-    # Puntuación total calculada
-    puntuacion_total = models.FloatField(
-        verbose_name="Puntuación TLX Total",
-        default=0.0,
-        help_text="Puntuación ponderada de carga mental (0-100)"
-    )
-    
-    notas_adicionales = models.TextField(
-        verbose_name="Notas Adicionales",
-        blank=True,
-        help_text="Observaciones adicionales sobre la evaluación"
-    )
-    
-    # Método para calcular la puntuación total
+    tarea_descripcion = models.TextField(verbose_name="Descripción de la tarea evaluada", blank=True)
+
+    # Dimensiones (0-20)
+    demanda_mental = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(20)], default=10)
+    demanda_fisica = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(20)], default=10)
+    demanda_temporal = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(20)], default=10)
+    rendimiento = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(20)], default=10)
+    esfuerzo = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(20)], default=10)
+    frustracion = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(20)], default=10)
+
+    # Pesos (0-5)
+    peso_demanda_mental = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
+    peso_demanda_fisica = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
+    peso_demanda_temporal = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
+    peso_rendimiento = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
+    peso_esfuerzo = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
+    peso_frustracion = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
+
+    puntuacion_total = models.FloatField(default=0.0, help_text="Escala 0-100")
+
+    # Video y metadatos
+    video = models.FileField(upload_to='videos_nasa_tlx/%Y/%m/%d/', null=True, blank=True)
+    video_metadata = models.JSONField(null=True, blank=True)
+    fecha_inicio = models.DateTimeField(null=True, blank=True)
+
+    notas_adicionales = models.TextField(blank=True)
+
     def calcular_puntuacion_total(self):
-        total = (
-            (self.demanda_mental * self.peso_demanda_mental) +
-            (self.demanda_fisica * self.peso_demanda_fisica) +
-            (self.demanda_temporal * self.peso_demanda_temporal) +
-            (self.rendimiento * self.peso_rendimiento) +
-            (self.esfuerzo * self.peso_esfuerzo) +
-            (self.frustracion * self.peso_frustracion)
-        ) / 15.0
+        suma_pesos = (self.peso_demanda_mental + self.peso_demanda_fisica +
+                      self.peso_demanda_temporal + self.peso_rendimiento +
+                      self.peso_esfuerzo + self.peso_frustracion)
+        if suma_pesos > 0:
+            suma_ponderada = (
+                self.demanda_mental * self.peso_demanda_mental +
+                self.demanda_fisica * self.peso_demanda_fisica +
+                self.demanda_temporal * self.peso_demanda_temporal +
+                self.rendimiento * self.peso_rendimiento +
+                self.esfuerzo * self.peso_esfuerzo +
+                self.frustracion * self.peso_frustracion
+            )
+            total = (suma_ponderada / (suma_pesos * 20)) * 100
+        else:
+            promedio = (self.demanda_mental + self.demanda_fisica +
+                        self.demanda_temporal + self.rendimiento +
+                        self.esfuerzo + self.frustracion) / 6
+            total = (promedio / 20) * 100
         return round(total, 2)
-    
+
     def save(self, *args, **kwargs):
         self.puntuacion_total = self.calcular_puntuacion_total()
         super().save(*args, **kwargs)
-    
-    DIMENSIONES_CHOICES = [
-        ('demanda_mental', 'Demanda Mental'),
-        ('demanda_fisica', 'Demanda Física'),
-        ('demanda_temporal', 'Demanda Temporal'),
-        ('rendimiento', 'Rendimiento'),
-        ('esfuerzo', 'Esfuerzo'),
-        ('frustracion', 'Frustración'),
-    ] 
+
     class Meta:
         verbose_name = "Evaluación NASA TLX"
-        verbose_name_plural = "Evaluaciones NASA TLX"
         ordering = ['-fecha_creacion']
-    
-    def __str__(self):
-        return f"NASA TLX - {self.usuario.username} - {self.fecha_creacion.strftime('%Y-%m-%d %H:%M')}"
-
+        
 class SesionGrabacionNASATLX(models.Model):
     """
     Modelo para almacenar las grabaciones de video y frames de cada evaluación NASA TLX
@@ -300,7 +229,6 @@ class SesionGrabacionNASATLX(models.Model):
     def __str__(self):
         return f"Sesión NASA TLX - {self.usuario.username} - {self.fecha_grabacion.strftime('%Y-%m-%d %H:%M')}"
 
-
 class FrameNASATLX(models.Model):
     """
     Modelo para almacenar cada frame capturado durante la evaluación NASA TLX
@@ -339,6 +267,7 @@ class FrameNASATLX(models.Model):
     
     def __str__(self):
         return f"Frame {self.numero_frame} - {self.sesion}"
+
 class RegistroFisiologico(models.Model):
     """
     Registros fisiológicos (signos vitales)
@@ -356,7 +285,7 @@ class RegistroFisiologico(models.Model):
     # Actividad física
     pasos_diarios = models.IntegerField(default=0)
     calorias_quemadas = models.IntegerField(default=0)
-    horas_sueno = models.DecimalField(max_digits=5, decimal_places=2,null=True, blank=True, help_text="Horas de sueño (ej: 7.75 = 7 horas 45 minutos) ")
+    horas_sueno = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Horas de sueño (ej: 7.75 = 7 horas 45 minutos) ")
     
     # ⭐⭐ NUEVOS CAMPOS PARA LOS 4 PORCENTAJES DE ESTRÉS ⭐⭐
     estres_relajado = models.IntegerField(
@@ -676,3 +605,39 @@ class Mission(models.Model):
     
     def __str__(self):
         return self.name
+    
+    
+    
+class VideoAnalisisEstrés(models.Model):
+    """Almacena resultados del análisis de estrés por video"""
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    evaluacion_nasa = models.OneToOneField(EvaluacionNASATLX, on_delete=models.CASCADE, null=True, blank=True)
+    evaluacion_zung = models.OneToOneField(ZungAnxietyScale, on_delete=models.CASCADE, null=True, blank=True)
+    
+    fecha_analisis = models.DateTimeField(auto_now_add=True)
+    
+    # Resultados del análisis facial
+    puntuacion_estres_facial = models.FloatField(default=0.0, help_text="0-100")
+    emocion_dominante = models.CharField(max_length=50, blank=True)
+    
+    # Microexpresiones detectadas
+    micro_sonrisa = models.FloatField(default=0.0)
+    micro_ceño = models.FloatField(default=0.0)
+    micro_parpadeo = models.FloatField(default=0.0)
+    micro_labios = models.FloatField(default=0.0)
+    micro_frente = models.FloatField(default=0.0)
+    
+    # Métricas temporales
+    variabilidad_emocional = models.FloatField(default=0.0)
+    tiempo_relajado = models.FloatField(default=0.0)
+    tiempo_tension = models.FloatField(default=0.0)
+    
+    # Datos raw (opcional, para debug)
+    datos_raw = models.JSONField(null=True, blank=True)
+    
+    class Meta:
+        verbose_name = "Análisis de Estrés Facial"
+        verbose_name_plural = "Análisis de Estrés Facial"
+    
+    def __str__(self):
+        return f"Estrés facial: {self.puntuacion_estres_facial} - {self.fecha_analisis}"

@@ -1,6 +1,7 @@
 from django.urls import path
 from . import api_views, views
-from .views import export_stress_vocabulary
+
+#from .views import export_stress_vocabulary
 
 # Importar vistas de la API HealthSync Pro
 from PWMS.views import (
@@ -49,17 +50,19 @@ web_urls = [
     path('graficas/psicologico/', api_views.grafica_psicologico, name='grafica_psicologico'),
     
     # NASA TLX (web)
-    path('nasa-tlx/', views.nasa_tlx_create, name='nasa_tlx_create'),
-    path('nasa-tlx/resultado/<int:pk>/', views.nasa_tlx_resultado, name='nasa_tlx_resultado'),
-    path('nasa-tlx/historial/', views.nasa_tlx_historial, name='nasa_tlx_historial'),
-    path('guardar-video-nasa-tlx/', views.guardar_video_nasa_tlx, name='guardar_video_nasa_tlx'),
+    path('nasa-tlx/', api_views.nasa_tlx_create, name='nasa_tlx_create'),
+    path('nasa-tlx/resultado/<int:pk>/', api_views.nasa_tlx_resultado, name='nasa_tlx_resultado'),
+    path('nasa-tlx/historial/', api_views.nasa_tlx_historial, name='nasa_tlx_historial'),
+    path('guardar-video-nasa-tlx/', api_views.guardar_video_nasa_tlx, name='guardar_video_nasa_tlx'),
     
     # Zung Anxiety (web)
     path('zung-anxiety/nuevo/', api_views.zung_anxiety_nuevo, name='zung_anxiety_nuevo'),
     path('zung-anxiety/<int:pk>/resultados/', api_views.zung_anxiety_resultados, name='zung_anxiety_resultados'),
     path('zung-anxiety/historial/', api_views.zung_anxiety_historial, name='zung_anxiety_historial'),
-    path('guardar-video-zung/', views.guardar_video_zung, name='guardar_video_zung'),
-
+    path('guardar-video-zung/', api_views.guardar_video_zung, name='guardar_video_zung'),
+    
+    #path('analizar-estres/<str:tipo>/<int:id>/', api_views.analizar_estres_video, name='analizar_estres_video'),
+    
     path('export-stress/<int:user_id>/', views.export_stress_vocabulary, name='export_stress_vocabulary'),
 ]
 

@@ -31,7 +31,8 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
+    # Servir archivos media (IMÁGENES, FRAMES, VIDEOS)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # Manejadores de error
 # handler404 = 'PWMS.views.pagina_no_encontrada'
 # handler500 = 'PWMS.views.error_servidor'

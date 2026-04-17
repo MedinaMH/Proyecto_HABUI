@@ -1,417 +1,362 @@
-{% extends 'PWMS/estructura_base_PWMS.html' %}
-{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escala de Ansiedad de Zung - PWMS</title>
 
-{% block titulo %}Escala de Ansiedad de Zung - PWMS{% endblock %}
+    <!-- Bootstrap local -->
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-icons.css">
 
-{% block extra_css %}
-<style>
-    .grabacion-indicator {
-        position: fixed;
-        top: 100px;
-        right: 20px;
-        z-index: 1000;
-        background: rgba(0,0,0,0.8);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 50px;
-        display: none;
-        align-items: center;
-        gap: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .grabacion-indicator .punto {
-        width: 12px;
-        height: 12px;
-        background-color: #dc3545;
-        border-radius: 50%;
-        animation: parpadeo 1.5s infinite;
-    }
-    @keyframes parpadeo {
-        0% { opacity: 1; }
-        50% { opacity: 0.3; }
-        100% { opacity: 1; }
-    }
-    /* Estilo temporal para depuración (muestra borde rojo al mostrarse) */
-    #contenido-prueba {
-        border: 3px solid red;
-        padding: 15px;
-        background-color: #f9f9f9;
-        display: none; /* Oculto inicialmente */
-    }
-    select.form-select {
-        width: 100%;
-        padding: 0.375rem 2.25rem 0.375rem 0.75rem;
-    }
-</style>
-{% endblock %}
-
-{% block contenido %}
-<div class="dashboard-container">
-    <div class="dashboard-grid">
-        <div class="welcome-card">
-            <h2><i class="bi bi-clipboard-plus"></i> Escala de Ansiedad de Zung (SAS)</h2>
-
-            <!-- BOTÓN INICIAL CON ONCLICK -->
-            <div id="panel-inicial" class="text-center mb-4">
-                <button id="btn-iniciar-prueba" class="btn btn-primary btn-lg" onclick="iniciarPruebaZung()">
-                    <i class="bi bi-play-circle-fill me-2"></i>Iniciar Prueba
-                </button>
-                <p class="text-muted mt-2 small">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Al hacer clic comenzará la grabación de video (2 minutos) y aparecerá el cuestionario.
-                </p>
-            </div>
-
-            <!-- CONTENIDO OCULTO INICIALMENTE (SE MUESTRA AL INICIAR) -->
-            <div id="contenido-prueba" style="display: none;">
-                
-                <!-- Indicador de grabación (visible durante la grabación) -->
-                <div id="grabacion-indicator" class="grabacion-indicator">
-                    <span class="punto"></span>
-                    <span>Grabando: <span id="grabacion-tiempo">0</span>/120 seg</span>
-                </div>
-
-                <div class="card">
-                    <div class="card-body">
-                        <div class="alert alert-primary mb-4">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            <strong>Instrucciones:</strong> Por favor, indique con qué frecuencia ha experimentado cada uno de los siguientes síntomas durante la última semana. Sea honesto en sus respuestas.
-                        </div>
-
-                        <!-- Badges de escala -->
-                        <div class="alert alert-info mb-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <strong>Escala de valoración:</strong>
-                                <span class="badge bg-success">1 = Rara vez</span>
-                                <span class="badge bg-warning text-dark">2 = Algunas veces</span>
-                                <span class="badge bg-danger">3 = Buena parte del tiempo</span>
-                                <span class="badge bg-secondary">4 = La mayor parte del tiempo</span>
-                            </div>
-                        </div>
-                        
-                        <form method="post" id="zung-form" novalidate>
-                            {% csrf_token %}
-                            <!-- Campos ocultos para los datos del video -->
-                            <input type="hidden" name="video_path" id="video_path" value="">
-                            <input type="hidden" name="video_metadata" id="video_metadata" value="">
-                            <input type="hidden" name="video_size" id="video_size" value="">
-                            <input type="hidden" name="video_duration" id="video_duration" value="120">
-                            
-                            <!-- Sección 1: Síntomas Afectivos (Preguntas 1-5) -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <h5 class="card-title mb-3">
-                                        <i class="bi bi-emoji-frown text-warning me-2"></i>
-                                        Síntomas Afectivos (Preguntas 1-5)
-                                    </h5>
-                                    
-                                    <div class="row">
-                                        {% for field in form %}
-                                            {% if field.name in 'p01_me_siento_mas_nervioso p02_siento_miedo_sin_razon p03_me_siento_alterado p04_siento_que_me_desmorono p05_siento_que_todo_bien' %}
-                                            <div class="col-md-12 mb-3">
-                                                <label class="form-label">{{ field.label }}</label>
-                                                {{ field }}
-                                                {% if field.name == 'p05_siento_que_todo_bien' %}
-                                                <small class="form-text text-muted">
-                                                    <i class="bi bi-arrow-repeat"></i> Pregunta inversa (se puntúa al revés)
-                                                </small>
-                                                {% endif %}
-                                                {% if field.errors %}
-                                                <div class="text-danger small">{{ field.errors.0 }}</div>
-                                                {% endif %}
-                                            </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Sección 2: Síntomas Somáticos (Preguntas 6-20) -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <h5 class="card-title mb-3">
-                                        <i class="bi bi-heart-pulse text-info me-2"></i>
-                                        Síntomas Somáticos (Preguntas 6-20)
-                                    </h5>
-                                    
-                                    <div class="row">
-                                        {% for field in form %}
-                                            {% if field.name not in 'p01_me_siento_mas_nervioso p02_siento_miedo_sin_razon p03_me_siento_alterado p04_siento_que_me_desmorono p05_siento_que_todo_bien observaciones' %}
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">{{ field.label }}</label>
-                                                {{ field }}
-                                                {% if field.name in 'p09_siento_calma_tranquilidad p13_respiracion_normal p17_manos_calidas_secas p19_duermo_bien_descanso' %}
-                                                <small class="form-text text-muted">
-                                                    <i class="bi bi-arrow-repeat"></i> Pregunta inversa
-                                                </small>
-                                                {% endif %}
-                                                {% if field.errors %}
-                                                <div class="text-danger small">{{ field.errors.0 }}</div>
-                                                {% endif %}
-                                            </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Observaciones -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <h5 class="card-title mb-3">
-                                        <i class="bi bi-chat-left-text text-info me-2"></i>
-                                        Observaciones (Opcional)
-                                    </h5>
-                                    
-                                    <div class="mb-3">
-                                        {{ form.observaciones }}
-                                        <small class="form-text text-muted">Espacio para notas adicionales si lo deseas</small>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="alert alert-warning mb-4">
-                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                <strong>Importante:</strong> Las preguntas 5, 9, 13, 17 y 19 se puntúan de forma inversa (1→4, 2→3, 3→2, 4→1).
-                            </div>
-                            
-                            <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                                <div class="btn-group" role="group">
-                                    <a href="{% url 'PWMS:zung_anxiety_historial' %}" class="btn btn-outline-info">
-                                        <i class="bi bi-clock-history me-1"></i>Ver Historial
-                                    </a>
-                                    <a href="{% url 'PWMS:nuevo_registro_psicologico' %}" class="btn btn-outline-secondary">
-                                        <i class="bi bi-journal me-1"></i>Registro Diario
-                                    </a>
-                                </div>
-                            </div>
-                            
-                            <!-- Botones de acción del formulario -->
-                            <div class="d-flex justify-content-between mt-4">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="bi bi-save me-2"></i>Guardar Evaluación
-                                </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    <!-- Estilos personalizados PWMS -->
+    <link rel="stylesheet" href="/static/css/estilos_panel_pwms.css?v=2">
+    <style>
+        .welcome-card {
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.05);
+            padding: 1.5rem;
+        }
+        .form-select {
+            border-radius: 0.75rem;
+        }
+        .btn-danger {
+            border-radius: 2rem;
+            padding: 0.75rem 2rem;
+        }
+        .question-card {
+            transition: all 0.2s;
+            border-radius: 1rem;
+            background-color: #fff;
+        }
+        .question-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.05);
+        }
+        .grabacion-indicator {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .grabacion-indicator .punto {
+            width: 12px;
+            height: 12px;
+            background-color: #dc3545;
+            border-radius: 50%;
+            animation: parpadeo 1.5s infinite;
+        }
+        @keyframes parpadeo {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar navbar-dark bg-primary fixed-top d-flex justify-content-between align-items-center px-3" style="height: 85px;">
+        <a href="/" class="btn btn-outline-light d-flex align-items-center gap-2">
+            <i class="bi bi-arrow-left-circle-fill fs-5"></i>
+            <span class="d-none d-sm-inline">Panel principal</span>
+        </a>
+        <div class="text-center flex-grow-1">
+            <span class="encabezado">Sistema de Monitoreo del Bienestar Psicológico PWMS</span>
         </div>
-    </div>
-</div>
-
-<!-- Tarjeta informativa: Zung Self-Rating Anxiety Scale (SAS) -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card bg-light">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-clipboard2-pulse me-2 text-primary"></i>
-                    Acerca del Test de Zung para Ansiedad (SAS)
-                </h5>
-                <p class="card-text small mb-3">
-                    La escala SAS (Zung Self‑Rating Anxiety Scale) es un cuestionario autoadministrado de 20 ítems que evalúa la frecuencia de síntomas ansiosos. Se puntúa en escala Likert de 1 a 4. La puntuación bruta (20‑80) se transforma en un <strong>índice de ansiedad</strong> (multiplicando por 1,25), obteniendo un rango de 25 a 100. La interpretación recomendada es:
-                </p>
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-success me-2">≤ 44</span>
-                            <strong>Ansiedad normal / mínima</strong>
-                            <i class="bi bi-emoji-smile ms-2 text-success"></i>
-                        </div>
-                        <small class="text-muted">Sin ansiedad clínicamente significativa.</small>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-warning text-dark me-2">45‑59</span>
-                            <strong>Ansiedad leve a moderada</strong>
-                            <i class="bi bi-emoji-neutral ms-2 text-warning"></i>
-                        </div>
-                        <small class="text-muted">Síntomas que pueden afectar el bienestar.</small>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-danger me-2">60‑74</span>
-                            <strong>Ansiedad marcada a severa</strong>
-                            <i class="bi bi-emoji-frown ms-2 text-danger"></i>
-                        </div>
-                        <small class="text-muted">Riesgo elevado de deterioro funcional.</small>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-secondary me-2">≥ 75</span>
-                            <strong>Ansiedad extrema</strong>
-                            <i class="bi bi-emoji-dizzy ms-2 text-secondary"></i>
-                        </div>
-                        <small class="text-muted">Nivel máximo, requiere atención inmediata.</small>
-                    </div>
-                </div>
-                <hr class="my-3">
-                <div class="row">
-                    <div class="col-12">
-                        <strong>Grupos de síntomas evaluados:</strong>
-                        <span class="badge bg-info me-1">Síntomas afectivos</span>
-                        <span class="badge bg-info me-1">Síntomas somáticos</span>
-                        <span class="badge bg-info me-1">Síntomas psicomotores</span>
-                        <span class="badge bg-info me-1">Síntomas autonómicos</span>
-                    </div>
-                </div>
-                <small class="text-muted mt-2 d-block">
-                    <i class="bi bi-lightbulb"></i> El SAS es una herramienta ampliamente validada en investigación y clínica. Existe también la escala Zung para depresión (SDS), que se utiliza de forma complementaria para evaluar comorbilidad.
-                </small>
-            </div>
+        <div class="d-flex align-items-center" style="width: 110px;">
+            <span class="text-light me-2 small d-none d-sm-inline">{{ user.username }}</span>
         </div>
+    </header>
+
+    <div style="display: flex; width: 100%;">
+        <nav class="sidebar" style="width: 260px; min-width: 260px; max-width: 260px;">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link" href="/pwms/dashboard/"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#submenuPsico">
+                            <span><i class="bi bi-clipboard-plus"></i>Registros Psicológicos</span>
+                            <i class="bi bi-caret-down-fill small"></i>
+                        </a>
+                        <div class="collapse ps-4" id="submenuPsico">
+                            <ul class="nav flex-column">
+                                <li class="nav-item"><a class="nav-link" href="/pwms/nuevo_registro_psicologico/"><i class="bi bi-plus-circle me-2"></i>Nuevo Registro</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/pwms/historial_psicologico/"><i class="bi bi-clock-history me-2"></i>Historial</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/pwms/historial-psic-integrado/"><i class="bi bi-clock-history me-2"></i>Historial integrado</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/pwms/perfil/"><i class="bi bi-person-circle me-2"></i>Mi Perfil</a></li>
+                    <li class="nav-item"><a class="nav-link text-danger" href="/pwms/logout/"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main style="background-color: #f0f2f5; min-height: calc(100vh - 85px); width: calc(100% - 260px); padding: 2rem;">
+            <div class="dashboard-container">
+                <div class="dashboard-grid">
+                    <div class="welcome-card">
+                        <!-- Panel inicial -->
+                        <div id="panel-inicial" class="text-center mb-4">
+                            <h2><i class="bi bi-clipboard-heart me-2 text-danger"></i> Escala de Ansiedad de Zung (SAS)</h2>
+                            <p class="text-muted">Self-Rating Anxiety Scale - 20 preguntas</p>
+                            <button id="btn-iniciar-prueba" class="btn btn-danger btn-lg mt-3" onclick="iniciarPruebaZung()">
+                                <i class="bi bi-play-circle-fill me-2"></i>Iniciar Prueba con Grabación
+                            </button>
+                            <p class="text-muted mt-2 small">La grabación dura 2 minutos mientras respondes el cuestionario.</p>
+                        </div>
+
+                        <!-- Cuestionario (se muestra al iniciar) -->
+                        <div id="contenido-prueba" style="display: none;">
+                            <div id="grabacion-indicator" class="grabacion-indicator">
+                                <span class="punto"></span>
+                                <span>Grabando: <span id="grabacion-tiempo">0</span>/120 seg</span>
+                            </div>
+
+                            <form method="post" id="zung-form" data-video-url="{% url 'PWMS:guardar_video_zung' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="video_path" id="video_path" value="">
+
+                                <div class="alert alert-info mb-4">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    Lee cada frase y selecciona la frecuencia con la que has experimentado cada síntoma durante la <strong>última semana</strong>.
+                                </div>
+
+                                <!-- 20 preguntas en 2 columnas -->
+                                <div class="row">
+                                    <!-- Pregunta 1 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">1. Me siento más nervioso y ansioso que de costumbre</label>
+                                                {{ form.p01_me_siento_mas_nervioso }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 2 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">2. Siento miedo sin razón</label>
+                                                {{ form.p02_siento_miedo_sin_razon }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 3 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">3. Me siento alterado o agitado</label>
+                                                {{ form.p03_me_siento_alterado }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 4 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">4. Siento que me estoy desmoronando</label>
+                                                {{ form.p04_siento_que_me_desmorono }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 5 (inversa) -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">5. Siento que todo está bien y no pasará nada malo</label>
+                                                {{ form.p05_siento_que_todo_bien }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 6 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">6. Tiemblan mis manos, brazos o piernas</label>
+                                                {{ form.p06_temblor_sacudidas }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 7 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">7. Tengo dolores de cabeza, cuello o espalda</label>
+                                                {{ form.p07_dolores_cabeza_cuello }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 8 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">8. Me siento débil y me canso fácilmente</label>
+                                                {{ form.p08_debilidad_fatiga }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 9 (inversa) -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">9. Me siento calmado y puedo permanecer en calma fácilmente</label>
+                                                {{ form.p09_siento_calma_tranquilidad }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 10 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">10. Siento latidos del corazón rápidos</label>
+                                                {{ form.p10_siento_latidos_corazon }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 11 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">11. Tengo mareos o vértigo</label>
+                                                {{ form.p11_mareos }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 12 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">12. Siento que me voy a desmayar</label>
+                                                {{ form.p12_desmayos }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 13 (inversa) -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">13. Puedo respirar normal</label>
+                                                {{ form.p13_respiracion_normal }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 14 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">14. Tengo entumecimiento u hormigueo en dedos, manos o pies</label>
+                                                {{ form.p14_entumecimiento_hormigueo }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 15 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">15. Tengo dolores de estómago o indigestión</label>
+                                                {{ form.p15_dolores_estomacales }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 16 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">16. Tengo necesidad frecuente de orinar</label>
+                                                {{ form.p16_necesidad_orinar }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 17 (inversa) -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">17. Mis manos están normalmente calientes y secas</label>
+                                                {{ form.p17_manos_calidas_secas }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 18 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">18. Mi cara se sonroja y siento bochornos</label>
+                                                {{ form.p18_sonrojo_bochorno }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 19 (inversa) -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">19. Duermo bien y descanso</label>
+                                                {{ form.p19_duermo_bien_descanso }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Pregunta 20 -->
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card question-card border h-100">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">20. Tengo pesadillas</label>
+                                                {{ form.p20_pesadillas }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Observaciones -->
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <div class="card question-card border">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold"><i class="bi bi-journal-text me-2"></i>Observaciones adicionales</label>
+                                                {{ form.observaciones }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-danger btn-lg px-5">
+                                        <i class="bi bi-check-circle me-2"></i>Enviar evaluación
+                                    </button>
+                                    <a href="{% url 'PWMS:zung_anxiety_historial' %}" class="btn btn-outline-secondary btn-lg px-4 ms-2">
+                                        <i class="bi bi-arrow-left me-2"></i>Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Interpretación -->
+                        <div class="mt-5 pt-3 border-top">
+                            <h6 class="mb-3"><i class="bi bi-info-circle me-2"></i>Interpretación del Índice de Ansiedad de Zung</h6>
+                            <div class="row">
+                                <div class="col-md-3"><span class="badge bg-success">25-44</span> Normal</div>
+                                <div class="col-md-3"><span class="badge bg-warning text-dark">45-59</span> Ansiedad mínima a moderada</div>
+                                <div class="col-md-3"><span class="badge bg-danger">60-74</span> Ansiedad marcada a severa</div>
+                                <div class="col-md-3"><span class="badge bg-dark">75-100</span> Ansiedad extrema</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-</div>
 
-<!-- Elemento de video oculto -->
-<video id="video-preview-background" autoplay playsinline style="display: none;"></video>
+    <footer class="text-center py-3 bg-light border-top mt-auto">
+        <small>&copy; 2025 MACII CREDES</small>
+    </footer>
 
-<!-- SCRIPT DE GRABACIÓN MEJORADO CON ENVÍO DE METADATOS -->
-<script>
-// Variables globales
-let mediaRecorder = null;
-let recordedChunks = [];
-let mediaStream = null;
-let tiempo = 0;
-let timer = null;
-let grabando = false;
-let videoSettings = null;
-const DURACION = 120;
-const urlGuardarVideo = "{% url 'PWMS:guardar_video_zung' %}";
-
-function iniciarPruebaZung() {
-    console.log('🖱️ iniciarPruebaZung ejecutada');
-    
-    const panelInicial = document.getElementById('panel-inicial');
-    const contenidoPrueba = document.getElementById('contenido-prueba');
-    const videoPreview = document.getElementById('video-preview-background');
-    const videoPathInput = document.getElementById('video_path');
-    const videoMetadataInput = document.getElementById('video_metadata');
-    const videoSizeInput = document.getElementById('video_size');
-    const statusSpan = document.getElementById('grabacion-tiempo');
-    const indicator = document.getElementById('grabacion-indicator');
-    const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-    
-    if (!contenidoPrueba) {
-        console.error('❌ No se encontró #contenido-prueba');
-        return;
-    }
-    
-    if (panelInicial) panelInicial.style.display = 'none';
-    contenidoPrueba.style.display = 'block';
-    contenidoPrueba.style.visibility = 'visible';
-    contenidoPrueba.style.opacity = '1';
-    
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        .then(function(stream) {
-            console.log('✅ Cámara obtenida');
-            mediaStream = stream;
-            
-            const track = stream.getVideoTracks()[0];
-            videoSettings = track.getSettings();
-            console.log('📷 Configuración:', videoSettings);
-            
-            if (indicator) indicator.style.display = 'flex';
-            
-            if (videoPreview) {
-                videoPreview.srcObject = stream;
-                videoPreview.style.display = 'none';
-                videoPreview.play();
-            }
-            
-            recordedChunks = [];
-            const mimeTypes = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
-            let options = {};
-            for (let type of mimeTypes) {
-                if (MediaRecorder.isTypeSupported(type)) {
-                    options = { mimeType: type };
-                    break;
-                }
-            }
-            mediaRecorder = new MediaRecorder(stream, options);
-            
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) recordedChunks.push(e.data);
-            };
-            
-            mediaRecorder.onstop = () => {
-                console.log('⏹️ Grabación detenida');
-                enviarVideo(csrf, videoPathInput, videoMetadataInput, videoSizeInput);
-            };
-            
-            mediaRecorder.start(1000);
-            grabando = true;
-            tiempo = 0;
-            
-            timer = setInterval(() => {
-                tiempo++;
-                if (statusSpan) statusSpan.textContent = tiempo;
-                if (tiempo >= DURACION) {
-                    detenerGrabacion();
-                }
-            }, 1000);
-            
-            console.log('🔴 Grabando...');
-        })
-        .catch(function(err) {
-            console.error('❌ Error cámara:', err);
-            alert('No se pudo acceder a la cámara. La prueba continuará sin grabación.');
-            if (contenidoPrueba) contenidoPrueba.style.display = 'block';
-        });
-}
-
-function detenerGrabacion() {
-    if (!grabando) return;
-    clearInterval(timer);
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-    }
-    if (mediaStream) {
-        mediaStream.getTracks().forEach(t => t.stop());
-    }
-    grabando = false;
-    const indicator = document.getElementById('grabacion-indicator');
-    if (indicator) indicator.style.display = 'none';
-}
-
-function enviarVideo(csrf, videoPathInput, videoMetadataInput, videoSizeInput) {
-    if (recordedChunks.length === 0) {
-        console.warn('⚠️ No hay video');
-        return;
-    }
-    
-    const blob = new Blob(recordedChunks, { type: 'video/webm' });
-    const formData = new FormData();
-    formData.append('video', blob, `zung_${Date.now()}.webm`);
-    
-    if (videoSettings) {
-        formData.append('metadata', JSON.stringify(videoSettings));
-    }
-    
-    fetch(urlGuardarVideo, {
-        method: 'POST',
-        body: formData,
-        headers: { 'X-CSRFToken': csrf || '' }
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log('✅ Video guardado:', data);
-        if (data.video_path) {
-            videoPathInput.value = data.video_path;
-        }
-        if (data.metadata && videoMetadataInput) {
-            videoMetadataInput.value = JSON.stringify(data.metadata);
-        }
-        if (data.file_size && videoSizeInput) {
-            videoSizeInput.value = data.file_size;
-        }
-    })
-    .catch(err => console.error('❌ Error en envío:', err));
-}
-
-// Detener grabación al enviar el formulario
-document.getElementById('zung-form')?.addEventListener('submit', function() {
-    if (grabando) detenerGrabacion();
-});
-</script>
-{% endblock %}
+    <script src="/static/js/bootstrap.bundle.js"></script>
+    <script src="/static/js/zung_anxiety.js"></script>
+</body>
+</html>

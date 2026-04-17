@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-10 14:54-0600\n"
+"POT-Creation-Date: 2026-04-16 16:12-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1613,6 +1613,10 @@ msgstr "Low energy"
 #: .\HABUI_APP\views.py:800
 msgid "Activar protocolos de emergencia"
 msgstr "Activate emergency protocols"
+
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:26
+msgid "Sistema de Monitoreo del Bienestar Psicológico PWMS"
+msgstr "PWMS Psycological Well-being Monitoring System"
 
 #~ msgid "ACEPTABLE"
 #~ msgstr "ACCEPTABLE"

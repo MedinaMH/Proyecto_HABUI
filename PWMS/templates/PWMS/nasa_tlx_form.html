@@ -32,7 +32,6 @@
         50% { opacity: 0.3; }
         100% { opacity: 1; }
     }
-    /* Estilos adicionales */
     .comparacion-radio {
         display: flex;
         gap: 20px;
@@ -43,22 +42,23 @@
         align-items: center;
         gap: 5px;
     }
+    .welcome-card {
+        background: white;
+        border-radius: 1.25rem;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.05);
+        padding: 1.5rem;
+    }
 </style>
 {% endblock %}
 
 {% block contenido %}
-<div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div>
-            <h1 class="h2 mb-1">Evaluación NASA TLX</h1>
-            <p class="text-muted mb-0">Evaluación de Carga Mental de Trabajo</p>
-        </div>
-    </div>
+<div class="dashboard-container">
+    <div class="dashboard-grid">
+        <div class="welcome-card">
+            <h2 class="mb-3"><i class="bi bi-bar-chart-steps me-2"></i> Evaluación NASA TLX</h2>
+            <p class="text-muted mb-4">Evaluación de Carga Mental de Trabajo</p>
 
-    <div class="row">
-        <div class="col-lg-10 mx-auto">
-            
-            <!-- BOTÓN INICIAL CON ONCLICK -->
+            <!-- BOTÓN INICIAL -->
             <div id="panel-inicial" class="text-center mb-4">
                 <button id="btn-iniciar-prueba" class="btn btn-primary btn-lg" onclick="iniciarPruebaTLX()">
                     <i class="bi bi-play-circle-fill me-2"></i>Iniciar Prueba
@@ -69,28 +69,25 @@
                 </p>
             </div>
 
-            <!-- CONTENIDO OCULTO INICIALMENTE -->
+            <!-- CONTENIDO PRUEBA -->
             <div id="contenido-prueba" style="display: none;">
-                
-                <!-- Indicador de grabación -->
                 <div id="grabacion-indicator" class="grabacion-indicator">
                     <span class="punto"></span>
                     <span>Grabando: <span id="grabacion-tiempo">0</span>/120 seg</span>
                 </div>
-                
-                <!-- FORMULARIO NASA TLX -->
-                <div class="card">
+
+                <div class="card shadow-sm rounded-4">
                     <div class="card-body">
                         <div class="alert alert-info mb-4">
                             <i class="bi bi-info-circle-fill me-2"></i>
                             <strong>Instrucciones NASA TLX:</strong> Esta evaluación mide la carga mental percibida al realizar una tarea.
                         </div>
-                        
-                        <form method="post" id="nasa-tlx-form">
+
+                        <form method="post" id="nasa-tlx-form" data-video-url="{% url 'PWMS:guardar_video_nasa_tlx' %}">
                             {% csrf_token %}
                             <input type="hidden" name="video_path" id="video_path" value="">
-                            
-                            <!-- ===== PASO 1: DESCRIPCIÓN DE LA TAREA ===== -->
+
+                            <!-- PASO 1 -->
                             <div class="step" id="step-1">
                                 <div class="row mb-4">
                                     <div class="col-12">
@@ -98,17 +95,13 @@
                                             <i class="bi bi-list-task text-primary me-2"></i>
                                             Paso 1: Descripción de la Tarea
                                         </h5>
-                                        
                                         <div class="mb-4">
                                             <label for="{{ form.tarea_descripcion.id_for_label }}" class="form-label">
                                                 <i class="bi bi-journal-text me-1"></i>¿Qué tarea realizaste?
                                             </label>
                                             {{ form.tarea_descripcion }}
-                                            <small class="form-text text-muted">
-                                                Describe la actividad específica que vas a evaluar.
-                                            </small>
+                                            <small class="form-text text-muted">Describe la actividad específica que vas a evaluar.</small>
                                         </div>
-                                        
                                         <div class="d-flex justify-content-end">
                                             <button type="button" class="btn btn-primary next-step" data-next="step-2">
                                                 Siguiente: Calificación <i class="bi bi-arrow-right ms-1"></i>
@@ -117,8 +110,8 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- ===== PASO 2: CALIFICACIÓN DE DIMENSIONES ===== -->
+
+                            <!-- PASO 2 -->
                             <div class="step d-none" id="step-2">
                                 <div class="row mb-4">
                                     <div class="col-12">
@@ -126,170 +119,85 @@
                                             <i class="bi bi-bar-chart-line text-success me-2"></i>
                                             Paso 2: Calificación de Dimensiones (0-20)
                                         </h5>
-                                        <p class="text-muted mb-4">
-                                            Desliza cada barra para indicar el nivel de cada dimensión.
-                                        </p>
-                                        
                                         <div class="row">
-                                            <!-- Demanda Mental -->
-                                            <div class="col-md-6 mb-4">
-                                                <div class="card h-100">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card border h-100">
                                                     <div class="card-body">
-                                                        <label class="form-label fw-bold">
-                                                            <i class="bi bi-cpu me-1 text-info"></i>Demanda Mental
-                                                        </label>
-                                                        <div class="d-flex align-items-center mb-2">
-                                                            <span class="text-muted small me-2">Baja</span>
-                                                            {{ form.demanda_mental }}
-                                                            <span class="text-muted small ms-2">Alta</span>
-                                                            <span class="slider-value ms-3" id="demanda_mental_value">20</span>
-                                                        </div>
-                                                        <small class="form-text text-muted">
-                                                            Actividad mental, concentración, decisiones
-                                                        </small>
+                                                        <label class="form-label fw-bold">Demanda Mental</label>
+                                                        {{ form.demanda_mental }}
+                                                        <span id="demanda_mental_value" class="ms-2">10</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            <!-- Demanda Física -->
-                                            <div class="col-md-6 mb-4">
-                                                <div class="card h-100">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card border h-100">
                                                     <div class="card-body">
-                                                        <label class="form-label fw-bold">
-                                                            <i class="bi bi-activity me-1 text-warning"></i>Demanda Física
-                                                        </label>
-                                                        <div class="d-flex align-items-center mb-2">
-                                                            <span class="text-muted small me-2">Baja</span>
-                                                            {{ form.demanda_fisica }}
-                                                            <span class="text-muted small ms-2">Alta</span>
-                                                            <span class="slider-value ms-3" id="demanda_fisica_value">20</span>
-                                                        </div>
-                                                        <small class="form-text text-muted">
-                                                            Esfuerzo físico, actividad muscular
-                                                        </small>
+                                                        <label class="form-label fw-bold">Demanda Física</label>
+                                                        {{ form.demanda_fisica }}
+                                                        <span id="demanda_fisica_value" class="ms-2">10</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            <!-- Demanda Temporal -->
-                                            <div class="col-md-6 mb-4">
-                                                <div class="card h-100">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card border h-100">
                                                     <div class="card-body">
-                                                        <label class="form-label fw-bold">
-                                                            <i class="bi bi-clock me-1 text-danger"></i>Demanda Temporal
-                                                        </label>
-                                                        <div class="d-flex align-items-center mb-2">
-                                                            <span class="text-muted small me-2">Baja</span>
-                                                            {{ form.demanda_temporal }}
-                                                            <span class="text-muted small ms-2">Alta</span>
-                                                            <span class="slider-value ms-3" id="demanda_temporal_value">20</span>
-                                                        </div>
-                                                        <small class="form-text text-muted">
-                                                            Presión de tiempo, ritmo, urgencia
-                                                        </small>
+                                                        <label class="form-label fw-bold">Demanda Temporal</label>
+                                                        {{ form.demanda_temporal }}
+                                                        <span id="demanda_temporal_value" class="ms-2">10</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            <!-- Rendimiento -->
-                                            <div class="col-md-6 mb-4">
-                                                <div class="card h-100">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card border h-100">
                                                     <div class="card-body">
-                                                        <label class="form-label fw-bold">
-                                                            <i class="bi bi-trophy me-1 text-success"></i>Rendimiento
-                                                        </label>
-                                                        <div class="d-flex align-items-center mb-2">
-                                                            <span class="text-muted small me-2">Bajo</span>
-                                                            {{ form.rendimiento }}
-                                                            <span class="text-muted small ms-2">Alto</span>
-                                                            <span class="slider-value ms-3" id="rendimiento_value">20</span>
-                                                        </div>
-                                                        <small class="form-text text-muted">
-                                                            Alto = Buen rendimiento = Menor carga
-                                                        </small>
+                                                        <label class="form-label fw-bold">Rendimiento</label>
+                                                        {{ form.rendimiento }}
+                                                        <span id="rendimiento_value" class="ms-2">10</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            <!-- Esfuerzo -->
-                                            <div class="col-md-6 mb-4">
-                                                <div class="card h-100">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card border h-100">
                                                     <div class="card-body">
-                                                        <label class="form-label fw-bold">
-                                                            <i class="bi bi-lightning-charge me-1 text-primary"></i>Esfuerzo
-                                                        </label>
-                                                        <div class="d-flex align-items-center mb-2">
-                                                            <span class="text-muted small me-2">Bajo</span>
-                                                            {{ form.esfuerzo }}
-                                                            <span class="text-muted small ms-2">Alta</span>
-                                                            <span class="slider-value ms-3" id="esfuerzo_value">20</span>
-                                                        </div>
-                                                        <small class="form-text text-muted">
-                                                            Esfuerzo mental y físico requerido
-                                                        </small>
+                                                        <label class="form-label fw-bold">Esfuerzo</label>
+                                                        {{ form.esfuerzo }}
+                                                        <span id="esfuerzo_value" class="ms-2">10</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            <!-- Frustración -->
-                                            <div class="col-md-6 mb-4">
-                                                <div class="card h-100">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card border h-100">
                                                     <div class="card-body">
-                                                        <label class="form-label fw-bold">
-                                                            <i class="bi bi-emoji-frown me-1 text-danger"></i>Frustración
-                                                        </label>
-                                                        <div class="d-flex align-items-center mb-2">
-                                                            <span class="text-muted small me-2">Baja</span>
-                                                            {{ form.frustracion }}
-                                                            <span class="text-muted small ms-2">Alta</span>
-                                                            <span class="slider-value ms-3" id="frustracion_value">20</span>
-                                                        </div>
-                                                        <small class="form-text text-muted">
-                                                            Estrés, irritación, desánimo
-                                                        </small>
+                                                        <label class="form-label fw-bold">Frustración</label>
+                                                        {{ form.frustracion }}
+                                                        <span id="frustracion_value" class="ms-2">10</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        
                                         <div class="d-flex justify-content-between mt-4">
-                                            <button type="button" class="btn btn-outline-secondary prev-step" data-prev="step-1">
-                                                <i class="bi bi-arrow-left me-1"></i>Anterior
-                                            </button>
-                                            <button type="button" class="btn btn-primary next-step" data-next="step-3">
-                                                Siguiente: Comparaciones <i class="bi bi-arrow-right ms-1"></i>
-                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary prev-step" data-prev="step-1">Anterior</button>
+                                            <button type="button" class="btn btn-primary next-step" data-next="step-3">Siguiente</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- ===== PASO 3: COMPARACIONES POR PARES ===== -->
+
+                            <!-- PASO 3: TODAS LAS COMPARACIONES (1 A 15) -->
                             <div class="step d-none" id="step-3">
                                 <div class="row mb-4">
                                     <div class="col-12">
-                                        <h5 class="card-title mb-3">
-                                            <i class="bi bi-ui-radios text-warning me-2"></i>
-                                            Paso 3: Comparaciones por Pares (15)
-                                        </h5>
-                                        
-                                        <div class="alert alert-warning mb-4">
-                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                            Para cada par, selecciona <strong>UNA</strong> dimensión que consideres que contribuyó más a tu carga de trabajo.
-                                        </div>
-                                        
+                                        <h5 class="card-title mb-3">Comparaciones por Pares (15)</h5>
+                                        <div class="alert alert-warning mb-4">Selecciona UNA dimensión que contribuyó más.</div>
                                         <div class="row">
                                             <!-- 1 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">1. Demanda Mental vs Demanda Física</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_1 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -297,15 +205,12 @@
                                             </div>
                                             <!-- 2 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">2. Demanda Mental vs Demanda Temporal</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_2 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -313,15 +218,12 @@
                                             </div>
                                             <!-- 3 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">3. Demanda Mental vs Rendimiento</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_3 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -329,15 +231,12 @@
                                             </div>
                                             <!-- 4 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">4. Demanda Mental vs Esfuerzo</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_4 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -345,15 +244,12 @@
                                             </div>
                                             <!-- 5 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">5. Demanda Mental vs Frustración</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_5 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -361,15 +257,12 @@
                                             </div>
                                             <!-- 6 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">6. Demanda Física vs Demanda Temporal</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_6 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -377,15 +270,12 @@
                                             </div>
                                             <!-- 7 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">7. Demanda Física vs Rendimiento</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_7 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -393,15 +283,12 @@
                                             </div>
                                             <!-- 8 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">8. Demanda Física vs Esfuerzo</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_8 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -409,15 +296,12 @@
                                             </div>
                                             <!-- 9 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">9. Demanda Física vs Frustración</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_9 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -425,15 +309,12 @@
                                             </div>
                                             <!-- 10 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">10. Demanda Temporal vs Rendimiento</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_10 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -441,15 +322,12 @@
                                             </div>
                                             <!-- 11 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">11. Demanda Temporal vs Esfuerzo</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_11 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -457,15 +335,12 @@
                                             </div>
                                             <!-- 12 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">12. Demanda Temporal vs Frustración</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_12 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -473,15 +348,12 @@
                                             </div>
                                             <!-- 13 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">13. Rendimiento vs Esfuerzo</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_13 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -489,15 +361,12 @@
                                             </div>
                                             <!-- 14 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">14. Rendimiento vs Frustración</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_14 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
@@ -505,336 +374,114 @@
                                             </div>
                                             <!-- 15 -->
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card border">
                                                     <div class="card-body">
                                                         <label class="form-label fw-bold">15. Esfuerzo vs Frustración</label>
                                                         <div class="comparacion-radio">
                                                             {% for radio in form.comparacion_15 %}
-                                                                <div class="form-check">
-                                                                    {{ radio.tag }}
-                                                                    <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                                                                </div>
+                                                                <div class="form-check">{{ radio.tag }}<label>{{ radio.choice_label }}</label></div>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        <!-- Notas adicionales -->
-                                        <div class="row mt-4">
-                                            <div class="col-12">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title mb-3">
-                                                            <i class="bi bi-chat-left-text me-2"></i>
-                                                            Notas Adicionales (Opcional)
-                                                        </h5>
-                                                        <div class="mb-3">
-                                                            {{ form.notas_adicionales }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
+
+                                        <div class="mt-3">{{ form.notas_adicionales }}</div>
+
                                         <div class="d-flex justify-content-between mt-4">
-                                            <button type="button" class="btn btn-outline-secondary prev-step" data-prev="step-2">
-                                                <i class="bi bi-arrow-left me-1"></i>Anterior
-                                            </button>
-                                            <button type="submit" class="btn btn-success" id="btn-enviar">
-                                                <i class="bi bi-check-circle me-1"></i>Completar Evaluación
-                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary prev-step" data-prev="step-2">Anterior</button>
+                                            <button type="submit" class="btn btn-success">Completar Evaluación</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </form>
-                        
-                        <!-- Barra de progreso -->
+
                         <div class="progress mt-4">
-                            <div class="progress-bar" id="progress-bar" role="progressbar" style="width: 33%;"></div>
-                        </div>
-                        <div class="d-flex justify-content-between mt-2">
-                            <small class="text-muted">Paso 1: Descripción</small>
-                            <small class="text-muted">Paso 2: Calificación</small>
-                            <small class="text-muted">Paso 3: Comparaciones</small>
+                            <div class="progress-bar" id="progress-bar" style="width: 33%;"></div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<!-- Tarjeta informativa NASA TLX (siempre visible) -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card bg-light">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="bi bi-info-circle me-2 text-primary"></i>
-                    Acerca del NASA TLX (Task Load Index)
-                </h5>
-                <p class="card-text small mb-3">
-                    El NASA TLX mide la carga de trabajo percibida en seis dimensiones. La puntuación total (0-100) se interpreta según los siguientes rangos:
-                </p>
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-success me-2">0-29</span>
-                            <strong>Carga BAJA</strong>
-                            <i class="bi bi-emoji-smile ms-2 text-success"></i>
+
+            <!-- INFO NASA TLX -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card bg-light border-0 rounded-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Acerca del NASA TLX</h5>
+                            <p class="small">Puntuación total (0-100): 0-29 Baja, 30-59 Moderada, 60-79 Alta, 80-100 Extrema</p>
                         </div>
-                        <small class="text-muted">Tarea poco demandante, fácil de realizar.</small>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-warning text-dark me-2">30-59</span>
-                            <strong>Carga MODERADA</strong>
-                            <i class="bi bi-emoji-neutral ms-2 text-warning"></i>
-                        </div>
-                        <small class="text-muted">Esfuerzo significativo pero manejable.</small>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-danger me-2">60-79</span>
-                            <strong>Carga ALTA</strong>
-                            <i class="bi bi-emoji-frown ms-2 text-danger"></i>
-                        </div>
-                        <small class="text-muted">Tarea muy demandante, puede afectar el rendimiento.</small>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-secondary me-2">80-100</span>
-                            <strong>Carga EXTREMA</strong>
-                            <i class="bi bi-emoji-dizzy ms-2 text-secondary"></i>
-                        </div>
-                        <small class="text-muted">Máxima carga, riesgo de error y fatiga.</small>
                     </div>
                 </div>
-                <hr class="my-3">
-                <div class="row">
-                    <div class="col-12">
-                        <strong>Dimensiones evaluadas:</strong>
-                        <span class="badge bg-info me-1">Demanda Mental</span>
-                        <span class="badge bg-info me-1">Demanda Física</span>
-                        <span class="badge bg-info me-1">Demanda Temporal</span>
-                        <span class="badge bg-info me-1">Rendimiento</span>
-                        <span class="badge bg-info me-1">Esfuerzo</span>
-                        <span class="badge bg-info me-1">Frustración</span>
-                    </div>
-                </div>
-                <small class="text-muted mt-2 d-block">
-                    <i class="bi bi-lightbulb"></i> La puntuación total es un promedio ponderado según la importancia que el usuario asigna a cada dimensión.
-                </small>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Elemento de video oculto -->
 <video id="video-preview-background" autoplay playsinline style="display: none;"></video>
 
-<!-- SCRIPT DE GRABACIÓN MEJORADO -->
 <script>
-// Variables globales
-let mediaRecorder = null;
-let recordedChunks = [];
-let mediaStream = null;
-let tiempo = 0;
-let timer = null;
-let grabando = false;
-let videoSettings = null;
+let mediaRecorder = null, recordedChunks = [], mediaStream = null, tiempo = 0, timer = null, grabando = false;
 const DURACION = 120;
 const urlGuardarVideo = "{% url 'PWMS:guardar_video_nasa_tlx' %}";
 
 function iniciarPruebaTLX() {
-    console.log('🖱️ iniciarPruebaTLX ejecutada');
-    
-    const panelInicial = document.getElementById('panel-inicial');
-    const contenidoPrueba = document.getElementById('contenido-prueba');
-    const videoPreview = document.getElementById('video-preview-background');
-    const videoPathInput = document.getElementById('video_path');
-    const statusSpan = document.getElementById('grabacion-tiempo');
-    const indicator = document.getElementById('grabacion-indicator');
-    const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-    
-    if (!contenidoPrueba) {
-        console.error('❌ No se encontró #contenido-prueba');
-        return;
-    }
-    
-    if (panelInicial) panelInicial.style.display = 'none';
-    contenidoPrueba.style.display = 'block';
-    contenidoPrueba.style.visibility = 'visible';
-    contenidoPrueba.style.opacity = '1';
-    
+    document.getElementById('panel-inicial').style.display = 'none';
+    document.getElementById('contenido-prueba').style.display = 'block';
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        .then(function(stream) {
-            console.log('✅ Cámara obtenida');
+        .then(stream => {
             mediaStream = stream;
-            
-            const track = stream.getVideoTracks()[0];
-            videoSettings = track.getSettings();
-            console.log('📷 Configuración:', videoSettings);
-            
-            if (indicator) indicator.style.display = 'flex';
-            
-            if (videoPreview) {
-                videoPreview.srcObject = stream;
-                videoPreview.style.display = 'none';
-                videoPreview.play();
-            }
-            
+            document.getElementById('grabacion-indicator').style.display = 'flex';
             recordedChunks = [];
-            const mimeTypes = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
-            let options = {};
-            for (let type of mimeTypes) {
-                if (MediaRecorder.isTypeSupported(type)) {
-                    options = { mimeType: type };
-                    break;
-                }
-            }
-            mediaRecorder = new MediaRecorder(stream, options);
-            
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) recordedChunks.push(e.data);
-            };
-            
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = e => { if(e.data.size) recordedChunks.push(e.data); };
             mediaRecorder.onstop = () => {
-                console.log('⏹️ Grabación detenida');
-                enviarVideo(csrf, videoPathInput);
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const fd = new FormData();
+                fd.append('video', blob, `nasa_tlx_${Date.now()}.webm`);
+                fetch(urlGuardarVideo, { method: 'POST', body: fd, headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value } })
+                    .then(r => r.json())
+                    .then(d => { if(d.video_path) document.getElementById('video_path').value = d.video_path; });
             };
-            
             mediaRecorder.start(1000);
             grabando = true;
-            tiempo = 0;
-            
-            timer = setInterval(() => {
-                tiempo++;
-                if (statusSpan) statusSpan.textContent = tiempo;
-                if (tiempo >= DURACION) {
-                    detenerGrabacion();
-                }
+            timer = setInterval(() => { 
+                tiempo++; 
+                document.getElementById('grabacion-tiempo').textContent = tiempo;
+                if(tiempo >= DURACION) detenerGrabacion();
             }, 1000);
-            
-            console.log('🔴 Grabando...');
-        })
-        .catch(function(err) {
-            console.error('❌ Error cámara:', err);
-            alert('No se pudo acceder a la cámara. La prueba continuará sin grabación.');
-            if (contenidoPrueba) contenidoPrueba.style.display = 'block';
-        });
+        }).catch(() => alert('No se pudo acceder a la cámara'));
 }
 
 function detenerGrabacion() {
-    if (!grabando) return;
+    if(!grabando) return;
     clearInterval(timer);
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-    }
-    if (mediaStream) {
-        mediaStream.getTracks().forEach(t => t.stop());
-    }
+    if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    if(mediaStream) mediaStream.getTracks().forEach(t => t.stop());
     grabando = false;
-    const indicator = document.getElementById('grabacion-indicator');
-    if (indicator) indicator.style.display = 'none';
+    document.getElementById('grabacion-indicator').style.display = 'none';
 }
 
-function enviarVideo(csrf, videoPathInput) {
-    if (recordedChunks.length === 0) {
-        console.warn('⚠️ No hay video');
-        return;
-    }
-    
-    const blob = new Blob(recordedChunks, { type: 'video/webm' });
-    const formData = new FormData();
-    formData.append('video', blob, `nasa_tlx_${Date.now()}.webm`);
-    
-    if (videoSettings) {
-        formData.append('metadata', JSON.stringify(videoSettings));
-    }
-    
-    fetch(urlGuardarVideo, {
-        method: 'POST',
-        body: formData,
-        headers: { 'X-CSRFToken': csrf || '' }
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log('✅ Video guardado:', data);
-        if (data.video_path) {
-            videoPathInput.value = data.video_path;
-        }
-    })
-    .catch(err => console.error('❌ Error en envío:', err));
-}
+document.getElementById('nasa-tlx-form')?.addEventListener('submit', () => { if(grabando) detenerGrabacion(); });
 
-// Detener grabación al enviar el formulario
-document.getElementById('nasa-tlx-form')?.addEventListener('submit', function() {
-    if (grabando) detenerGrabacion();
-});
-
-// Script para sliders y navegación
 document.addEventListener('DOMContentLoaded', function() {
-    // Sliders
-    const sliders = document.querySelectorAll('.form-range');
-    sliders.forEach(slider => {
-        const valueDisplay = document.getElementById(slider.id + '_value');
-        if (valueDisplay) {
-            valueDisplay.textContent = slider.value;
-            slider.addEventListener('input', function() {
-                valueDisplay.textContent = this.value;
-            });
-        }
-    });
-    
-    // Navegación por pasos
-    const steps = document.querySelectorAll('.step');
-    const progressBar = document.getElementById('progress-bar');
-    
-    window.showStep = function(stepId) {
-        steps.forEach(step => step.classList.add('d-none'));
-        document.getElementById(stepId).classList.remove('d-none');
-        const stepNumber = parseInt(stepId.split('-')[1]);
-        progressBar.style.width = `${(stepNumber / 3) * 100}%`;
-    };
-    
-    document.querySelectorAll('.next-step').forEach(btn => {
-        btn.addEventListener('click', function() {
-            showStep(this.dataset.next);
-        });
-    });
-    
-    document.querySelectorAll('.prev-step').forEach(btn => {
-        btn.addEventListener('click', function() {
-            showStep(this.dataset.prev);
-        });
-    });
-    
-    showStep('step-1');
-    
-    // Validación de comparaciones
-    document.getElementById('nasa-tlx-form').addEventListener('submit', function(e) {
-        const comparaciones = [
-            'comparacion_1', 'comparacion_2', 'comparacion_3', 'comparacion_4', 'comparacion_5',
-            'comparacion_6', 'comparacion_7', 'comparacion_8', 'comparacion_9', 'comparacion_10',
-            'comparacion_11', 'comparacion_12', 'comparacion_13', 'comparacion_14', 'comparacion_15'
-        ];
-        
-        let todasSeleccionadas = true;
-        comparaciones.forEach(comp => {
-            const seleccionado = document.querySelector(`input[name="${comp}"]:checked`);
-            if (!seleccionado) {
-                todasSeleccionadas = false;
-            }
-        });
-        
-        if (!todasSeleccionadas) {
-            e.preventDefault();
-            alert('Por favor, selecciona una opción en todas las comparaciones antes de enviar.');
-            showStep('step-3');
-        }
+    document.querySelectorAll('.next-step').forEach(btn => btn.addEventListener('click', function() {
+        document.querySelectorAll('.step').forEach(s => s.classList.add('d-none'));
+        document.getElementById(this.dataset.next).classList.remove('d-none');
+        const step = parseInt(this.dataset.next.split('-')[1]);
+        document.getElementById('progress-bar').style.width = `${(step/3)*100}%`;
+    }));
+    document.querySelectorAll('.prev-step').forEach(btn => btn.addEventListener('click', function() {
+        document.querySelectorAll('.step').forEach(s => s.classList.add('d-none'));
+        document.getElementById(this.dataset.prev).classList.remove('d-none');
+        const step = parseInt(this.dataset.prev.split('-')[1]);
+        document.getElementById('progress-bar').style.width = `${(step/3)*100}%`;
+    }));
+    document.querySelectorAll('.form-range').forEach(s => {
+        let span = document.getElementById(s.id.replace('_slider', '') + '_value');
+        if(span) { span.textContent = s.value; s.addEventListener('input', () => span.textContent = s.value); }
     });
 });
 </script>

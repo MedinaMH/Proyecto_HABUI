@@ -91,185 +91,98 @@ class RegistroPsicologicoForm(forms.ModelForm):
         }
 
 class NASATLXForm(forms.ModelForm):
-    """
-    Formulario para evaluación NASA TLX (Carga mental de trabajo)
-    """
-    # Diccionario para etiquetas de dimensiones
-    DIMENSIONES_CHOICES = {
-        'demanda_mental': 'Demanda Mental',
-        'demanda_fisica': 'Demanda Física', 
-        'demanda_temporal': 'Demanda Temporal',
-        'rendimiento': 'Rendimiento',
-        'esfuerzo': 'Esfuerzo',
-        'frustracion': 'Frustración',
-    }
-    
-    # Campos para las 15 comparaciones por pares
-    # Comparación 1
+    # ==================== 15 COMPARACIONES POR PARES ====================
     comparacion_1 = forms.ChoiceField(
-        choices=[
-            ('demanda_mental', 'Demanda Mental'),
-            ('demanda_fisica', 'Demanda Física')
-        ],
+        choices=[('demanda_mental', 'Demanda Mental'), ('demanda_fisica', 'Demanda Física')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="1. ¿Qué contribuyó más?",
+        label="1. Demanda Mental vs Demanda Física",
         required=True
     )
-    
-    # Comparación 2
     comparacion_2 = forms.ChoiceField(
-        choices=[
-            ('demanda_mental', 'Demanda Mental'),
-            ('demanda_temporal', 'Demanda Temporal')
-        ],
+        choices=[('demanda_mental', 'Demanda Mental'), ('demanda_temporal', 'Demanda Temporal')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="2. ¿Qué contribuyó más?",
+        label="2. Demanda Mental vs Demanda Temporal",
         required=True
     )
-    
-    # Comparación 3
     comparacion_3 = forms.ChoiceField(
-        choices=[
-            ('demanda_mental', 'Demanda Mental'),
-            ('rendimiento', 'Rendimiento')
-        ],
+        choices=[('demanda_mental', 'Demanda Mental'), ('rendimiento', 'Rendimiento')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="3. ¿Qué contribuyó más?",
+        label="3. Demanda Mental vs Rendimiento",
         required=True
     )
-    
-    # Comparación 4
     comparacion_4 = forms.ChoiceField(
-        choices=[
-            ('demanda_mental', 'Demanda Mental'),
-            ('esfuerzo', 'Esfuerzo')
-        ],
+        choices=[('demanda_mental', 'Demanda Mental'), ('esfuerzo', 'Esfuerzo')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="4. ¿Qué contribuyó más?",
+        label="4. Demanda Mental vs Esfuerzo",
         required=True
     )
-    
-    # Comparación 5
     comparacion_5 = forms.ChoiceField(
-        choices=[
-            ('demanda_mental', 'Demanda Mental'),
-            ('frustracion', 'Frustración')
-        ],
+        choices=[('demanda_mental', 'Demanda Mental'), ('frustracion', 'Frustración')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="5. ¿Qué contribuyó más?",
+        label="5. Demanda Mental vs Frustración",
         required=True
     )
-    
-    # Comparación 6
     comparacion_6 = forms.ChoiceField(
-        choices=[
-            ('demanda_fisica', 'Demanda Física'),
-            ('demanda_temporal', 'Demanda Temporal')
-        ],
+        choices=[('demanda_fisica', 'Demanda Física'), ('demanda_temporal', 'Demanda Temporal')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="6. ¿Qué contribuyó más?",
+        label="6. Demanda Física vs Demanda Temporal",
         required=True
     )
-    
-    # Comparación 7
     comparacion_7 = forms.ChoiceField(
-        choices=[
-            ('demanda_fisica', 'Demanda Física'),
-            ('rendimiento', 'Rendimiento')
-        ],
+        choices=[('demanda_fisica', 'Demanda Física'), ('rendimiento', 'Rendimiento')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="7. ¿Qué contribuyó más?",
+        label="7. Demanda Física vs Rendimiento",
         required=True
     )
-    
-    # Comparación 8
     comparacion_8 = forms.ChoiceField(
-        choices=[
-            ('demanda_fisica', 'Demanda Física'),
-            ('esfuerzo', 'Esfuerzo')
-        ],
+        choices=[('demanda_fisica', 'Demanda Física'), ('esfuerzo', 'Esfuerzo')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="8. ¿Qué contribuyó más?",
+        label="8. Demanda Física vs Esfuerzo",
         required=True
     )
-    
-    # Comparación 9
     comparacion_9 = forms.ChoiceField(
-        choices=[
-            ('demanda_fisica', 'Demanda Física'),
-            ('frustracion', 'Frustración')
-        ],
+        choices=[('demanda_fisica', 'Demanda Física'), ('frustracion', 'Frustración')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="9. ¿Qué contribuyó más?",
+        label="9. Demanda Física vs Frustración",
         required=True
     )
-    
-    # Comparación 10
     comparacion_10 = forms.ChoiceField(
-        choices=[
-            ('demanda_temporal', 'Demanda Temporal'),
-            ('rendimiento', 'Rendimiento')
-        ],
+        choices=[('demanda_temporal', 'Demanda Temporal'), ('rendimiento', 'Rendimiento')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="10. ¿Qué contribuyó más?",
+        label="10. Demanda Temporal vs Rendimiento",
         required=True
     )
-    
-    # Comparación 11
     comparacion_11 = forms.ChoiceField(
-        choices=[
-            ('demanda_temporal', 'Demanda Temporal'),
-            ('esfuerzo', 'Esfuerzo')
-        ],
+        choices=[('demanda_temporal', 'Demanda Temporal'), ('esfuerzo', 'Esfuerzo')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="11. ¿Qué contribuyó más?",
+        label="11. Demanda Temporal vs Esfuerzo",
         required=True
     )
-    
-    # Comparación 12
     comparacion_12 = forms.ChoiceField(
-        choices=[
-            ('demanda_temporal', 'Demanda Temporal'),
-            ('frustracion', 'Frustración')
-        ],
+        choices=[('demanda_temporal', 'Demanda Temporal'), ('frustracion', 'Frustración')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="12. ¿Qué contribuyó más?",
+        label="12. Demanda Temporal vs Frustración",
         required=True
     )
-    
-    # Comparación 13
     comparacion_13 = forms.ChoiceField(
-        choices=[
-            ('rendimiento', 'Rendimiento'),
-            ('esfuerzo', 'Esfuerzo')
-        ],
+        choices=[('rendimiento', 'Rendimiento'), ('esfuerzo', 'Esfuerzo')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="13. ¿Qué contribuyó más?",
+        label="13. Rendimiento vs Esfuerzo",
         required=True
     )
-    
-    # Comparación 14
     comparacion_14 = forms.ChoiceField(
-        choices=[
-            ('rendimiento', 'Rendimiento'),
-            ('frustracion', 'Frustración')
-        ],
+        choices=[('rendimiento', 'Rendimiento'), ('frustracion', 'Frustración')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="14. ¿Qué contribuyó más?",
+        label="14. Rendimiento vs Frustración",
         required=True
     )
-    
-    # Comparación 15
     comparacion_15 = forms.ChoiceField(
-        choices=[
-            ('esfuerzo', 'Esfuerzo'),
-            ('frustracion', 'Frustración')
-        ],
+        choices=[('esfuerzo', 'Esfuerzo'), ('frustracion', 'Frustración')],
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="15. ¿Qué contribuyó más?",
+        label="15. Esfuerzo vs Frustración",
         required=True
     )
-    
+
     class Meta:
         model = EvaluacionNASATLX
         fields = [
@@ -282,55 +195,31 @@ class NASATLXForm(forms.ModelForm):
             'tarea_descripcion': forms.Textarea(attrs={
                 'rows': 3,
                 'class': 'form-control',
-                'placeholder': 'Ej: Realizar informe mensual, Reunión de equipo, Manejar situación de crisis...'
+                'placeholder': 'Ej: Realizar informe mensual, Reunión de equipo...'
             }),
             'demanda_mental': forms.NumberInput(attrs={
-                'type': 'range',
-                'min': '1',
-                'max': '20',
-                'step': '1',
-                'class': 'form-range tlx-slider',
-                'id': 'demanda_mental_slider'
+                'type': 'range', 'min': 0, 'max': 20, 'step': 1,
+                'class': 'form-range tlx-slider', 'id': 'demanda_mental_slider'
             }),
             'demanda_fisica': forms.NumberInput(attrs={
-                'type': 'range',
-                'min': '0',
-                'max': '100',
-                'step': '5',
-                'class': 'form-range tlx-slider',
-                'id': 'demanda_fisica_slider'
+                'type': 'range', 'min': 0, 'max': 20, 'step': 1,
+                'class': 'form-range tlx-slider', 'id': 'demanda_fisica_slider'
             }),
             'demanda_temporal': forms.NumberInput(attrs={
-                'type': 'range',
-                'min': '0',
-                'max': '100',
-                'step': '5',
-                'class': 'form-range tlx-slider',
-                'id': 'demanda_temporal_slider'
+                'type': 'range', 'min': 0, 'max': 20, 'step': 1,
+                'class': 'form-range tlx-slider', 'id': 'demanda_temporal_slider'
             }),
             'rendimiento': forms.NumberInput(attrs={
-                'type': 'range',
-                'min': '0',
-                'max': '100',
-                'step': '5',
-                'class': 'form-range tlx-slider',
-                'id': 'rendimiento_slider'
+                'type': 'range', 'min': 0, 'max': 20, 'step': 1,
+                'class': 'form-range tlx-slider', 'id': 'rendimiento_slider'
             }),
             'esfuerzo': forms.NumberInput(attrs={
-                'type': 'range',
-                'min': '0',
-                'max': '100',
-                'step': '5',
-                'class': 'form-range tlx-slider',
-                'id': 'esfuerzo_slider'
+                'type': 'range', 'min': 0, 'max': 20, 'step': 1,
+                'class': 'form-range tlx-slider', 'id': 'esfuerzo_slider'
             }),
             'frustracion': forms.NumberInput(attrs={
-                'type': 'range',
-                'min': '0',
-                'max': '100',
-                'step': '5',
-                'class': 'form-range tlx-slider',
-                'id': 'frustracion_slider'
+                'type': 'range', 'min': 0, 'max': 20, 'step': 1,
+                'class': 'form-range tlx-slider', 'id': 'frustracion_slider'
             }),
             'notas_adicionales': forms.Textarea(attrs={
                 'rows': 3,
@@ -339,29 +228,24 @@ class NASATLXForm(forms.ModelForm):
             }),
         }
         labels = {
-            'demanda_mental': 'Demanda Mental (0-100)',
-            'demanda_fisica': 'Demanda Física (0-100)',
-            'demanda_temporal': 'Demanda Temporal (0-100)',
-            'rendimiento': 'Rendimiento (0-100)',
-            'esfuerzo': 'Esfuerzo (0-100)',
-            'frustracion': 'Frustración (0-100)',
+            'demanda_mental': 'Demanda Mental (0-20)',
+            'demanda_fisica': 'Demanda Física (0-20)',
+            'demanda_temporal': 'Demanda Temporal (0-20)',
+            'rendimiento': 'Rendimiento (0-20)',
+            'esfuerzo': 'Esfuerzo (0-20)',
+            'frustracion': 'Frustración (0-20)',
         }
-        help_texts = {
-            'rendimiento': 'NOTA: Una puntuación ALTA en Rendimiento significa BUEN rendimiento (menor carga)',
-        }
-    
+
     def clean(self):
         cleaned_data = super().clean()
-        
-        # Validar que todos los campos de rango estén entre 0 y 100
-        dimension_fields = ['demanda_mental', 'demanda_fisica', 'demanda_temporal', 'rendimiento', 'esfuerzo', 'frustracion']
-        
+        dimension_fields = ['demanda_mental', 'demanda_fisica', 'demanda_temporal',
+                            'rendimiento', 'esfuerzo', 'frustracion']
         for field in dimension_fields:
             value = cleaned_data.get(field)
-            if value is not None and (value < 0 or value > 100):
-                self.add_error(field, 'El valor debe estar entre 0 y 100')
-        
+            if value is not None and (value < 0 or value > 20):
+                self.add_error(field, 'El valor debe estar entre 0 y 20')
         return cleaned_data
+        
 class RegistroFisiologicoForm(forms.ModelForm):
     """
     Formulario para registro fisiológico
