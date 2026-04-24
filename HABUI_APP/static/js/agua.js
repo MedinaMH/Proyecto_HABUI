@@ -423,12 +423,36 @@ function crearTanqueAgua(containerId, valorInicial) {
 // ============================================================
 function crearSerieTemporalAgua() {
     const container = d3.select("#serie-temporal");
-    container.html(""); // Limpiar contenedor
+    container.html("");
 
-    const outerW = 1200, outerH = 600;
+    const outerW = 1200;
+    const outerH = 600;
     const margin = { top: 50, right: 40, bottom: 60, left: 80 };
     const width = outerW - margin.left - margin.right;
     const height = outerH - margin.top - margin.bottom;
+
+    // ===================== CONFIGURACIÓN DE VENTANA TEMPORAL =====================
+    // Ventana inicial: 1 minuto
+    const DEFAULT_WINDOW_MS = 60 * 1000;
+
+    // Límites de zoom
+    const MIN_WINDOW_MS = 10 * 1000;              // 10 segundos
+    const MAX_WINDOW_MS = 24 * 60 * 60 * 1000;    // 24 horas
+
+    const ZOOM_FACTOR = 0.18;
+    const LIVE_EDGE_TOLERANCE_MS = 1500;
+    const DRAG_DIRECTION_THRESHOLD_PX = 2;
+
+    let data = [];
+    let currentViewStart = null;
+    let currentViewEnd = null;
+    let currentWindowMs = DEFAULT_WINDOW_MS;
+    let autoFollowLatest = true;
+
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartViewStart = null;
+    let dragStartViewEnd = null;
 
     const svg = container.append("svg")
         .attr("width", outerW)
@@ -438,9 +462,10 @@ function crearSerieTemporalAgua() {
         .style("border-radius", "12px")
         .style("box-shadow", "0 4px 20px rgba(0, 191, 255, 0.15)");
 
-    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    const g = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Título
+    // ===================== TÍTULO =====================
     svg.append("text")
         .attr("x", outerW / 2)
         .attr("y", 28)
@@ -449,10 +474,14 @@ function crearSerieTemporalAgua() {
         .attr("font-weight", "700")
         .attr("text-anchor", "middle")
         .style("letter-spacing", "0.5px")
-        .text(TRANSLATIONS.level_history || "HISTÓRICO DE NIVELES DE AGUA (%)");
+        .text(
+            typeof TRANSLATIONS !== "undefined" && TRANSLATIONS.level_history
+                ? TRANSLATIONS.level_history
+                : "HISTÓRICO DE NIVELES DE AGUA (%)"
+        );
 
-    // Botón para regresar al inicio
-    const homeButton = container.append("button")
+    // ===================== BOTÓN HOME =====================
+    container.append("button")
         .attr("class", "btn btn-sm")
         .style("position", "absolute")
         .style("top", "12px")
@@ -465,29 +494,27 @@ function crearSerieTemporalAgua() {
         .style("cursor", "pointer")
         .style("z-index", "10")
         .style("transition", "all 0.3s")
+        .attr("title", "Volver al último minuto")
         .html('<i class="bi bi-house-door"></i>')
-        .on("mouseover", function() {
+        .on("mouseover", function () {
             d3.select(this)
                 .style("background", "#00bfff")
                 .style("color", "#0f172a")
                 .style("transform", "scale(1.05)");
         })
-        .on("mouseout", function() {
+        .on("mouseout", function () {
             d3.select(this)
                 .style("background", "rgba(0, 191, 255, 0.2)")
                 .style("color", "#00bfff")
                 .style("transform", "scale(1)");
         })
-        .on("click", function() {
-            // Regresar al inicio 
-            currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
-            redraw();
-            
-            // Efecto visual de click
+        .on("click", function () {
+            goToLatest(true);
+
             d3.select(this)
                 .style("background", "#0099cc")
                 .style("color", "#0f172a");
-            
+
             setTimeout(() => {
                 d3.select(this)
                     .style("background", "rgba(0, 191, 255, 0.2)")
@@ -495,16 +522,39 @@ function crearSerieTemporalAgua() {
             }, 300);
         });
 
-    // Scales
+    // Ayuda visual discreta
+    container.append("div")
+        .style("position", "absolute")
+        .style("bottom", "70px")
+        .style("right", "14px")
+        .style("font-size", "10px")
+        .style("color", "#475569")
+        .style("pointer-events", "none")
+        .text("🖱 Rueda: zoom  |  Arrastrar: desplazar  |  Doble clic: volver al final");
+
+    // ===================== ESCALAS =====================
     const x = d3.scaleTime().range([0, width]);
     const y = d3.scaleLinear().range([height, 0]);
 
-    // Gradiente para el área
-    const gradient = svg.append("defs")
-        .append("linearGradient")
-        .attr("id", "water-gradient")
-        .attr("x1", "0%").attr("y1", "0%")
-        .attr("x2", "0%").attr("y2", "100%");
+    const waterColors = {
+        critico: "#ff4444",
+        bajo: "#ffaa00",
+        normal: "#00bfff",
+        optimo: "#00cc66"
+    };
+
+    const gradientId = "water-gradient-temporal";
+    const lineGradientId = "water-line-gradient-temporal";
+
+    // ===================== DEFS / GRADIENTES =====================
+    const defs = svg.append("defs");
+
+    const gradient = defs.append("linearGradient")
+        .attr("id", gradientId)
+        .attr("x1", "0%")
+        .attr("y1", "0%")
+        .attr("x2", "0%")
+        .attr("y2", "100%");
 
     gradient.append("stop")
         .attr("offset", "0%")
@@ -513,18 +563,20 @@ function crearSerieTemporalAgua() {
 
     gradient.append("stop")
         .attr("offset", "80%")
-        .attr("stop-color", "rgba(0, 191, 255, 0.1)");
+        .attr("stop-color", "rgba(0, 191, 255, 0.1)")
+        .attr("stop-opacity", 0.2);
 
     gradient.append("stop")
         .attr("offset", "100%")
-        .attr("stop-color", "rgba(0, 191, 255, 0.05)");
+        .attr("stop-color", "rgba(0, 191, 255, 0.05)")
+        .attr("stop-opacity", 0.1);
 
-    // Gradiente para la línea
-    const lineGradient = svg.append("defs")
-        .append("linearGradient")
-        .attr("id", "water-line-gradient")
-        .attr("x1", "0%").attr("y1", "0%")
-        .attr("x2", "100%").attr("y2", "0%");
+    const lineGradient = defs.append("linearGradient")
+        .attr("id", lineGradientId)
+        .attr("x1", "0%")
+        .attr("y1", "0%")
+        .attr("x2", "100%")
+        .attr("y2", "0%");
 
     lineGradient.append("stop")
         .attr("offset", "0%")
@@ -534,7 +586,7 @@ function crearSerieTemporalAgua() {
         .attr("offset", "100%")
         .attr("stop-color", "#0066cc");
 
-    // Generadores de línea y área
+    // ===================== GENERADORES =====================
     const line = d3.line()
         .x(d => x(d.time))
         .y(d => y(d.value))
@@ -546,25 +598,25 @@ function crearSerieTemporalAgua() {
         .y1(d => y(d.value))
         .curve(d3.curveMonotoneX);
 
-    // Grid horizontal
+    const zonesGroup = g.append("g")
+        .attr("class", "zones-group");
+
     const grid = g.append("g")
         .attr("class", "grid");
 
-    // Área de fondo con gradiente
     const areaPath = g.append("path")
         .attr("class", "area-water")
-        .attr("fill", "url(#water-gradient)")
+        .attr("fill", `url(#${gradientId})`)
         .attr("stroke", "none");
 
-    // Línea principal
     const path = g.append("path")
         .attr("class", "line-water")
         .attr("fill", "none")
-        .attr("stroke", "url(#water-line-gradient)")
+        .attr("stroke", `url(#${lineGradientId})`)
         .attr("stroke-width", 3.5)
         .style("filter", "drop-shadow(0 0 8px rgba(0, 191, 255, 0.5))");
 
-    // Ejes
+    // ===================== EJES =====================
     const xAxisG = g.append("g")
         .attr("class", "x-axis")
         .attr("transform", `translate(0,${height})`)
@@ -574,7 +626,6 @@ function crearSerieTemporalAgua() {
         .attr("class", "y-axis")
         .style("font-size", "12px");
 
-    // Etiqueta eje Y 
     g.append("text")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
@@ -583,8 +634,12 @@ function crearSerieTemporalAgua() {
         .attr("font-size", "22px")
         .attr("font-weight", "600")
         .attr("text-anchor", "middle")
-        .text(TRANSLATIONS.nivel || "Nivel (%)");
-    
+        .text(
+            typeof TRANSLATIONS !== "undefined" && TRANSLATIONS.nivel
+                ? TRANSLATIONS.nivel
+                : "Nivel (%)"
+        );
+
     g.append("text")
         .attr("x", width / 2)
         .attr("y", height + 40)
@@ -592,18 +647,43 @@ function crearSerieTemporalAgua() {
         .attr("font-size", "22px")
         .attr("font-weight", "600")
         .attr("text-anchor", "middle")
-        .text(TRANSLATIONS.tiempo || "Tiempo");
+        .text(
+            typeof TRANSLATIONS !== "undefined" && TRANSLATIONS.tiempo
+                ? TRANSLATIONS.tiempo
+                : "Tiempo"
+        );
 
-    // Zonas de nivel de agua en el fondo
+    // ===================== ZONAS DE NIVEL DE AGUA =====================
     const waterZonesData = [
-        {min: 0, max: 20, color: "rgba(244, 67, 54, 0.08)", label: "CRÍTICO"},
-        {min: 20, max: 40, color: "rgba(255, 193, 7, 0.08)", label: "BAJO"},
-        {min: 40, max: 70, color: "rgba(33, 150, 243, 0.08)", label: "NORMAL"},
-        {min: 70, max: 100, color: "rgba(76, 175, 80, 0.08)", label: "ÓPTIMO"}
+        {
+            min: 0,
+            max: 20,
+            color: "rgba(244, 67, 54, 0.08)",
+            label: "CRÍTICO"
+        },
+        {
+            min: 20,
+            max: 40,
+            color: "rgba(255, 193, 7, 0.08)",
+            label: "BAJO"
+        },
+        {
+            min: 40,
+            max: 70,
+            color: "rgba(33, 150, 243, 0.08)",
+            label: "NORMAL"
+        },
+        {
+            min: 70,
+            max: 100,
+            color: "rgba(76, 175, 80, 0.08)",
+            label: "ÓPTIMO"
+        }
     ];
 
+    // ===================== TOOLTIP =====================
     d3.select("body").selectAll(".tooltip-water").remove();
-    // Tooltip
+
     const tooltip = d3.select("body").append("div")
         .attr("class", "tooltip-water")
         .style("position", "absolute")
@@ -620,7 +700,6 @@ function crearSerieTemporalAgua() {
         .style("backdrop-filter", "blur(4px)")
         .style("z-index", "9999");
 
-    // Punto focal interactivo
     const focus = g.append("circle")
         .attr("class", "focus-point")
         .attr("r", 0)
@@ -630,7 +709,6 @@ function crearSerieTemporalAgua() {
         .style("filter", "drop-shadow(0 0 6px rgba(0, 255, 204, 0.8))")
         .style("opacity", 0);
 
-    // Línea vertical guía
     const verticalLine = g.append("line")
         .attr("class", "vertical-line")
         .attr("stroke", "rgba(255, 255, 255, 0.3)")
@@ -638,7 +716,7 @@ function crearSerieTemporalAgua() {
         .attr("stroke-dasharray", "5,5")
         .style("opacity", 0);
 
-    // Línea de referencia (nivel recomendado 70%)
+    // Línea de referencia: nivel óptimo recomendado 70 %
     const referenceLine = g.append("line")
         .attr("class", "reference-line")
         .attr("stroke", "rgba(255, 255, 255, 0.5)")
@@ -646,37 +724,206 @@ function crearSerieTemporalAgua() {
         .attr("stroke-dasharray", "8,4")
         .style("opacity", 0.6);
 
-    // Variables de control (EXACTAMENTE IGUAL AL CO₂)
-    let data = []; // Todos los datos
-    const MAX_VISIBLE_POINTS = 15;
-    const MAX_MEMORY_POINTS = 1000;
-    let currentStartIndex = 0;
-    let isDragging = false;
-    let dragStartX = 0;
-
-    // Función para obtener datos visibles (EXACTAMENTE IGUAL AL CO₂)
-    function getVisibleData() {
-        if (data.length === 0) return [];
-        
-        const endIndex = Math.min(currentStartIndex + MAX_VISIBLE_POINTS, data.length);
-        
-        if (endIndex - currentStartIndex < MAX_VISIBLE_POINTS && data.length >= MAX_VISIBLE_POINTS) {
-            currentStartIndex = data.length - MAX_VISIBLE_POINTS;
-        }
-        
-        return data.slice(currentStartIndex, endIndex);
+    // ===================== FUNCIONES AUXILIARES =====================
+    function clamp(value, minValue, maxValue) {
+        return Math.max(minValue, Math.min(maxValue, value));
     }
 
-    // Función para redibujar el gráfico
-    function redraw() {
-        const visibleData = getVisibleData();
-        if (visibleData.length === 0) return;
+    function getWaterValue(item) {
+        const value =
+            item.nivel ??
+            item.valor ??
+            item.agua ??
+            item.value;
 
-        x.domain(d3.extent(visibleData, d => d.time));
-        y.domain([0, 100]); // Agua siempre de 0 a 100%
+        return parseFloat(value);
+    }
+
+    function getWaterDate(item) {
+        return item.fecha_hora || item.timestamp || item.created_at || item.time;
+    }
+
+    function getLatestTime() {
+        if (data.length === 0) return new Date();
+        return data[data.length - 1].time;
+    }
+
+    function getEarliestTime() {
+        if (data.length === 0) return new Date();
+        return data[0].time;
+    }
+
+    function ensureViewInitialized() {
+        if (currentViewStart && currentViewEnd) return;
+
+        const latest = getLatestTime();
+
+        currentViewEnd = new Date(latest);
+        currentViewStart = new Date(latest.getTime() - currentWindowMs);
+    }
+
+    function getVisibleData() {
+        ensureViewInitialized();
+
+        return data.filter(d => {
+            return d.time >= currentViewStart && d.time <= currentViewEnd;
+        });
+    }
+
+    function setHistoricalMode() {
+        autoFollowLatest = false;
+    }
+
+    function setLiveMode() {
+        autoFollowLatest = true;
+    }
+
+    function goToLatest(resetToOneMinute = false) {
+        if (resetToOneMinute) {
+            currentWindowMs = DEFAULT_WINDOW_MS;
+        }
+
+        const latest = getLatestTime();
+
+        currentViewEnd = new Date(latest);
+        currentViewStart = new Date(latest.getTime() - currentWindowMs);
+
+        setLiveMode();
+        redraw();
+    }
+
+    function clampViewToDataRange() {
+        if (data.length === 0 || !currentViewStart || !currentViewEnd) return;
+
+        const earliest = getEarliestTime();
+        const latest = getLatestTime();
+        const viewMs = currentViewEnd.getTime() - currentViewStart.getTime();
+
+        if (currentViewStart.getTime() < earliest.getTime()) {
+            currentViewStart = new Date(earliest);
+            currentViewEnd = new Date(earliest.getTime() + viewMs);
+        }
+
+        if (currentViewEnd.getTime() > latest.getTime()) {
+            currentViewEnd = new Date(latest);
+            currentViewStart = new Date(latest.getTime() - viewMs);
+        }
+
+        currentWindowMs = currentViewEnd.getTime() - currentViewStart.getTime();
+    }
+
+    function maybeReactivateLiveFromPan() {
+        if (data.length === 0 || !currentViewEnd) return;
+
+        const latest = getLatestTime();
+        const tolerance = Math.max(LIVE_EDGE_TOLERANCE_MS, currentWindowMs * 0.01);
+
+        if (
+            Math.abs(currentViewEnd.getTime() - latest.getTime()) <= tolerance ||
+            currentViewEnd.getTime() >= latest.getTime()
+        ) {
+            currentViewEnd = new Date(latest);
+            currentViewStart = new Date(latest.getTime() - currentWindowMs);
+            setLiveMode();
+        }
+    }
+
+    function updateViewForNewData() {
+        if (!currentViewStart || !currentViewEnd) {
+            ensureViewInitialized();
+            return;
+        }
+
+        if (autoFollowLatest) {
+            const latest = getLatestTime();
+
+            currentViewEnd = new Date(latest);
+            currentViewStart = new Date(latest.getTime() - currentWindowMs);
+        }
+    }
+
+    function getTickFormatter() {
+        if (currentWindowMs <= 60 * 1000) {
+            return d3.timeFormat("%H:%M:%S");
+        }
+
+        if (currentWindowMs <= 60 * 60 * 1000) {
+            return d3.timeFormat("%H:%M:%S");
+        }
+
+        if (currentWindowMs <= 24 * 60 * 60 * 1000) {
+            return d3.timeFormat("%d/%m %H:%M");
+        }
+
+        return d3.timeFormat("%d/%m/%Y %H:%M");
+    }
+
+    function formatWindowLabel(ms) {
+        if (ms < 60000) {
+            return `${Math.round(ms / 1000)}s`;
+        }
+
+        if (ms < 3600000) {
+            return `${(ms / 60000).toFixed(1)} min`;
+        }
+
+        if (ms < 86400000) {
+            return `${(ms / 3600000).toFixed(1)} h`;
+        }
+
+        return `${(ms / 86400000).toFixed(1)} d`;
+    }
+
+    function getWaterLevel(v) {
+        if (v < 20) {
+            return {
+                level: "CRÍTICO",
+                color: waterColors.critico,
+                emoji: "🔴",
+                descripcion: "¡Nivel crítico! Reponer agua urgentemente"
+            };
+        }
+
+        if (v < 40) {
+            return {
+                level: "BAJO",
+                color: waterColors.bajo,
+                emoji: "🟡",
+                descripcion: "Nivel bajo, se recomienda planificar reposición"
+            };
+        }
+
+        if (v < 70) {
+            return {
+                level: "NORMAL",
+                color: waterColors.normal,
+                emoji: "🔵",
+                descripcion: "Nivel operativo normal"
+            };
+        }
+
+        return {
+            level: "ÓPTIMO",
+            color: waterColors.optimo,
+            emoji: "🟢",
+            descripcion: "Nivel óptimo de disponibilidad"
+        };
+    }
+
+    // ===================== REDIBUJADO =====================
+    function redraw() {
+        updateViewForNewData();
+
+        const visibleData = getVisibleData();
+
+        if (!currentViewStart || !currentViewEnd) return;
+
+        x.domain([currentViewStart, currentViewEnd]);
+        y.domain([0, 100]);
 
         // Zonas de nivel de agua
-        const waterZones = g.selectAll(".water-zone").data(waterZonesData);
+        const waterZones = zonesGroup.selectAll(".water-zone")
+            .data(waterZonesData);
 
         waterZones.enter()
             .append("rect")
@@ -691,28 +938,36 @@ function crearSerieTemporalAgua() {
 
         waterZones.exit().remove();
 
-        // Actualizar línea de referencia (70% óptimo)
+        // Línea de referencia 70 %
         const recommendedLevel = 70;
+
         referenceLine
             .attr("x1", 0)
             .attr("y1", y(recommendedLevel))
             .attr("x2", width)
-            .attr("y2", y(recommendedLevel));
+            .attr("y2", y(recommendedLevel))
+            .style("opacity", 0.6);
 
-        // Actualizar grid
-        grid.call(d3.axisLeft(y)
-            .ticks(6)
-            .tickSize(-width)
-            .tickFormat(""))
+        // Grid
+        grid.call(
+            d3.axisLeft(y)
+                .ticks(6)
+                .tickSize(-width)
+                .tickFormat("")
+        )
             .attr("opacity", 0.15)
             .selectAll("line")
             .attr("stroke", "#00bfff");
 
-        // Actualizar ejes
-        xAxisG.call(d3.axisBottom(x)
-            .ticks(Math.min(6, visibleData.length))
-            .tickFormat(d3.timeFormat("%H:%M:%S"))
-            .tickSizeOuter(0))
+        grid.select(".domain").remove();
+
+        // Eje X
+        xAxisG.call(
+            d3.axisBottom(x)
+                .ticks(6)
+                .tickFormat(getTickFormatter())
+                .tickSizeOuter(0)
+        )
             .selectAll("text")
             .attr("fill", "#94a3b8")
             .attr("font-size", "11px")
@@ -722,10 +977,13 @@ function crearSerieTemporalAgua() {
             .attr("stroke", "#00bfff")
             .attr("opacity", 0.5);
 
-        yAxisG.call(d3.axisLeft(y)
-            .ticks(6)
-            .tickFormat(d => d + "%")
-            .tickSizeOuter(0))
+        // Eje Y
+        yAxisG.call(
+            d3.axisLeft(y)
+                .ticks(6)
+                .tickFormat(d => `${d}%`)
+                .tickSizeOuter(0)
+        )
             .selectAll("text")
             .attr("fill", "#94a3b8")
             .attr("font-size", "11px")
@@ -736,46 +994,61 @@ function crearSerieTemporalAgua() {
             .attr("stroke", "#00bfff")
             .attr("opacity", 0.5);
 
-        yAxisG.select(".domain").attr("stroke", "none");
+        yAxisG.select(".domain")
+            .attr("stroke", "none");
 
-        // Actualizar línea y área
-        path.datum(visibleData)
-            .transition()
-            .duration(300)
-            .ease(d3.easeCubicOut)
-            .attr("d", line);
+        // Línea y área
+        if (visibleData.length > 0) {
+            path.datum(visibleData)
+                .transition()
+                .duration(250)
+                .ease(d3.easeCubicOut)
+                .attr("d", line);
 
-        areaPath.datum(visibleData)
-            .transition()
-            .duration(300)
-            .ease(d3.easeCubicOut)
-            .attr("d", area);
+            areaPath.datum(visibleData)
+                .transition()
+                .duration(250)
+                .ease(d3.easeCubicOut)
+                .attr("d", area);
+        } else {
+            path.datum([])
+                .attr("d", line);
 
-        // Puntos de datos
+            areaPath.datum([])
+                .attr("d", area);
+        }
+
+        // Puntos
+        const showPoints = visibleData.length <= 350;
+        const pointData = showPoints ? visibleData : [];
+
         const points = g.selectAll(".data-point")
-            .data(visibleData, d => d.id);
+            .data(pointData, d => d.id);
 
         points.enter()
             .append("circle")
             .attr("class", "data-point")
+            .attr("r", 0)
             .merge(points)
             .attr("cx", d => x(d.time))
             .attr("cy", d => y(d.value))
+            .transition()
+            .duration(150)
             .attr("r", 4)
-            .attr("fill", d => {
-                if (d.value < 20) return "#ff4444";
-                if (d.value < 40) return "#ffaa00";
-                if (d.value < 70) return "#00bfff";
-                return "#00cc66";
-            })
+            .attr("fill", d => getWaterLevel(d.value).color)
             .attr("stroke", "#ffffff")
             .attr("stroke-width", 1.5)
-            .style("opacity", 0.9)
+            .style("opacity", 0.9);
+
+        g.selectAll(".data-point")
             .style("cursor", "pointer")
-            .on("mouseover", function(event, d) {
+            .on("mouseover", function (event, d) {
+                const levelInfo = getWaterLevel(d.value);
+
                 focus
                     .attr("cx", x(d.time))
                     .attr("cy", y(d.value))
+                    .attr("fill", levelInfo.color)
                     .transition()
                     .duration(200)
                     .attr("r", 8)
@@ -790,46 +1063,33 @@ function crearSerieTemporalAgua() {
                     .duration(200)
                     .style("opacity", 1);
 
-                let nivelTexto, nivelColor;
-                if (d.value < 20) {
-                    nivelTexto = "CRÍTICO";
-                    nivelColor = "#ff4444";
-                } else if (d.value < 40) {
-                    nivelTexto = "BAJO";
-                    nivelColor = "#ffaa00";
-                } else if (d.value < 70) {
-                    nivelTexto = "NORMAL";
-                    nivelColor = "#00bfff";
-                } else {
-                    nivelTexto = "ÓPTIMO";
-                    nivelColor = "#00cc66";
-                }
-
                 tooltip
                     .html(`
                         <div style="display: flex; align-items: center; margin-bottom: 6px;">
-                            <div style="width: 12px; height: 12px; background: ${nivelColor}; border-radius: 50%; margin-right: 8px;"></div>
+                            <div style="width: 12px; height: 12px; background: ${levelInfo.color}; border-radius: 50%; margin-right: 8px;"></div>
                             <strong style="font-size: 16px; color: #00bfff;">${d.value.toFixed(1)}%</strong>
                         </div>
                         <div style="color: #94a3b8; margin-bottom: 4px;">
-                            <span style="color: ${nivelColor}; font-weight: 600;">${nivelTexto}</span>
-                            <span style="margin-left: 8px; font-size: 11px;">
-                                ${d.value < 20 ? '🔴 ' : d.value < 40 ? '🟡 ' : d.value < 70 ? '🔵 ' : '🟢 '}
+                            <span style="color: ${levelInfo.color}; font-weight: 600;">
+                                ${levelInfo.emoji} ${levelInfo.level}
                             </span>
                         </div>
-                        <div style="font-size: 11px; color: #cbd5e1;">
+                        <div style="font-size: 12px; color: #94a3b8; margin-bottom: 6px;">
+                            ${levelInfo.descripcion}
+                        </div>
+                        <div style="font-size: 11px; color: #cbd5e1; border-top: 1px solid #334155; padding-top: 6px;">
                             ${d3.timeFormat("%H:%M:%S")(d.time)}<br>
                             ${d3.timeFormat("%d/%m/%Y")(d.time)}
                         </div>
-                        ${d.value < 20 ? '<div style="margin-top: 8px; padding: 4px 8px; background: rgba(255, 68, 68, 0.1); border-radius: 4px; font-size: 10px; color: #ff4444;">¡Nivel crítico! Reponer agua urgentemente</div>' : ''}
                     `)
-                    .style("left", (event.pageX + 15) + "px")
-                    .style("top", (event.pageY - 80) + "px")
+                    .style("border-color", levelInfo.color)
+                    .style("left", event.pageX + 15 + "px")
+                    .style("top", event.pageY - 100 + "px")
                     .transition()
                     .duration(200)
                     .style("opacity", 1);
             })
-            .on("mouseout", function() {
+            .on("mouseout", function () {
                 focus.transition()
                     .duration(200)
                     .attr("r", 0)
@@ -846,12 +1106,16 @@ function crearSerieTemporalAgua() {
 
         points.exit()
             .transition()
-            .duration(200)
+            .duration(150)
             .attr("r", 0)
             .remove();
 
-        // Mostrar contador de datos (IGUAL AL CO₂)
+        // Contador
         g.selectAll(".data-counter").remove();
+
+        const visibleText = `${visibleData.length}/${data.length}`;
+        const modeText = autoFollowLatest ? "EN VIVO" : "HISTÓRICO";
+
         g.append("text")
             .attr("class", "data-counter")
             .attr("x", width - 10)
@@ -859,142 +1123,283 @@ function crearSerieTemporalAgua() {
             .attr("fill", "#94a3b8")
             .attr("font-size", "10px")
             .attr("text-anchor", "end")
-            .text(`${Math.min(currentStartIndex + MAX_VISIBLE_POINTS, data.length)}/${data.length}`);
+            .text(`${visibleText} · ${modeText}`);
+
+        // Etiqueta de zoom
+        g.selectAll(".zoom-label").remove();
+
+        g.append("text")
+            .attr("class", "zoom-label")
+            .attr("x", 10)
+            .attr("y", 20)
+            .attr("fill", "#475569")
+            .attr("font-size", "10px")
+            .text(`Ventana: ${formatWindowLabel(currentWindowMs)}`);
     }
 
-    // Configurar arrastre (EXACTAMENTE IGUAL AL CO₂)
-    svg.on("mousedown", function(event) {
+    // ===================== DESPLAZAMIENTO HORIZONTAL =====================
+    svg.on("mousedown", function (event) {
+        if (!currentViewStart || !currentViewEnd) return;
+
         isDragging = true;
         dragStartX = event.clientX;
+        dragStartViewStart = new Date(currentViewStart);
+        dragStartViewEnd = new Date(currentViewEnd);
+
         svg.style("cursor", "grabbing");
     });
 
-    svg.on("mousemove", function(event) {
-        if (!isDragging) return;
-        
-        const dragDelta = event.clientX - dragStartX;
-        const pointsToMove = Math.round(dragDelta / (width / MAX_VISIBLE_POINTS) * -1);
-        
-        if (pointsToMove !== 0) {
-            currentStartIndex += pointsToMove;
-            currentStartIndex = Math.max(0, currentStartIndex);
-            currentStartIndex = Math.min(data.length - MAX_VISIBLE_POINTS, currentStartIndex);
-            redraw();
-            dragStartX = event.clientX;
+    svg.on("mousemove", function (event) {
+        if (!isDragging || !dragStartViewStart || !dragStartViewEnd) return;
+
+        const dx = event.clientX - dragStartX;
+
+        // Solo cuando se arrastra hacia la derecha se desactiva el tiempo real.
+        // Esto permite ir a datos históricos sin que el gráfico vuelva automáticamente al último dato.
+        if (dx > DRAG_DIRECTION_THRESHOLD_PX) {
+            setHistoricalMode();
         }
+
+        const msPerPixel =
+            (dragStartViewEnd.getTime() - dragStartViewStart.getTime()) / width;
+
+        const deltaMs = dx * msPerPixel;
+
+        currentViewStart = new Date(dragStartViewStart.getTime() - deltaMs);
+        currentViewEnd = new Date(dragStartViewEnd.getTime() - deltaMs);
+
+        clampViewToDataRange();
+        maybeReactivateLiveFromPan();
+        redraw();
     });
 
-    svg.on("mouseup", function() {
+    svg.on("mouseup", function () {
         isDragging = false;
+        maybeReactivateLiveFromPan();
         svg.style("cursor", "grab");
+        redraw();
     });
 
-    svg.on("mouseleave", function() {
+    svg.on("mouseleave", function () {
         isDragging = false;
         svg.style("cursor", "default");
     });
 
     svg.style("cursor", "grab");
 
-    // Función para agregar nuevo dato 
+    // ===================== DOBLE CLIC =====================
+    svg.on("dblclick", function () {
+        goToLatest(false);
+    });
+
+    // ===================== ZOOM CON RUEDA =====================
+    svg.node().addEventListener(
+        "wheel",
+        function (event) {
+            event.preventDefault();
+
+            ensureViewInitialized();
+
+            const rect = svg.node().getBoundingClientRect();
+            const rawX = event.clientX - rect.left - margin.left;
+            const mouseX = clamp(rawX, 0, width);
+            const mouseXRel = mouseX / width;
+
+            const oldMs =
+                currentViewEnd.getTime() - currentViewStart.getTime();
+
+            const dir = event.deltaY > 0 ? 1 : -1;
+
+            let newMs = Math.round(oldMs * (1 + dir * ZOOM_FACTOR));
+            newMs = clamp(newMs, MIN_WINDOW_MS, MAX_WINDOW_MS);
+
+            if (newMs === oldMs) return;
+
+            currentWindowMs = newMs;
+
+            const anchorMs =
+                currentViewStart.getTime() + mouseXRel * oldMs;
+
+            currentViewStart = new Date(anchorMs - mouseXRel * newMs);
+            currentViewEnd = new Date(currentViewStart.getTime() + newMs);
+
+            setHistoricalMode();
+            clampViewToDataRange();
+            maybeReactivateLiveFromPan();
+            redraw();
+        },
+        { passive: false }
+    );
+
+    // ===================== AGREGAR NUEVO DATO =====================
     function addData(value, timestampStr) {
-        const time = new Date(timestampStr || new Date());
-        const id = `water-data-${time.getTime()}-${Math.random()}`;
-        
+        const parsedValue = parseFloat(value);
+        const time = timestampStr ? new Date(timestampStr) : new Date();
+
+        if (isNaN(parsedValue) || isNaN(time.getTime())) {
+            console.log("Dato de agua inválido:", value, timestampStr);
+            return;
+        }
+
+        const valueClamped = clamp(parsedValue, 0, 100);
+
         data.push({
-            id: id,
+            id: `agua-${time.getTime()}-${Math.random()}`,
             time: time,
-            value: value 
+            value: valueClamped
         });
-        
-        if (data.length > MAX_MEMORY_POINTS) {
-            data = data.slice(data.length - MAX_MEMORY_POINTS);
-            if (currentStartIndex > data.length - MAX_VISIBLE_POINTS) {
-                currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
-            }
-        }
-        
-        const visibleData = getVisibleData();
-        if (visibleData.length > 0 && 
-            visibleData[visibleData.length - 1].id === data[data.length - 2]?.id) {
-            currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
-        }
-        
+
+        data.sort((a, b) => a.time - b.time);
+
         redraw();
     }
 
-    // Función para cargar datos históricos desde API
+    // ===================== CARGA DE HISTÓRICO COMPLETO =====================
+    async function fetchAllHistoricalData(initialUrl = "/api/agua/") {
+        let allRows = [];
+        let nextUrl = initialUrl;
+        let safety = 0;
+
+        while (nextUrl && safety < 200) {
+            const response = await fetch(nextUrl);
+
+            if (!response.ok) {
+                throw new Error(`Error HTTP ${response.status} al consultar ${nextUrl}`);
+            }
+
+            const payload = await response.json();
+
+            if (Array.isArray(payload)) {
+                allRows = allRows.concat(payload);
+                nextUrl = null;
+            } else if (payload && Array.isArray(payload.results)) {
+                allRows = allRows.concat(payload.results);
+                nextUrl = payload.next || null;
+            } else {
+                nextUrl = null;
+            }
+
+            safety += 1;
+        }
+
+        return allRows;
+    }
+
     async function loadHistoricalData() {
         try {
-            const response = await fetch('/api/agua/');
-            if (!response.ok) return;
-            
-            const apiData = await response.json();
+            const apiData = await fetchAllHistoricalData("/api/agua/");
+
             if (apiData && apiData.length > 0) {
-                // Convertir datos usando nivel y fecha_hora
-                const formattedData = apiData.map((item) => ({
-                    id: `db-${item.id}`,
-                    time: new Date(item.fecha_hora),
-                    value: parseFloat(item.nivel)  // Cambiado a "value"
-                })).filter(item => !isNaN(item.time.getTime()) && !isNaN(item.value));
-                
-                if (formattedData.length > 0) {
-                    // Ordenar por fecha (más antiguo primero) - IGUAL AL CO₂
-                    formattedData.sort((a, b) => a.time - b.time);
-                    
-                    data = formattedData;
-                    currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
-                    redraw();
-                    
-                    console.log(`Datos de agua cargados: ${data.length} puntos`);
+                data = apiData
+                    .map(item => {
+                        const value = getWaterValue(item);
+                        const time = new Date(getWaterDate(item));
+
+                        return {
+                            id: `db-${item.id || getWaterDate(item) || Math.random()}`,
+                            time: time,
+                            value: clamp(value, 0, 100)
+                        };
+                    })
+                    .filter(item => {
+                        return !isNaN(item.time.getTime()) && !isNaN(item.value);
+                    })
+                    .sort((a, b) => a.time - b.time);
+
+                autoFollowLatest = true;
+
+                const latest = getLatestTime();
+                currentViewEnd = new Date(latest);
+                currentViewStart = new Date(latest.getTime() - currentWindowMs);
+
+                redraw();
+
+                // Actualizar tanque con el último valor histórico
+                if (data.length > 0 && typeof actualizarTanque === "function") {
+                    const lastValue = data[data.length - 1].value;
+                    actualizarTanque(lastValue);
                 }
+
+                console.log(`Datos de agua cargados: ${data.length} puntos`);
+            } else {
+                redraw();
             }
         } catch (error) {
-            console.log('No se pudieron cargar datos históricos de agua:', error);
+            console.log("No se pudieron cargar datos históricos de agua:", error);
         }
     }
 
-    // Cargar datos históricos al inicio
     loadHistoricalData();
 
-    // Función de actualización
+    // ===================== FUNCIÓN DE ACTUALIZACIÓN COMPATIBLE =====================
     function actualizarSerie(nivel) {
         addData(nivel);
     }
 
+    // ===================== MÉTODOS PÚBLICOS =====================
     return {
         actualizarSerie: actualizarSerie,
-        
-        push: function(value, timestampStr) {
+
+        push(value, timestampStr) {
             addData(value, timestampStr);
         },
-        reset: function() {
+
+        reset() {
             data = [];
-            currentStartIndex = 0;
+            currentViewStart = null;
+            currentViewEnd = null;
+            currentWindowMs = DEFAULT_WINDOW_MS;
+            autoFollowLatest = true;
+
             path.datum([]).attr("d", line);
             areaPath.datum([]).attr("d", area);
-            
+
             g.selectAll(".data-point").remove();
             g.selectAll(".water-zone").remove();
             g.selectAll(".data-counter").remove();
-            
+            g.selectAll(".zoom-label").remove();
+
             focus.attr("r", 0).style("opacity", 0);
             verticalLine.style("opacity", 0);
             tooltip.style("opacity", 0);
+            referenceLine.style("opacity", 0.6);
         },
-        setData: function(newData) {
-            data = newData.map((d, i) => ({
-                id: `data-${i}`,
-                time: new Date(d.t),
-                value: d.v
-            }));
-            currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
+
+        setData(newData) {
+            data = newData
+                .map((d, i) => ({
+                    id: `data-${i}`,
+                    time: new Date(d.t || d.time || d.fecha_hora || d.timestamp),
+                    value: clamp(parseFloat(d.v || d.value || d.valor || d.nivel || d.agua), 0, 100)
+                }))
+                .filter(d => !isNaN(d.time.getTime()) && !isNaN(d.value))
+                .sort((a, b) => a.time - b.time);
+
+            autoFollowLatest = true;
+
+            const latest = getLatestTime();
+            currentViewEnd = new Date(latest);
+            currentViewStart = new Date(latest.getTime() - currentWindowMs);
+
             redraw();
         },
-        // Función pública para regresar al inicio
-        goHome: function() {
-            currentStartIndex = Math.max(0, data.length - MAX_VISIBLE_POINTS);
-            redraw();
+
+        goHome() {
+            goToLatest(true);
+        },
+
+        loadData() {
+            loadHistoricalData();
+        },
+
+        setWindowMinutes(minutes) {
+            currentWindowMs = clamp(
+                minutes * 60000,
+                MIN_WINDOW_MS,
+                MAX_WINDOW_MS
+            );
+
+            goToLatest(false);
         }
     };
 }
