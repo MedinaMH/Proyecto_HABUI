@@ -27,9 +27,16 @@ def panel_principal(request):
 def panel_all_resources(request):
     return render(request, 'REMS/all_resources.html')
 
+# Energía
 def panel_energia_rems(request):
     return render(request, 'REMS/panel_energia.html')
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_energia_get(request):
+    datos = models.RecursoEnergia.objects.all().order_by('-fecha_hora')[:1000]
+    serializer = serializers.RecursoEnergiaSerializer(datos, many=True)
+    return Response(serializer.data)
 #----------Recurso agua-----------------
 def panel_agua_rems(request, recurso_id=None):
     contexto = {'recurso_id': recurso_id or ''}
@@ -766,39 +773,105 @@ def control_sensores(request):
             },
             {
                 'nombre': 'simulador_fallas_energia',
-                'descripcion': _('Simulador de Energía'),
+                'descripcion': _('Simulador de Energía Solar'),
                 'modos': [
-                    {'valor': 'normal', 'nombre': _('Normal')},
+                    {'valor': 'normal', 'nombre': _('Normal / Nominal')},
+                    {'valor': 'warning', 'nombre': _('Advertencia')},
+                    {'valor': 'critical', 'nombre': _('Crítico')},
                 ],
                 'requiere_id': False,
-                'parametros_extra': ['interval', 'capacity', 'initial_soc', 'low_energy'],
+                'parametros_extra': [
+                    'mode',
+                    'interval',
+                    'count',
+                    'capacity',
+                    'initial_soc',
+                    'solar_max',
+                    'low_energy_mode',
+                    'soc_drift',
+                    'noise_wh',
+                ],
                 'campos_extra': [
+                    {
+                        'nombre': 'mode',
+                        'tipo': 'select',
+                        'label': _('Modo energético'),
+                        'default': 'normal',
+                        'opciones': [
+                            {'valor': 'normal', 'nombre': _('Normal / Nominal')},
+                            {'valor': 'warning', 'nombre': _('Advertencia')},
+                            {'valor': 'critical', 'nombre': _('Crítico')},
+                        ],
+                        'descripcion': _('Escenario operativo del subsistema energético')
+                    },
+                    {
+                        'nombre': 'count',
+                        'tipo': 'number',
+                        'label': _('Número de iteraciones'),
+                        'default': 0,
+                        'step': 1,
+                        'min': 0,
+                        'descripcion': _('0 = ejecución continua')
+                    },
                     {
                         'nombre': 'capacity',
                         'tipo': 'number',
-                        'label': _('Capacidad (Wh)'),
-                        'default': 6500,
+                        'label': _('Capacidad batería (Wh)'),
+                        'default': 12000,
                         'step': 100,
                         'min': 100,
-                        'descripcion': _('Capacidad del banco de baterías')
+                        'descripcion': _('Capacidad total del banco de baterías')
                     },
                     {
                         'nombre': 'initial_soc',
                         'tipo': 'number',
-                        'label': _('Carga inicial'),
-                        'default': 0.9,
+                        'label': _('SoC inicial'),
+                        'default': 0.65,
                         'step': 0.01,
                         'min': 0,
                         'max': 1,
                         'descripcion': _('0.0 = 0%, 0.5 = 50%, 1.0 = 100%')
                     },
                     {
-                        'nombre': 'low_energy',
+                        'nombre': 'solar_max',
+                        'tipo': 'number',
+                        'label': _('Potencia solar máxima (W)'),
+                        'default': 3000,
+                        'step': 100,
+                        'min': 0,
+                        'descripcion': _('Potencia máxima estimada del arreglo fotovoltaico')
+                    },
+                    {
+                        'nombre': 'low_energy_mode',
                         'tipo': 'checkbox',
-                        'label': _('Baja energía'),
+                        'label': _('Modo de baja energía'),
                         'default': False,
-                        'descripcion': _('Activar protocolos de emergencia')
-                    }
+                        'descripcion': _('Fuerza baja generación solar y mayor consumo')
+                    },
+                    {
+                        'nombre': 'soc_drift',
+                        'tipo': 'number',
+                        'label': _('Deriva SoC (%/min)'),
+                        'default': 0,
+                        'step': 0.1,
+                        'descripcion': _('Valor negativo descarga la batería de forma forzada')
+                    },
+                    {
+                        'nombre': 'noise_wh',
+                        'tipo': 'number',
+                        'label': _('Ruido batería (Wh/muestra)'),
+                        'default': 2.5,
+                        'step': 0.5,
+                        'min': 0,
+                        'descripcion': _('Perturbación aleatoria agregada al balance de batería por muestra')
+                    },
+                    {
+                        'nombre': 'csv',
+                        'tipo': 'text',
+                        'label': _('Ruta CSV opcional'),
+                        'default': '',
+                        'descripcion': _('Si se deja vacío, usa data/energia.csv')
+                    },
                 ]
             },
         ],

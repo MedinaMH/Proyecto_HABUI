@@ -8,6 +8,48 @@ class RecursoAguaSerializer(serializers.ModelSerializer):
         model = RecursoAgua
         fields = ['id', 'recurso', 'nivel', 'fecha_hora']
 
+class RecursoEnergiaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.RecursoEnergia
+        fields = [
+            'id',
+            'recurso',
+
+            # Variables heredadas / técnicas
+            'voltaje',
+            'corriente',
+            'potencia',
+            'factor_potencia',
+            'frecuencia',
+
+            # Generación solar
+            'potencia_generada_w',
+            'energia_generada_wh',
+            'temperatura_panel_c',
+
+            # Consumo
+            'potencia_consumida_w',
+            'energia_consumida_wh',
+
+            # Balance
+            'balance_w',
+            'balance_acumulado_wh',
+
+            # Batería
+            'soc_bateria_pct',
+            'energia_bateria_wh',
+            'capacidad_bateria_wh',
+            'autonomia_h',
+            'temperatura_bateria_c',
+
+            # Estado operativo
+            'estado_energia',
+            'modo_baja_energia',
+
+            # Tiempo
+            'fecha_hora',
+        ]
+
 class RecursoO2Serializer(serializers.ModelSerializer):
     class Meta:
         model = RecursoOxigeno

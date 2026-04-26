@@ -19,13 +19,137 @@ class Recurso(models.Model):
 
 # ENERGÍA
 class RecursoEnergia(models.Model):
-    recurso = models.ForeignKey(Recurso, on_delete=models.CASCADE, limit_choices_to={'tipo': 'energia'})
+    ESTADO_ENERGIA_CHOICES = [
+        ('normal', 'Normal'),
+        ('warning', 'Advertencia'),
+        ('critical', 'Crítico'),
+    ]
+
+    recurso = models.ForeignKey(
+        Recurso,
+        on_delete=models.CASCADE,
+        limit_choices_to={'tipo': 'energia'}
+    )
+
+    # ======================================================
+    # Variables técnicas del sistema eléctrico
+    # Pueden representar la salida del sistema/inversor.
+    # ======================================================
     voltaje = models.FloatField()
     corriente = models.FloatField()
     potencia = models.FloatField()
+
+    # Variables AC opcionales, útiles si se monitorea inversor
     factor_potencia = models.FloatField(null=True, blank=True)
     frecuencia = models.FloatField(null=True, blank=True)
+
+    # ======================================================
+    # Generación solar
+    # ======================================================
+    potencia_generada_w = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Potencia instantánea generada por los paneles solares en W"
+    )
+
+    energia_generada_wh = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Energía solar acumulada generada en Wh"
+    )
+
+    temperatura_panel_c = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Temperatura estimada o medida del panel solar en °C"
+    )
+
+    # ======================================================
+    # Consumo del hábitat
+    # ======================================================
+    potencia_consumida_w = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Potencia instantánea consumida por el hábitat en W"
+    )
+
+    energia_consumida_wh = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Energía acumulada consumida por el hábitat en Wh"
+    )
+
+    # ======================================================
+    # Balance energético
+    # ======================================================
+    balance_w = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Diferencia instantánea entre generación solar y consumo en W"
+    )
+
+    balance_acumulado_wh = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Balance energético acumulado en Wh"
+    )
+
+    # ======================================================
+    # Banco de baterías
+    # ======================================================
+    soc_bateria_pct = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Estado de carga de la batería en porcentaje"
+    )
+
+    energia_bateria_wh = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Energía restante en el banco de baterías en Wh"
+    )
+
+    capacidad_bateria_wh = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Capacidad total del banco de baterías en Wh"
+    )
+
+    autonomia_h = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Autonomía estimada restante en horas"
+    )
+
+    temperatura_bateria_c = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Temperatura estimada o medida del banco de baterías en °C"
+    )
+
+    # ======================================================
+    # Estado operativo
+    # ======================================================
+    estado_energia = models.CharField(
+        max_length=20,
+        choices=ESTADO_ENERGIA_CHOICES,
+        default='normal'
+    )
+
+    modo_baja_energia = models.BooleanField(
+        default=False,
+        help_text="Indica si el sistema activó el protocolo de baja energía"
+    )
+
     fecha_hora = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return (
+            f"Energía | Solar: {self.potencia_generada_w} W | "
+            f"Consumo: {self.potencia_consumida_w} W | "
+            f"Batería: {self.soc_bateria_pct}% | "
+            f"{self.fecha_hora}"
+        )
 
 # AGUA
 class RecursoAgua(models.Model):

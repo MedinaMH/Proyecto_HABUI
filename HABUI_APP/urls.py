@@ -2,7 +2,7 @@ from django.urls import path
 from .import views
 
 urlpatterns = [
-    path('control_inicial', views.control_inicial, name='control_inicial'),
+    path('inicio_control', views.control_inicial, name='control_inicial'),
     path('control_alimentos', views.control_alimentos, name='control_alimentos'),
     path('control_sensores', views.control_sensores, name='control_sensores'),
 
@@ -17,6 +17,7 @@ urlpatterns = [
     path('api/o2/', views.api_o2_get, name='api_o2_get'), # GET
     path('co2_rems', views.panel_co2, name='panel_co2_rems'),
     path('api/co2/', views.api_co2_get, name='api_co2_get'),# GET
+    path('api/energia_get/', views.api_energia_get, name='api_energia_get'),# GET
     # ---------------Alimentos--------------------
     path('alimentos_rems', views.panel_alimentos_rems, name='panel_alimentos_rems'),
     path('alimentos-rems/<int:recurso_id>/', views.panel_alimentos_rems, name='panel_alimentos_id'),
