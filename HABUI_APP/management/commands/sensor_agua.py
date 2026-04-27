@@ -215,7 +215,7 @@ class Command(BaseCommand):
                         'alerta_esperada': alerta_esperada,
                         'clasificacion_correcta': clasificacion_correcta,
                         'alerta_correcta': alerta_correcta,
-                        'fecha_hora': tgen.strftime("%Y-%m-%d %H:%M:%S"),
+                        'fecha_hora': tgen.isoformat(),
                         'timestamp_iso': tgen.isoformat(),
                         'unidad': '%',
                         'tstart': tstart.isoformat(),

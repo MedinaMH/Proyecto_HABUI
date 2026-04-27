@@ -1,3 +1,4 @@
+
 /* estilos_view_alimentos.css */
 
 body {
@@ -456,20 +457,19 @@ body {
   transition: all 0.3s ease;
 }
 
-/* Ajustar colores existentes para el nuevo tamaño */
-.metric-status-large.status-good { 
-  background: linear-gradient(135deg, #10b981, #0da271) !important; 
-  color: white !important; 
+.metric-status-large.status-good {
+  background: linear-gradient(135deg, #10b981, #0da271) !important;
+  color: white !important;
 }
 
-.metric-status-large.status-warning { 
-  background: linear-gradient(135deg, #f59e0b, #d5890a) !important; 
-  color: white !important; 
+.metric-status-large.status-warning {
+  background: linear-gradient(135deg, #f59e0b, #d5890a) !important;
+  color: white !important;
 }
 
-.metric-status-large.status-critical { 
-  background: linear-gradient(135deg, #ef4444, #dc2626) !important; 
-  color: white !important; 
+.metric-status-large.status-critical {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: white !important;
 }
 
 /* Unidad más pequeña debajo del estado */
@@ -667,4 +667,365 @@ body {
   text-align: center;
   min-width: 100px;
   transition: all 0.3s ease;
+}
+
+/* ============================================================
+   AJUSTES 2026 - VISTA DE ALIMENTOS SIN PANEL DE ALERTAS
+   ============================================================ */
+
+/* Contenedor más amplio para que Registro y Suministro ocupen mejor el ancho */
+.dashboard-container {
+  max-width: 1680px;
+}
+
+/* Dos columnas principales: Registro de Consumo + Suministro de Alimentos */
+.main-grid {
+  grid-template-columns: minmax(420px, 0.95fr) minmax(560px, 1.35fr) !important;
+  gap: clamp(18px, 1.8vw, 32px) !important;
+  align-items: stretch;
+}
+
+/* Paneles principales más amplios y visualmente balanceados */
+.control-panel,
+.metrics-panel {
+  min-width: 0;
+  min-height: 100%;
+  padding: clamp(20px, 1.8vw, 30px);
+}
+
+/* Gráfico de porciones un poco más alto en pantallas grandes */
+#portions-chart {
+  min-height: 320px;
+}
+
+/* Panel de misión conservado, ahora separado de Alertas y Sugerencias */
+.mission-info-panel {
+  background: linear-gradient(145deg, #111827, #0f172a);
+  border: 2px solid #ff6b6b;
+  border-radius: 15px;
+  padding: clamp(16px, 1.5vw, 24px);
+  box-shadow: 0 8px 32px rgba(255, 107, 107, 0.1);
+  margin-bottom: 30px;
+}
+
+.mission-info-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.mission-info-header h3 {
+  color: #ffffff;
+  margin: 0;
+  font-size: clamp(1.1rem, 1.4vw, 1.45rem);
+}
+
+.mission-info-icon {
+  font-size: 1.5rem;
+}
+
+.mission-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: clamp(10px, 1.2vw, 18px);
+}
+
+.mission-info-card {
+  background: rgba(30, 41, 59, 0.7);
+  border-left: 4px solid #ff6b6b;
+  border-radius: 10px;
+  padding: 14px 16px;
+  min-width: 0;
+}
+
+.mission-info-label {
+  display: block;
+  color: #ffa8a8;
+  font-size: clamp(0.78rem, 0.9vw, 0.95rem);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.mission-info-value {
+  display: block;
+  color: #ffffff;
+  font-size: clamp(1.3rem, 2vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Alerta superior dinámica */
+.food-alert-banner {
+  position: sticky;
+  top: 12px;
+  z-index: 900;
+  margin: 0 0 22px 0;
+  border-radius: 14px;
+  padding: 16px 18px;
+  color: #ffffff;
+  background: rgba(30, 41, 59, 0.98);
+  border: 2px solid #3b82f6;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  animation: fadeIn 0.25s ease;
+}
+
+.food-alert-banner.hidden {
+  display: none;
+}
+
+.food-alert-banner.info {
+  border-color: #3b82f6;
+  background: linear-gradient(145deg, rgba(30, 64, 175, 0.96), rgba(15, 23, 42, 0.98));
+}
+
+.food-alert-banner.warning {
+  border-color: #f59e0b;
+  background: linear-gradient(145deg, rgba(146, 64, 14, 0.96), rgba(15, 23, 42, 0.98));
+}
+
+.food-alert-banner.critical {
+  border-color: #ef4444;
+  background: linear-gradient(145deg, rgba(127, 29, 29, 0.96), rgba(15, 23, 42, 0.98));
+  animation: alertPulse 2.2s infinite;
+}
+
+.food-alert-banner.success {
+  border-color: #10b981;
+  background: linear-gradient(145deg, rgba(6, 95, 70, 0.96), rgba(15, 23, 42, 0.98));
+}
+
+.food-alert-banner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.food-alert-title-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.food-alert-icon {
+  font-size: 1.65rem;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+#food-alert-title {
+  display: block;
+  font-size: clamp(1rem, 1.25vw, 1.35rem);
+  line-height: 1.2;
+}
+
+.food-alert-summary {
+  margin: 4px 0 0 0;
+  color: #f8fafc;
+  font-size: clamp(0.88rem, 0.95vw, 1rem);
+  line-height: 1.4;
+}
+
+.food-alert-close {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.6);
+  color: #ffffff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.food-alert-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.06);
+}
+
+.food-alert-content {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.food-alert-message {
+  background: rgba(15, 23, 42, 0.42);
+  border-radius: 10px;
+  padding: 10px 12px;
+  line-height: 1.45;
+  color: #ffffff;
+  font-size: clamp(0.82rem, 0.9vw, 0.95rem);
+}
+
+.food-alert-message strong {
+  color: #bfdbfe;
+}
+
+/* Responsive*/
+@media (max-width: 1200px) {
+  .main-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mission-info-grid {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
+  }
+
+  .food-alert-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    padding: 12px;
+  }
+
+  .dashboard-header {
+    margin-bottom: 18px;
+  }
+
+  .main-grid {
+    gap: 16px !important;
+  }
+
+  .control-panel,
+  .metrics-panel,
+  .mission-info-panel,
+  .chart-panel {
+    padding: 16px;
+  }
+
+  .mission-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .food-alert-banner {
+    top: 8px;
+    padding: 14px;
+  }
+
+  .food-alert-banner-header {
+    gap: 10px;
+  }
+
+  .food-alert-title-wrap {
+    gap: 8px;
+  }
+}
+
+.dashboard-title {
+  font-size: clamp(2.1rem, 2.4vw, 3rem) !important;
+}
+
+.control-panel > h3,
+.metrics-panel > h3,
+.chart-panel h3,
+.mission-info-header h3 {
+  font-size: clamp(1.35rem, 1.6vw, 1.8rem) !important;
+}
+
+.control-panel h4,
+.chart-panel h4 {
+  font-size: clamp(1.05rem, 1.25vw, 1.35rem) !important;
+}
+
+.form-label {
+  font-size: clamp(1.05rem, 1.15vw, 1.25rem) !important;
+}
+
+.form-select,
+.form-input,
+.btn-primary {
+  font-size: clamp(1rem, 1.1vw, 1.2rem) !important;
+}
+
+#daily-consumption span {
+  font-size: clamp(1rem, 1.05vw, 1.2rem) !important;
+}
+
+#total-day-count,
+#expected-day-count {
+  font-size: clamp(1.05rem, 1.2vw, 1.35rem) !important;
+}
+
+#portions-text {
+  font-size: clamp(2.2rem, 2.8vw, 3.2rem) !important;
+}
+
+#portions-text + div {
+  font-size: clamp(1.2rem, 1.6vw, 1.8rem) !important;
+}
+
+.metric-title {
+  font-size: clamp(1.25rem, 1.45vw, 1.65rem) !important;
+}
+
+.metric-value {
+  font-size: clamp(2.8rem, 4vw, 4.5rem) !important;
+}
+
+.metric-status-large {
+  font-size: clamp(0.95rem, 1.05vw, 1.2rem) !important;
+  min-width: 132px;
+}
+
+.mission-info-label {
+  font-size: clamp(0.98rem, 1.05vw, 1.18rem) !important;
+}
+
+.mission-info-value {
+  font-size: clamp(1.7rem, 2.25vw, 2.5rem) !important;
+}
+
+#food-alert-title {
+  font-size: clamp(1.2rem, 1.4vw, 1.6rem) !important;
+}
+
+.food-alert-summary,
+.food-alert-message {
+  font-size: clamp(1rem, 1.08vw, 1.18rem) !important;
+}
+
+table th,
+table td {
+  font-size: clamp(0.95rem, 1vw, 1.1rem) !important;
+}
+
+.food-alert-icon,
+.mission-info-icon {
+  display: none !important;
+}
+
+.food-alert-title-wrap,
+.mission-info-header {
+  gap: 0 !important;
+}
+
+.food-alert-close {
+  width: auto;
+  min-width: 78px;
+  padding: 0 12px;
+  font-size: 0.95rem;
+  color: transparent;
+}
+
+.food-alert-close::before {
+  content: "Cerrar";
+  color: #ffffff;
+}
+
+@media (max-width: 720px) {
+  .metric-value {
+    font-size: 2.7rem !important;
+  }
+
+  .food-alert-close {
+    min-width: 68px;
+  }
 }

@@ -1,474 +1,693 @@
 // ============================================================
 // ============ BATERÍA  ============
 // ============================================================
-function initBatteryVisualization(containerId, initialSOC) {
-const svg = d3.select(containerId);
-const width = 320;
-const height = 460;
-
-svg.attr("width", width).attr("height", height);
-
-// Crear batería principal
-const batteryGroup = svg.append("g")
-    .attr("transform", `translate(${width/2 + 25}, 22)`);
-
-// Cuerpo de la batería 
-const batteryWidth = 180; 
-const batteryHeight = 340;
-
-// Marco exterior
-batteryGroup.append("rect")
-    .attr("x", -batteryWidth/2)
-    .attr("y", 0)
-    .attr("width", batteryWidth)
-    .attr("height", batteryHeight)
-    .attr("rx", 15) 
-    .attr("ry", 15) 
-    .attr("fill", "none")
-    .attr("stroke", "#ffffff")
-    .attr("stroke-width", 6);
-
-// Terminal positivo 
-batteryGroup.append("rect")
-    .attr("x", -25)
-    .attr("y", -22)
-    .attr("width", 50)
-    .attr("height", 22)
-    .attr("rx", 6)
-    .attr("fill", "#fbbf24")
-    .attr("stroke", "#d97706")
-    .attr("stroke-width", 3);
-
-// Nivel de carga
-const chargeLevel = batteryGroup.append("rect")
-    .attr("x", -batteryWidth/2 + 12)
-    .attr("y", batteryHeight)
-    .attr("width", batteryWidth - 24)
-    .attr("height", 0)
-    .attr("rx", 10)
-    .attr("fill", "#10b981");
-
-// Marcas de nivel
-for (let i = 0; i <= 100; i += 20) {
-    const yPos = batteryHeight - (i/100) * batteryHeight;
-    
-    // Líneas de indicador 
-    batteryGroup.append("line")
-    .attr("x1", -batteryWidth/2 - 20)
-    .attr("x2", -batteryWidth/2 - 5)
-    .attr("y1", yPos)
-    .attr("y2", yPos)
-    .attr("stroke", "#6b7280")
-    .attr("stroke-width", 4); 
-    
-    // Texto de porcentaje 
-    batteryGroup.append("text")
-    .attr("x", -batteryWidth/2 - 25)
-    .attr("y", yPos + 5)
-    .attr("text-anchor", "end")
-    .attr("fill", "#ffffff")
-    .attr("font-size", "28px")
-    .attr("font-weight", "600")
-    .text(i + "%");
+function prepararSvgResponsivo(svg, width, height) {
+    svg
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .style("display", "block")
+        .style("margin", "0 auto")
+        .style("max-width", "100%")
+        .style("max-height", "100%");
 }
 
-// Función para actualizar batería
-function updateBattery(soc) {
-    const socPercent = soc * 100;
-    const fillHeight = (socPercent / 100) * batteryHeight;
-    const yPos = batteryHeight - fillHeight;
-    
-    // Determinar color según estado energético
-    let color, statusText;
-    
+// ============================================================
+// ============ PALETA GLOBAL DE ESTADOS ============
+// ============================================================
+const COLOR_ESTADO = {
+    optimo: "#10b981",       // Verde
+    advertencia: "#fbbf24",  // Amarillo
+    critico: "#ef4444",      // Rojo
+    moderado: "#3b82f6"      // Azul para estado moderado
+};
+
+const TEXTO_VALOR_GAUGE = {
+    fontSize: "40px",
+    fontWeight: "700"
+};
+
+function obtenerPrimerElementoRespuesta(payload) {
+    if (!payload) return null;
+
+    if (Array.isArray(payload)) {
+        return payload.length > 0 ? payload[0] : null;
+    }
+
+    if (Array.isArray(payload.results)) {
+        return payload.results.length > 0 ? payload.results[0] : null;
+    }
+
+    if (Array.isArray(payload.data)) {
+        return payload.data.length > 0 ? payload.data[0] : null;
+    }
+
+    if (payload.data && typeof payload.data === "object") {
+        return payload.data;
+    }
+
+    if (payload.ultimo && typeof payload.ultimo === "object") {
+        return payload.ultimo;
+    }
+
+    if (payload.latest && typeof payload.latest === "object") {
+        return payload.latest;
+    }
+
+    return payload;
+}
+
+function obtenerCampoNumerico(objeto, campos) {
+    if (!objeto) return null;
+
+    for (const campo of campos) {
+        if (objeto[campo] !== undefined && objeto[campo] !== null && objeto[campo] !== "") {
+            const numero = parseFloat(objeto[campo]);
+            if (!isNaN(numero)) return numero;
+        }
+    }
+
+    return null;
+}
+
+function normalizarSoc(valor) {
+    let numero = parseFloat(valor);
+    if (isNaN(numero)) return 0;
+
+    if (numero > 1) {
+        numero = numero / 100;
+    }
+
+    return Math.max(0, Math.min(1, numero));
+}
+
+function extraerSocEnergia(dato) {
+    const valor = obtenerCampoNumerico(dato, [
+        "battery",
+        "soc_bateria_pct",
+        "soc_pct",
+        "battery_soc",
+        "bateria",
+        "nivel",
+        "valor",
+        "porcentaje",
+        "estado_carga"
+    ]);
+
+    if (valor === null) return null;
+    return normalizarSoc(valor);
+}
+
+function obtenerFechaDato(dato) {
+    if (!dato) return null;
+    return dato.fecha_hora || dato.timestamp || dato.created_at || dato.fecha || dato.time || null;
+}
+
+function formatearHora(fecha) {
+    if (!fecha) return new Date().toLocaleTimeString();
+
+    const date = new Date(fecha);
+    if (isNaN(date.getTime())) {
+        return new Date().toLocaleTimeString();
+    }
+
+    return date.toLocaleTimeString();
+}
+
+function clasificarEnergiaPorSoc(soc) {
+    const socNormalizado = normalizarSoc(soc);
+    const socPercent = socNormalizado * 100;
+
     if (socPercent < 15) {
-    color = "#ef4444";
-    statusText = TRANSLATIONS.critical || "CRÍTICO";
-    } else if (socPercent < 30) {
-    color = "#f59e0b";
-    statusText = TRANSLATIONS.low || "BAJO";
-    } else if (socPercent < 70) {
-    color = "#3b82f6";
-    statusText = TRANSLATIONS.moderate || "MODERADO";
-    } else {
-    color = "#10b981";
-    statusText = TRANSLATIONS.optimal || "ÓPTIMO";
+        return {
+            color: COLOR_ESTADO.critico,
+            estado: TRANSLATIONS.critical || "CRÍTICO",
+            alerta: TRANSLATIONS.critical_battery || "Nivel de batería crítico",
+            tipoAlerta: "critical"
+        };
     }
-    
-    // Animación de nivel
-    chargeLevel.transition()
-    .duration(800)
-    .attr("y", yPos)
-    .attr("height", fillHeight)
-    .attr("fill", color);
-    
-    // Actualizar porcentaje debajo de la batería
-    const percentageLarge = document.getElementById('battery-percentage-large');
-    if (percentageLarge) {
-    percentageLarge.textContent = Math.round(socPercent) + '%';
+
+    if (socPercent < 30) {
+        return {
+            color: COLOR_ESTADO.advertencia,
+            estado: TRANSLATIONS.low || "BAJO",
+            alerta: TRANSLATIONS.low_battery || "Nivel de batería bajo",
+            tipoAlerta: "warning"
+        };
     }
-    
-    // Actualizar estado en el footer 
-    const statusElement = document.getElementById('battery-status');
-    if (statusElement) {
-    statusElement.textContent = statusText;
-    statusElement.style.color = color;
+
+    if (socPercent < 70) {
+        return {
+            color: COLOR_ESTADO.moderado,
+            estado: TRANSLATIONS.moderate || "MODERADO",
+            alerta: TRANSLATIONS.moderate_battery || "Nivel de batería moderado",
+            tipoAlerta: "info"
+        };
     }
-    
-    return socPercent;
+
+    return {
+        color: COLOR_ESTADO.optimo,
+        estado: TRANSLATIONS.optimal || "ÓPTIMO",
+        alerta: null,
+        tipoAlerta: "info"
+    };
 }
 
-// Inicializar con valores por defecto
-updateBattery(initialSOC || 0.5);
+function initBatteryVisualization(containerId, initialSOC) {
+    const svg = d3.select(containerId);
+    const width = 320;
+    const height = 460;
 
-return updateBattery;
+    svg.selectAll("*").remove();
+    prepararSvgResponsivo(svg, width, height);
+
+    const batteryGroup = svg.append("g")
+        .attr("transform", `translate(${width / 2 + 25}, 22)`);
+
+    const batteryWidth = 180;
+    const batteryHeight = 340;
+
+    batteryGroup.append("rect")
+        .attr("x", -batteryWidth / 2)
+        .attr("y", 0)
+        .attr("width", batteryWidth)
+        .attr("height", batteryHeight)
+        .attr("rx", 15)
+        .attr("ry", 15)
+        .attr("fill", "none")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 6);
+
+    batteryGroup.append("rect")
+        .attr("x", -25)
+        .attr("y", -22)
+        .attr("width", 50)
+        .attr("height", 22)
+        .attr("rx", 6)
+        .attr("fill", COLOR_ESTADO.advertencia)
+        .attr("stroke", "#d97706")
+        .attr("stroke-width", 3);
+
+    const chargeLevel = batteryGroup.append("rect")
+        .attr("x", -batteryWidth / 2 + 12)
+        .attr("y", batteryHeight)
+        .attr("width", batteryWidth - 24)
+        .attr("height", 0)
+        .attr("rx", 10)
+        .attr("fill", COLOR_ESTADO.optimo);
+
+    for (let i = 0; i <= 100; i += 20) {
+        const yPos = batteryHeight - (i / 100) * batteryHeight;
+
+        batteryGroup.append("line")
+            .attr("x1", -batteryWidth / 2 - 20)
+            .attr("x2", -batteryWidth / 2 - 5)
+            .attr("y1", yPos)
+            .attr("y2", yPos)
+            .attr("stroke", "#6b7280")
+            .attr("stroke-width", 4);
+
+        batteryGroup.append("text")
+            .attr("x", -batteryWidth / 2 - 25)
+            .attr("y", yPos + 5)
+            .attr("text-anchor", "end")
+            .attr("fill", "#ffffff")
+            .attr("font-size", "28px")
+            .attr("font-weight", "600")
+            .text(i + "%");
+    }
+
+    function updateBattery(soc) {
+        const socNormalizado = normalizarSoc(soc);
+        const socPercent = socNormalizado * 100;
+        const fillHeight = (socPercent / 100) * batteryHeight;
+        const yPos = batteryHeight - fillHeight;
+
+        const estadoEnergia = clasificarEnergiaPorSoc(socNormalizado);
+        const color = estadoEnergia.color;
+
+        chargeLevel.transition()
+            .duration(800)
+            .attr("y", yPos)
+            .attr("height", fillHeight)
+            .attr("fill", color);
+
+        const percentageLarge = document.getElementById("battery-percentage-large");
+        if (percentageLarge) {
+            percentageLarge.textContent = Math.round(socPercent) + "%";
+            percentageLarge.style.color = color;
+            percentageLarge.style.fontSize = "40px";
+            percentageLarge.style.fontWeight = "700";
+            percentageLarge.style.lineHeight = "1";
+            percentageLarge.style.textShadow = `0 0 10px ${color}55`;
+        }
+
+        const statusElement = document.getElementById("battery-status");
+        if (statusElement) {
+            statusElement.textContent = estadoEnergia.estado;
+            statusElement.style.color = color;
+        }
+
+        return socPercent;
+    }
+
+    async function cargarUltimoDatoBD() {
+        try {
+            console.log("Cargando último dato de energía desde /api/energia_get/...");
+            const response = await fetch("/api/energia_get/");
+
+            if (!response.ok) {
+                console.log("No se pudieron obtener datos de energía de la BD");
+                return null;
+            }
+
+            const payload = await response.json();
+            const ultimoDato = obtenerPrimerElementoRespuesta(payload);
+            const soc = extraerSocEnergia(ultimoDato);
+
+            if (soc === null) {
+                console.log("No se encontró un campo de batería/SoC válido:", payload);
+                return null;
+            }
+
+            updateBattery(soc);
+
+            const timeElement = document.getElementById("battery-time");
+            if (timeElement) {
+                timeElement.textContent = formatearHora(obtenerFechaDato(ultimoDato));
+            }
+
+            return soc;
+        } catch (error) {
+            console.log("Error al cargar el último dato de energía:", error);
+            return null;
+        }
+    }
+
+    async function cargarDatosRecientesBD(limite = 10) {
+        try {
+            const response = await fetch("/api/energia_get/");
+
+            if (!response.ok) {
+                console.log("No se pudieron obtener datos recientes de energía");
+                return [];
+            }
+
+            const payload = await response.json();
+
+            const datos = Array.isArray(payload)
+                ? payload
+                : Array.isArray(payload.results)
+                    ? payload.results
+                    : Array.isArray(payload.data)
+                        ? payload.data
+                        : payload ? [obtenerPrimerElementoRespuesta(payload)] : [];
+
+            return datos
+                .filter(Boolean)
+                .slice(0, limite)
+                .map(dato => {
+                    const soc = extraerSocEnergia(dato);
+                    if (soc === null) return null;
+
+                    const estadoEnergia = clasificarEnergiaPorSoc(soc);
+
+                    return {
+                        id: dato.id,
+                        valor: soc * 100,
+                        soc: soc,
+                        fecha: obtenerFechaDato(dato),
+                        estado: estadoEnergia.estado,
+                        color: estadoEnergia.color
+                    };
+                })
+                .filter(Boolean);
+        } catch (error) {
+            console.log("Error al cargar datos recientes de energía:", error);
+            return [];
+        }
+    }
+
+    updateBattery(initialSOC || 0.5);
+
+    setTimeout(() => {
+        cargarUltimoDatoBD();
+    }, 500);
+
+    const funcionActualizar = function(soc) {
+        return updateBattery(soc);
+    };
+
+    funcionActualizar.update = updateBattery;
+    funcionActualizar.actualizar = updateBattery;
+    funcionActualizar.cargarUltimoDato = cargarUltimoDatoBD;
+    funcionActualizar.cargarDatosRecientes = cargarDatosRecientesBD;
+
+    return funcionActualizar;
 }
 
 // ============================================================
 // ============ TANQUE DE AGUA ============
 // ============================================================
 function crearTanqueAguaRealista(containerId, valorInicial) {
-const container = d3.select(containerId);
-container.html(""); // Limpiar contenedor
+    const container = d3.select(containerId);
+    container.html("");
 
-const width = 380;
-const height = 520;
+    const width = 380;
+    const height = 520;
 
-const svg = container.append("svg")
-    .attr("width", width)
-    .attr("height", height);
+    const svg = container.append("svg");
+    prepararSvgResponsivo(svg, width, height);
 
-// Dimensiones del tanque
-const tanqueWidth = 200;
-const tanqueHeight = 340;
-const tanqueX = (width - tanqueWidth) / 2;
-const tanqueY = 50;
-const tanqueCurvatura = 15;
+    const tanqueWidth = 200;
+    const tanqueHeight = 340;
+    const tanqueX = (width - tanqueWidth) / 2;
+    const tanqueY = 50;
+    const tanqueCurvatura = 15;
 
-// --- Efectos 3D y sombras ---
-const defs = svg.append("defs");
+    const defs = svg.append("defs");
 
-// Gradiente para efecto metálico del tanque
-const gradienteTanque = defs.append("linearGradient")
-    .attr("id", "gradTanque")
-    .attr("x1", "0%").attr("y1", "0%")
-    .attr("x2", "100%").attr("y2", "0%");
+    const gradienteTanque = defs.append("linearGradient")
+        .attr("id", "gradTanque")
+        .attr("x1", "0%").attr("y1", "0%")
+        .attr("x2", "100%").attr("y2", "0%");
 
-gradienteTanque.append("stop")
-    .attr("offset", "0%")
-    .attr("stop-color", "#2c3e50")
-    .attr("stop-opacity", 0.8);
+    gradienteTanque.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", "#2c3e50")
+        .attr("stop-opacity", 0.8);
 
-gradienteTanque.append("stop")
-    .attr("offset", "50%")
-    .attr("stop-color", "#34495e")
-    .attr("stop-opacity", 1);
+    gradienteTanque.append("stop")
+        .attr("offset", "50%")
+        .attr("stop-color", "#34495e")
+        .attr("stop-opacity", 1);
 
-gradienteTanque.append("stop")
-    .attr("offset", "100%")
-    .attr("stop-color", "#2c3e50")
-    .attr("stop-opacity", 0.8);
+    gradienteTanque.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", "#2c3e50")
+        .attr("stop-opacity", 0.8);
 
-// Sombra del tanque
-const filtroSombra = defs.append("filter")
-    .attr("id", "sombraTanque")
-    .attr("x", "-20%").attr("y", "-20%")
-    .attr("width", "140%").attr("height", "140%");
+    const filtroSombra = defs.append("filter")
+        .attr("id", "sombraTanque")
+        .attr("x", "-20%").attr("y", "-20%")
+        .attr("width", "140%").attr("height", "140%");
 
-filtroSombra.append("feDropShadow")
-    .attr("dx", "2")
-    .attr("dy", "5")
-    .attr("stdDeviation", "8")
-    .attr("flood-color", "#000")
-    .attr("flood-opacity", "0.3");
+    filtroSombra.append("feDropShadow")
+        .attr("dx", "2")
+        .attr("dy", "5")
+        .attr("stdDeviation", "8")
+        .attr("flood-color", "#000")
+        .attr("flood-opacity", "0.3");
 
-// Gradiente para el agua (realista con ondulaciones)
-const gradienteAgua = defs.append("linearGradient")
-    .attr("id", "gradAgua")
-    .attr("x1", "0%").attr("y1", "100%")
-    .attr("x2", "0%").attr("y2", "0%");
+    const gradienteAgua = defs.append("linearGradient")
+        .attr("id", "gradAgua")
+        .attr("x1", "0%").attr("y1", "100%")
+        .attr("x2", "0%").attr("y2", "0%");
 
-gradienteAgua.append("stop")
-    .attr("offset", "0%")
-    .attr("stop-color", "#1e90ff")
-    .attr("stop-opacity", 0.9);
+    gradienteAgua.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", d3.color(COLOR_ESTADO.optimo).darker(0.5))
+        .attr("stop-opacity", 0.9);
 
-gradienteAgua.append("stop")
-    .attr("offset", "50%")
-    .attr("stop-color", "#00bfff")
-    .attr("stop-opacity", 0.8);
+    gradienteAgua.append("stop")
+        .attr("offset", "50%")
+        .attr("stop-color", COLOR_ESTADO.optimo)
+        .attr("stop-opacity", 0.8);
 
-gradienteAgua.append("stop")
-    .attr("offset", "100%")
-    .attr("stop-color", "#87ceeb")
-    .attr("stop-opacity", 0.7);
+    gradienteAgua.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", d3.color(COLOR_ESTADO.optimo).brighter(0.5))
+        .attr("stop-opacity", 0.7);
 
-// --- ESTRUCTURA DEL TANQUE ---
+    svg.append("rect")
+        .attr("x", tanqueX + 5)
+        .attr("y", tanqueY + 5)
+        .attr("width", tanqueWidth)
+        .attr("height", tanqueHeight)
+        .attr("rx", tanqueCurvatura)
+        .attr("ry", tanqueCurvatura)
+        .attr("fill", "#000")
+        .attr("opacity", 0.3)
+        .attr("filter", "url(#sombraTanque)");
 
-// Base del tanque
-svg.append("rect")
-    .attr("x", tanqueX + 5)
-    .attr("y", tanqueY + 5)
-    .attr("width", tanqueWidth)
-    .attr("height", tanqueHeight)
-    .attr("rx", tanqueCurvatura)
-    .attr("ry", tanqueCurvatura)
-    .attr("fill", "#000")
-    .attr("opacity", 0.3)
-    .attr("filter", "url(#sombraTanque)");
+    svg.append("rect")
+        .attr("x", tanqueX)
+        .attr("y", tanqueY)
+        .attr("width", tanqueWidth)
+        .attr("height", tanqueHeight)
+        .attr("rx", tanqueCurvatura)
+        .attr("ry", tanqueCurvatura)
+        .attr("fill", "url(#gradTanque)")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 3);
 
-// Cuerpo principal del tanque
-const cuerpoTanque = svg.append("rect")
-    .attr("x", tanqueX)
-    .attr("y", tanqueY)
-    .attr("width", tanqueWidth)
-    .attr("height", tanqueHeight)
-    .attr("rx", tanqueCurvatura)
-    .attr("ry", tanqueCurvatura)
-    .attr("fill", "url(#gradTanque)")
-    .attr("stroke", "#ffffff")
-    .attr("stroke-width", 3);
+    svg.append("rect")
+        .attr("x", tanqueX + 5)
+        .attr("y", tanqueY + 5)
+        .attr("width", 40)
+        .attr("height", tanqueHeight - 10)
+        .attr("rx", 8)
+        .attr("fill", "rgba(255, 255, 255, 0.15)")
+        .attr("opacity", 0.6);
 
-// Reflejo metálico
-const reflejo = svg.append("rect")
-    .attr("x", tanqueX + 5)
-    .attr("y", tanqueY + 5)
-    .attr("width", 40)
-    .attr("height", tanqueHeight - 10)
-    .attr("rx", 8)
-    .attr("fill", "rgba(255, 255, 255, 0.15)")
-    .attr("opacity", 0.6);
+    svg.append("rect")
+        .attr("x", tanqueX - 10)
+        .attr("y", tanqueY - 15)
+        .attr("width", tanqueWidth + 20)
+        .attr("height", 20)
+        .attr("rx", 10)
+        .attr("fill", "#2c3e50")
+        .attr("stroke", "#ffffff")
+        .attr("stroke-width", 2);
 
-// Tapa superior del tanque
-const tapa = svg.append("rect")
-    .attr("x", tanqueX - 10)
-    .attr("y", tanqueY - 15)
-    .attr("width", tanqueWidth + 20)
-    .attr("height", 20)
-    .attr("rx", 10)
-    .attr("fill", "#2c3e50")
-    .attr("stroke", "#ffffff")
-    .attr("stroke-width", 2);
+    const agua = svg.append("rect")
+        .attr("x", tanqueX)
+        .attr("width", tanqueWidth)
+        .attr("fill", "url(#gradAgua)")
+        .attr("rx", tanqueCurvatura - 2)
+        .attr("opacity", 0.85);
 
-// Nivel de agua
-const agua = svg.append("rect")
-    .attr("x", tanqueX)
-    .attr("width", tanqueWidth)
-    .attr("fill", "url(#gradAgua)")
-    .attr("rx", tanqueCurvatura - 2)
-    .attr("opacity", 0.85);
+    const superficieAgua = svg.append("rect")
+        .attr("x", tanqueX)
+        .attr("width", tanqueWidth)
+        .attr("height", 3)
+        .attr("fill", "rgba(255, 255, 255, 0.4)")
+        .attr("rx", 2);
 
-// Superficie del agua 
-const superficieAgua = svg.append("rect")
-    .attr("x", tanqueX)
-    .attr("width", tanqueWidth)
-    .attr("height", 3)
-    .attr("fill", "rgba(255, 255, 255, 0.4)")
-    .attr("rx", 2);
+    for (let i = 0; i <= 100; i += 25) {
+        const y = tanqueY + tanqueHeight - (i / 100) * tanqueHeight;
 
-// Indicador de nivel en la barra lateral
-const indicadorNivel = svg.append("rect")
-    .attr("x", tanqueX + tanqueWidth + 22)
-    .attr("width", 8)
-    .attr("fill", "#00bfff")
-    .attr("rx", 4);
+        svg.append("line")
+            .attr("x1", tanqueX - 15)
+            .attr("x2", tanqueX - 5)
+            .attr("y1", y)
+            .attr("y2", y)
+            .attr("stroke", "#ffffff")
+            .attr("stroke-width", 4);
 
-// --- MARCAS DE NIVEL ---
-const marcasY = [];
-for (let i = 0; i <= 100; i += 25) {
-    const y = tanqueY + tanqueHeight - (i / 100) * tanqueHeight;
-    marcasY.push({ y, valor: i });
-    
-    svg.append("line")
-    .attr("x1", tanqueX - 15)
-    .attr("x2", tanqueX - 5)
-    .attr("y1", y)
-    .attr("y2", y)
-    .attr("stroke", "#00bfff")
-    .attr("stroke-width", 4);
-    
-    svg.append("text")
-    .attr("x", tanqueX - 20)
-    .attr("y", y + 4)
-    .attr("fill", "#ffffffff")
-    .attr("font-size", "28px")
-    .attr("text-anchor", "end")
-    .text(i + "%");
-}
-
-const textoNivel = svg.append("text")
-    .attr("x", tanqueX + tanqueWidth - 100)
-    .attr("y", tanqueY + tanqueHeight + 60)
-    .attr("fill", "#00ffcc")
-    .attr("font-size", "40px") 
-    .attr("font-weight", "700")
-    .attr("text-anchor", "middle")
-    .style("font-family", "inherit")
-    .text("00.0%");
-
-// --- ESCALA Y ANIMACIÓN ---
-const escala = d3.scaleLinear()
-    .domain([0, 100])
-    .range([tanqueY + tanqueHeight, tanqueY]);
-
-function actualizar(valor) {
-    const porcentaje = Math.max(0, Math.min(100, valor));
-    const yAgua = escala(porcentaje);
-    const alturaAgua = tanqueY + tanqueHeight - yAgua;
-    
-    const yIndicador = escala(porcentaje);
-    const alturaIndicador = tanqueY + tanqueHeight - yIndicador;
-    
-    agua.transition()
-    .duration(800)
-    .ease(d3.easeCubicOut)
-    .attr("y", yAgua)
-    .attr("height", alturaAgua);
-    
-    superficieAgua.transition()
-    .duration(800)
-    .ease(d3.easeCubicOut)
-    .attr("y", yAgua);
-    
-    textoNivel.transition()
-    .duration(400)
-    .text(porcentaje.toFixed(1) + "%");
-    
-    let colorAgua;
-    let colorIndicador;
-    
-    if (porcentaje < 20) {
-    colorAgua = "#ff4444";
-    colorIndicador = "#ff4444";
-    } else if (porcentaje < 40) {
-    colorAgua = "#ffaa00";
-    colorIndicador = "#ffaa00";
-    } else if (porcentaje < 70) {
-    colorAgua = "#00bfff";
-    colorIndicador = "#00bfff";
-    } else {
-    colorAgua = "#00cc66";
-    colorIndicador = "#00cc66";
+        svg.append("text")
+            .attr("x", tanqueX - 20)
+            .attr("y", y + 4)
+            .attr("fill", "#ffffff")
+            .attr("font-size", "28px")
+            .attr("text-anchor", "end")
+            .text(i + "%");
     }
-    
-    defs.select("#gradAgua").remove();
-    const nuevoGradiente = defs.append("linearGradient")
-    .attr("id", "gradAgua")
-    .attr("x1", "0%").attr("y1", "100%")
-    .attr("x2", "0%").attr("y2", "0%");
-    
-    nuevoGradiente.append("stop")
-    .attr("offset", "0%")
-    .attr("stop-color", d3.color(colorAgua).darker(0.5))
-    .attr("stop-opacity", 0.9);
-    
-    nuevoGradiente.append("stop")
-    .attr("offset", "50%")
-    .attr("stop-color", colorAgua)
-    .attr("stop-opacity", 0.8);
-    
-    nuevoGradiente.append("stop")
-    .attr("offset", "100%")
-    .attr("stop-color", d3.color(colorAgua).brighter(0.5))
-    .attr("stop-opacity", 0.7);
-    
-    agua.attr("fill", "url(#gradAgua)");
-    
-    if (porcentaje > 90) {
-    for (let i = 0; i < 3; i++) {
-        const bubbleX = tanqueX + Math.random() * tanqueWidth * 0.8 + tanqueWidth * 0.1;
-        const bubbleY = yAgua + Math.random() * 10;
-        const bubbleSize = Math.random() * 4 + 2;
-        
-        const bubble = svg.append("circle")
-        .attr("cx", bubbleX)
-        .attr("cy", bubbleY)
-        .attr("r", bubbleSize)
-        .attr("fill", "rgba(255, 255, 255, 0.6)")
-        .attr("opacity", 0);
-        
-        bubble.transition()
-        .duration(1500)
-        .attr("cy", bubbleY - 30)
-        .attr("opacity", 0.8)
-        .transition()
-        .duration(500)
-        .attr("opacity", 0)
-        .remove();
-    }
-    }
-    
-    return porcentaje;
-}
 
-actualizar(valorInicial);
+    const textoNivel = svg.append("text")
+        .attr("x", tanqueX + tanqueWidth - 100)
+        .attr("y", tanqueY + tanqueHeight + 60)
+        .attr("fill", COLOR_ESTADO.optimo)
+        .attr("font-size", TEXTO_VALOR_GAUGE.fontSize)
+        .attr("font-weight", TEXTO_VALOR_GAUGE.fontWeight)
+        .attr("text-anchor", "middle")
+        .style("font-family", "inherit")
+        .text("00.0%");
 
-async function cargarUltimoDatoBD() {
-    try {
-        console.log('Cargando datos de agua desde BD para obtener el último...');
-        const response = await fetch('/api/agua/');
-        
-        if (!response.ok) {
-            console.log('No se pudieron obtener datos de agua de la BD');
-            return;
-        }
-        
-        const datos = await response.json();
-        
-        if (datos && Array.isArray(datos) && datos.length > 0) {
-            const ultimoDato = datos[0];
-            const ultimoNivel = parseFloat(ultimoDato.nivel);
-            
-            console.log('Último dato de agua encontrado:', ultimoNivel, 'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora);
-            actualizar(ultimoNivel);
-            return ultimoNivel;
+    const escala = d3.scaleLinear()
+        .domain([0, 100])
+        .range([tanqueY + tanqueHeight, tanqueY]);
+
+    function actualizar(valor) {
+        const porcentaje = Math.max(0, Math.min(100, valor));
+        const yAgua = escala(porcentaje);
+        const alturaAgua = tanqueY + tanqueHeight - yAgua;
+
+        const yIndicador = escala(porcentaje);
+        const alturaIndicador = tanqueY + tanqueHeight - yIndicador;
+
+        let colorAgua;
+        let colorIndicador;
+        let estadoTexto;
+
+        if (porcentaje < 20) {
+            colorAgua = COLOR_ESTADO.critico;
+            colorIndicador = COLOR_ESTADO.critico;
+            estadoTexto = TRANSLATIONS.critical || "CRÍTICO";
+        } else if (porcentaje < 40) {
+            colorAgua = COLOR_ESTADO.advertencia;
+            colorIndicador = COLOR_ESTADO.advertencia;
+            estadoTexto = TRANSLATIONS.low || "BAJO";
+        } else if (porcentaje < 70) {
+            colorAgua = COLOR_ESTADO.moderado;
+            colorIndicador = COLOR_ESTADO.moderado;
+            estadoTexto = TRANSLATIONS.moderate || "MODERADO";
         } else {
-            console.log('No hay datos de agua en la BD');
+            colorAgua = COLOR_ESTADO.optimo;
+            colorIndicador = COLOR_ESTADO.optimo;
+            estadoTexto = TRANSLATIONS.optimal || "ÓPTIMO";
+        }
+
+        agua.transition()
+            .duration(800)
+            .ease(d3.easeCubicOut)
+            .attr("y", yAgua)
+            .attr("height", alturaAgua);
+
+        superficieAgua.transition()
+            .duration(800)
+            .ease(d3.easeCubicOut)
+            .attr("y", yAgua);
+
+        textoNivel.transition()
+            .duration(400)
+            .text(porcentaje.toFixed(1) + "%")
+            .attr("fill", colorAgua);
+
+        const statusElement = document.getElementById("agua-status");
+        if (statusElement) {
+            statusElement.textContent = estadoTexto;
+            statusElement.style.color = colorAgua;
+        }
+
+        const timeElement = document.getElementById("agua-time");
+        if (timeElement) {
+            const ahora = new Date();
+            const horaStr = ahora.getHours().toString().padStart(2, "0") + ":" +
+                            ahora.getMinutes().toString().padStart(2, "0");
+            timeElement.textContent = horaStr;
+        }
+
+        defs.select("#gradAgua").remove();
+
+        const nuevoGradiente = defs.append("linearGradient")
+            .attr("id", "gradAgua")
+            .attr("x1", "0%").attr("y1", "100%")
+            .attr("x2", "0%").attr("y2", "0%");
+
+        nuevoGradiente.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", d3.color(colorAgua).darker(0.5))
+            .attr("stop-opacity", 0.9);
+
+        nuevoGradiente.append("stop")
+            .attr("offset", "50%")
+            .attr("stop-color", colorAgua)
+            .attr("stop-opacity", 0.8);
+
+        nuevoGradiente.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", d3.color(colorAgua).brighter(0.5))
+            .attr("stop-opacity", 0.7);
+
+        agua.attr("fill", "url(#gradAgua)");
+
+        if (porcentaje > 90) {
+            for (let i = 0; i < 3; i++) {
+                const bubbleX = tanqueX + Math.random() * tanqueWidth * 0.8 + tanqueWidth * 0.1;
+                const bubbleY = yAgua + Math.random() * 10;
+                const bubbleSize = Math.random() * 4 + 2;
+
+                const bubble = svg.append("circle")
+                    .attr("cx", bubbleX)
+                    .attr("cy", bubbleY)
+                    .attr("r", bubbleSize)
+                    .attr("fill", "rgba(255, 255, 255, 0.6)")
+                    .attr("opacity", 0);
+
+                bubble.transition()
+                    .duration(1500)
+                    .attr("cy", bubbleY - 30)
+                    .attr("opacity", 0.8)
+                    .transition()
+                    .duration(500)
+                    .attr("opacity", 0)
+                    .remove();
+            }
+        }
+
+        return porcentaje;
+    }
+
+    actualizar(valorInicial);
+
+    async function cargarUltimoDatoBD() {
+        try {
+            console.log("Cargando datos de agua desde BD para obtener el último...");
+            const response = await fetch("/api/agua/");
+
+            if (!response.ok) {
+                console.log("No se pudieron obtener datos de agua de la BD");
+                return null;
+            }
+
+            const datos = await response.json();
+
+            if (datos && Array.isArray(datos) && datos.length > 0) {
+                const ultimoDato = datos[0];
+                const ultimoNivel = parseFloat(ultimoDato.nivel);
+
+                console.log("Último dato de agua encontrado:", ultimoNivel, "ID:", ultimoDato.id, "Fecha:", ultimoDato.fecha_hora);
+                actualizar(ultimoNivel);
+                return ultimoNivel;
+            } else {
+                console.log("No hay datos de agua en la BD");
+                return null;
+            }
+        } catch (error) {
+            console.log("Error al cargar datos de agua:", error);
             return null;
         }
-    } catch (error) {
-        console.log('Error al cargar datos de agua:', error);
-        return null;
     }
-}
 
-async function cargarDatosRecientesBD(limite = 10) {
-    try {
-        const response = await fetch('/api/agua/');
-        
-        if (!response.ok) {
-            console.log('No se pudieron obtener datos de agua de la BD');
+    async function cargarDatosRecientesBD(limite = 10) {
+        try {
+            const response = await fetch("/api/agua/");
+
+            if (!response.ok) {
+                console.log("No se pudieron obtener datos de agua de la BD");
+                return [];
+            }
+
+            const datos = await response.json();
+
+            if (datos && Array.isArray(datos)) {
+                const datosRecientes = datos.slice(0, limite);
+                console.log(`Cargados ${datosRecientes.length} datos recientes de agua`);
+                return datosRecientes;
+            }
+
+            return [];
+        } catch (error) {
+            console.log("Error al cargar datos recientes:", error);
             return [];
         }
-        
-        const datos = await response.json();
-        
-        if (datos && Array.isArray(datos)) {
-            const datosRecientes = datos.slice(0, limite);
-            console.log(`Cargados ${datosRecientes.length} datos recientes de agua`);
-            return datosRecientes;
-        }
-        
-        return [];
-    } catch (error) {
-        console.log('Error al cargar datos recientes:', error);
-        return [];
     }
-}
 
-setTimeout(() => {
-    cargarUltimoDatoBD();
-}, 500);
+    setTimeout(() => {
+        cargarUltimoDatoBD();
+    }, 500);
 
-const funcionActualizar = function(valor) {
-    return actualizar(valor);
-};
+    const funcionActualizar = function(valor) {
+        return actualizar(valor);
+    };
 
-funcionActualizar.cargarUltimoDato = cargarUltimoDatoBD;
-funcionActualizar.cargarDatosRecientes = cargarDatosRecientesBD;
-funcionActualizar.actualizar = actualizar;
+    funcionActualizar.cargarUltimoDato = cargarUltimoDatoBD;
+    funcionActualizar.cargarDatosRecientes = cargarDatosRecientesBD;
+    funcionActualizar.actualizar = actualizar;
 
-return funcionActualizar;
+    return funcionActualizar;
 }
 
 // ===================== GAUGE VERTICAL (Oxígeno %) =====================
@@ -481,17 +700,13 @@ function gaugeO2(containerId, initial) {
     const min = 0.0;
     const max = 100.0;
 
-    const svg = container.append("svg")
-        .attr("width", width)
-        .attr("height", height);
+    const svg = container.append("svg");
+    prepararSvgResponsivo(svg, width, height);
 
     const colorPalette = {
-        green: "#10b981",
-        yellow: "#fbbf24",
-        red: "#ef4444",
-        lightGreen: "#34d399",
-        darkGreen: "#059669",
-        lightRed: "#f87171",
+        green: COLOR_ESTADO.optimo,
+        yellow: COLOR_ESTADO.advertencia,
+        red: COLOR_ESTADO.critico,
         white: "#ffffff"
     };
 
@@ -514,7 +729,7 @@ function gaugeO2(containerId, initial) {
 
     for (let i = 0; i <= 100; i += 25) {
         const y = scale(i);
-        
+
         svg.append("line")
             .attr("x1", frameX - 10)
             .attr("y1", y)
@@ -522,7 +737,7 @@ function gaugeO2(containerId, initial) {
             .attr("y2", y)
             .attr("stroke", colorPalette.white)
             .attr("stroke-width", 1.5);
-        
+
         svg.append("text")
             .attr("x", frameX - 20)
             .attr("y", y + 4)
@@ -542,26 +757,17 @@ function gaugeO2(containerId, initial) {
         .attr("rx", 12);
 
     const valueText = svg.append("text")
-        .attr("x", width/2)
+        .attr("x", width / 2)
         .attr("y", frameY + frameH + 50)
         .attr("fill", colorFor(initial))
-        .attr("font-size", "40px")
-        .attr("font-weight", "700")
+        .attr("font-size", TEXTO_VALOR_GAUGE.fontSize)
+        .attr("font-weight", TEXTO_VALOR_GAUGE.fontWeight)
         .attr("text-anchor", "middle")
         .text(initial.toFixed(2) + " %");
 
-    const qualityText = svg.append("text")
-        .attr("x", width/2)
-        .attr("y", frameY + frameH + 120)
-        .attr("fill", colorFor(initial))
-        .attr("font-size", "25px")
-        .attr("font-weight", "600")
-        .attr("text-anchor", "middle")
-        .text(getQualityText(initial));
-
     function colorFor(v) {
         const valor = Math.max(0, Math.min(100, v));
-        
+
         if (valor >= 19.5 && valor <= 23.5) {
             return colorPalette.green;
         } else if ((valor >= 17 && valor <= 19.4) || (valor >= 23.6 && valor <= 25)) {
@@ -573,7 +779,7 @@ function gaugeO2(containerId, initial) {
 
     function getQualityText(v) {
         const valor = Math.max(0, Math.min(100, v));
-        
+
         if (valor >= 19.5 && valor <= 23.5) {
             return TRANSLATIONS.optimal || "ÓPTIMO";
         } else if ((valor >= 17 && valor <= 19.4) || (valor >= 23.6 && valor <= 25)) {
@@ -584,24 +790,15 @@ function gaugeO2(containerId, initial) {
     }
 
     function getFooterQualityText(v) {
-        const valor = Math.max(0, Math.min(100, v));
-        
-        if (valor >= 19.5 && valor <= 23.5) {
-            return TRANSLATIONS.optimal || "ÓPTIMO";
-        } else if ((valor >= 17 && valor <= 19.4) || (valor >= 23.6 && valor <= 25)) {
-            return TRANSLATIONS.warning || "ADVERTENCIA";
-        } else {
-            return TRANSLATIONS.critical || "CRÍTICO";
-        }
+        return getQualityText(v);
     }
 
     function actualizarGauge(newVal) {
         const valorLimitado = Math.max(0, Math.min(100, newVal));
-        
+
         const y = scale(valorLimitado);
         const h = Math.max(2, (frameY + frameH) - y);
         const newColor = colorFor(valorLimitado);
-        const qualityTextValue = getQualityText(valorLimitado);
 
         fillRect
             .transition().duration(300)
@@ -614,24 +811,19 @@ function gaugeO2(containerId, initial) {
             .text(valorLimitado.toFixed(2) + " %")
             .attr("fill", newColor);
 
-        qualityText
-            .transition().duration(300)
-            .text(qualityTextValue)
-            .attr("fill", newColor);
+        const qualityElement = document.getElementById("oxigeno-quality");
+        const timeElement = document.getElementById("oxigeno-time");
 
-        const qualityElement = document.getElementById('oxigeno-quality');
-        const timeElement = document.getElementById('oxigeno-time');
-        
         if (qualityElement) {
             const footerText = getFooterQualityText(valorLimitado);
             qualityElement.textContent = footerText;
             qualityElement.style.color = newColor;
         }
-        
+
         if (timeElement) {
             const ahora = new Date();
-            const horaStr = ahora.getHours().toString().padStart(2, '0') + ':' + 
-                            ahora.getMinutes().toString().padStart(2, '0');
+            const horaStr = ahora.getHours().toString().padStart(2, "0") + ":" +
+                            ahora.getMinutes().toString().padStart(2, "0");
             timeElement.textContent = horaStr;
         }
 
@@ -640,35 +832,34 @@ function gaugeO2(containerId, initial) {
 
     async function cargarUltimoDatoBD() {
         try {
-            console.log('Cargando datos de oxígeno desde BD para obtener el último...');
-            const response = await fetch('/api/o2/');
-            
+            console.log("Cargando datos de oxígeno desde BD para obtener el último...");
+            const response = await fetch("/api/o2/");
+
             if (!response.ok) {
-                console.log('No se pudieron obtener datos de oxígeno de la BD');
+                console.log("No se pudieron obtener datos de oxígeno de la BD");
                 return null;
             }
-            
+
             const datos = await response.json();
-            
+
             if (datos && Array.isArray(datos) && datos.length > 0) {
                 const ultimoDato = datos[0];
-                
-                let ultimoValor;
-                ultimoValor = parseFloat(ultimoDato.nivel);
+
+                let ultimoValor = parseFloat(ultimoDato.nivel);
                 ultimoValor = Math.max(0, Math.min(100, ultimoValor));
-                
-                console.log('Último dato de oxígeno encontrado:', ultimoValor.toFixed(2) + '%', 
-                        'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
-                
+
+                console.log("Último dato de oxígeno encontrado:", ultimoValor.toFixed(2) + "%", 
+                    "ID:", ultimoDato.id, "Fecha:", ultimoDato.fecha_hora || ultimoDato.timestamp);
+
                 actualizarGauge(ultimoValor);
-                
+
                 return ultimoValor;
             } else {
-                console.log('No hay datos de oxígeno en la BD');
+                console.log("No hay datos de oxígeno en la BD");
                 return null;
             }
         } catch (error) {
-            console.log('Error al cargar datos de oxígeno:', error);
+            console.log("Error al cargar datos de oxígeno:", error);
             return null;
         }
     }
@@ -676,50 +867,39 @@ function gaugeO2(containerId, initial) {
     async function cargarDatosRecientesBD(limite = 10) {
         try {
             console.log(`Cargando últimos ${limite} datos de oxígeno...`);
-            const response = await fetch('/api/o2/');
-            
+            const response = await fetch("/api/o2/");
+
             if (!response.ok) {
-                console.log('No se pudieron obtener datos de oxígeno de la BD');
+                console.log("No se pudieron obtener datos de oxígeno de la BD");
                 return [];
             }
-            
+
             const datos = await response.json();
-            
+
             if (datos && Array.isArray(datos)) {
                 const datosRecientes = datos.slice(0, limite);
-                
+
                 const datosFormateados = datosRecientes.map(dato => {
-                    let valor;
-                    
-                    valor = parseFloat(dato.nivel);
-                    
+                    let valor = parseFloat(dato.nivel);
+
                     if (isNaN(valor)) return null;
                     valor = Math.max(0, Math.min(100, valor));
-                    
-                    let calidad;
-                    if (valor >= 19.5 && valor <= 23.5) {
-                        calidad = TRANSLATIONS.optimal || "ÓPTIMO";
-                    } else if ((valor >= 17 && valor <= 19.4) || (valor >= 23.6 && valor <= 25)) {
-                        calidad = TRANSLATIONS.warning || "ADVERTENCIA";
-                    } else {
-                        calidad = TRANSLATIONS.critical || "CRÍTICO";
-                    }
-                    
+
                     return {
                         id: dato.id,
                         valor: valor,
                         fecha: dato.fecha_hora || dato.timestamp,
-                        calidad: calidad
+                        calidad: getQualityText(valor)
                     };
                 }).filter(dato => dato !== null);
-                
+
                 console.log(`Cargados ${datosFormateados.length} datos recientes de oxígeno`);
                 return datosFormateados;
             }
-            
+
             return [];
         } catch (error) {
-            console.log('Error al cargar datos recientes de oxígeno:', error);
+            console.log("Error al cargar datos recientes de oxígeno:", error);
             return [];
         }
     }
@@ -731,7 +911,7 @@ function gaugeO2(containerId, initial) {
     const gaugeObject = {
         update: function(newVal) {
             const valorActualizado = actualizarGauge(newVal);
-            
+
             return {
                 valor: valorActualizado,
                 calidad: getQualityText(valorActualizado),
@@ -766,23 +946,19 @@ function gaugeO2(containerId, initial) {
 function gaugeCO2(containerId, initial) {
     const container = d3.select(containerId);
     container.html("");
-    
+
     const width = 300;
     const height = 520;
     const min = 0.0;
     const max = 3000.0;
 
-    const svg = container.append("svg")
-        .attr("width", width)
-        .attr("height", height);
+    const svg = container.append("svg");
+    prepararSvgResponsivo(svg, width, height);
 
     const colorPalette = {
-        green: "#10b981",
-        yellow: "#fbbf24",
-        red: "#ef4444",
-        lightGreen: "#34d399",
-        darkGreen: "#059669",
-        lightRed: "#f87171",
+        green: COLOR_ESTADO.optimo,
+        yellow: COLOR_ESTADO.advertencia,
+        red: COLOR_ESTADO.critico,
         white: "#ffffff"
     };
 
@@ -803,10 +979,10 @@ function gaugeCO2(containerId, initial) {
 
     const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
     const nivelesCO2 = [0, 600, 1200, 1800, 2400, 3000];
-    
+
     nivelesCO2.forEach(ppm => {
         const y = scale(ppm);
-        
+
         svg.append("line")
             .attr("x1", frameX - 10)
             .attr("y1", y)
@@ -824,10 +1000,10 @@ function gaugeCO2(containerId, initial) {
             .attr("text-anchor", "end")
             .text(formatPPM(ppm));
     });
-    
+
     function formatPPM(ppm) {
         if (ppm >= 1000) {
-            return (ppm / 1000).toFixed(1) + 'k';
+            return (ppm / 1000).toFixed(1) + "k";
         }
         return ppm.toString();
     }
@@ -841,26 +1017,17 @@ function gaugeCO2(containerId, initial) {
         .attr("rx", 12);
 
     const valueText = svg.append("text")
-        .attr("x", width/2)
+        .attr("x", width / 2)
         .attr("y", frameY + frameH + 50)
         .attr("fill", colorFor(initial))
-        .attr("font-size", "40px")
-        .attr("font-weight", "700")
+        .attr("font-size", TEXTO_VALOR_GAUGE.fontSize)
+        .attr("font-weight", TEXTO_VALOR_GAUGE.fontWeight)
         .attr("text-anchor", "middle")
         .text(initial.toFixed(0) + " ppm");
 
-    const qualityText = svg.append("text")
-        .attr("x", width/2)
-        .attr("y", frameY + frameH + 130)
-        .attr("fill", colorFor(initial))
-        .attr("font-size", "25px")
-        .attr("font-weight", "600")
-        .attr("text-anchor", "middle")
-        .text(getQualityText(initial));
-
     function colorFor(v) {
         const valor = Math.max(min, Math.min(max, v));
-        
+
         if (valor >= 400 && valor <= 1000) {
             return colorPalette.green;
         } else if (valor > 1000 && valor <= 2000) {
@@ -872,7 +1039,7 @@ function gaugeCO2(containerId, initial) {
 
     function getQualityText(v) {
         const valor = Math.max(min, Math.min(max, v));
-        
+
         if (valor >= 400 && valor <= 1000) {
             return TRANSLATIONS.optimal || "ÓPTIMO";
         } else if (valor > 1000 && valor <= 2000) {
@@ -883,23 +1050,15 @@ function gaugeCO2(containerId, initial) {
     }
 
     function getFooterQualityText(v) {
-        const valor = Math.max(min, Math.min(max, v));
-        if (valor >= 400 && valor <= 1000) {
-            return TRANSLATIONS.optimal || "ÓPTIMO";
-        } else if (valor > 1000 && valor <= 2000) {
-            return TRANSLATIONS.warning || "ADVERTENCIA";
-        } else {
-            return TRANSLATIONS.critical || "CRÍTICO";
-        }
+        return getQualityText(v);
     }
 
     function actualizarGauge(newVal) {
         const valorLimitado = Math.max(min, Math.min(max, newVal));
-        
+
         const y = scale(valorLimitado);
         const h = Math.max(2, (frameY + frameH) - y);
         const newColor = colorFor(valorLimitado);
-        const qualityTextValue = getQualityText(valorLimitado);
 
         fillRect
             .transition().duration(300)
@@ -912,24 +1071,19 @@ function gaugeCO2(containerId, initial) {
             .text(valorLimitado.toFixed(0) + " ppm")
             .attr("fill", newColor);
 
-        qualityText
-            .transition().duration(300)
-            .text(qualityTextValue)
-            .attr("fill", newColor);
+        const qualityElement = document.getElementById("co2-concentration");
+        const timeElement = document.getElementById("co2-time");
 
-        const qualityElement = document.getElementById('co2-concentration');
-        const timeElement = document.getElementById('co2-time');
-        
         if (qualityElement) {
             const footerText = getFooterQualityText(valorLimitado);
             qualityElement.textContent = footerText;
             qualityElement.style.color = newColor;
         }
-        
+
         if (timeElement) {
             const ahora = new Date();
-            const horaStr = ahora.getHours().toString().padStart(2, '0') + ':' + 
-                           ahora.getMinutes().toString().padStart(2, '0');
+            const horaStr = ahora.getHours().toString().padStart(2, "0") + ":" +
+                            ahora.getMinutes().toString().padStart(2, "0");
             timeElement.textContent = horaStr;
         }
 
@@ -938,21 +1092,21 @@ function gaugeCO2(containerId, initial) {
 
     async function cargarUltimoDatoBD() {
         try {
-            console.log('Cargando datos de CO₂ desde BD para obtener el último...');
-            const response = await fetch('/api/co2/');
-            
+            console.log("Cargando datos de CO₂ desde BD para obtener el último...");
+            const response = await fetch("/api/co2/");
+
             if (!response.ok) {
-                console.log('No se pudieron obtener datos de CO₂ de la BD');
+                console.log("No se pudieron obtener datos de CO₂ de la BD");
                 return null;
             }
-            
+
             const datos = await response.json();
-            
+
             if (datos && Array.isArray(datos) && datos.length > 0) {
                 const ultimoDato = datos[0];
-                
+
                 let ultimoValor = null;
-                
+
                 if (ultimoDato.concentracion !== undefined && ultimoDato.concentracion !== null) {
                     ultimoValor = parseFloat(ultimoDato.concentracion);
                 } else if (ultimoDato.valor !== undefined && ultimoDato.valor !== null) {
@@ -963,24 +1117,24 @@ function gaugeCO2(containerId, initial) {
                     console.log('Campo "concentracion", "valor" o "nivel" no encontrado en:', ultimoDato);
                     return null;
                 }
-                
+
                 if (isNaN(ultimoValor)) {
-                    console.log('Valor de CO₂ no es un número:', ultimoDato);
+                    console.log("Valor de CO₂ no es un número:", ultimoDato);
                     return null;
                 }
-                
-                console.log('Último dato de CO₂ encontrado:', ultimoValor.toFixed(0) + ' ppm', 
-                        'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
-                
+
+                console.log("Último dato de CO₂ encontrado:", ultimoValor.toFixed(0) + " ppm", 
+                    "ID:", ultimoDato.id, "Fecha:", ultimoDato.fecha_hora || ultimoDato.timestamp);
+
                 actualizarGauge(ultimoValor);
-                
+
                 return ultimoValor;
             } else {
-                console.log('No hay datos de CO₂ en la BD');
+                console.log("No hay datos de CO₂ en la BD");
                 return null;
             }
         } catch (error) {
-            console.log('Error al cargar datos de CO₂:', error);
+            console.log("Error al cargar datos de CO₂:", error);
             return null;
         }
     }
@@ -988,21 +1142,21 @@ function gaugeCO2(containerId, initial) {
     async function cargarDatosRecientesBD(limite = 10) {
         try {
             console.log(`Cargando últimos ${limite} datos de CO₂...`);
-            const response = await fetch('/api/co2/');
-            
+            const response = await fetch("/api/co2/");
+
             if (!response.ok) {
-                console.log('No se pudieron obtener datos de CO₂ de la BD');
+                console.log("No se pudieron obtener datos de CO₂ de la BD");
                 return [];
             }
-            
+
             const datos = await response.json();
-            
+
             if (datos && Array.isArray(datos)) {
                 const datosRecientes = datos.slice(0, limite);
-                
+
                 const datosFormateados = datosRecientes.map(dato => {
                     let valor;
-                    
+
                     if (dato.concentracion !== undefined && dato.concentracion !== null) {
                         valor = parseFloat(dato.concentracion);
                     } else if (dato.valor !== undefined && dato.valor !== null) {
@@ -1012,33 +1166,24 @@ function gaugeCO2(containerId, initial) {
                     } else {
                         return null;
                     }
-                    
+
                     if (isNaN(valor)) return null;
-                    
-                    let calidad;
-                    if (valor >= 400 && valor <= 1000) {
-                        calidad = TRANSLATIONS.optimal || "ÓPTIMO";
-                    } else if (valor > 1000 && valor <= 2000) {
-                        calidad = TRANSLATIONS.warning || "ADVERTENCIA";
-                    } else {
-                        calidad = TRANSLATIONS.critical || "CRÍTICO";
-                    }
-                    
+
                     return {
                         id: dato.id,
                         valor: valor,
                         fecha: dato.fecha_hora || dato.timestamp,
-                        calidad: calidad
+                        calidad: getQualityText(valor)
                     };
                 }).filter(dato => dato !== null);
-                
+
                 console.log(`Cargados ${datosFormateados.length} datos recientes de CO₂`);
                 return datosFormateados;
             }
-            
+
             return [];
         } catch (error) {
-            console.log('Error al cargar datos recientes de CO₂:', error);
+            console.log("Error al cargar datos recientes de CO₂:", error);
             return [];
         }
     }
@@ -1050,7 +1195,7 @@ function gaugeCO2(containerId, initial) {
     const gaugeObject = {
         update: function(newVal) {
             const valorActualizado = actualizarGauge(newVal);
-            
+
             return {
                 valor: valorActualizado,
                 calidad: getQualityText(valorActualizado),
@@ -1080,29 +1225,56 @@ function gaugeTemperatura(containerId, initial) {
     const container = d3.select(containerId);
     container.html("");
 
-    const width = 280;
-    const height = 420;
+    const width = 300;
+    const height = 520;
     const min = 0;
     const max = 45;
 
-    const svg = container.append("svg")
-        .attr("width", width)
-        .attr("height", height);
+    const svg = container.append("svg");
+    prepararSvgResponsivo(svg, width, height);
 
     const tempPalette = {
-        critico: "#ff6b6b",
-        advertencia: "#ffd43b",
-        optimo: "#69db7c",
+        critico: COLOR_ESTADO.critico,
+        advertencia: COLOR_ESTADO.advertencia,
+        optimo: COLOR_ESTADO.optimo,
         contorno: "#ffffff"
     };
 
-    const termometroX = width/2 - 15;
+    const termometroX = width / 2 - 15;
     const termometroY = 15;
     const termometroH = 280;
     const bulboRadio = 28;
 
+    function getTempLevel(v) {
+        if (v < 18 || v > 26) return {
+            nivel: TRANSLATIONS.critical || "CRÍTICO",
+            emoji: "⚠️",
+            color: tempPalette.critico,
+            estado: "critico"
+        };
+
+        if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return {
+            nivel: TRANSLATIONS.warning || "ADVERTENCIA",
+            emoji: "⚠️",
+            color: tempPalette.advertencia,
+            estado: "advertencia"
+        };
+
+        return {
+            nivel: TRANSLATIONS.optimal || "ÓPTIMO",
+            emoji: "✅",
+            color: tempPalette.optimo,
+            estado: "optimo"
+        };
+    }
+
+    function colorFor(v) {
+        const level = getTempLevel(v);
+        return level.color;
+    }
+
     svg.append("circle")
-        .attr("cx", width/2 + 15)
+        .attr("cx", width / 2 + 15)
         .attr("cy", termometroY + termometroH + bulboRadio)
         .attr("r", bulboRadio)
         .attr("fill", "#0f1724")
@@ -1128,67 +1300,23 @@ function gaugeTemperatura(containerId, initial) {
         .attr("width", 52)
         .attr("y", scale(initial))
         .attr("height", Math.max(2, (termometroY + termometroH) - scale(initial)))
-        .attr("fill", tempPalette.critico)
+        .attr("fill", colorFor(initial))
         .attr("rx", 11);
 
     const mercurioBulbo = svg.append("circle")
-        .attr("cx", width/2 + 15)
+        .attr("cx", width / 2 + 15)
         .attr("cy", termometroY + termometroH + bulboRadio)
         .attr("r", bulboRadio - 5)
-        .attr("fill", tempPalette.critico);
+        .attr("fill", colorFor(initial));
 
     const valueText = svg.append("text")
-        .attr("x", width/2 + 15)
+        .attr("x", width / 2 + 15)
         .attr("y", termometroY + termometroH + bulboRadio + 85)
-        .attr("fill", tempPalette.critico)
-        .attr("font-size", "40px")
-        .attr("font-weight", "700")
+        .attr("fill", colorFor(initial))
+        .attr("font-size", TEXTO_VALOR_GAUGE.fontSize)
+        .attr("font-weight", TEXTO_VALOR_GAUGE.fontWeight)
         .attr("text-anchor", "middle")
         .text(initial.toFixed(1) + " °C");
-
-    function getTempLevel(v) {
-        if (v < 18 || v > 26) return {
-            nivel: TRANSLATIONS.critical || "CRÍTICO", 
-            emoji: "⚠️",
-            color: tempPalette.critico,
-            estado: "critico"
-        };
-        if ((v >= 18 && v < 20) || (v >= 24 && v <= 26)) return {
-            nivel: TRANSLATIONS.warning || "ADVERTENCIA", 
-            emoji: "⚠️",
-            color: tempPalette.advertencia,
-            estado: "advertencia"
-        };
-        return {
-            nivel: TRANSLATIONS.optimal || "ÓPTIMO", 
-            emoji: "✅",
-            color: tempPalette.optimo,
-            estado: "optimo"
-        };
-    }
-
-    function colorFor(v) {
-        const level = getTempLevel(v);
-        return level.color;
-    }
-
-    const levelText = svg.append("text")
-        .attr("x", width/2 + 15)
-        .attr("y", termometroY + termometroH + bulboRadio + 130) 
-        .attr("fill", tempPalette.critico)
-        .attr("font-size", "30px")  
-        .attr("font-weight", "600")
-        .attr("text-anchor", "middle")
-        .text(getTempLevel(initial).nivel);
-
-    const descText = svg.append("text")
-        .attr("x", width/2 + 15)
-        .attr("y", termometroY + termometroH + bulboRadio + 125)
-        .attr("fill", "#94a3b8")
-        .attr("font-size", "14px")
-        .attr("font-weight", "500")
-        .attr("text-anchor", "middle")
-        .text(getTempDescription(initial));
 
     function getTempDescription(v) {
         if (v < 18 || v > 26) return TRANSLATIONS.thermal_stress_risk || "Riesgo fisiológico, estrés térmico";
@@ -1198,6 +1326,7 @@ function gaugeTemperatura(containerId, initial) {
 
     for (let temp = min; temp <= max; temp += 5) {
         const y = scale(temp);
+
         svg.append("line")
             .attr("x1", termometroX - 20)
             .attr("x2", termometroX)
@@ -1205,7 +1334,7 @@ function gaugeTemperatura(containerId, initial) {
             .attr("y2", y)
             .attr("stroke", tempPalette.contorno)
             .attr("stroke-width", 2);
-        
+
         svg.append("text")
             .attr("x", termometroX - 25)
             .attr("y", y + 4)
@@ -1217,21 +1346,21 @@ function gaugeTemperatura(containerId, initial) {
 
     async function cargarUltimoDatoBD() {
         try {
-            console.log('Cargando datos de Temperatura desde BD para obtener el último...');
-            const response = await fetch('/api/temperatura/');
-            
+            console.log("Cargando datos de Temperatura desde BD para obtener el último...");
+            const response = await fetch("/api/temperatura/");
+
             if (!response.ok) {
-                console.log('No se pudieron obtener datos de Temperatura de la BD');
+                console.log("No se pudieron obtener datos de Temperatura de la BD");
                 return null;
             }
-            
+
             const datos = await response.json();
-            
+
             if (datos && Array.isArray(datos) && datos.length > 0) {
                 const ultimoDato = datos[0];
-                
+
                 let ultimoValor = null;
-                
+
                 if (ultimoDato.temperatura !== undefined && ultimoDato.temperatura !== null) {
                     ultimoValor = parseFloat(ultimoDato.temperatura);
                 } else if (ultimoDato.valor !== undefined && ultimoDato.valor !== null) {
@@ -1242,24 +1371,24 @@ function gaugeTemperatura(containerId, initial) {
                     console.log('Campo "temperatura", "valor" o "nivel" no encontrado en:', ultimoDato);
                     return null;
                 }
-                
+
                 if (isNaN(ultimoValor)) {
-                    console.log('Valor de Temperatura no es un número:', ultimoDato);
+                    console.log("Valor de Temperatura no es un número:", ultimoDato);
                     return null;
                 }
-                
-                console.log('Último dato de Temperatura encontrado:', ultimoValor.toFixed(1) + ' °C', 
-                        'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
-                
+
+                console.log("Último dato de Temperatura encontrado:", ultimoValor.toFixed(1) + " °C", 
+                    "ID:", ultimoDato.id, "Fecha:", ultimoDato.fecha_hora || ultimoDato.timestamp);
+
                 actualizarGauge(ultimoValor);
-                
+
                 return ultimoValor;
             } else {
-                console.log('No hay datos de Temperatura en la BD');
+                console.log("No hay datos de Temperatura en la BD");
                 return null;
             }
         } catch (error) {
-            console.log('Error al cargar datos de Temperatura:', error);
+            console.log("Error al cargar datos de Temperatura:", error);
             return null;
         }
     }
@@ -1267,21 +1396,21 @@ function gaugeTemperatura(containerId, initial) {
     async function cargarDatosRecientesBD(limite = 10) {
         try {
             console.log(`Cargando últimos ${limite} datos de Temperatura...`);
-            const response = await fetch('/api/temperatura/');
-            
+            const response = await fetch("/api/temperatura/");
+
             if (!response.ok) {
-                console.log('No se pudieron obtener datos de Temperatura de la BD');
+                console.log("No se pudieron obtener datos de Temperatura de la BD");
                 return [];
             }
-            
+
             const datos = await response.json();
-            
+
             if (datos && Array.isArray(datos)) {
                 const datosRecientes = datos.slice(0, limite);
-                
+
                 const datosFormateados = datosRecientes.map(dato => {
                     let valor;
-                    
+
                     if (dato.temperatura !== undefined && dato.temperatura !== null) {
                         valor = parseFloat(dato.temperatura);
                     } else if (dato.valor !== undefined && dato.valor !== null) {
@@ -1291,11 +1420,11 @@ function gaugeTemperatura(containerId, initial) {
                     } else {
                         return null;
                     }
-                    
+
                     if (isNaN(valor)) return null;
-                    
+
                     const nivelInfo = getTempLevel(valor);
-                    
+
                     return {
                         id: dato.id,
                         valor: valor,
@@ -1306,22 +1435,23 @@ function gaugeTemperatura(containerId, initial) {
                         descripcion: getTempDescription(valor)
                     };
                 }).filter(dato => dato !== null);
-                
+
                 console.log(`Cargados ${datosFormateados.length} datos recientes de Temperatura`);
                 return datosFormateados;
             }
-            
+
             return [];
         } catch (error) {
-            console.log('Error al cargar datos recientes de Temperatura:', error);
+            console.log("Error al cargar datos recientes de Temperatura:", error);
             return [];
         }
     }
 
     function actualizarGauge(newVal) {
-        const y = scale(newVal);
+        const valorLimitado = Math.max(min, Math.min(max, newVal));
+        const y = scale(valorLimitado);
         const h = Math.max(2, (termometroY + termometroH) - y);
-        const newLevel = getTempLevel(newVal);
+        const newLevel = getTempLevel(valorLimitado);
         const newColor = newLevel.color;
 
         mercurio
@@ -1336,47 +1466,39 @@ function gaugeTemperatura(containerId, initial) {
 
         valueText
             .transition().duration(300)
-            .text(newVal.toFixed(1) + " °C")
+            .text(valorLimitado.toFixed(1) + " °C")
             .attr("fill", newColor);
 
-        levelText
-            .transition().duration(300)
-            .text(newLevel.nivel)
-            .attr("fill", newColor);
+        const feelingElement = document.getElementById("temp-feeling") ||
+                               document.getElementById("temp-quality");
+        const timeElement = document.getElementById("temp-time");
 
-        descText
-            .transition().duration(300)
-            .text(getTempDescription(newVal))
-            .attr("fill", "#94a3b8");
-            
-        const feelingElement = document.getElementById('temp-feeling') || 
-                                document.getElementById('temp-quality');
-        const timeElement = document.getElementById('temp-time');
-        
         if (feelingElement) {
             feelingElement.textContent = newLevel.nivel;
             feelingElement.style.color = newColor;
         }
-        
+
         if (timeElement) {
             const ahora = new Date();
-            const horaStr = ahora.getHours().toString().padStart(2, '0') + ':' + 
-                            ahora.getMinutes().toString().padStart(2, '0');
+            const horaStr = ahora.getHours().toString().padStart(2, "0") + ":" +
+                            ahora.getMinutes().toString().padStart(2, "0");
             timeElement.textContent = horaStr;
         }
+
+        return valorLimitado;
     }
 
     setTimeout(() => {
         cargarUltimoDatoBD().then(ultimoValor => {
             if (ultimoValor !== null) {
-                console.log('Gauge Temperatura inicializado con valor de BD:', ultimoValor.toFixed(1) + ' °C');
+                console.log("Gauge Temperatura inicializado con valor de BD:", ultimoValor.toFixed(1) + " °C");
             }
         });
     }, 500);
 
     const gaugeObject = {
         update: function(newVal) {
-            actualizarGauge(newVal);
+            return actualizarGauge(newVal);
         },
         cargarUltimoDato: cargarUltimoDatoBD,
         cargarDatosRecientes: cargarDatosRecientesBD,
@@ -1390,7 +1512,7 @@ function gaugeTemperatura(containerId, initial) {
             return getTempLevel(v).nivel;
         },
         getNivelActual: function() {
-            return getTempLevel(parseFloat(valueText.text().replace(' °C', '')));
+            return getTempLevel(parseFloat(valueText.text().replace(" °C", "")));
         },
         actualizarDesdeBD: function() {
             return cargarUltimoDatoBD().then(valor => {
@@ -1413,15 +1535,13 @@ function gaugeHumedad(containerId, initial) {
     const width = 300;
     const height = 520;
 
-    const svg = container.append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .style("border-radius", "8px");
+    const svg = container.append("svg");
+    prepararSvgResponsivo(svg, width, height);
 
     const humPalette = {
-        critico: "#ff6b6b",
-        advertencia: "#ffd43b",
-        optimo: "#69db7c",
+        critico: COLOR_ESTADO.critico,
+        advertencia: COLOR_ESTADO.advertencia,
+        optimo: COLOR_ESTADO.optimo,
         contorno: "#ffffff"
     };
 
@@ -1443,10 +1563,10 @@ function gaugeHumedad(containerId, initial) {
     const min = 0;
     const max = 100;
     const scale = d3.scaleLinear().domain([min, max]).range([frameY + frameH, frameY]);
-    
+
     for (let i = 0; i <= 100; i += 25) {
         const y = scale(i);
-        
+
         svg.append("line")
             .attr("x1", frameX - 10)
             .attr("y1", y)
@@ -1454,7 +1574,7 @@ function gaugeHumedad(containerId, initial) {
             .attr("y2", y)
             .attr("stroke", "#ffffff")
             .attr("stroke-width", 1.5);
-        
+
         svg.append("text")
             .attr("x", frameX - 20)
             .attr("y", y + 4)
@@ -1464,32 +1584,6 @@ function gaugeHumedad(containerId, initial) {
             .attr("text-anchor", "end")
             .text(i + "%");
     }
-
-    const fillRect = svg.append("rect")
-        .attr("x", frameX)
-        .attr("width", frameW)
-        .attr("y", scale(initial))
-        .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
-        .attr("fill", humPalette.critico)
-        .attr("rx", 12);
-
-    const valueText = svg.append("text")
-        .attr("x", width/2+30)
-        .attr("y", frameY + frameH + 50)
-        .attr("fill", humPalette.critico)
-        .attr("font-size", "40px")
-        .attr("font-weight", "700")
-        .attr("text-anchor", "middle")
-        .text(initial.toFixed(1) + " %");
-
-    const levelText = svg.append("text")
-        .attr("x", width/2+30)
-        .attr("y", frameY + frameH + 130)
-        .attr("fill", humPalette.critico)
-        .attr("font-size", "25px")
-        .attr("font-weight", "600")
-        .attr("text-anchor", "middle")
-        .text(getNivelTexto(initial));
 
     function colorFor(v) {
         if (v < 30 || v > 70) return humPalette.critico;
@@ -1515,6 +1609,23 @@ function gaugeHumedad(containerId, initial) {
         return getNivelTexto(v);
     }
 
+    const fillRect = svg.append("rect")
+        .attr("x", frameX)
+        .attr("width", frameW)
+        .attr("y", scale(initial))
+        .attr("height", Math.max(2, (frameY + frameH) - scale(initial)))
+        .attr("fill", colorFor(initial))
+        .attr("rx", 12);
+
+    const valueText = svg.append("text")
+        .attr("x", width / 2 + 30)
+        .attr("y", frameY + frameH + 50)
+        .attr("fill", colorFor(initial))
+        .attr("font-size", TEXTO_VALOR_GAUGE.fontSize)
+        .attr("font-weight", TEXTO_VALOR_GAUGE.fontWeight)
+        .attr("text-anchor", "middle")
+        .text(initial.toFixed(1) + " %");
+
     const stats = {
         current: initial,
         min: initial,
@@ -1532,7 +1643,7 @@ function gaugeHumedad(containerId, initial) {
             nivel: getNivelTexto(newVal),
             color: colorFor(newVal)
         });
-        
+
         if (stats.history.length > 100) {
             stats.history.shift();
         }
@@ -1540,21 +1651,21 @@ function gaugeHumedad(containerId, initial) {
 
     async function cargarUltimoDatoBD() {
         try {
-            console.log('Cargando datos de Humedad desde BD para obtener el último...');
-            const response = await fetch('/api/humedad/');
-            
+            console.log("Cargando datos de Humedad desde BD para obtener el último...");
+            const response = await fetch("/api/humedad/");
+
             if (!response.ok) {
-                console.log('No se pudieron obtener datos de Humedad de la BD');
+                console.log("No se pudieron obtener datos de Humedad de la BD");
                 return null;
             }
-            
+
             const datos = await response.json();
-            
+
             if (datos && Array.isArray(datos) && datos.length > 0) {
                 const ultimoDato = datos[0];
-                
+
                 let ultimoValor = null;
-                
+
                 if (ultimoDato.humedad !== undefined && ultimoDato.humedad !== null) {
                     ultimoValor = parseFloat(ultimoDato.humedad);
                 } else if (ultimoDato.valor !== undefined && ultimoDato.valor !== null) {
@@ -1565,24 +1676,24 @@ function gaugeHumedad(containerId, initial) {
                     console.log('Campo "humedad", "valor" o "nivel" no encontrado en:', ultimoDato);
                     return null;
                 }
-                
+
                 if (isNaN(ultimoValor)) {
-                    console.log('Valor de Humedad no es un número:', ultimoDato);
+                    console.log("Valor de Humedad no es un número:", ultimoDato);
                     return null;
                 }
-                
-                console.log('Último dato de Humedad encontrado:', ultimoValor.toFixed(1) + ' %', 
-                        'ID:', ultimoDato.id, 'Fecha:', ultimoDato.fecha_hora || ultimoDato.timestamp);
-                
+
+                console.log("Último dato de Humedad encontrado:", ultimoValor.toFixed(1) + " %", 
+                    "ID:", ultimoDato.id, "Fecha:", ultimoDato.fecha_hora || ultimoDato.timestamp);
+
                 actualizarGauge(ultimoValor);
-                
+
                 return ultimoValor;
             } else {
-                console.log('No hay datos de Humedad en la BD');
+                console.log("No hay datos de Humedad en la BD");
                 return null;
             }
         } catch (error) {
-            console.log('Error al cargar datos de Humedad:', error);
+            console.log("Error al cargar datos de Humedad:", error);
             return null;
         }
     }
@@ -1590,21 +1701,21 @@ function gaugeHumedad(containerId, initial) {
     async function cargarDatosRecientesBD(limite = 10) {
         try {
             console.log(`Cargando últimos ${limite} datos de Humedad...`);
-            const response = await fetch('/api/humedad/');
-            
+            const response = await fetch("/api/humedad/");
+
             if (!response.ok) {
-                console.log('No se pudieron obtener datos de Humedad de la BD');
+                console.log("No se pudieron obtener datos de Humedad de la BD");
                 return [];
             }
-            
+
             const datos = await response.json();
-            
+
             if (datos && Array.isArray(datos)) {
                 const datosRecientes = datos.slice(0, limite);
-                
+
                 const datosFormateados = datosRecientes.map(dato => {
                     let valor;
-                    
+
                     if (dato.humedad !== undefined && dato.humedad !== null) {
                         valor = parseFloat(dato.humedad);
                     } else if (dato.valor !== undefined && dato.valor !== null) {
@@ -1614,7 +1725,7 @@ function gaugeHumedad(containerId, initial) {
                     } else {
                         return null;
                     }
-                    
+
                     if (isNaN(valor)) return null;
 
                     let estadoInterno;
@@ -1625,7 +1736,7 @@ function gaugeHumedad(containerId, initial) {
                     } else {
                         estadoInterno = "optimo";
                     }
-                    
+
                     return {
                         id: dato.id,
                         valor: valor,
@@ -1636,23 +1747,24 @@ function gaugeHumedad(containerId, initial) {
                         descripcion: getDescripcionNivel(valor)
                     };
                 }).filter(dato => dato !== null);
-                
+
                 console.log(`Cargados ${datosFormateados.length} datos recientes de Humedad`);
                 return datosFormateados;
             }
-            
+
             return [];
         } catch (error) {
-            console.log('Error al cargar datos recientes de Humedad:', error);
+            console.log("Error al cargar datos recientes de Humedad:", error);
             return [];
         }
     }
 
     function actualizarGauge(newVal) {
-        const y = scale(newVal);
+        const valorLimitado = Math.max(min, Math.min(max, newVal));
+        const y = scale(valorLimitado);
         const h = Math.max(2, (frameY + frameH) - y);
-        const newColor = colorFor(newVal);
-        const nivelTexto = getNivelTexto(newVal);
+        const newColor = colorFor(valorLimitado);
+        const nivelTexto = getNivelTexto(valorLimitado);
 
         fillRect
             .transition().duration(300)
@@ -1662,36 +1774,33 @@ function gaugeHumedad(containerId, initial) {
 
         valueText
             .transition().duration(300)
-            .text(newVal.toFixed(1) + " %")
+            .text(valorLimitado.toFixed(1) + " %")
             .attr("fill", newColor);
 
-        levelText
-            .transition().duration(300)
-            .text(nivelTexto)
-            .attr("fill", newColor);
-        
-        updateStats(newVal);
-        
-        const feelingElement = document.getElementById('humidity-condition');
-        const timeElement = document.getElementById('humidity-time');
-        
+        updateStats(valorLimitado);
+
+        const feelingElement = document.getElementById("humidity-condition");
+        const timeElement = document.getElementById("humidity-time");
+
         if (feelingElement) {
             feelingElement.textContent = nivelTexto;
             feelingElement.style.color = newColor;
         }
-        
+
         if (timeElement) {
             const ahora = new Date();
-            const horaStr = ahora.getHours().toString().padStart(2, '0') + ':' + 
-                            ahora.getMinutes().toString().padStart(2, '0');
+            const horaStr = ahora.getHours().toString().padStart(2, "0") + ":" +
+                            ahora.getMinutes().toString().padStart(2, "0");
             timeElement.textContent = horaStr;
         }
+
+        return valorLimitado;
     }
 
     setTimeout(() => {
         cargarUltimoDatoBD().then(ultimoValor => {
             if (ultimoValor !== null) {
-                console.log('Gauge Humedad inicializado con valor de BD:', ultimoValor.toFixed(1) + ' %');
+                console.log("Gauge Humedad inicializado con valor de BD:", ultimoValor.toFixed(1) + " %");
             }
         });
     }, 500);
@@ -1699,13 +1808,12 @@ function gaugeHumedad(containerId, initial) {
     const gaugeObject = {
         update: function(newVal) {
             actualizarGauge(newVal);
-            const nivelInfo = {
+            return {
                 valor: newVal,
                 nivel: getNivelTexto(newVal),
                 color: colorFor(newVal),
                 textoFooter: getFooterTexto(newVal)
             };
-            return nivelInfo;
         },
         cargarUltimoDato: cargarUltimoDatoBD,
         cargarDatosRecientes: cargarDatosRecientesBD,
@@ -1737,14 +1845,44 @@ function gaugeHumedad(containerId, initial) {
         },
         obtenerRangos: function() {
             return {
-                optimo: { min: 40, max: 60, color: humPalette.optimo, estado: TRANSLATIONS.optimal || "ÓPTIMO", descripcion: TRANSLATIONS.pathogen_comfort_balance || "Minimiza patógenos, maximiza confort respiratorio" },
+                optimo: {
+                    min: 40,
+                    max: 60,
+                    color: humPalette.optimo,
+                    estado: TRANSLATIONS.optimal || "ÓPTIMO",
+                    descripcion: TRANSLATIONS.pathogen_comfort_balance || "Minimiza patógenos, maximiza confort respiratorio"
+                },
                 advertencia: [
-                    { min: 30, max: 40, color: humPalette.advertencia, estado: TRANSLATIONS.warning || "ADVERTENCIA", descripcion: TRANSLATIONS.respiratory_dryness_risk || "Riesgo de sequedad respiratoria" },
-                    { min: 60, max: 70, color: humPalette.advertencia, estado: TRANSLATIONS.warning || "ADVERTENCIA", descripcion: TRANSLATIONS.microbial_growth_risk || "Riesgo de proliferación microbiana" }
+                    {
+                        min: 30,
+                        max: 40,
+                        color: humPalette.advertencia,
+                        estado: TRANSLATIONS.warning || "ADVERTENCIA",
+                        descripcion: TRANSLATIONS.respiratory_dryness_risk || "Riesgo de sequedad respiratoria"
+                    },
+                    {
+                        min: 60,
+                        max: 70,
+                        color: humPalette.advertencia,
+                        estado: TRANSLATIONS.warning || "ADVERTENCIA",
+                        descripcion: TRANSLATIONS.microbial_growth_risk || "Riesgo de proliferación microbiana"
+                    }
                 ],
                 critico: [
-                    { min: 0, max: 30, color: humPalette.critico, estado: TRANSLATIONS.critical || "CRÍTICO", descripcion: TRANSLATIONS.extreme_dryness_irritation || "Irritación respiratoria por sequedad extrema" },
-                    { min: 70, max: 100, color: humPalette.critico, estado: TRANSLATIONS.critical || "CRÍTICO", descripcion: TRANSLATIONS.mold_growth_risk || "Riesgo de crecimiento de moho e irritación respiratoria" }
+                    {
+                        min: 0,
+                        max: 30,
+                        color: humPalette.critico,
+                        estado: TRANSLATIONS.critical || "CRÍTICO",
+                        descripcion: TRANSLATIONS.extreme_dryness_irritation || "Irritación respiratoria por sequedad extrema"
+                    },
+                    {
+                        min: 70,
+                        max: 100,
+                        color: humPalette.critico,
+                        estado: TRANSLATIONS.critical || "CRÍTICO",
+                        descripcion: TRANSLATIONS.mold_growth_risk || "Riesgo de crecimiento de moho e irritación respiratoria"
+                    }
                 ]
             };
         }
