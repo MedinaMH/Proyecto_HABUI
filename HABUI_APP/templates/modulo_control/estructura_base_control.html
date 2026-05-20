@@ -60,6 +60,12 @@
             <a class="nav-link {% if request.path == '/control_sensores' %}active{% endif %}"  href="{% url 'control_sensores' %}">
                 <i class="bi bi-lightning-charge-fill me-2"></i>Sensores
             </a>
+
+            <!-- PWMS -->
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'PWMS:missions_list' %}">
+                    <i class="bi bi-clock-history me-2"></i>PWMS
+                </a>
             </li>
 
         </ul>

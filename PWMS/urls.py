@@ -9,7 +9,6 @@ from PWMS.views import (
     HealthSyncRegisterAPI,  
     HealthSyncLogoutAPI,
     HealthSyncPerfilAPI,
-    HealthSyncRegistroPsicologicoAPI,
     HealthSyncRegistroFisiologicoAPI,  # ← Solo este
     HealthSyncDashboardAPI,
     healthsync_status_api,              # ← Para /api/healthsync/status/
@@ -37,7 +36,7 @@ web_urls = [
     path('nuevo_registro_psicologico/', api_views.nuevo_registro_psicologico, name='nuevo_registro_psicologico'),
     path('nuevo_registro_fisiologico/', api_views.nuevo_registro_fisiologico, name='nuevo_registro_fisiologico'),
     path('historial_psicologico/', api_views.historial_psicologico, name='historial_psicologico'),
-    path('historial-psic-integrado/', api_views.historial_psic_integrado, name='historial_psic_integrado'),
+    path('historial-psic-integrado/', api_views.historial_psicologico, name='historial_psic_integrado'),
     path('historial_fisiologico/', api_views.historial_fisiologico, name='historial_fisiologico'),
     
     # Gráficos web
@@ -53,17 +52,41 @@ web_urls = [
     path('nasa-tlx/', api_views.nasa_tlx_create, name='nasa_tlx_create'),
     path('nasa-tlx/resultado/<int:pk>/', api_views.nasa_tlx_resultado, name='nasa_tlx_resultado'),
     path('nasa-tlx/historial/', api_views.nasa_tlx_historial, name='nasa_tlx_historial'),
-    path('guardar-video-nasa-tlx/', api_views.guardar_video_nasa_tlx, name='guardar_video_nasa_tlx'),
     
     # Zung Anxiety (web)
     path('zung-anxiety/nuevo/', api_views.zung_anxiety_nuevo, name='zung_anxiety_nuevo'),
     path('zung-anxiety/<int:pk>/resultados/', api_views.zung_anxiety_resultados, name='zung_anxiety_resultados'),
     path('zung-anxiety/historial/', api_views.zung_anxiety_historial, name='zung_anxiety_historial'),
-    path('guardar-video-zung/', api_views.guardar_video_zung, name='guardar_video_zung'),
+
+    # ========== URLs para Misiones ==========
     
-    #path('analizar-estres/<str:tipo>/<int:id>/', api_views.analizar_estres_video, name='analizar_estres_video'),
+    # Lista de misiones 
+    path('missions/', api_views.missions_list, name='missions_list'),
     
-    path('export-stress/<int:user_id>/', views.export_stress_vocabulary, name='export_stress_vocabulary'),
+    # Dashboard con GET (para el botón) - estaba duplicada
+    path('mission/dashboard/', api_views.mission_dashboard_by_get, name='mission_dashboard_get'),
+    
+    # Exportar con GET (para el botón)
+    path('mission/export-xml/', api_views.export_mission_by_get, name='export_mission_get'),
+    
+    path('export-stress/<int:user_id>/', api_views.export_stress_vocabulary, name='export_stress_vocabulary'),
+    
+    # Exportación a XML para AnalogCrewStudy (con ID en ruta)
+    path('mission/<int:mission_id>/export-analog-xml/', api_views.export_mission_to_analog_xml, name='export_analog_xml'),
+    
+    # Dashboard de misión (con ID en ruta)
+    path('mission/<int:mission_id>/dashboard/', api_views.mission_dashboard, name='mission_dashboard'),
+    
+    # API de estadísticas
+    path('api/mission/<int:mission_id>/stats/', api_views.api_mission_stats, name='api_mission_stats'),
+
+    path('mission/new/', api_views.mission_form, name='mission_form_new'),
+    path('mission/edit/<int:mission_id>/', api_views.mission_form, name='mission_form_edit'),
+    path('api/save-mission/', api_views.api_save_mission, name='save_mission'),
+    path('api/delete-mission/<int:mission_id>/', api_views.api_delete_mission, name='delete_mission'),
+
+    path('mission/<int:mission_id>/heatmap/', api_views.heatmap_view, name='heatmap_view'),
+    path('api/mission/<int:mission_id>/heatmap-data/', api_views.heatmap_data_api, name='heatmap_data'), 
 ]
 
 # ===== URLs API (para apps) =====
@@ -82,7 +105,6 @@ api_urls = [
     
     # Registros API (¡SOLO UNO para fisiológico!)
     path('api/healthsync/save/', HealthSyncRegistroFisiologicoAPI.as_view(), name='healthsync_save'),
-    path('api/healthsync/registro/psicologico/', HealthSyncRegistroPsicologicoAPI.as_view(), name='healthsync_registro_psicologico'),
     
     # Dashboard API
     path('api/healthsync/dashboard/', HealthSyncDashboardAPI.as_view(), name='healthsync_dashboard'),

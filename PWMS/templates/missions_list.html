@@ -1,0 +1,110 @@
+{% extends "modulo_control/estructura_base_control.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block titulo %}{% trans "Lista de Misiones" %} - PWMS{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">🚀 {% trans "PWMS - Misiones Análogas" %}</h3>
+                </div>
+                <div class="card-body">
+                    <a href="/pwms/mission/new/" class="btn btn-success mb-3">➕ {% trans "Nueva Misión" %}</a>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>{% trans "Nombre" %}</th>
+                                    <th>{% trans "Hábitat" %}</th>
+                                    <th>{% trans "Días" %}</th>
+                                    <th>{% trans "Inicio" %}</th>
+                                    <th>{% trans "Tripulantes" %}</th>
+                                    <th>{% trans "Acciones" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mission in missions %}
+                                <tr>
+                                    <td>{{ mission.id }}</div>
+                                    <td><strong>{{ mission.name }}</strong></td>
+                                    <td>{{ mission.habitat_type }}</div>
+                                    <td>{{ mission.duration_days }}</div>
+                                    <td>{{ mission.start_date }}</div>
+                                    <td>{{ mission.crew_members.count }}</div>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="/pwms/mission/{{ mission.id }}/dashboard/" class="btn btn-primary">📊 {% trans "Dash" %}</a>
+                                            <a href="/pwms/mission/edit/{{ mission.id }}/" class="btn btn-warning">✏️ {% trans "Editar" %}</a>
+                                            <a href="/pwms/mission/{{ mission.id }}/heatmap/" class="btn btn-danger">🔥 {% trans "Heatmap" %}</a>
+                                            <button type="button" class="btn btn-success" onclick="exportarMision({{ mission.id }})">📥 {% trans "XML" %}</button>
+                                            <button type="button" class="btn btn-dark" onclick="eliminarMision({{ mission.id }}, '{{ mission.name|escapejs }}')">🗑️ {% trans "Eliminar" %}</button>
+                                        </div>
+                                    </div>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        📭 {% trans "No hay misiones disponibles" %}
+                                    </div>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function exportarMision(missionId) {
+        window.location.href = '/pwms/mission/export-xml/?id=' + missionId;
+    }
+    
+    function eliminarMision(missionId, missionName) {
+        if (confirm('{% trans "¿Eliminar la misión" %} "' + missionName + '"? {% trans "Esta acción no se puede deshacer." %}')) {
+            fetch('/pwms/api/delete-mission/' + missionId + '/', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('{% trans "Misión eliminada correctamente" %}');
+                    location.reload();
+                } else {
+                    alert('{% trans "Error:" %} ' + (data.error || '{% trans "No se pudo eliminar" %}'));
+                }
+            })
+            .catch(error => {
+                alert('{% trans "Error al eliminar:" %} ' + error);
+            });
+        }
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

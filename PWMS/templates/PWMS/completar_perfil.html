@@ -1,7 +1,8 @@
 {% extends "PWMS/estructura_base_PWMS.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block titulo %}Completar Perfil - PWMS{% endblock %}
+{% block titulo %}{% trans "Completar Perfil" %} - PWMS{% endblock %}
 
 {% block contenido %}
 <div class="container-fluid">
@@ -12,7 +13,7 @@
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">
                         <i class="bi bi-person-fill me-2"></i>
-                        Completar Información del Perfil
+                        {% trans "Completar Información del Perfil" %}
                     </h4>
                 </div>
 
@@ -21,49 +22,49 @@
                         {% csrf_token %}
                         {% if perfil.foto %}
                             <div class="mb-3">
-                                <img src="{{ perfil.foto.url }}" alt="Foto de perfil" class="img-thumbnail" style="max-width: 150px;">
+                                <img src="{{ perfil.foto.url }}" alt="{% trans 'Foto de perfil' %}" class="img-thumbnail" style="max-width: 150px;">
                             </div>
                         {% endif %}
 
 
                         <!-- ================= DATOS PERSONALES ================= -->
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Foto de Perfil</label>
+                            <label class="form-label fw-bold">{% trans "Foto de Perfil" %}</label>
                             <input type="file" name="foto" class="form-control" accept="image/*">
                         </div>
 
                         <h5 class="mb-3 text-primary">
                             <i class=""></i>
-                            Datos Personales
+                            {% trans "Datos Personales" %}
                         </h5>                      
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Nombre Completo</label>
+                                <label class="form-label fw-bold">{% trans "Nombre Completo" %}</label>
                                 <input type="text" name="nombre_completo" class="form-control"
                                     value="{{ perfil.nombre_completo|default:'' }}">
                             </div>
                             
                             <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Teléfono</label>
+                                <label class="form-label fw-bold">{% trans "Teléfono" %}</label>
                                 <input type="tel" name="telefono" class="form-control"
                                     value="{{ perfil.telefono|default:'' }}">
                             </div>
 
                             <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Fecha de Nacimiento</label>
+                                <label class="form-label fw-bold">{% trans "Fecha de Nacimiento" %}</label>
                                 <input type="date" name="fecha_nacimiento" class="form-control"
                                     value="{{ perfil.fecha_nacimiento|date:'Y-m-d' }}">
                             </div>
 
                             <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Género</label>
+                                <label class="form-label fw-bold">{% trans "Género" %}</label>
                                 <select name="genero" class="form-select">
-                                    <option value="">Seleccionar...</option>
-                                    <option value="masculino" {% if perfil.genero == 'masculino' %}selected{% endif %}>Masculino</option>
-                                    <option value="femenino" {% if perfil.genero == 'femenino' %}selected{% endif %}>Femenino</option>
-                                    <option value="otro" {% if perfil.genero == 'otro' %}selected{% endif %}>Otro</option>
-                                    <option value="prefiero_no_decirlo" {% if perfil.genero == 'prefiero_no_decirlo' %}selected{% endif %}>Prefiero no decirlo</option>
+                                    <option value="">{% trans "Seleccionar..." %}</option>
+                                    <option value="masculino" {% if perfil.genero == 'masculino' %}selected{% endif %}>{% trans "Masculino" %}</option>
+                                    <option value="femenino" {% if perfil.genero == 'femenino' %}selected{% endif %}>{% trans "Femenino" %}</option>
+                                    <option value="otro" {% if perfil.genero == 'otro' %}selected{% endif %}>{% trans "Otro" %}</option>
+                                    <option value="prefiero_no_decirlo" {% if perfil.genero == 'prefiero_no_decirlo' %}selected{% endif %}>{% trans "Prefiero no decirlo" %}</option>
                                 </select>
                             </div>
                         </div>
@@ -71,12 +72,12 @@
                         <!-- ================= PIN ================= -->
                         <div class="row mt-3">
                             <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">PIN de 4 dígitos</label>
+                                <label class="form-label fw-bold">{% trans "PIN de 4 dígitos" %}</label>
                                 <input type="text" name="pin" maxlength="4" pattern="\d{4}"
                                     class="form-control"
                                     value="{{ perfil.pin|default:'' }}"
-                                    placeholder="Ej: 1234" required>
-                                <small class="text-muted">Solo números (4 dígitos)</small>
+                                    placeholder="{% trans 'Ej: 1234' %}" required>
+                                <small class="text-muted">{% trans "Solo números (4 dígitos)" %}</small>
                             </div>
                         </div>
 
@@ -85,29 +86,29 @@
                         <!-- ================= DATOS MÉDICOS ================= -->
                         <h5 class="mb-3 text-danger">
                             <i class="bi bi-heart-pulse me-2"></i>
-                            Información Médica
+                            {% trans "Información Médica" %}
                         </h5>
 
                         <div class="row">
                             <div class="col-md-3 mb-3">
-                                <label class="form-label fw-bold">Grupo Sanguíneo</label>
+                                <label class="form-label fw-bold">{% trans "Grupo Sanguíneo" %}</label>
                                 <input type="text" name="grupo_sanguineo" class="form-control"
                                     value="{{ perfil.grupo_sanguineo|default:'' }}"
-                                    placeholder="Ej: O+">
+                                    placeholder="{% trans 'Ej: O+' %}">
                             </div>
 
                             <div class="col-md-9 mb-3">
-                                <label class="form-label fw-bold">Alergias</label>
+                                <label class="form-label fw-bold">{% trans "Alergias" %}</label>
                                 <textarea name="alergias" rows="2" class="form-control">{{ perfil.alergias|default:'' }}</textarea>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Medicamentos</label>
+                                <label class="form-label fw-bold">{% trans "Medicamentos" %}</label>
                                 <textarea name="medicamentos" rows="2" class="form-control">{{ perfil.medicamentos|default:'' }}</textarea>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Condiciones Médicas</label>
+                                <label class="form-label fw-bold">{% trans "Condiciones Médicas" %}</label>
                                 <textarea name="condiciones_medicas" rows="2" class="form-control">{{ perfil.condiciones_medicas|default:'' }}</textarea>
                             </div>
                         </div>
@@ -117,18 +118,18 @@
                         <!-- ================= DATOS PSICOLÓGICOS ================= -->
                         <h5 class="mb-3 text-info">
                             <i class="bi bi-brain me-2"></i>
-                            Seguimiento Psicológico
+                            {% trans "Seguimiento Psicológico" %}
                         </h5>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Psicólogo Asignado</label>
+                                <label class="form-label fw-bold">{% trans "Psicólogo Asignado" %}</label>
                                 <input type="text" name="psicologo_asignado" class="form-control"
                                     value="{{ perfil.psicologo_asignado|default:'' }}">
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Motivo de Consulta</label>
+                                <label class="form-label fw-bold">{% trans "Motivo de Consulta" %}</label>
                                 <textarea name="motivo_consulta" rows="2" class="form-control">{{ perfil.motivo_consulta|default:'' }}</textarea>
                             </div>
                         </div>
@@ -138,14 +139,14 @@
                         <!-- ================= PRIVACIDAD ================= -->
                         <h5 class="mb-3 text-secondary">
                             <i class="bi bi-gear me-2"></i>
-                            Configuración de Privacidad
+                            {% trans "Configuración de Privacidad" %}
                         </h5>
 
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" name="compartir_datos_medicos"
                                 {% if perfil.compartir_datos_medicos %}checked{% endif %}>
                             <label class="form-check-label">
-                                Compartir datos médicos
+                                {% trans "Compartir datos médicos" %}
                             </label>
                         </div>
 
@@ -153,7 +154,7 @@
                             <input class="form-check-input" type="checkbox" name="recibir_recordatorios"
                                 {% if perfil.recibir_recordatorios %}checked{% endif %}>
                             <label class="form-check-label">
-                                Recibir recordatorios
+                                {% trans "Recibir recordatorios" %}
                             </label>
                         </div>
 
@@ -161,7 +162,7 @@
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="bi bi-check-circle me-2"></i>
-                                Guardar Perfil
+                                {% trans "Guardar Perfil" %}
                             </button>
                         </div>
                     </form>

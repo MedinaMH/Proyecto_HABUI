@@ -1,53 +1,361 @@
 {% extends "PWMS/estructura_base_PWMS.html" %}
+{% load i18n %}
 
-{% block titulo %}Dashboard - PWMS{% endblock %}
+{% block titulo %}{% trans "Dashboard" %} - PWMS{% endblock %}
 
 {% block contenido %}
 <div class="dashboard-container">
     <div class="dashboard-grid">
         <div class="welcome-card">
-            <h2><i class="bi bi-heart-pulse"></i> Monitoreo del Bienestar Psicológico y Fisiológico</h2>
-            
-            <div class="welcome-features">
-                <div class="feature">
-                    <span class="feature-icon">📊</span>
-                    <h4>Dashboard Principal</h4>
-                    <p>Visualiza tu estado general de salud</p>
-                </div>
-                
-                <div class="feature">
-                    <span class="feature-icon">📈</span>
-                    <h4>Gráficas Detalladas</h4>
-                    <p>7 tipos de gráficas para análisis específico</p>
-                </div>
-                
-                <div class="feature">
-                    <span class="feature-icon">📝</span>
-                    <h4>Registros Diarios</h4>
-                    <p>Registra tu estado psicológico y fisiológico</p>
-                </div>
-                
-                <div class="feature">
-                    <span class="feature-icon">📋</span>
-                    <h4>Historial Completo</h4>
-                    <p>Revisa tu evolución a lo largo del tiempo</p>
+            <h2><i class="bi bi-heart-pulse me-2"></i> {% trans "Monitoreo del Bienestar Psicológico" %}</h2>
+            <p class="text-muted mb-4">{% trans "Resumen de tu estado actual y últimos registros" %}</p>
+
+            <!-- ================= ÚLTIMOS SIGNOS VITALES ================= -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm rounded-4 border-0">
+                        <div class="card-header bg-white rounded-top-4 border-0 pt-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-activity me-2 text-primary"></i> {% trans "Últimos Signos Vitales" %}
+                                <small class="text-muted fs-6 ms-2">({% trans "registro más reciente" %})</small>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if ultimo_fisiologico %}
+                            <div class="row text-center">
+                                <div class="col-md-2 col-6 mb-3">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <i class="bi bi-heart-pulse fs-1 text-danger"></i>
+                                        <div class="small text-muted mt-2">{% trans "Frecuencia Cardíaca" %}</div>
+                                        <div class="h4 mb-0 {% if ultimo_fisiologico.frecuencia_cardiaca < 60 or ultimo_fisiologico.frecuencia_cardiaca > 100 %}text-danger{% elif ultimo_fisiologico.frecuencia_cardiaca <= 120 %}text-warning{% else %}text-success{% endif %}">
+                                            {{ ultimo_fisiologico.frecuencia_cardiaca }}
+                                        </div>
+                                        <small class="text-muted">{% trans "lpm" %}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6 mb-3">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <i class="bi bi-graph-up fs-1 text-info"></i>
+                                        <div class="small text-muted mt-2">{% trans "Presión Arterial" %}</div>
+                                        <div class="h5 mb-0">
+                                            <span class="{% if ultimo_fisiologico.presion_arterial_sistolica > 140 %}text-danger{% elif ultimo_fisiologico.presion_arterial_sistolica > 130 %}text-warning{% else %}text-success{% endif %}">
+                                                {{ ultimo_fisiologico.presion_arterial_sistolica }}
+                                            </span>/
+                                            <span class="{% if ultimo_fisiologico.presion_arterial_diastolica > 90 %}text-danger{% elif ultimo_fisiologico.presion_arterial_diastolica > 80 %}text-warning{% else %}text-success{% endif %}">
+                                                {{ ultimo_fisiologico.presion_arterial_diastolica }}
+                                            </span>
+                                        </div>
+                                        <small class="text-muted">{% trans "mmHg" %}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6 mb-3">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <i class="bi bi-thermometer-half fs-1 text-warning"></i>
+                                        <div class="small text-muted mt-2">{% trans "Temperatura" %}</div>
+                                        <div class="h4 mb-0 {% if ultimo_fisiologico.temperatura < 36.0 or ultimo_fisiologico.temperatura > 37.5 %}text-danger{% else %}text-success{% endif %}">
+                                            {{ ultimo_fisiologico.temperatura }}
+                                        </div>
+                                        <small class="text-muted">°C</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6 mb-3">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <i class="bi bi-lungs fs-1 text-success"></i>
+                                        <div class="small text-muted mt-2">{% trans "Oxigenación" %}</div>
+                                        <div class="h4 mb-0 {% if ultimo_fisiologico.oxigenacion_sangre < 95 %}text-warning{% elif ultimo_fisiologico.oxigenacion_sangre < 90 %}text-danger{% else %}text-success{% endif %}">
+                                            {{ ultimo_fisiologico.oxigenacion_sangre }}%
+                                        </div>
+                                        <small class="text-muted">SpO2</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6 mb-3">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <i class="bi bi-moon-stars fs-1 text-secondary"></i>
+                                        <div class="small text-muted mt-2">{% trans "Sueño" %}</div>
+                                        <div class="h4 mb-0 {% if ultimo_fisiologico.horas_sueno < 6 %}text-danger{% elif ultimo_fisiologico.horas_sueno > 8 %}text-warning{% else %}text-success{% endif %}">
+                                            {{ ultimo_fisiologico.horas_sueno|default:"—" }}
+                                        </div>
+                                        <small class="text-muted">{% trans "horas" %}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-6 mb-3">
+                                    <div class="p-3 bg-light rounded-3">
+                                        <i class="bi bi-lightning-charge fs-1 text-danger"></i>
+                                        <div class="small text-muted mt-2">{% trans "Estrés" %}</div>
+                                        <div class="h4 mb-0 {% if ultimo_fisiologico.nivel_estres > 75 %}text-danger{% elif ultimo_fisiologico.nivel_estres > 50 %}text-warning{% elif ultimo_fisiologico.nivel_estres > 25 %}text-info{% else %}text-success{% endif %}">
+                                            {{ ultimo_fisiologico.nivel_estres|default:"—" }}
+                                        </div>
+                                        <small class="text-muted">{% trans "nivel" %}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar3 me-1"></i> {{ ultimo_fisiologico.fecha|date:"d/m/Y H:i" }}
+                                    <i class="bi bi-phone ms-3 me-1"></i> {{ ultimo_fisiologico.dispositivo_origen|default:"HealthSync Pro" }}
+                                </small>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="bi bi-heart-pulse fs-1 text-muted"></i>
+                                <p class="text-muted mt-2">{% trans "No hay registros fisiológicos aún" %}</p>
+                                <a href="{% url 'PWMS:nuevo_registro_fisiologico' %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-plus-circle"></i> {% trans "Agregar primer registro" %}
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <div class="dashboard-instructions">
-                <h4><i class="bi bi-info-circle"></i> Cómo usar el sistema:</h4>
+
+            <!-- ================= ÚLTIMA PRUEBA NASA TLX ================= -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="card shadow-sm rounded-4 border-0 h-100">
+                        <div class="card-header bg-white rounded-top-4 border-0 pt-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-brain me-2 text-info"></i> {% trans "Última Evaluación NASA TLX" %}
+                                <small class="text-muted fs-6 ms-2">({% trans "carga mental" %})</small>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if ultimo_tlx %}
+                            <div class="text-center mb-3">
+                                <div class="display-1 mb-2">
+                                    {% if ultimo_tlx.puntuacion_total < 30 %}
+                                        <i class="bi bi-emoji-smile text-success"></i>
+                                    {% elif ultimo_tlx.puntuacion_total < 60 %}
+                                        <i class="bi bi-emoji-neutral text-warning"></i>
+                                    {% else %}
+                                        <i class="bi bi-emoji-frown text-danger"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="h2 {% if ultimo_tlx.puntuacion_total < 30 %}text-success{% elif ultimo_tlx.puntuacion_total < 60 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ ultimo_tlx.puntuacion_total }}
+                                </div>
+                                <div class="small text-muted">{% trans "Puntuación TLX (0-100)" %}</div>
+                                <div class="progress mt-2 mb-3" style="height: 8px;">
+                                    <div class="progress-bar {% if ultimo_tlx.puntuacion_total < 30 %}bg-success{% elif ultimo_tlx.puntuacion_total < 60 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                         style="width: {{ ultimo_tlx.puntuacion_total }}%"></div>
+                                </div>
+                                <p class="small text-muted">
+                                    <i class="bi bi-calendar3 me-1"></i> {{ ultimo_tlx.fecha_creacion|date:"d/m/Y H:i" }}
+                                </p>
+                            </div>
+                            <div class="row text-center small">
+                                <div class="col-4">
+                                    <div class="text-muted">{% trans "Mental" %}</div>
+                                    <strong>{{ ultimo_tlx.demanda_mental }}</strong>
+                                </div>
+                                <div class="col-4">
+                                    <div class="text-muted">{% trans "Física" %}</div>
+                                    <strong>{{ ultimo_tlx.demanda_fisica }}</strong>
+                                </div>
+                                <div class="col-4">
+                                    <div class="text-muted">{% trans "Temporal" %}</div>
+                                    <strong>{{ ultimo_tlx.demanda_temporal }}</strong>
+                                </div>
+                                <div class="col-4 mt-2">
+                                    <div class="text-muted">{% trans "Rendimiento" %}</div>
+                                    <strong>{{ ultimo_tlx.rendimiento }}</strong>
+                                </div>
+                                <div class="col-4 mt-2">
+                                    <div class="text-muted">{% trans "Esfuerzo" %}</div>
+                                    <strong>{{ ultimo_tlx.esfuerzo }}</strong>
+                                </div>
+                                <div class="col-4 mt-2">
+                                    <div class="text-muted">{% trans "Frustración" %}</div>
+                                    <strong>{{ ultimo_tlx.frustracion }}</strong>
+                                </div>
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'PWMS:nasa_tlx_historial' %}" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-clock-history"></i> {% trans "Ver historial completo" %}
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="bi bi-brain fs-1 text-muted"></i>
+                                <p class="text-muted mt-2">{% trans "No hay evaluaciones NASA TLX" %}</p>
+                                <a href="{% url 'PWMS:nasa_tlx_create' %}" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-plus-circle"></i> {% trans "Realizar primera evaluación" %}
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= ÚLTIMA PRUEBA ZUNG ================= -->
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="card shadow-sm rounded-4 border-0 h-100">
+                        <div class="card-header bg-white rounded-top-4 border-0 pt-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-clipboard-heart me-2 text-danger"></i> {% trans "Última Prueba de Ansiedad (Zung)" %}
+                                <small class="text-muted fs-6 ms-2">({% trans "escala 25-100" %})</small>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if ultimo_zung %}
+                            <div class="text-center mb-3">
+                                <div class="display-1 mb-2">
+                                    {% if ultimo_zung.puntuacion_indice <= 44 %}
+                                        <i class="bi bi-emoji-smile text-success"></i>
+                                    {% elif ultimo_zung.puntuacion_indice <= 59 %}
+                                        <i class="bi bi-emoji-neutral text-warning"></i>
+                                    {% elif ultimo_zung.puntuacion_indice <= 74 %}
+                                        <i class="bi bi-emoji-frown text-orange"></i>
+                                    {% else %}
+                                        <i class="bi bi-emoji-dizzy text-danger"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="h2 {% if ultimo_zung.puntuacion_indice <= 44 %}text-success{% elif ultimo_zung.puntuacion_indice <= 59 %}text-warning{% elif ultimo_zung.puntuacion_indice <= 74 %}text-orange{% else %}text-danger{% endif %}">
+                                    {{ ultimo_zung.puntuacion_indice }}
+                                </div>
+                                <div class="small text-muted">{% trans "Índice de Ansiedad" %}</div>
+                                <div class="progress mt-2 mb-3" style="height: 8px;">
+                                    <div class="progress-bar {% if ultimo_zung.puntuacion_indice <= 44 %}bg-success{% elif ultimo_zung.puntuacion_indice <= 59 %}bg-warning{% elif ultimo_zung.puntuacion_indice <= 74 %}bg-orange{% else %}bg-danger{% endif %}" 
+                                         style="width: {{ ultimo_zung.puntuacion_indice }}%"></div>
+                                </div>
+                                <div class="badge {% if ultimo_zung.nivel_ansiedad == 'normal' %}bg-success{% elif ultimo_zung.nivel_ansiedad == 'minima' %}bg-warning{% elif ultimo_zung.nivel_ansiedad == 'marcada' %}bg-orange{% else %}bg-danger{% endif %} fs-6 px-3 py-2">
+                                    {{ ultimo_zung.get_nivel_ansiedad_display }}
+                                </div>
+                                <p class="small text-muted mt-2">
+                                    <i class="bi bi-calendar3 me-1"></i> {{ ultimo_zung.fecha_registro|date:"d/m/Y H:i" }}
+                                </p>
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'PWMS:zung_anxiety_historial' %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-clock-history"></i> {% trans "Ver historial completo" %}
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="bi bi-clipboard-heart fs-1 text-muted"></i>
+                                <p class="text-muted mt-2">{% trans "No hay pruebas de ansiedad Zung" %}</p>
+                                <a href="{% url 'PWMS:zung_anxiety_nuevo' %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-plus-circle"></i> {% trans "Realizar primera prueba" %}
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= ACTIVIDAD RECIENTE ================= -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm rounded-4 border-0">
+                        <div class="card-header bg-white rounded-top-4 border-0 pt-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-clock-history me-2 text-secondary"></i> {% trans "Actividad Reciente" %}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-heart-pulse fs-3 text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="small text-muted">{% trans "Último registro fisiológico" %}</div>
+                                            <div class="fw-bold">
+                                                {% if ultimo_fisiologico %}
+                                                    {{ ultimo_fisiologico.fecha|timesince }} {% trans "atrás" %}
+                                                {% else %}
+                                                    {% trans "Sin registros" %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-brain fs-3 text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="small text-muted">{% trans "Última evaluación TLX" %}</div>
+                                            <div class="fw-bold">
+                                                {% if ultimo_tlx %}
+                                                    {{ ultimo_tlx.fecha_creacion|timesince }} {% trans "atrás" %}
+                                                {% else %}
+                                                    {% trans "Sin evaluaciones" %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-clipboard-heart fs-3 text-danger"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="small text-muted">{% trans "Última prueba Zung" %}</div>
+                                            <div class="fw-bold">
+                                                {% if ultimo_zung %}
+                                                    {{ ultimo_zung.fecha_registro|timesince }} {% trans "atrás" %}
+                                                {% else %}
+                                                    {% trans "Sin pruebas" %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-instructions mt-4">
+                <h4><i class="bi bi-info-circle me-2"></i> {% trans "Cómo usar el sistema:" %}</h4>
                 <ol>
-                    <li>Usa el menú lateral para navegar</li>
-                    <li>Ve a tu aplicación Android HealthSync Pro para añadir un registro con datos fisiológicos</li>
-                    <li>Visita las gráficas para ver tu evolución</li>
-                    <li>Revisa tu historial para análisis a largo plazo</li>
+                    <li>{% trans "Usa el menú lateral para navegar entre las secciones" %}</li>
+                    <li>{% trans "Ve a tu aplicación Android HealthSync Pro para añadir registros fisiológicos" %}</li>
+                    <li>{% trans "Visita el historial para ver tu evolución detallada" %}</li>
+                    <li>{% trans "Revisa tu historial para análisis a largo plazo" %}</li>
                 </ol>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .welcome-card {
+        background: white;
+        border-radius: 1.25rem;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.05);
+        padding: 1.5rem;
+    }
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+    .bg-orange {
+        background-color: #fd7e14 !important;
+    }
+    .text-orange {
+        color: #fd7e14 !important;
+    }
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 1rem;
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}
-<!-- Sin JavaScript -->
+<script>
+    // Tooltips automáticos de Bootstrap
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
 {% endblock %}

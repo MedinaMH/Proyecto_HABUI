@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-16 16:12-0600\n"
+"POT-Creation-Date: 2026-05-20 05:54-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -128,7 +128,7 @@ msgstr "Partially connected sensors"
 msgid "Todos los sensores desconectados"
 msgstr "All sensors disconnected"
 
-#: .\HABUI_APP\templates\REMS\all_resources.html:42
+#: .\HABUI_APP\templates\REMS\all_resources.html:42 .\PWMS\models.py:269
 msgid "Última actualización"
 msgstr "Last update"
 
@@ -151,6 +151,9 @@ msgstr "CO2"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:48
 #: .\HABUI_APP\templates\REMS\estructura_base.html:117
+#: .\PWMS\templates\PWMS\dashboard.html:54
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:182
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:486
 msgid "Temperatura"
 msgstr "Temperature"
 
@@ -192,6 +195,8 @@ msgid "BUENA"
 msgstr "GOOD"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:61
+#: .\PWMS\templates\PWMS\historial_psicologico.html:139
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:94
 msgid "MODERADA"
 msgstr "MODERATE"
 
@@ -217,6 +222,14 @@ msgstr "State:"
 #: .\HABUI_APP\templates\REMS\panel_energia.html:267 .\HABUI_APP\views.py:702
 #: .\HABUI_APP\views.py:714 .\HABUI_APP\views.py:728 .\HABUI_APP\views.py:743
 #: .\HABUI_APP\views.py:757 .\HABUI_APP\views.py:771
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:37
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:57
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:77
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:98
+#: .\PWMS\templates\PWMS\historial_psicologico.html:203
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:310
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:170
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:309
 msgid "Normal"
 msgstr "Normal"
 
@@ -239,6 +252,7 @@ msgstr "Oxygen Levels"
 
 #: .\HABUI_APP\templates\REMS\all_resources.html:140 .\HABUI_APP\views.py:715
 #: .\HABUI_APP\views.py:729 .\HABUI_APP\views.py:744 .\HABUI_APP\views.py:758
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:227
 msgid "Óptimo"
 msgstr "Optimum"
 
@@ -269,6 +283,9 @@ msgid "Conectando..."
 msgstr "Connecting..."
 
 #: .\HABUI_APP\templates\REMS\estructura_base.html:28
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:24
+#: .\PWMS\templates\PWMS\login.html:25
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:43
 msgid "Panel principal"
 msgstr "Main panel"
 
@@ -566,10 +583,13 @@ msgid "Porciones"
 msgstr " Portions"
 
 #: .\HABUI_APP\templates\REMS\panel_alimentos.html:200
+#: .\PWMS\templates\mission_dashboard.html:32
+#: .\PWMS\templates\mission_form.html:48 .\PWMS\templates\missions_list.html:27
 msgid "Tripulantes"
 msgstr "Crew members"
 
 #: .\HABUI_APP\templates\REMS\panel_alimentos.html:201
+#: .\PWMS\templates\missions_list.html:28
 msgid "Acciones"
 msgstr " Actions"
 
@@ -582,6 +602,9 @@ msgid "¿Está seguro de que desea realizar esta operación?"
 msgstr "Are you sure you want to perform this operation?"
 
 #: .\HABUI_APP\templates\REMS\panel_alimentos.html:225
+#: .\PWMS\templates\PWMS\registro.html:302
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:301
+#: .\PWMS\templates\mission_form.html:77
 msgid "Cancelar"
 msgstr "Cancel"
 
@@ -789,6 +812,7 @@ msgid "No hay registros de consumo aún"
 msgstr "There are no consumption records yet"
 
 #: .\HABUI_APP\templates\REMS\panel_alimentos.html:930
+#: .\PWMS\templates\missions_list.html:46
 msgid "Eliminar"
 msgstr "Delete"
 
@@ -815,6 +839,7 @@ msgstr "consumed correctly."
 #: .\HABUI_APP\templates\REMS\panel_alimentos.html:1087
 #: .\HABUI_APP\templates\REMS\panel_alimentos.html:1185
 #: .\HABUI_APP\templates\REMS\panel_alimentos.html:1207
+#: .\PWMS\templates\heatmap.html:15 .\PWMS\templates\mission_dashboard.html:17
 msgid "días"
 msgstr "days"
 
@@ -1093,8 +1118,8 @@ msgstr "Warning"
 
 #: .\HABUI_APP\templates\REMS\panel_energia.html:269 .\HABUI_APP\views.py:705
 #: .\HABUI_APP\views.py:717 .\HABUI_APP\views.py:746 .\HABUI_APP\views.py:760
-#, fuzzy
-#| msgid "Área Crítica:"
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:39
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:96
 msgid "Crítico"
 msgstr "Critical"
 
@@ -1316,7 +1341,7 @@ msgstr "Oxygen Reference Levels"
 msgid "ESTADO CRÍTICO"
 msgstr "CRITICAL STATE"
 
-#: .\HABUI_APP\templates\REMS\panel_temperatura.html:10
+#: .\HABUI_APP\templates\REMS\panel_temperatura.html:10 .\PWMS\forms.py:292
 msgid "Temperatura (°C)"
 msgstr "Temperature (°C)"
 
@@ -1338,6 +1363,8 @@ msgstr "Temperature Reference Levels"
 
 #: .\HABUI_APP\templates\modulo_control\control_inicial.html:10
 #: .\HABUI_APP\templates\panel_principal.html:10
+#: .\PWMS\templates\mission_dashboard.html:17
+#: .\PWMS\templates\missions_list.html:26
 msgid "Inicio"
 msgstr "Main"
 
@@ -1408,6 +1435,8 @@ msgid "Módulo de Simulación"
 msgstr "Simulation Module"
 
 #: .\HABUI_APP\templates\modulo_control\sensores.html:170
+#: .\PWMS\templates\PWMS\completar_perfil.html:63
+#: .\PWMS\templates\PWMS\registro.html:257
 msgid "Seleccionar..."
 msgstr "Select..."
 
@@ -1490,6 +1519,8 @@ msgstr "Simulation Details"
 
 #: .\HABUI_APP\templates\modulo_control\sensores.html:272
 #: .\HABUI_APP\templates\modulo_control\sensores.html:279
+#: .\PWMS\templates\PWMS\registro.html:161
+#: .\PWMS\templates\PWMS\registro.html:452
 msgid "Cerrar"
 msgstr "Close"
 
@@ -1614,9 +1645,2560 @@ msgstr "Low energy"
 msgid "Activar protocolos de emergencia"
 msgstr "Activate emergency protocols"
 
-#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:26
+#: .\PWMS\forms.py:15
+msgid "Correo electrónico"
+msgstr "E-mail"
+
+#: .\PWMS\forms.py:19
+msgid "4 dígitos"
+msgstr "4-digit"
+
+#: .\PWMS\forms.py:20
+msgid "PIN de 4 dígitos para acceso rápido"
+msgstr "a-digit PIN for quick access"
+
+#: .\PWMS\forms.py:21 .\PWMS\forms.py:63
+msgid "PIN"
+msgstr "PIN"
+
+#: .\PWMS\forms.py:30 .\PWMS\forms.py:58
+msgid "Nombre de usuario"
+msgstr "Username"
+
+#: .\PWMS\forms.py:31 .\PWMS\templates\PWMS\registro.html:200
+msgid "Contraseña"
+msgstr "Password"
+
+#: .\PWMS\forms.py:32
+msgid "Confirmar contraseña"
+msgstr "Confirm password"
+
+#: .\PWMS\forms.py:37
+msgid "El PIN debe contener solo números"
+msgstr "The PIN must contain only numbers"
+
+#: .\PWMS\forms.py:39
+msgid "El PIN debe tener exactamente 4 dígitos"
+msgstr "The PIN must be exactly 4 digits"
+
+#: .\PWMS\forms.py:62 .\PWMS\templates\PWMS\completar_perfil.html:75
+msgid "PIN de 4 dígitos"
+msgstr "4-digit PIN"
+
+#: .\PWMS\forms.py:85
+#, fuzzy
+#| msgid "Nombre completo"
+msgid "Tu nombre completo"
+msgstr "Your full name"
+
+#: .\PWMS\forms.py:95
+msgid "Nombre completo"
+msgstr "Your full name"
+
+#: .\PWMS\forms.py:96
+msgid "Fecha de nacimiento"
+msgstr "Date of birth"
+
+#: .\PWMS\forms.py:97 .\PWMS\templates\PWMS\completar_perfil.html:61
+#: .\PWMS\templates\PWMS\registro.html:254
+msgid "Género"
+msgstr "Gender"
+
+#: .\PWMS\forms.py:98 .\PWMS\templates\PWMS\completar_perfil.html:49
+#: .\PWMS\templates\PWMS\registro.html:234
+msgid "Teléfono"
+msgstr "Phone number"
+
+#: .\PWMS\forms.py:99
+msgid "Grupo sanguíneo"
+msgstr "Blood type"
+
+#: .\PWMS\forms.py:100 .\PWMS\templates\PWMS\completar_perfil.html:101
+msgid "Alergias"
+msgstr "Allergies"
+
+#: .\PWMS\forms.py:101
+msgid "Medicamentos actuales"
+msgstr "Current medications"
+
+#: .\PWMS\forms.py:102
+msgid "Condiciones médicas"
+msgstr "Medical conditions"
+
+#: .\PWMS\forms.py:103
+msgid "Psicólogo asignado"
+msgstr "Assigned psychologist"
+
+#: .\PWMS\forms.py:104
+msgid "Motivo de consulta"
+msgstr "Reason for consultation"
+
+#: .\PWMS\forms.py:105 .\PWMS\templates\PWMS\completar_perfil.html:149
+msgid "Compartir datos médicos"
+msgstr "Share medical data"
+
+#: .\PWMS\forms.py:106 .\PWMS\templates\PWMS\completar_perfil.html:157
+msgid "Recibir recordatorios"
+msgstr "Receive reminders"
+
+#: .\PWMS\forms.py:115 .\PWMS\forms.py:121 .\PWMS\forms.py:127
+#: .\PWMS\forms.py:133 .\PWMS\forms.py:139
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:84
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:192
+msgid "Demanda Mental"
+msgstr "Mental Demand"
+
+#: .\PWMS\forms.py:115 .\PWMS\forms.py:145 .\PWMS\forms.py:151
+#: .\PWMS\forms.py:157 .\PWMS\forms.py:163
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:93
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:193
+msgid "Demanda Física"
+msgstr "Physical Demand"
+
+#: .\PWMS\forms.py:117
+#, fuzzy
+#| msgid "Demanda Mental vs Demanda Física"
+msgid "1. Demanda Mental vs Demanda Física"
+msgstr "Mental Demand vs Physical Demand"
+
+#: .\PWMS\forms.py:121 .\PWMS\forms.py:145 .\PWMS\forms.py:169
+#: .\PWMS\forms.py:175 .\PWMS\forms.py:181
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:102
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:194
+msgid "Demanda Temporal"
+msgstr "Temporal Demand"
+
+#: .\PWMS\forms.py:123
+#, fuzzy
+#| msgid "Demanda Mental vs Demanda Temporal"
+msgid "2. Demanda Mental vs Demanda Temporal"
+msgstr "Mental Demand vs Temporal Demand"
+
+#: .\PWMS\forms.py:127 .\PWMS\forms.py:151 .\PWMS\forms.py:169
+#: .\PWMS\forms.py:187 .\PWMS\forms.py:193
+#: .\PWMS\templates\PWMS\dashboard.html:160
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:111
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:195
+msgid "Rendimiento"
+msgstr "Performance"
+
+#: .\PWMS\forms.py:129
+#, fuzzy
+#| msgid "Demanda Mental vs Rendimiento"
+msgid "3. Demanda Mental vs Rendimiento"
+msgstr "Mental Demand vs Performance"
+
+#: .\PWMS\forms.py:133 .\PWMS\forms.py:157 .\PWMS\forms.py:175
+#: .\PWMS\forms.py:187 .\PWMS\forms.py:199
+#: .\PWMS\templates\PWMS\dashboard.html:164
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:120
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:196
+msgid "Esfuerzo"
+msgstr "Effort"
+
+#: .\PWMS\forms.py:135
+#, fuzzy
+#| msgid "Demanda Mental vs Esfuerzo"
+msgid "4. Demanda Mental vs Esfuerzo"
+msgstr "Mental Demand vs Effort"
+
+#: .\PWMS\forms.py:139 .\PWMS\forms.py:163 .\PWMS\forms.py:181
+#: .\PWMS\forms.py:193 .\PWMS\forms.py:199
+#: .\PWMS\templates\PWMS\dashboard.html:168
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:129
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:197
+msgid "Frustración"
+msgstr "Frustration"
+
+#: .\PWMS\forms.py:141
+msgid "5. Demanda Mental vs Frustración"
+msgstr "Mental Demand vs Frustration"
+
+#: .\PWMS\forms.py:147
+msgid "6. Demanda Física vs Demanda Temporal"
+msgstr "Physical Demand vs Temporal Demand"
+
+#: .\PWMS\forms.py:153
+msgid "7. Demanda Física vs Rendimiento"
+msgstr "Physical Demand vs Performance"
+
+#: .\PWMS\forms.py:159
+msgid "8. Demanda Física vs Esfuerzo"
+msgstr "Physical Demand vs Effort"
+
+#: .\PWMS\forms.py:165
+msgid "9. Demanda Física vs Frustración"
+msgstr "Physical Demand vs Frustration"
+
+#: .\PWMS\forms.py:171
+msgid "10. Demanda Temporal vs Rendimiento"
+msgstr "Temporal Demand vs Performance"
+
+#: .\PWMS\forms.py:177
+msgid "11. Demanda Temporal vs Esfuerzo"
+msgstr "Temporal Demand vs Effort"
+
+#: .\PWMS\forms.py:183
+msgid "12. Demanda Temporal vs Frustración"
+msgstr "Temporal Demand vs Frustration"
+
+#: .\PWMS\forms.py:189
+msgid "13. Rendimiento vs Esfuerzo"
+msgstr "Performance vs Effort"
+
+#: .\PWMS\forms.py:195
+msgid "14. Rendimiento vs Frustración"
+msgstr "Performance vs Frustration"
+
+#: .\PWMS\forms.py:201
+msgid "15. Esfuerzo vs Frustración"
+msgstr "Effort vs Frustration"
+
+#: .\PWMS\forms.py:217
+msgid "Ej: Realizar informe mensual, Reunión de equipo..."
+msgstr "E.g.: Prepare monthly report, Team meeting..."
+
+#: .\PWMS\forms.py:246
+msgid "Observaciones adicionales sobre tu experiencia..."
+msgstr "Additional observations about your experience..."
+
+#: .\PWMS\forms.py:250
+#, fuzzy
+#| msgid "Paso 1: Descripción de la Tarea"
+msgid "Descripción de la tarea"
+msgstr "Step 1: Task Description"
+
+#: .\PWMS\forms.py:251
+msgid "Demanda Mental (0-20)"
+msgstr "Mental Demand"
+
+#: .\PWMS\forms.py:252
+msgid "Demanda Física (0-20)"
+msgstr "Physical Demand"
+
+#: .\PWMS\forms.py:253
+msgid "Demanda Temporal (0-20)"
+msgstr "Temporal Demand"
+
+#: .\PWMS\forms.py:254
+msgid "Rendimiento (0-20)"
+msgstr "Performance"
+
+#: .\PWMS\forms.py:255
+msgid "Esfuerzo (0-20)"
+msgstr "Effort"
+
+#: .\PWMS\forms.py:256
+msgid "Frustración (0-20)"
+msgstr "Frustration"
+
+#: .\PWMS\forms.py:257
+msgid "Notas adicionales"
+msgstr "Additional notes"
+
+#: .\PWMS\forms.py:267
+msgid "El valor debe estar entre 0 y 20"
+msgstr "The value must be between 0 and 20"
+
+#: .\PWMS\forms.py:289
+msgid "Frecuencia cardíaca (lpm)"
+msgstr "Heart rate (bpm)"
+
+#: .\PWMS\forms.py:290
+msgid "Presión arterial sistólica (mmHg)"
+msgstr "Systolic blood pressure (mmHg)"
+
+#: .\PWMS\forms.py:291
+msgid "Presión arterial diastólica (mmHg)"
+msgstr "Diastolic blood pressure (mmHg)"
+
+#: .\PWMS\forms.py:293
+msgid "Oxigenación en sangre (%)"
+msgstr "Blood oxygenation (%)"
+
+#: .\PWMS\forms.py:294
+msgid "Pasos diarios"
+msgstr "Daily steps"
+
+#: .\PWMS\forms.py:295
+msgid "Calorías quemadas"
+msgstr "Calories burned"
+
+#: .\PWMS\forms.py:296
+msgid "Horas de sueño"
+msgstr "Sleep hours"
+
+#: .\PWMS\forms.py:297
+msgid "Dispositivo de origen"
+msgstr "Source device"
+
+#: .\PWMS\forms.py:337
+msgid "Observaciones adicionales (opcional)"
+msgstr "Additional observations (optional)"
+
+#: .\PWMS\forms.py:354 .\PWMS\models.py:275
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:107
+msgid "1. Me siento más nervioso y ansioso que de costumbre"
+msgstr "1. I feel more nervous and anxious than usual"
+
+#: .\PWMS\forms.py:355 .\PWMS\models.py:279
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:116
+msgid "2. Siento miedo sin razón"
+msgstr "2. I feel afraid for no reason"
+
+#: .\PWMS\forms.py:356 .\PWMS\models.py:283
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:125
+msgid "3. Me siento alterado o agitado"
+msgstr "3. I feel upset or agitated"
+
+#: .\PWMS\forms.py:357 .\PWMS\models.py:287
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:134
+msgid "4. Siento que me estoy desmoronando"
+msgstr "4. I feel like I'm falling apart"
+
+#: .\PWMS\forms.py:358 .\PWMS\models.py:291
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:143
+msgid "5. Siento que todo está bien y no pasará nada malo"
+msgstr "5. I feel that everything is fine and nothing bad will happen"
+
+#: .\PWMS\forms.py:359 .\PWMS\models.py:295
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:152
+msgid "6. Tiemblan mis manos, brazos o piernas"
+msgstr "6. My hands, arms or legs shake"
+
+#: .\PWMS\forms.py:360 .\PWMS\models.py:299
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:161
+msgid "7. Tengo dolores de cabeza, cuello o espalda"
+msgstr "7. I have headaches, neck or back pain"
+
+#: .\PWMS\forms.py:361 .\PWMS\models.py:303
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:170
+msgid "8. Me siento débil y me canso fácilmente"
+msgstr "8. I feel weak and tire easily"
+
+#: .\PWMS\forms.py:362 .\PWMS\models.py:307
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:179
+msgid "9. Me siento calmado y puedo permanecer en calma fácilmente"
+msgstr "9. I feel calm and can remain calm easily"
+
+#: .\PWMS\forms.py:363 .\PWMS\models.py:311
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:188
+msgid "10. Siento latidos del corazón rápidos"
+msgstr "10. I feel rapid heartbeats"
+
+#: .\PWMS\forms.py:364 .\PWMS\models.py:315
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:197
+msgid "11. Tengo mareos o vértigo"
+msgstr "11. I feel dizzy or have vertigo"
+
+#: .\PWMS\forms.py:365 .\PWMS\models.py:319
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:206
+msgid "12. Siento que me voy a desmayar"
+msgstr "12. I feel like I'm going to faint"
+
+#: .\PWMS\forms.py:366 .\PWMS\models.py:323
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:215
+msgid "13. Puedo respirar normal"
+msgstr "13. I can breathe normally"
+
+#: .\PWMS\forms.py:367 .\PWMS\models.py:327
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:224
+msgid "14. Tengo entumecimiento u hormigueo en dedos, manos o pies"
+msgstr "14. I have numbness or tingling in my fingers, hands or feet"
+
+#: .\PWMS\forms.py:368 .\PWMS\models.py:331
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:233
+msgid "15. Tengo dolores de estómago o indigestión"
+msgstr "15. I have stomach pains or indigestion"
+
+#: .\PWMS\forms.py:369 .\PWMS\models.py:335
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:242
+msgid "16. Tengo necesidad frecuente de orinar"
+msgstr "16. I have a frequent need to urinate"
+
+#: .\PWMS\forms.py:370 .\PWMS\models.py:339
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:251
+msgid "17. Mis manos están normalmente calientes y secas"
+msgstr "17. My hands are normally warm and dry"
+
+#: .\PWMS\forms.py:371 .\PWMS\models.py:343
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:260
+msgid "18. Mi cara se sonroja y siento bochornos"
+msgstr "18. My face flushes and I feel hot flashes"
+
+#: .\PWMS\forms.py:372 .\PWMS\models.py:347
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:269
+msgid "19. Duermo bien y descanso"
+msgstr "19. I sleep well and rest"
+
+#: .\PWMS\forms.py:373 .\PWMS\models.py:351
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:278
+msgid "20. Tengo pesadillas"
+msgstr "20. I have nightmares"
+
+#: .\PWMS\forms.py:374 .\PWMS\models.py:372
+#: .\PWMS\templates\PWMS\historial_psicologico.html:184
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:73
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:286
+msgid "Observaciones"
+msgstr "Observations"
+
+#: .\PWMS\models.py:20 .\PWMS\templates\PWMS\completar_perfil.html:64
+#: .\PWMS\templates\PWMS\registro.html:258
+msgid "Masculino"
+msgstr "Male"
+
+#: .\PWMS\models.py:21 .\PWMS\templates\PWMS\completar_perfil.html:65
+#: .\PWMS\templates\PWMS\registro.html:259
+msgid "Femenino"
+msgstr "Female"
+
+#: .\PWMS\models.py:22 .\PWMS\templates\PWMS\completar_perfil.html:66
+#: .\PWMS\templates\PWMS\registro.html:260
+msgid "Otro"
+msgstr "Other"
+
+#: .\PWMS\models.py:23 .\PWMS\templates\PWMS\completar_perfil.html:67
+#: .\PWMS\templates\PWMS\registro.html:261
+msgid "Prefiero no decirlo"
+msgstr "Prefer not to say"
+
+#: .\PWMS\models.py:240 .\PWMS\templates\PWMS\zung_anxiety_resultados.html:255
+msgid "Rara vez"
+msgstr "Rarely"
+
+#: .\PWMS\models.py:241 .\PWMS\templates\PWMS\zung_anxiety_resultados.html:261
+msgid "Algunas veces"
+msgstr "Sometimes"
+
+#: .\PWMS\models.py:242
+msgid "Buena parte del tiempo"
+msgstr "Much of the time"
+
+#: .\PWMS\models.py:243
+msgid "La mayor parte del tiempo"
+msgstr "Most of the time"
+
+#: .\PWMS\models.py:248
+msgid "Dentro de lo normal (25-44)"
+msgstr "Within normal range (25-44)"
+
+#: .\PWMS\models.py:249
+msgid "Ansiedad mínima a moderada (45-59)"
+msgstr "Minimal to moderate anxiety (45-59)"
+
+#: .\PWMS\models.py:250
+msgid "Ansiedad marcada a severa (60-74)"
+msgstr "Marked to severe anxiety (60-74)"
+
+#: .\PWMS\models.py:251
+msgid "Ansiedad extrema (75-100)"
+msgstr "Extreme anxiety (75-100)"
+
+#: .\PWMS\models.py:259 .\PWMS\templates\PWMS\login.html:65
+msgid "Usuario"
+msgstr "Username"
+
+#: .\PWMS\models.py:265
+#, fuzzy
+#| msgid "Fecha de nacimiento"
+msgid "Fecha de registro"
+msgstr "Date of birth"
+
+#: .\PWMS\models.py:356 .\PWMS\templates\PWMS\zung_anxiety_resultados.html:221
+msgid "Puntuación bruta"
+msgstr "Raw score"
+
+#: .\PWMS\models.py:357
+msgid "Suma total de las respuestas"
+msgstr "Total sum of responses"
+
+#: .\PWMS\models.py:361 .\PWMS\templates\PWMS\dashboard.html:216
+msgid "Índice de Ansiedad"
+msgstr "Anxiety Index"
+
+#: .\PWMS\models.py:362
+msgid "Puntuación bruta × 1.25 (escala de 25-100)"
+msgstr "Raw score × 1.25 (scale of 25-100)"
+
+#: .\PWMS\models.py:368
+msgid "Nivel de ansiedad"
+msgstr "Anxiety level"
+
+#: .\PWMS\models.py:382
+msgid "Ruta del video"
+msgstr ""
+
+#: .\PWMS\models.py:387
+msgid "Metadatos del video (resolución, fps, etc.)"
+msgstr ""
+
+#: .\PWMS\models.py:392
+msgid "Tamaño del video (bytes)"
+msgstr ""
+
+#: .\PWMS\models.py:397
+msgid "Duración del video (segundos)"
+msgstr ""
+
+#: .\PWMS\models.py:401 .\PWMS\templates\PWMS\historial_psicologico.html:173
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:49
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:9
+msgid "Escala de Ansiedad de Zung"
+msgstr "Zung Anxiety Scale"
+
+#: .\PWMS\models.py:402
+msgid "Escalas de Ansiedad de Zung"
+msgstr "Zung Anxiety Scale"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:5
+#, fuzzy
+#| msgid "Completar perfil"
+msgid "Completar Perfil"
+msgstr "Complete profile"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:16
+msgid "Completar Información del Perfil"
+msgstr "Complete profile information"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:25
+msgid "Foto de perfil"
+msgstr "Profile picture"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:32
+msgid "Foto de Perfil"
+msgstr "My profile"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:38
+#: .\PWMS\templates\PWMS\perfil.html:60
+msgid "Datos Personales"
+msgstr "Personal data"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:43
+msgid "Nombre Completo"
+msgstr "Full name"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:55
+#: .\PWMS\templates\PWMS\registro.html:244
+msgid "Fecha de Nacimiento"
+msgstr "Date of birth"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:79
+msgid "Ej: 1234"
+msgstr "Ex: 1234"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:80
+msgid "Solo números (4 dígitos)"
+msgstr "Numbers only, 4 digits"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:89
+#: .\PWMS\templates\PWMS\perfil.html:97
+msgid "Información Médica"
+msgstr "Medical information"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:94
+msgid "Grupo Sanguíneo"
+msgstr "Blood type"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:97
+msgid "Ej: O+"
+msgstr "Ex: O+"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:106
+msgid "Medicamentos"
+msgstr "Current medications"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:111
+msgid "Condiciones Médicas"
+msgstr "Medical conditions"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:121
+#: .\PWMS\templates\PWMS\perfil.html:126
+msgid "Seguimiento Psicológico"
+msgstr "Psychological follow-up"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:126
+msgid "Psicólogo Asignado"
+msgstr "Assigned psychologist"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:132
+msgid "Motivo de Consulta"
+msgstr "Reason for consultation"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:142
+#: .\PWMS\templates\PWMS\perfil.html:151
+msgid "Configuración de Privacidad"
+msgstr "Privacy settings"
+
+#: .\PWMS\templates\PWMS\completar_perfil.html:165
+msgid "Guardar Perfil"
+msgstr "Save profile"
+
+#: .\PWMS\templates\PWMS\dashboard.html:4
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:52
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:97
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:65
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:130
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: .\PWMS\templates\PWMS\dashboard.html:10
+msgid "Monitoreo del Bienestar Psicológico"
+msgstr "Psycological-Well-being Monitoring"
+
+#: .\PWMS\templates\PWMS\dashboard.html:11
+msgid "Resumen de tu estado actual y últimos registros"
+msgstr "Summary of your current status and latest records"
+
+#: .\PWMS\templates\PWMS\dashboard.html:19
+msgid "Últimos Signos Vitales"
+msgstr "Lastest Vital Signals"
+
+#: .\PWMS\templates\PWMS\dashboard.html:20
+msgid "registro más reciente"
+msgstr "most recent record"
+
+#: .\PWMS\templates\PWMS\dashboard.html:29
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:485
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:31
+msgid "Frecuencia Cardíaca"
+msgstr "Heart Rate"
+
+#: .\PWMS\templates\PWMS\dashboard.html:33
+msgid "lpm"
+msgstr "bpm"
+
+#: .\PWMS\templates\PWMS\dashboard.html:39
+msgid "Presión Arterial"
+msgstr "Blood Pressure"
+
+#: .\PWMS\templates\PWMS\dashboard.html:48
+msgid "mmHg"
+msgstr "mmHg"
+
+#: .\PWMS\templates\PWMS\dashboard.html:64
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:487
+msgid "Oxigenación"
+msgstr "Oxigenation"
+
+#: .\PWMS\templates\PWMS\dashboard.html:74
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:184
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:285
+msgid "Sueño"
+msgstr "Sleep"
+
+#: .\PWMS\templates\PWMS\dashboard.html:78
+msgid "horas"
+msgstr "hours"
+
+#: .\PWMS\templates\PWMS\dashboard.html:84
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:264
+msgid "Estrés"
+msgstr "Stress"
+
+#: .\PWMS\templates\PWMS\dashboard.html:88
+msgid "nivel"
+msgstr "level"
+
+#: .\PWMS\templates\PWMS\dashboard.html:101
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:298
+msgid "No hay registros fisiológicos aún"
+msgstr "There are no physiological records yet"
+
+#: .\PWMS\templates\PWMS\dashboard.html:103
+msgid "Agregar primer registro"
+msgstr "Add first record"
+
+#: .\PWMS\templates\PWMS\dashboard.html:118
+msgid "Última Evaluación NASA TLX"
+msgstr "Latest NASA TLX Assessment"
+
+#: .\PWMS\templates\PWMS\dashboard.html:119
+msgid "carga mental"
+msgstr "mental workload"
+
+#: .\PWMS\templates\PWMS\dashboard.html:137
+#: .\PWMS\templates\PWMS\historial_psicologico.html:247
+msgid "Puntuación TLX (0-100)"
+msgstr "TLX Score (0-100)"
+
+#: .\PWMS\templates\PWMS\dashboard.html:148
+msgid "Mental"
+msgstr "Mental"
+
+#: .\PWMS\templates\PWMS\dashboard.html:152
+msgid "Física"
+msgstr "Physical"
+
+#: .\PWMS\templates\PWMS\dashboard.html:156
+msgid "Temporal"
+msgstr "Temporal"
+
+#: .\PWMS\templates\PWMS\dashboard.html:174
+#: .\PWMS\templates\PWMS\dashboard.html:230
+msgid "Ver historial completo"
+msgstr "View full history"
+
+#: .\PWMS\templates\PWMS\dashboard.html:180
+msgid "No hay evaluaciones NASA TLX"
+msgstr "No NASA TLX assessments"
+
+#: .\PWMS\templates\PWMS\dashboard.html:182
+msgid "Realizar primera evaluación"
+msgstr "Take first assessment"
+
+#: .\PWMS\templates\PWMS\dashboard.html:195
+msgid "Última Prueba de Ansiedad (Zung)"
+msgstr "Latest Anxiety Test (Zung)"
+
+#: .\PWMS\templates\PWMS\dashboard.html:196
+msgid "escala 25-100"
+msgstr "scale 25-100"
+
+#: .\PWMS\templates\PWMS\dashboard.html:236
+msgid "No hay pruebas de ansiedad Zung"
+msgstr "No Zung anxiety tests"
+
+#: .\PWMS\templates\PWMS\dashboard.html:238
+msgid "Realizar primera prueba"
+msgstr "Take first test"
+
+#: .\PWMS\templates\PWMS\dashboard.html:253
+msgid "Actividad Reciente"
+msgstr "Recent Activity"
+
+#: .\PWMS\templates\PWMS\dashboard.html:264
+msgid "Último registro fisiológico"
+msgstr "Last physiological record"
+
+#: .\PWMS\templates\PWMS\dashboard.html:267
+#: .\PWMS\templates\PWMS\dashboard.html:284
+#: .\PWMS\templates\PWMS\dashboard.html:301
+msgid "atrás"
+msgstr "back"
+
+#: .\PWMS\templates\PWMS\dashboard.html:269
+#, fuzzy
+#| msgid "Eliminar Registro"
+msgid "Sin registros"
+msgstr "No records"
+
+#: .\PWMS\templates\PWMS\dashboard.html:281
+msgid "Última evaluación TLX"
+msgstr "Last TLX assessment"
+
+#: .\PWMS\templates\PWMS\dashboard.html:286
+msgid "Sin evaluaciones"
+msgstr "No assessments"
+
+#: .\PWMS\templates\PWMS\dashboard.html:298
+msgid "Última prueba Zung"
+msgstr "Last Zung test"
+
+#: .\PWMS\templates\PWMS\dashboard.html:303
+msgid "Sin pruebas"
+msgstr "No tests"
+
+#: .\PWMS\templates\PWMS\dashboard.html:316
+msgid "Cómo usar el sistema:"
+msgstr "How to use the system:"
+
+#: .\PWMS\templates\PWMS\dashboard.html:318
+msgid "Usa el menú lateral para navegar entre las secciones"
+msgstr "Use the side menu to navigate between sections"
+
+#: .\PWMS\templates\PWMS\dashboard.html:319
+msgid ""
+"Ve a tu aplicación Android HealthSync Pro para añadir registros fisiológicos"
+msgstr "Go to your HealthSync Pro Android app to add physiological records"
+
+#: .\PWMS\templates\PWMS\dashboard.html:320
+msgid "Visita el historial para ver tu evolución detallada"
+msgstr "Visit the graphs to see your detailed evolution"
+
+#: .\PWMS\templates\PWMS\dashboard.html:321
+msgid "Revisa tu historial para análisis a largo plazo"
+msgstr "Check your history for long-term analysis"
+
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:9
+#: .\PWMS\templates\PWMS\login.html:10 .\PWMS\templates\PWMS\registro.html:9
+msgid "Sistema PWMS"
+msgstr "PWMS System"
+
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:27
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:46
 msgid "Sistema de Monitoreo del Bienestar Psicológico PWMS"
-msgstr "PWMS Psycological Well-being Monitoring System"
+msgstr "PWMS - Psycological Well-being Monitoring System"
+
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:58
+#: .\PWMS\templates\PWMS\perfil.html:188
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:68
+msgid "Registros Psicológicos"
+msgstr "Psychological records"
+
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:65
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:86
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:19
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:73
+msgid "Nuevo Registro"
+msgstr "New record"
+
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:70
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:91
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:91
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:37
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:56
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:74
+msgid "Historial"
+msgstr "History"
+
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:79
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:171
+#: .\PWMS\templates\PWMS\perfil.html:192
+msgid "Registros Fisiológicos"
+msgstr "Physiological Records"
+
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:100
+#: .\PWMS\templates\PWMS\perfil.html:5
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:78
+msgid "Mi Perfil"
+msgstr "My profile"
+
+#: .\PWMS\templates\PWMS\estructura_base_PWMS.html:106
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:79
+msgid "Cerrar Sesión"
+msgstr "Log out"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:5
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:14
+msgid "Historial Fisiológico"
+msgstr "Physiological history"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:15
+msgid "Tus registros de signos vitales y actividad"
+msgstr "Your vital signs and activity records"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:31
+msgid "Evolución de Frecuencia Cardíaca"
+msgstr "Heart rate evolution"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:36
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:97
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:115
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:155
+#: .\PWMS\templates\heatmap.html:90
+msgid "Bajo"
+msgstr "Low"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:38
+msgid "Elevado"
+msgstr "High"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:51
+msgid "Evolución de Presión Arterial"
+msgstr "Blood Pressure evolution"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:56
+msgid "Óptima"
+msgstr "Optimal"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:58
+msgid "Elevada"
+msgstr "High"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:59
+msgid "Hipertensión"
+msgstr "Hypertension"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:71
+msgid "Evolución de Temperatura"
+msgstr "Temperature evolution"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:76
+msgid "Hipotermia"
+msgstr "Hypothermia"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:78
+msgid "Febrícula"
+msgstr "Low-grade fever"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:79
+msgid "Fiebre"
+msgstr "Fever"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:91
+msgid "Evolución de Oxigenación (SpO2)"
+msgstr "Blood oxygenation evolution (SpO2)"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:110
+msgid "Evolución del Nivel de Estrés"
+msgstr "Evolution of stress level"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:116
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:156
+#: .\PWMS\templates\heatmap.html:91
+msgid "Moderado"
+msgstr "Moderate"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:117
+#: .\PWMS\templates\heatmap.html:92
+msgid "Alto"
+msgstr "Very high"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:118
+msgid "Muy Alto"
+msgstr ""
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:130
+msgid "Evolución de Horas de Sueño"
+msgstr "Evolution of hours of sleep"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:135
+msgid "Insuficiente"
+msgstr "Insufficient"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:136
+msgid "Adecuado"
+msgstr "Adequiate"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:137
+msgid "Excesivo"
+msgstr "Excessive"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:149
+msgid "Evolución de Pasos Diarios"
+msgstr "Evolution of daily steps"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:154
+msgid "Sedentario"
+msgstr "Sedentary"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:157
+msgid "Activo"
+msgstr "Active"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:179
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:478
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:541
+#: .\PWMS\templates\PWMS\historial_psicologico.html:114
+#: .\PWMS\templates\PWMS\historial_psicologico.html:181
+#: .\PWMS\templates\PWMS\historial_psicologico.html:249
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:70
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:70
+msgid "Fecha"
+msgstr "Date/Time"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:180
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:252
+msgid "FC"
+msgstr ""
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:181
+#, fuzzy
+#| msgid "Tensión"
+msgid "Presión"
+msgstr "Voltage"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:183
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:260
+msgid "SpO2"
+msgstr "SpO2"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:185
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:274
+msgid "Actividad"
+msgstr "Physical activity"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:186
+#, fuzzy
+#| msgid "Estado:"
+msgid "Estado"
+msgstr "State:"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:229
+#, fuzzy
+#| msgid "Alergias"
+msgid "Alerta"
+msgstr "Allergies"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:231
+msgid "Regular"
+msgstr "REgular"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:249
+msgid "Promedios"
+msgstr "Averages"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:256
+msgid "Temp"
+msgstr "Temperature"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:277
+msgid "Pasos"
+msgstr "Steps"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:281
+msgid "Calorías"
+msgstr "Calories burned"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:299
+msgid "Comienza tu seguimiento registrando tus signos vitales"
+msgstr "Begin your monitoring by recording your vital signs"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:301
+msgid "Crear Primer Registro"
+msgstr "Create the first record"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:488
+#: .\PWMS\templates\heatmap.html:47 .\PWMS\templates\heatmap.html:60
+msgid "Nivel de Estrés"
+msgstr "Stress level"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:489
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:76
+msgid "Horas de Sueño"
+msgstr "Sleep hours"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:490
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:97
+msgid "Pasos Diarios"
+msgstr "Daily steps"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:500
+msgid "Presión Sistólica"
+msgstr "Systolic blood pressure"
+
+#: .\PWMS\templates\PWMS\historial_fisiologico.html:513
+msgid "Presión Diastólica"
+msgstr "Diastolic blood pressure (Diastolic)"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:5
+#: .\PWMS\templates\PWMS\historial_psicologico.html:15
+msgid "Historial Psicológico"
+msgstr "Psychological history"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:16
+msgid "Visualiza tu evolución en carga de trabajo y ansiedad."
+msgstr "Visualize your evolution in workload and anxiety."
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:28
+#: .\PWMS\templates\PWMS\historial_psicologico.html:106
+msgid "Evaluaciones NASA TLX"
+msgstr "NASA TLX Assessments"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:39
+msgid "Evaluaciones Zung"
+msgstr "Zung Assesments"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:50
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:44
+msgid "Carga de trabajo promedio"
+msgstr "Average workload"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:51
+msgid "NASA TLX"
+msgstr "NASA TLX"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:62
+msgid "Ansiedad promedio"
+msgstr "Average anxiety"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:63
+msgid "Zung"
+msgstr "Zung"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:76
+msgid "NASA TLX - Evolución de la carga de trabajo"
+msgstr "NASA TLX - Workload aessessments evolution"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:88
+msgid "Zung - Evolución del índice de ansiedad"
+msgstr "Zung - Evolution of the anxiety index"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:115
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:71
+msgid "Tarea"
+msgstr "Task"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:116
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:182
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:215
+msgid "Puntuación"
+msgstr "Score"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:117
+#: .\PWMS\templates\PWMS\historial_psicologico.html:183
+msgid "Nivel"
+msgstr "Level"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:137
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:92
+msgid "BAJA"
+msgstr "LOW"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:141
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:96
+msgid "ALTA"
+msgstr "HIGH"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:143
+#, fuzzy
+#| msgid "Carga EXTREMA"
+msgid "EXTREMA"
+msgstr "EXTREME Load"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:148
+#: .\PWMS\templates\PWMS\historial_psicologico.html:215
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:101
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:107
+msgid "Ver"
+msgstr "See"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:159
+msgid "No hay evaluaciones NASA registradas"
+msgstr "There are no NASA evaluations on records"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:160
+#: .\PWMS\templates\PWMS\historial_psicologico.html:227
+msgid "Crear evaluación"
+msgstr "Create Assessment."
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:182
+msgid "Índice"
+msgstr "Index"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:205
+msgid "Mínima"
+msgstr "Minimal"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:207
+msgid "Marcada"
+msgstr "Marked"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:209
+msgid "Extrema"
+msgstr "Extreme"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:226
+msgid "No hay evaluaciones Zung registradas"
+msgstr "No NASA TLX assessments"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:245
+msgid "Carga Mental (NASA TLX)"
+msgstr "Task Load (NASA TLX)"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:246
+msgid "Índice de Ansiedad (Zung)"
+msgstr "Zung Anxiety Index"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:248
+msgid "Índice Zung (25-100)"
+msgstr "Zung Index (25-100)"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:250
+msgid "No hay datos suficientes para mostrar la gráfica."
+msgstr "There is not enough data to display the graph."
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:251
+msgid "Completa algunas evaluaciones NASA TLX."
+msgstr "Complete some NASA TLX assessments"
+
+#: .\PWMS\templates\PWMS\historial_psicologico.html:252
+msgid "Completa algunas evaluaciones Zung."
+msgstr "Complete some Zung assesments"
+
+#: .\PWMS\templates\PWMS\login.html:10
+msgid "Login"
+msgstr "Login"
+
+#: .\PWMS\templates\PWMS\login.html:32
+msgid "Sistema PWMS - Monitoreo del Bienestar Psicológico"
+msgstr "PWMS - Psycological Well-being Monitoring System"
+
+#: .\PWMS\templates\PWMS\login.html:56
+msgid "Iniciar Sesión PWMS"
+msgstr "Sign in PWMS"
+
+#: .\PWMS\templates\PWMS\login.html:57
+msgid "Ingresa tu usuario y PIN de 4 dígitos"
+msgstr "Enter your username and 4-digit PIN"
+
+#: .\PWMS\templates\PWMS\login.html:67
+msgid "Ingresa tu usuario"
+msgstr "Enter your username"
+
+#: .\PWMS\templates\PWMS\login.html:72
+msgid "PIN (4 dígitos)"
+msgstr "4-digit PIN"
+
+#: .\PWMS\templates\PWMS\login.html:74
+msgid "Ingresa tu PIN"
+msgstr "Enter your PIN"
+
+#: .\PWMS\templates\PWMS\login.html:75
+msgid "Solo números, 4 dígitos"
+msgstr "Numbers only, 4 digits"
+
+#: .\PWMS\templates\PWMS\login.html:80
+msgid "Iniciar Sesión"
+msgstr "Log in"
+
+#: .\PWMS\templates\PWMS\login.html:86
+msgid "¿No tienes cuenta? Regístrate"
+msgstr "Don´t have an account? Register"
+
+#: .\PWMS\templates\PWMS\login.html:106
+msgid "Sistema PWMS v1.0"
+msgstr "PWMS v1.0"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:5
+msgid "Evaluación NASA TLX - Carga Mental"
+msgstr "Latest NASA TLX Assessment"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:33
+msgid "Evaluación NASA TLX"
+msgstr "Latest NASA TLX Assessment"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:34
+msgid "Evaluación de Carga Mental de Trabajo"
+msgstr "Measures mental workload"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:42
+msgid "Instrucciones NASA TLX:"
+msgstr "NASA TLX instructions: "
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:42
+msgid "Esta evaluación mide la carga mental percibida al realizar una tarea."
+msgstr ""
+"This assessment measures the perceived mental workload when performing a "
+"task."
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:54
+msgid "Paso 1: Descripción de la Tarea"
+msgstr "Step 1: Task Description"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:58
+msgid "¿Qué tarea realizaste?"
+msgstr "What task did you perform?"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:61
+msgid "Describe la actividad específica que vas a evaluar."
+msgstr "Describe the specific activity you are going to evaluate."
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:65
+msgid "Siguiente: Calificación"
+msgstr "Next: Rating"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:78
+msgid "Paso 2: Calificación de Dimensiones (0-10)"
+msgstr "Step 2: Dimensions Rating (0-20)"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:137
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:351
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:116
+#: .\PWMS\templates\PWMS\registro.html:285
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:125
+msgid "Anterior"
+msgstr "Previous"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:138
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:120
+#: .\PWMS\templates\PWMS\registro.html:291
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:135
+msgid "Siguiente"
+msgstr "Next"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:148
+msgid "Comparaciones por Pares (15)"
+msgstr "Pairwise Comparisons (15)"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:149
+msgid "Selecciona UNA dimensión que contribuyó más."
+msgstr "Select ONE dimension that contributed the most."
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:155
+msgid "Demanda Mental vs Demanda Física"
+msgstr "Mental Demand vs Physical Demand"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:168
+msgid "Demanda Mental vs Demanda Temporal"
+msgstr "Mental Demand vs Temporal Demand"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:181
+msgid "Demanda Mental vs Rendimiento"
+msgstr "Mental Demand vs Performance"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:194
+msgid "Demanda Mental vs Esfuerzo"
+msgstr "Mental Demand vs Effort"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:207
+msgid "Demanda Mental vs Frustración"
+msgstr "Mental Demand vs Frustration"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:220
+msgid "Demanda Física vs Demanda Temporal"
+msgstr "Physical Demand vs Temporal Demand"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:233
+msgid "Demanda Física vs Rendimiento"
+msgstr "Physical Demand vs Performance"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:246
+msgid "Demanda Física vs Esfuerzo"
+msgstr "Physical Demand vs Effort"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:259
+msgid "Demanda Física vs Frustración"
+msgstr "Physical Demand vs Frustration"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:272
+msgid "Demanda Temporal vs Rendimiento"
+msgstr "Temporal Demand vs Performance"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:285
+msgid "Demanda Temporal vs Esfuerzo"
+msgstr "Temporal Demand vs Effort"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:298
+msgid "Demanda Temporal vs Frustración"
+msgstr "Temporal Demand vs Frustration"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:311
+msgid "Rendimiento vs Esfuerzo"
+msgstr "Performance vs Effort"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:324
+msgid "Rendimiento vs Frustración"
+msgstr "Performance vs Frustration"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:337
+msgid "Esfuerzo vs Frustración"
+msgstr "Effort vs Frustration"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:352
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:298
+msgid "Completar evaluación"
+msgstr "Complete Assessment"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:371
+msgid "Acerca del NASA TLX"
+msgstr "About NASA TLX"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_form.html:372
+msgid ""
+"Puntuación total (0-100): 0-29 Baja, 30-59 Moderada, 60-79 Alta, 80-100 "
+"Extrema"
+msgstr ""
+"Total score (0-100): 0-29 Low, 30-59 Moderate, 60-79 High, 80-100 Extreme"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:5
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:14
+msgid "Historial NASA TLX"
+msgstr "NASA TLX history "
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:15
+msgid "Tus evaluaciones de carga mental (Task Load Index)"
+msgstr "Your mental workload assessments (Task Load Index)"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:19
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:94
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:19
+msgid "Nueva Evaluación"
+msgstr "New Assessment."
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:31
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:31
+msgid "Total Evaluaciones"
+msgstr "Total Evaluations"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:61
+msgid "Evaluaciones de Carga Mental"
+msgstr "Mental Workload Assessments"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:72
+msgid "Puntuación TLX"
+msgstr "Score"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:73
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:216
+msgid "Interpretación"
+msgstr "Interpretation"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:74
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:74
+msgid "Detalle"
+msgstr "Detail"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:115
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:122
+msgid "Primera"
+msgstr "First"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:118
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:130
+msgid "Página"
+msgstr "Page"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:118
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:130
+msgid "de"
+msgstr "of"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:121
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:138
+msgid "Última"
+msgstr "Last one"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:130
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:148
+#, fuzzy
+#| msgid "No hay evaluaciones NASA TLX"
+msgid "No hay evaluaciones registradas"
+msgstr "No NASA TLX assessments"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:131
+msgid "Completa tu primera evaluación de carga mental"
+msgstr "Complete your first mental workload assessment"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_historial.html:133
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:151
+msgid "Comenzar Evaluación"
+msgstr "Start Assessment."
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:5
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:86
+msgid "Resultado NASA TLX"
+msgstr "NASA TLX Result"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:135
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:274
+msgid "Carga BAJA"
+msgstr "LOW Load"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:137
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:283
+msgid "Carga MODERADA"
+msgstr "MODERATE Load"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:139
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:292
+msgid "Carga ALTA"
+msgstr "HIGH Load"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:141
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:301
+msgid "Carga EXTREMA"
+msgstr "EXTREME Load"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:155
+msgid "Puntuación NASA TLX (0-100)"
+msgstr "TLX Score (0-100)"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:161
+msgid "Tarea Evaluada"
+msgstr "Evaluated Task"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:173
+msgid "Dimensiones de Carga Mental"
+msgstr "Mental Workload Dimensions"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:181
+msgid "Dimensión"
+msgstr "Dimension"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:183
+msgid "Peso"
+msgstr "Weight"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:184
+msgid "Contribución"
+msgstr "Contribution"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:202
+msgid "Alta puntuación = Buen rendimiento = Menor carga"
+msgstr "High score = Good performance = Lower workload"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:252
+msgid "Notas Adicionales"
+msgstr "Additional notes"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:265
+msgid "Escala de Interpretación NASA TLX"
+msgstr "NASA TLX Interpretation Scale"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:275
+msgid "Tarea fácil"
+msgstr "Easy task"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:284
+msgid "Tarea manejable"
+msgstr "Manageable task"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:293
+msgid "Tarea demandante"
+msgstr "Demanding task"
+
+#: .\PWMS\templates\PWMS\nasa_tlx_resultado.html:302
+msgid "Muy demandante"
+msgstr "Very demanding"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:5
+msgid "Registro Fisiológico"
+msgstr "Physiological Record"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:11
+msgid "Registro de signos vitales"
+msgstr "Vital signs records"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:16
+msgid "Importante:"
+msgstr "Important:"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:16
+msgid ""
+"Registra estos datos cada dos horas preferiblemente en reposo, después de 5 "
+"minutos de descanso para obtener medidas más precisas."
+msgstr ""
+"Record this data every two hours, preferably at rest, after a 5-minute break "
+"for more accurate measurements."
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:25
+msgid "Signos vitales básicos leídos del reloj inteligente"
+msgstr "Basic vital signs read from the smartwatch"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:34
+msgid "Latidos por minuto (60-100 normal en reposo)"
+msgstr "Heartbeats per minute (60-100 normal at rest)"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:42
+msgid "Presión Arterial (Sistólica)"
+msgstr "Systolic blood pressure"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:45
+msgid "Presión alta (90-120 normal)"
+msgstr "High blood pressure (90-120 normal)"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:54
+msgid "Presión Arterial (Diastólica)"
+msgstr "Blood Pressure (Diastolic)"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:57
+msgid "Presión baja (60-80 normal)"
+msgstr "Low pressure (60-80 normal)"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:64
+msgid "Oxigenación en Sangre (SpO2)"
+msgstr "Blood oxygenation (SpO2)"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:67
+#, fuzzy, python-format
+#| msgid "En porcentaje (95-100% normal)"
+msgid "En porcentaje (95-100%% normal)"
+msgstr "In percentage (95-100% normal)"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:79
+msgid "Horas dormidas la noche anterior"
+msgstr "Hours slept the previous night"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:91
+msgid "Actividad Física"
+msgstr "Physical activity"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:100
+msgid "Número de pasos hoy"
+msgstr "Number of steps today"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:108
+msgid "Calorías Quemadas"
+msgstr "Calories burned"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:111
+msgid "Calorías quemadas hoy"
+msgstr "Calories burned today"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:120
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:153
+msgid "Dispositivo de Origen"
+msgstr "Source device"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:123
+msgid "Ej: Smartwatch, aplicación móvil, manual"
+msgstr "Ex: Smartwatch, mobile, app, manual"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:135
+msgid ""
+"La temperatura debe medirse con el termómetro colocado a corta distancia en "
+"la frente"
+msgstr ""
+"The temperature should be measured with the thermometer placed a short "
+"distance from the forhead"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:141
+msgid "Temperatura Corporal"
+msgstr "Body temperature"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:144
+msgid "En °C (36.5-37.2 normal)"
+msgstr "In °C (36.5-37.2 normal)"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:156
+msgid "Ej: Termómetro, manual"
+msgstr "Thermometer, manual"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:166
+msgid "Recomendación:"
+msgstr "Recommendations:"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:166
+msgid ""
+"Para seguimiento óptimo, registra estos datos a la misma hora cada día, "
+"preferiblemente por la mañana."
+msgstr ""
+"For optimal tracking, record this data at the same time every day, "
+"preferably in the morning."
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:171
+msgid "Ver Historial"
+msgstr "See history"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:183
+msgid "Valores Normales"
+msgstr "Normal values"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:186
+msgid "Frecuencia cardíaca: 60-100 lpm"
+msgstr "Heart rate: 60-100 lpm"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:187
+msgid "Presión arterial: 90-120/60-80 mmHg"
+msgstr "Heart rate: 90-120/60-80 mmHg"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:188
+msgid "Temperatura: 36.5-37.2 °C"
+msgstr "Temperature: 36.5-37.2 °C"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:189
+#, fuzzy, python-format
+#| msgid "Oxigenación: 95-100%"
+msgid "Oxigenación: 95-100%%"
+msgstr "Oxigenation: 95-100%"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:190
+msgid "Sueño: 7-9 horas"
+msgstr "Sleep: 7-9 hours"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:199
+msgid "Cuándo consultar"
+msgstr "When to consult"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:202
+msgid "FC > 100 o < 60 en reposo"
+msgstr "HR > 100 or <60 at rest"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:203
+msgid "PA > 140/90 o < 90/60"
+msgstr "BP > 140/90 or < 90/60"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:204
+msgid "Temperatura > 38 °C"
+msgstr "Temperature (°C)"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:205
+#, fuzzy, python-format
+#| msgid "Oxigenación"
+msgid "Oxigenación < 92%%"
+msgstr "Oxigenation"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_fisiologico.html:206
+msgid "Sueño < 6 horas por varios días"
+msgstr "Sleep < 6 hours for several days"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:4
+#, fuzzy
+#| msgid "Registro psicológico"
+msgid "Registro Psicológico"
+msgstr "Last psychological record"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:10
+msgid "Nuevo registro psicológico"
+msgstr "New psychological record"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:15
+msgid "Recuerda:"
+msgstr "Remember"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:15
+msgid ""
+"El registro de las pruebas es confidencial y te ayudará a llevar un "
+"seguimiento de tu bienestar emocional. Intenta ser lo más honesto posible."
+msgstr ""
+"The record of the tests is confidential and will help you keep track of your "
+"emotional well-being. Try to be as honest as possible."
+
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:20
+msgid "Consejo:"
+msgstr "Tip"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:20
+msgid ""
+"Intenta hacer este registro a la misma hora cada día para obtener datos "
+"consistentes."
+msgstr ""
+"Try to make this record at the same time each day to obtain consistent data."
+
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:31
+msgid "Mide la carga mental de trabajo"
+msgstr "Measures mental workload"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:34
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:53
+msgid "Nuevo registro"
+msgstr "New record"
+
+#: .\PWMS\templates\PWMS\nuevo_registro_psicologico.html:50
+msgid "Evalúa síntomas de ansiedad"
+msgstr "Evaluates anxiety symptoms"
+
+#: .\PWMS\templates\PWMS\perfil.html:10
+#, fuzzy
+#| msgid "Mi Perfil"
+msgid "Mi Perfil PWMS"
+msgstr "My profile"
+
+#: .\PWMS\templates\PWMS\perfil.html:12
+msgid "Miembro desde:"
+msgstr "Memeber since:"
+
+#: .\PWMS\templates\PWMS\perfil.html:16
+msgid "Exportar datos de estrés (XML)"
+msgstr "Export stress data (XML)"
+
+#: .\PWMS\templates\PWMS\perfil.html:39
+msgid "PIN de acceso rápido"
+msgstr "Quick access PIN"
+
+#: .\PWMS\templates\PWMS\perfil.html:48
+msgid "Completar perfil"
+msgstr "Complete profile"
+
+#: .\PWMS\templates\PWMS\perfil.html:66
+msgid "Nombre completo:"
+msgstr "Your full name:"
+
+#: .\PWMS\templates\PWMS\perfil.html:70
+msgid "Nombre de usuario:"
+msgstr "Username:"
+
+#: .\PWMS\templates\PWMS\perfil.html:74
+msgid "Fecha de nacimiento:"
+msgstr "Date of birth:"
+
+#: .\PWMS\templates\PWMS\perfil.html:78
+msgid "Género:"
+msgstr "Gender:"
+
+#: .\PWMS\templates\PWMS\perfil.html:82
+msgid "Teléfono:"
+msgstr "Phone number:"
+
+#: .\PWMS\templates\PWMS\perfil.html:86
+msgid "Correo electrónico:"
+msgstr "E-mail:"
+
+#: .\PWMS\templates\PWMS\perfil.html:103
+#, fuzzy
+#| msgid "Grupo sanguíneo"
+msgid "Grupo sanguíneo:"
+msgstr "Blood type:"
+
+#: .\PWMS\templates\PWMS\perfil.html:104
+msgid "No especificado"
+msgstr "Not specified"
+
+#: .\PWMS\templates\PWMS\perfil.html:107
+msgid "Alergias:"
+msgstr "Allergies:"
+
+#: .\PWMS\templates\PWMS\perfil.html:108 .\PWMS\templates\PWMS\perfil.html:116
+msgid "Ninguna registrada"
+msgstr "None recorded"
+
+#: .\PWMS\templates\PWMS\perfil.html:111
+msgid "Medicamentos:"
+msgstr "Current medications:"
+
+#: .\PWMS\templates\PWMS\perfil.html:112
+msgid "Ninguno registrado"
+msgstr "None recorded"
+
+#: .\PWMS\templates\PWMS\perfil.html:115
+msgid "Condiciones médicas:"
+msgstr "Medical conditions:"
+
+#: .\PWMS\templates\PWMS\perfil.html:132
+msgid "Fecha de ingreso:"
+msgstr "Date of entry:"
+
+#: .\PWMS\templates\PWMS\perfil.html:136
+msgid "Psicólogo asignado:"
+msgstr "Assigned psychologist:"
+
+#: .\PWMS\templates\PWMS\perfil.html:140
+msgid "Motivo de consulta:"
+msgstr "Reason for consultation:"
+
+#: .\PWMS\templates\PWMS\perfil.html:157
+msgid "Compartir datos médicos:"
+msgstr "Share medical data:"
+
+#: .\PWMS\templates\PWMS\perfil.html:160 .\PWMS\templates\PWMS\perfil.html:170
+msgid "Sí"
+msgstr "Yes"
+
+#: .\PWMS\templates\PWMS\perfil.html:162 .\PWMS\templates\PWMS\perfil.html:172
+msgid "No"
+msgstr "No"
+
+#: .\PWMS\templates\PWMS\perfil.html:167
+msgid "Recibir recordatorios:"
+msgstr "Receive reminders:"
+
+#: .\PWMS\templates\PWMS\perfil.html:184
+msgid "Resumen de Actividad"
+msgstr "Activity summary"
+
+#: .\PWMS\templates\PWMS\registro.html:9
+msgid "Registro"
+msgstr "User registration"
+
+#: .\PWMS\templates\PWMS\registro.html:141
+msgid "Registro Completo - Sistema de Monitoreo del Bienestar Psicológico PWMS"
+msgstr ""
+"Complete Registration - Psychological Wellbeing Monitoring System (PWMS)"
+
+#: .\PWMS\templates\PWMS\registro.html:147
+msgid "Cuenta"
+msgstr "Account"
+
+#: .\PWMS\templates\PWMS\registro.html:151
+msgid "Perfil"
+msgstr "My profile"
+
+#: .\PWMS\templates\PWMS\registro.html:175
+msgid "Información de la Cuenta"
+msgstr "Account informmation"
+
+#: .\PWMS\templates\PWMS\registro.html:182
+msgid "Nombre de Usuario"
+msgstr "Username"
+
+#: .\PWMS\templates\PWMS\registro.html:184
+msgid "Ingrese su usuario"
+msgstr "Enter your username"
+
+#: .\PWMS\templates\PWMS\registro.html:184
+msgid "Mínimo 3 caracteres"
+msgstr "Minimum 3 characters"
+
+#: .\PWMS\templates\PWMS\registro.html:185
+msgid ""
+"Este será tu nombre para iniciar sesión (Compuesto por las 3 primeras letras "
+"de tu nombre, un guión bajo, tres primeras letras de tu primer apellido y "
+"primera letra del segundo nombre. Todo en minúsculas)"
+msgstr ""
+"This will be your login name (Composed of the first 3 letters of your first "
+"name, an underscore, the first three letters of your first surname, and the "
+"first letter of your middle name. All in lowercase)"
+
+#: .\PWMS\templates\PWMS\registro.html:191
+msgid "Correo Electrónico"
+msgstr "E-mail"
+
+#: .\PWMS\templates\PWMS\registro.html:193
+msgid "ejemplo@email.com"
+msgstr ""
+
+#: .\PWMS\templates\PWMS\registro.html:194
+msgid "Opcional - Para recuperación de cuenta"
+msgstr "example@email.com"
+
+#: .\PWMS\templates\PWMS\registro.html:204
+#: .\PWMS\templates\PWMS\registro.html:205
+msgid "Mínimo 8 caracteres"
+msgstr "Minimum 8 characters"
+
+#: .\PWMS\templates\PWMS\registro.html:211
+msgid "PIN de Seguridad"
+msgstr "Security PIN"
+
+#: .\PWMS\templates\PWMS\registro.html:215
+#, fuzzy
+#| msgid "4 dígitos"
+msgid "4 dígitos numéricos"
+msgstr "4-digit"
+
+#: .\PWMS\templates\PWMS\registro.html:216
+msgid "4 dígitos numéricos para acceso rápido"
+msgstr "4 numeric digits for quick access"
+
+#: .\PWMS\templates\PWMS\registro.html:227
+msgid "Información Personal"
+msgstr "Personal information"
+
+#: .\PWMS\templates\PWMS\registro.html:237
+msgid "Ej: 555-1234567"
+msgstr "Ex: 555-123456"
+
+#: .\PWMS\templates\PWMS\registro.html:238
+msgid "Para contacto y notificaciones"
+msgstr "For contact and notifications"
+
+#: .\PWMS\templates\PWMS\registro.html:248
+msgid "Selecciona tu fecha de nacimiento"
+msgstr "Select your date of birth"
+
+#: .\PWMS\templates\PWMS\registro.html:263
+msgid "Información para personalización"
+msgstr "Personalization information"
+
+#: .\PWMS\templates\PWMS\registro.html:269
+msgid "Tu PIN de Seguridad"
+msgstr "Your security PIN"
+
+#: .\PWMS\templates\PWMS\registro.html:272
+msgid "PIN Configurado:"
+msgstr "PIN Configured:"
+
+#: .\PWMS\templates\PWMS\registro.html:274
+msgid "Este es el PIN que configuraste en el paso anterior"
+msgstr "This is the PIN you set up in the previous step"
+
+#: .\PWMS\templates\PWMS\registro.html:297
+msgid "Completar Registro"
+msgstr "Complete user registration"
+
+#: .\PWMS\templates\PWMS\registro.html:386
+msgid "El usuario debe tener al menos 3 caracteres"
+msgstr "The username must have at least 3 characters"
+
+#: .\PWMS\templates\PWMS\registro.html:392
+msgid "La contraseña debe tener al menos 8 caracteres"
+msgstr "The password must be at least 8 characters long"
+
+#: .\PWMS\templates\PWMS\registro.html:398
+msgid "El PIN debe ser de exactamente 4 dígitos numéricos"
+msgstr "The PIN must be exactly 4 digits"
+
+#: .\PWMS\templates\PWMS\registro.html:417
+msgid "Por favor ingresa tu número de teléfono"
+msgstr "Please enter your phone number"
+
+#: .\PWMS\templates\PWMS\registro.html:423
+msgid "Por favor selecciona tu fecha de nacimiento"
+msgstr "Please select your date of birth"
+
+#: .\PWMS\templates\PWMS\registro.html:430
+msgid "La fecha de nacimiento debe ser en el pasado"
+msgstr "The date of birth must be in the past"
+
+#: .\PWMS\templates\PWMS\registro.html:437
+msgid "Por favor selecciona tu género"
+msgstr "Please select your gender"
+
+#: .\PWMS\templates\PWMS\registro.html:486
+msgid "Por favor completa todos los campos requeridos correctamente."
+msgstr "Please complete all required fields correctly."
+
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:89
+msgid "Escala de Ansiedad de Zung (SAS)"
+msgstr "Zung Anxiety Scale (SAS)"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:90
+msgid "Self-Rating Anxiety Scale - 20 preguntas"
+msgstr "Self-Rating Anxiety Scale - 20 questions"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:99
+msgid ""
+"Lee cada frase y selecciona la frecuencia con la que has experimentado cada "
+"síntoma durante la"
+msgstr ""
+"Read each sentence and select how often you have experienced each symptom "
+"during the"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:99
+msgid "última semana"
+msgstr "Last week"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:289
+msgid "Observaciones adicionales"
+msgstr "Additional observations"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:308
+msgid "Interpretación del Índice de Ansiedad de Zung"
+msgstr "Interpretation of the Zung Anxiety Index"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:311
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:172
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:318
+msgid "Ansiedad mínima a moderada"
+msgstr "Minimal to moderate anxiety"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:312
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:174
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:327
+msgid "Ansiedad marcada a severa"
+msgstr "Marked to severe anxiety"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_form.html:313
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:176
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:336
+msgid "Ansiedad extrema"
+msgstr "Extreme anxiety"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:5
+#, fuzzy
+#| msgid "Resultados Zung - Escala de Ansiedad"
+msgid "Historial Zung - Escala de Ansiedad"
+msgstr "Zung Anxiety Scale Results"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:14
+msgid "Historial de Escala de Ansiedad de Zung"
+msgstr "Zung Anxiety Scale History"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:15
+msgid "Registro de tus evaluaciones de ansiedad (Self-Rating Anxiety Scale)"
+msgstr "Record of your anxiety assessments (Self-Rating Anxiety Scale)"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:44
+msgid "Índice de ansiedad promedio"
+msgstr "Average anxiety index"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:61
+#, fuzzy
+#| msgid "Resultados de la Escala de Ansiedad de Zung"
+msgid "Registros de la Escala de Zung"
+msgstr "Zung Anxiety Scale Results"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:71
+msgid "Índice Zung"
+msgstr "Anxiety índex"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:72
+#: .\PWMS\templates\heatmap.html:50 .\PWMS\templates\heatmap.html:69
+#, fuzzy
+#| msgid "Nivel de ansiedad"
+msgid "Nivel de Ansiedad"
+msgstr "Anxiety level"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:106
+#, fuzzy
+#| msgid "Ver historial completo"
+msgid "Ver resultados completos"
+msgstr "View full history"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_historial.html:149
+#, fuzzy
+#| msgid "Completa tu primera evaluación de carga mental"
+msgid "Completa tu primera escala de ansiedad de Zung"
+msgstr "Complete your first mental workload assessment"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:5
+msgid "Resultados Zung - Escala de Ansiedad"
+msgstr "Zung Anxiety Scale Results"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:119
+msgid "Resultados de la Escala de Ansiedad de Zung"
+msgstr "Zung Anxiety Scale Results"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:124
+msgid "Ver historial"
+msgstr "See history"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:127
+msgid "Nueva evaluación"
+msgstr "New Assessment"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:188
+msgid "Índice de Ansiedad de Zung (25-100)"
+msgstr "Zung Anxiety Index (25-100)"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:194
+msgid "Fecha de evaluación"
+msgstr "Evaluation date."
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:206
+msgid "Detalles de la evaluación"
+msgstr "Evaluationation Details"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:214
+msgid "Métrica"
+msgstr ""
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:223
+msgid "Rango 20-80"
+msgstr "Range 20-80"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:226
+msgid "Índice estandarizado"
+msgstr "Standardized index"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:234
+msgid "Rango 25-100"
+msgstr "Range 25-100"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:247
+msgid "Distribución de respuestas"
+msgstr "Distribution of responses"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:267
+#, fuzzy
+#| msgid "Buena parte del tiempo"
+msgid "Buena parte"
+msgstr "Much of the time"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:273
+#, fuzzy
+#| msgid "Mayor parte del tiempo"
+msgid "Mayor parte"
+msgstr "Most of the time"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:300
+msgid "Escala de Interpretación del Índice de Ansiedad de Zung"
+msgstr "Interpretation of the Zung Anxiety Index"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:310
+msgid "Dentro de lo normal"
+msgstr "Within normal range"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:319
+msgid "Síntomas leves"
+msgstr "Mild symptoms"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:328
+msgid "Síntomas significativos"
+msgstr "Significant symptoms"
+
+#: .\PWMS\templates\PWMS\zung_anxiety_resultados.html:337
+msgid "Síntomas muy severos"
+msgstr "Very severe symptoms"
+
+#: .\PWMS\templates\heatmap.html:5 .\PWMS\templates\heatmap.html:13
+#: .\PWMS\templates\mission_dashboard.html:61
+#: .\PWMS\templates\missions_list.html:44
+msgid "Heatmap"
+msgstr "Heatmap"
+
+#: .\PWMS\templates\heatmap.html:14
+msgid "Visualización de Estrés, Ansiedad y Carga de Trabajo"
+msgstr "Visualization of stress, anxiety, and workload"
+
+#: .\PWMS\templates\heatmap.html:15
+msgid "Duración de la misión"
+msgstr "Mission duration:"
+
+#: .\PWMS\templates\heatmap.html:22
+msgid "Filtrar"
+msgstr "Filter"
+
+#: .\PWMS\templates\heatmap.html:24 .\PWMS\templates\heatmap.html:192
+msgid "Todos los tripulantes"
+msgstr "All crew members"
+
+#: .\PWMS\templates\heatmap.html:27
+msgid "Aplicar filtro"
+msgstr "Apply filter"
+
+#: .\PWMS\templates\heatmap.html:30
+msgid "Limpiar"
+msgstr "Clear"
+
+#: .\PWMS\templates\heatmap.html:36
+msgid "Descargar actual"
+msgstr "Download current"
+
+#: .\PWMS\templates\heatmap.html:39
+msgid "Descargar todos"
+msgstr "Download all"
+
+#: .\PWMS\templates\heatmap.html:53 .\PWMS\templates\heatmap.html:78
+msgid "Carga de Trabajo"
+msgstr "Workload"
+
+#: .\PWMS\templates\heatmap.html:60 .\PWMS\templates\heatmap.html:69
+msgid "Escala de 1 (muy bajo) a 10 (muy alto)"
+msgstr "Scale from 1 (very low) to 10 (very high)"
+
+#: .\PWMS\templates\heatmap.html:63
+msgid "Cargando datos de estrés..."
+msgstr "Loading stress data..."
+
+#: .\PWMS\templates\heatmap.html:72
+msgid "Cargando datos de ansiedad..."
+msgstr "Loading anxiety data..."
+
+#: .\PWMS\templates\heatmap.html:78
+msgid "Escala de 0 a 100 (NASA-TLX)"
+msgstr "Scale of 0 to 100 (NASA-TLX)"
+
+#: .\PWMS\templates\heatmap.html:81
+msgid "Cargando datos de carga de trabajo..."
+msgstr "Loading workload data..."
+
+#: .\PWMS\templates\heatmap.html:89
+msgid "Muy Bajo"
+msgstr "Too Low"
+
+#: .\PWMS\templates\heatmap.html:93
+msgid "Sin Datos"
+msgstr "No records"
+
+#: .\PWMS\templates\heatmap.html:130
+msgid "No hay datos disponibles"
+msgstr "No missions available"
+
+#: .\PWMS\templates\heatmap.html:140
+msgid "No se encontró el tripulante seleccionado"
+msgstr "The selected crew member could not be found"
+
+#: .\PWMS\templates\heatmap.html:148
+msgid "Tripulante / Día"
+msgstr "Crew member / Day"
+
+#: .\PWMS\templates\heatmap.html:150
+msgid "Día"
+msgstr "Day"
+
+#: .\PWMS\templates\heatmap.html:201 .\PWMS\templates\heatmap.html:202
+#: .\PWMS\templates\heatmap.html:203
+#: .\PWMS\templates\mission_dashboard.html:109
+msgid "Error al cargar datos"
+msgstr "Error loading data"
+
+#: .\PWMS\templates\mission_dashboard.html:5
+msgid "Dashboard de Misión"
+msgstr "Mission dashboard"
+
+#: .\PWMS\templates\mission_dashboard.html:17
+#: .\PWMS\templates\missions_list.html:24
+msgid "Hábitat"
+msgstr "Habitat"
+
+#: .\PWMS\templates\mission_dashboard.html:25
+msgid "Estadísticas Generales"
+msgstr "General statistics"
+
+#: .\PWMS\templates\mission_dashboard.html:38
+msgid "Días de Misión"
+msgstr "Mission days."
+
+#: .\PWMS\templates\mission_dashboard.html:44
+msgid "Evaluaciones"
+msgstr "Evaluations"
+
+#: .\PWMS\templates\mission_dashboard.html:54
+msgid "Exportar Datos"
+msgstr "Export data"
+
+#: .\PWMS\templates\mission_dashboard.html:58
+msgid "Exportar a XML"
+msgstr "Export to (XML)"
+
+#: .\PWMS\templates\mission_dashboard.html:59
+msgid "Ver JSON"
+msgstr "See JSON"
+
+#: .\PWMS\templates\mission_dashboard.html:60
+#: .\PWMS\templates\mission_form.html:6 .\PWMS\templates\mission_form.html:16
+msgid "Editar Misión"
+msgstr "Edit mission"
+
+#: .\PWMS\templates\mission_dashboard.html:62
+msgid "Volver a lista"
+msgstr "Back to list"
+
+#: .\PWMS\templates\mission_dashboard.html:70
+msgid "Fases de la Misión"
+msgstr "Mission phases"
+
+#: .\PWMS\templates\mission_dashboard.html:78
+#: .\PWMS\templates\missions_list.html:25
+msgid "Días"
+msgstr "Days"
+
+#: .\PWMS\templates\mission_dashboard.html:83
+msgid "No hay fases definidas"
+msgstr "No missions defined"
+
+#: .\PWMS\templates\mission_dashboard.html:91
+msgid "Tripulación"
+msgstr "Crew"
+
+#: .\PWMS\templates\mission_dashboard.html:95
+msgid "Cargando estadísticas..."
+msgstr "Loading statistics..."
+
+#: .\PWMS\templates\mission_dashboard.html:115
+msgid "No hay tripulantes asignados a esta misión"
+msgstr "There are no crew members assigned to this mission"
+
+#: .\PWMS\templates\mission_dashboard.html:138
+msgid "Estrés promedio:"
+msgstr "Average stress:"
+
+#: .\PWMS\templates\mission_dashboard.html:148
+msgid "Ansiedad promedio:"
+msgstr "Average anxiety"
+
+#: .\PWMS\templates\mission_dashboard.html:158
+msgid "FC promedio:"
+msgstr "Averages HR"
+
+#: .\PWMS\templates\mission_dashboard.html:167
+msgid "Evaluaciones NASA:"
+msgstr "NASA TLX Assessments:"
+
+#: .\PWMS\templates\mission_dashboard.html:178
+msgid "Error al cargar estadísticas"
+msgstr "Error loading statistics"
+
+#: .\PWMS\templates\mission_form.html:6 .\PWMS\templates\mission_form.html:16
+#: .\PWMS\templates\missions_list.html:16
+msgid "Nueva Misión"
+msgstr "New mission"
+
+#: .\PWMS\templates\mission_form.html:23
+msgid "Nombre de la Misión"
+msgstr "Mission name"
+
+#: .\PWMS\templates\mission_form.html:28
+msgid "Tipo de Hábitat"
+msgstr "Habitat type"
+
+#: .\PWMS\templates\mission_form.html:33
+msgid "Duración (días)"
+msgstr "Duration (days)"
+
+#: .\PWMS\templates\mission_form.html:38
+msgid "Fecha de Inicio"
+msgstr "Start date"
+
+#: .\PWMS\templates\mission_form.html:43
+msgid "Descripción"
+msgstr "Description"
+
+#: .\PWMS\templates\mission_form.html:61
+msgid "Seleccionar rol..."
+msgstr "Select rol..."
+
+#: .\PWMS\templates\mission_form.html:62
+msgid "Comandante"
+msgstr "Commander"
+
+#: .\PWMS\templates\mission_form.html:63
+msgid "Piloto"
+msgstr "Pilot"
+
+#: .\PWMS\templates\mission_form.html:64
+msgid "Científico"
+msgstr "Scientist"
+
+#: .\PWMS\templates\mission_form.html:65
+msgid "Ingeniero"
+msgstr "Engineer"
+
+#: .\PWMS\templates\mission_form.html:66
+msgid "Oficial Médico"
+msgstr "Medical officer"
+
+#: .\PWMS\templates\mission_form.html:67
+msgid "Especialista de Carga"
+msgstr "Payload Specialist"
+
+#: .\PWMS\templates\mission_form.html:72
+msgid "Selecciona los tripulantes y asígnales un rol"
+msgstr "Selecciona los tripulantes y asígnales un rol"
+
+#: .\PWMS\templates\mission_form.html:76
+msgid "Guardar"
+msgstr "Save"
+
+#: .\PWMS\templates\mission_form.html:128
+msgid "Misión guardada correctamente"
+msgstr "Mission successfully saved"
+
+#: .\PWMS\templates\mission_form.html:131
+#: .\PWMS\templates\missions_list.html:86
+msgid "Error:"
+msgstr "Error:"
+
+#: .\PWMS\templates\mission_form.html:134
+msgid "Error al guardar:"
+msgstr "Error saving data"
+
+#: .\PWMS\templates\missions_list.html:5
+msgid "Lista de Misiones"
+msgstr "List of missions"
+
+#: .\PWMS\templates\missions_list.html:13
+msgid "PWMS - Misiones Análogas"
+msgstr "PWMS - Analog missions"
+
+#: .\PWMS\templates\missions_list.html:23
+msgid "Nombre"
+msgstr "Name"
+
+#: .\PWMS\templates\missions_list.html:42
+msgid "Dash"
+msgstr "Dashboard"
+
+#: .\PWMS\templates\missions_list.html:43
+msgid "Editar"
+msgstr "Edit"
+
+#: .\PWMS\templates\missions_list.html:45
+msgid "XML"
+msgstr "XML"
+
+#: .\PWMS\templates\missions_list.html:53
+msgid "No hay misiones disponibles"
+msgstr "No missions available"
+
+#: .\PWMS\templates\missions_list.html:72
+msgid "¿Eliminar la misión"
+msgstr "Delete the mission?"
+
+#: .\PWMS\templates\missions_list.html:72
+msgid "Esta acción no se puede deshacer."
+msgstr "This action cannot be undone."
+
+#: .\PWMS\templates\missions_list.html:83
+msgid "Misión eliminada correctamente"
+msgstr "Mission successfully completed"
+
+#: .\PWMS\templates\missions_list.html:86
+msgid "No se pudo eliminar"
+msgstr "It could not be deleted"
+
+#: .\PWMS\templates\missions_list.html:90
+msgid "Error al eliminar:"
+msgstr "Error deleting:"
+
+#~ msgid "Sin rol"
+#~ msgstr "Without rol"
+
+#~ msgid "Ctrl+clic para seleccionar múltiples"
+#~ msgstr "Ctrl+click to select multiple"
+
+#~ msgid "Tripulante"
+#~ msgstr "Crew members"
+
+#, fuzzy
+#~| msgid "1. Me siento más nervioso y ansioso que de costumbre"
+#~ msgid "Me siento más nervioso y ansioso que de costumbre"
+#~ msgstr "1. I feel more nervous and anxious than usual"
+
+#, fuzzy
+#~| msgid "2. Siento miedo sin razón"
+#~ msgid "Siento miedo sin razón"
+#~ msgstr "2. I feel afraid for no reason"
+
+#, fuzzy
+#~| msgid "3. Me siento alterado o agitado"
+#~ msgid "Me siento alterado o agitado"
+#~ msgstr "3. I feel upset or agitated"
+
+#, fuzzy
+#~| msgid "4. Siento que me estoy desmoronando"
+#~ msgid "Siento que me estoy desmoronando"
+#~ msgstr "4. I feel like I'm falling apart"
+
+#, fuzzy
+#~| msgid "5. Siento que todo está bien y no pasará nada malo"
+#~ msgid "Siento que todo está bien y no pasará nada malo"
+#~ msgstr "5. I feel that everything is fine and nothing bad will happen"
+
+#, fuzzy
+#~| msgid "6. Tiemblan mis manos, brazos o piernas"
+#~ msgid "Tiemblan mis manos, brazos o piernas"
+#~ msgstr "6. My hands, arms or legs shake"
+
+#, fuzzy
+#~| msgid "7. Tengo dolores de cabeza, cuello o espalda"
+#~ msgid "Tengo dolores de cabeza, cuello o espalda"
+#~ msgstr "7. I have headaches, neck or back pain"
+
+#, fuzzy
+#~| msgid "8. Me siento débil y me canso fácilmente"
+#~ msgid "Me siento débil y me canso fácilmente"
+#~ msgstr "8. I feel weak and tire easily"
+
+#, fuzzy
+#~| msgid "9. Me siento calmado y puedo permanecer en calma fácilmente"
+#~ msgid "Me siento calmado y puedo permanecer en calma fácilmente"
+#~ msgstr "9. I feel calm and can remain calm easily"
+
+#, fuzzy
+#~| msgid "10. Siento latidos del corazón rápidos"
+#~ msgid "Siento latidos del corazón rápidos"
+#~ msgstr "10. I feel rapid heartbeats"
+
+#, fuzzy
+#~| msgid "11. Tengo mareos o vértigo"
+#~ msgid "Tengo mareos o vértigo"
+#~ msgstr "11. I feel dizzy or have vertigo"
+
+#, fuzzy
+#~| msgid "12. Siento que me voy a desmayar"
+#~ msgid "Siento que me voy a desmayar"
+#~ msgstr "12. I feel like I'm going to faint"
+
+#, fuzzy
+#~| msgid "13. Puedo respirar normal"
+#~ msgid "Puedo respirar normal"
+#~ msgstr "13. I can breathe normally"
+
+#, fuzzy
+#~| msgid "14. Tengo entumecimiento u hormigueo en dedos, manos o pies"
+#~ msgid "Tengo entumecimiento u hormigueo en dedos, manos o pies"
+#~ msgstr "14. I have numbness or tingling in my fingers, hands or feet"
+
+#, fuzzy
+#~| msgid "15. Tengo dolores de estómago o indigestión"
+#~ msgid "Tengo dolores de estómago o indigestión"
+#~ msgstr "15. I have stomach pains or indigestion"
+
+#, fuzzy
+#~| msgid "16. Tengo necesidad frecuente de orinar"
+#~ msgid "Tengo necesidad frecuente de orinar"
+#~ msgstr "16. I have a frequent need to urinate"
+
+#, fuzzy
+#~| msgid "17. Mis manos están normalmente calientes y secas"
+#~ msgid "Mis manos están normalmente calientes y secas"
+#~ msgstr "17. My hands are normally warm and dry"
+
+#, fuzzy
+#~| msgid "18. Mi cara se sonroja y siento bochornos"
+#~ msgid "Mi cara se sonroja y siento bochornos"
+#~ msgstr "18. My face flushes and I feel hot flashes"
+
+#, fuzzy
+#~| msgid "19. Duermo bien y descanso"
+#~ msgid "Duermo bien y descanso"
+#~ msgstr "19. I sleep well and rest"
+
+#, fuzzy
+#~| msgid "20. Tengo pesadillas"
+#~ msgid "Tengo pesadillas"
+#~ msgstr "20. I have nightmares"
+
+#~ msgid ""
+#~ "No hay datos suficientes para mostrar la gráfica. Completa algunas "
+#~ "evaluaciones NASA TLX."
+#~ msgstr ""
+#~ "There is not enough data to display the graph. Please complete some NASA "
+#~ "TLX assessments."
 
 #~ msgid "ACEPTABLE"
 #~ msgstr "ACCEPTABLE"
@@ -1650,19 +4232,8 @@ msgstr "PWMS Psycological Well-being Monitoring System"
 
 #, fuzzy
 #~| msgid "Temperatura"
-#~ msgid "Temperatura alta"
-#~ msgstr "Temperature"
-
-#, fuzzy
-#~| msgid "Temperatura"
 #~ msgid "Temperatura muy alta"
 #~ msgstr "Temperature"
-
-#~ msgid "Concentración:"
-#~ msgstr "Concentration"
-
-#~ msgid "Sensación:"
-#~ msgstr "Sensation:"
 
 #, fuzzy, python-format
 #~| msgid "%% de Humedad"

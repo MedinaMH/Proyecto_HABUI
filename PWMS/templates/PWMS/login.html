@@ -1,10 +1,13 @@
 {% load static %}
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+
 <!doctype html>
-<html lang="es">
+<html lang="{{ CURRENT_LANGUAGE }}">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Login - Sistema PWMS</title>
+        <title>{% trans "Login" %} - {% trans "Sistema PWMS" %}</title>
 
         <!-- Bootstrap local -->
         <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
@@ -19,17 +22,27 @@
         <header class="navbar navbar-dark bg-primary fixed-top d-flex justify-content-between align-items-center px-3 login-header">
             <a href="{% url 'panel_principal' %}" class="btn btn-outline-light d-flex align-items-center gap-2">
                 <i class="bi bi-arrow-left-circle-fill fs-5"></i>
-                <span class="d-none d-sm-inline">Panel principal</span>
+                <span class="d-none d-sm-inline">{% trans "Panel principal" %}</span>
             </a>
             
             <div class="login-header-spacer"></div>
             
             <!-- Título -->
             <div class="text-center flex-grow-1 mx-2">
-                <span class="encabezado">Sistema PWMS - Monitoreo del Bienestar Psicológico</span>
+                <span class="encabezado">{% trans "Sistema PWMS - Monitoreo del Bienestar Psicológico" %}</span>
             </div>
             
-            <div class="login-header-spacer"></div>
+            <!-- Selector de idioma -->
+            <div class="language-switcher me-2">
+                <form action="{% url 'set_language' %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <select name="language" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
+                        <option value="es" {% if CURRENT_LANGUAGE == 'es' %}selected{% endif %}>ES</option>
+                        <option value="en" {% if CURRENT_LANGUAGE == 'en' %}selected{% endif %}>EN</option>
+                    </select>
+                </form>
+            </div>
         </header>
 
         <!-- Formulario de login -->
@@ -40,8 +53,8 @@
                         <div class="card-body p-4 p-md-5">
                             <div class="text-center mb-4">
                                 <i class="bi bi-person-circle text-primary login-icon"></i>
-                                <h3 class="card-title mt-3 login-title">Iniciar Sesión PWMS</h3>
-                                <p class="text-muted login-subtitle">Ingresa tu usuario y PIN de 4 dígitos</p>
+                                <h3 class="card-title mt-3 login-title">{% trans "Iniciar Sesión PWMS" %}</h3>
+                                <p class="text-muted login-subtitle">{% trans "Ingresa tu usuario y PIN de 4 dígitos" %}</p>
                             </div>
                             
                             <form method="post" class="login-form">
@@ -49,28 +62,28 @@
                                 
                                 <div class="mb-3">
                                     <label for="username" class="form-label login-label">
-                                        <i class="bi bi-person-fill me-2"></i>Usuario
+                                        <i class="bi bi-person-fill me-2"></i>{% trans "Usuario" %}
                                     </label>
-                                    <input type="text" class="form-control login-input" id="username" name="username" placeholder="Ingresa tu usuario" required autofocus>
+                                    <input type="text" class="form-control login-input" id="username" name="username" placeholder="{% trans 'Ingresa tu usuario' %}" required autofocus>
                                 </div>
                                 
                                 <div class="mb-4">
                                     <label for="pin" class="form-label login-label">
-                                        <i class="bi bi-lock-fill me-2"></i>PIN (4 dígitos)
+                                        <i class="bi bi-lock-fill me-2"></i>{% trans "PIN (4 dígitos)" %}
                                     </label>
-                                    <input type="password" class="form-control login-input" id="pin" name="pin" placeholder="Ingresa tu PIN" maxlength="4" pattern="\d{4}" required>
-                                    <small class="form-text text-muted">Solo números, 4 dígitos</small>
+                                    <input type="password" class="form-control login-input" id="pin" name="pin" placeholder="{% trans 'Ingresa tu PIN' %}" maxlength="4" pattern="\d{4}" required>
+                                    <small class="form-text text-muted">{% trans "Solo números, 4 dígitos" %}</small>
                                 </div>
                                 
                                 <div class="d-grid gap-2 mb-3">
                                     <button type="submit" class="btn btn-primary btn-lg login-submit-btn">
-                                        <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>{% trans "Iniciar Sesión" %}
                                     </button>
                                 </div>
                                 
                                 <div class="text-center mb-3">
                                     <a href="{% url 'PWMS:registro_usuario' %}" class="text-decoration-none">
-                                        <i class="bi bi-person-plus me-1"></i>¿No tienes cuenta? Regístrate
+                                        <i class="bi bi-person-plus me-1"></i>{% trans "¿No tienes cuenta? Regístrate" %}
                                     </a>
                                 </div>
                                 
@@ -90,7 +103,7 @@
                             <div class="text-center mt-4 pt-3 border-top login-footer">
                                 <small class="text-muted">
                                     <i class="bi bi-info-circle me-1"></i>
-                                    Sistema PWMS v1.0 &copy; 2025
+                                    {% trans "Sistema PWMS v1.0" %} &copy; 2025
                                 </small>
                             </div>
                         </div>

@@ -11,8 +11,6 @@ from django.db import transaction
 from django.db.models import Avg
 from django.utils import timezone
 from datetime import datetime, timedelta
-import json, shutil
-import os
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.conf import settings
@@ -22,10 +20,8 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import NASATLXForm, ZungAnxietyScaleForm
-from .models import PerfilPWMS, RegistroPsicologico, RegistroFisiologico, SesionGrabacionNASATLX, FrameNASATLX, EvaluacionNASATLX, Mission, ZungAnxietyScale
-from .serializers import (UserSerializer, PerfilSerializer, LoginSerializer, RegistroPsicologicoSerializer,
-    RegistroFisiologicoSerializer)
+from .models import PerfilPWMS, RegistroFisiologico, EvaluacionNASATLX, ZungAnxietyScale, Mission
+from .serializers import (UserSerializer, PerfilSerializer, LoginSerializer, RegistroFisiologicoSerializer)
 from django.views.decorators.csrf import csrf_exempt
 import xml.etree.ElementTree as ET
 from django.http import HttpResponse
@@ -314,45 +310,6 @@ class HealthSyncPerfilAPI(APIView):
 
 # ===== API DE REGISTROS =====
 
-class HealthSyncRegistroPsicologicoAPI(APIView):
-    """
-    API para registrar datos psicológicos desde HealthSync Pro
-    URL: /api/healthsync/registro/psicologico/
-    Método: POST
-    """
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        serializer = RegistroPsicologicoSerializer(data=request.data)
-        
-        if serializer.is_valid():
-            # Agregar usuario al registro
-            registro = serializer.save(usuario=request.user, creado_por=request.user)
-            
-            return Response({
-                'status': 'success',
-                'message': 'Registro psicológico guardado exitosamente',
-                'registro_id': registro.id,
-                'fecha': registro.fecha
-            }, status=status.HTTP_201_CREATED)
-        
-        return Response({
-            'status': 'error',
-            'message': 'Error en los datos',
-            'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
-    def get(self, request):
-        """Obtener últimos registros psicológicos"""
-        registros = RegistroPsicologico.objects.filter(usuario=request.user).order_by('-fecha')[:10]
-        serializer = RegistroPsicologicoSerializer(registros, many=True)
-        
-        return Response({
-            'status': 'success',
-            'registros': serializer.data,
-            'total': registros.count()
-        }, status=status.HTTP_200_OK)
-
 def get_fisiologicos_previos(evaluacion, horas=2):
     timestamp = evaluacion.fecha_inicio or evaluacion.fecha_creacion
     limite = timestamp - timedelta(hours=horas)
@@ -364,7 +321,6 @@ def get_fisiologicos_previos(evaluacion, horas=2):
     
     return render(request, 'PWMS/nasa_tlx_historial.html', context)
 
-# ===== API DE REGISTROS =====
 class HealthSyncRegistroFisiologicoAPI(APIView):
     """
     API para registrar datos fisiológicos desde HealthSync Pro 
@@ -525,26 +481,29 @@ class HealthSyncDashboardAPI(APIView):
                 }, status=status.HTTP_200_OK)
             
             # Obtener estadísticas
-            registros_psico = RegistroPsicologico.objects.filter(
-                usuario=request.user
-            ).order_by('-fecha')[:5]
-            
             registros_fisio = RegistroFisiologico.objects.filter(
                 usuario=request.user
             ).order_by('-fecha')[:5]
             
             # Serializar datos
-            psico_serializer = RegistroPsicologicoSerializer(registros_psico, many=True)
             fisio_serializer = RegistroFisiologicoSerializer(registros_fisio, many=True)
             
             # Calcular promedios
-            promedios_psico = RegistroPsicologico.objects.filter(
+            evaluaciones_tlx = EvaluacionNASATLX.objects.filter(
                 usuario=request.user
-            ).aggregate(
-                avg_estres=Avg('nivel_estres'),
-                avg_ansiedad=Avg('nivel_ansiedad'),
-                avg_animo=Avg('estado_animo')
-            )
+            ).order_by('-fecha_creacion')[:5]
+
+            pruebas_zung = ZungAnxietyScale.objects.filter(
+                usuario=request.user
+            ).order_by('-fecha_registro')[:5]
+
+            promedio_tlx = EvaluacionNASATLX.objects.filter(
+                usuario=request.user
+            ).aggregate(avg=Avg('puntuacion_total'))['avg'] or 0
+
+            promedio_zung = ZungAnxietyScale.objects.filter(
+                usuario=request.user
+            ).aggregate(avg=Avg('puntuacion_indice'))['avg'] or 0
             
             promedios_fisio = RegistroFisiologico.objects.filter(
                 usuario=request.user
@@ -560,14 +519,27 @@ class HealthSyncDashboardAPI(APIView):
                 'status': 'success',
                 'perfil_completo': True,
                 'registros_recientes': {
-                    'psicologicos': psico_serializer.data,
+                    'nasa_tlx': [
+                        {
+                            'id': e.id,
+                            'fecha': e.fecha_creacion,
+                            'puntuacion_total': e.puntuacion_total,
+                        } for e in evaluaciones_tlx
+                    ],
+                    'zung_sas': [
+                        {
+                            'id': z.id,
+                            'fecha': z.fecha_registro,
+                            'puntuacion_indice': z.puntuacion_indice,
+                            'nivel_ansiedad': z.nivel_ansiedad,
+                        } for z in pruebas_zung
+                    ],
                     'fisiologicos': fisio_serializer.data
                 },
                 'estadisticas': {
                     'psicologicas': {
-                        'estres_promedio': round(promedios_psico.get('avg_estres', 0), 1),
-                        'ansiedad_promedio': round(promedios_psico.get('avg_ansiedad', 0), 1),
-                        'animo_promedio': round(promedios_psico.get('avg_animo', 0), 1)
+                        'carga_tlx_promedio': round(promedio_tlx, 1),
+                        'indice_zung_promedio': round(promedio_zung, 1),
                     },
                     'fisiologicas': {
                         'fc_promedio': round(promedios_fisio.get('avg_fc', 0), 1),
@@ -663,14 +635,11 @@ def export_stress_vocabulary(request, user_id):
         mission.crew_members.add(user)
     
     # Agrupar datos por día
-    registros_psico = RegistroPsicologico.objects.filter(usuario=user).order_by('fecha')
     registros_fisio = RegistroFisiologico.objects.filter(usuario=user).order_by('fecha')
     evaluaciones_tlx = EvaluacionNASATLX.objects.filter(usuario=user).order_by('fecha_creacion')
     zung_tests = ZungAnxietyScale.objects.filter(usuario=user).order_by('fecha_registro')
     
     by_day = {}
-    for r in registros_psico:
-        by_day.setdefault(r.fecha.date(), {})['psico'] = r
     for r in registros_fisio:
         by_day.setdefault(r.fecha.date(), {})['fisio'] = r
     for t in evaluaciones_tlx:
@@ -733,17 +702,10 @@ def export_stress_vocabulary(request, user_id):
         else:
             ET.SubElement(ps, 'MentalStress').text = ''
             ET.SubElement(ps, 'MentalStrain').text = ''
-        
-        psico = data.get('psico')
-        if psico:
-            ET.SubElement(ps, 'PositiveAffect').text = str(psico.positive_affect if psico.positive_affect else psico.estado_animo)
-            neg = psico.negative_affect if psico.negative_affect else (11 - psico.estado_animo)
-            ET.SubElement(ps, 'NegativeAffect').text = str(neg)
-            ET.SubElement(ps, 'FatigueLevel').text = str(psico.fatiga) if psico.fatiga else ''
-        else:
-            ET.SubElement(ps, 'PositiveAffect').text = ''
-            ET.SubElement(ps, 'NegativeAffect').text = ''
-            ET.SubElement(ps, 'FatigueLevel').text = ''
+            
+        ET.SubElement(ps, 'PositiveAffect').text = ''
+        ET.SubElement(ps, 'NegativeAffect').text = ''
+        ET.SubElement(ps, 'FatigueLevel').text = ''
         
         zung = data.get('zung')
         if zung:

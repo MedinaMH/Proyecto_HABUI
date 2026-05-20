@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import PerfilPWMS, RegistroPsicologico, RegistroFisiologico
+from .models import PerfilPWMS, RegistroFisiologico, EvaluacionNASATLX,ZungAnxietyScale
 from django.utils import timezone
 
 # ===== SERIALIZADORES DE USUARIO =====
@@ -92,36 +92,6 @@ class PerfilSerializer(serializers.ModelSerializer):
         return value.upper() if value else value
 
 # ===== SERIALIZADORES DE REGISTROS =====
-
-class RegistroPsicologicoSerializer(serializers.ModelSerializer):
-    """Serializer para registros psicológicos - EN USO"""
-    usuario = serializers.StringRelatedField(read_only=True)
-    
-    class Meta:
-        model = RegistroPsicologico
-        fields = [
-            'id', 'usuario', 'fecha', 'nivel_estres', 'nivel_ansiedad',
-            'estado_animo', 'notas_dia', 'eventos_significativos',
-            'pensamientos_recurrentes', 'creado_por'
-        ]
-        read_only_fields = ['id', 'usuario', 'fecha', 'creado_por']
-    
-    def validate_nivel_estres(self, value):
-        if not 1 <= value <= 10:
-            raise serializers.ValidationError("El nivel de estrés debe estar entre 1 y 10")
-        return value
-    
-    def validate_nivel_ansiedad(self, value):
-        if not 1 <= value <= 10:
-            raise serializers.ValidationError("El nivel de ansiedad debe estar entre 1 y 10")
-        return value
-    
-    def validate_estado_animo(self, value):
-        if not 1 <= value <= 10:
-            raise serializers.ValidationError("El estado de ánimo debe estar entre 1 y 10")
-        return value
-
-
 class RegistroFisiologicoSerializer(serializers.ModelSerializer):
     """
     Serializer para registros fisiológicos - EN USO

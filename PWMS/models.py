@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.validators import MinValueValidator, MaxValueValidator
+from datetime import date, timedelta
+from django.utils.translation import gettext_lazy as _
 
 class PerfilPWMS(models.Model):
     """
@@ -15,10 +17,10 @@ class PerfilPWMS(models.Model):
     nombre_completo = models.CharField(max_length=150, null=True, blank=True)
     fecha_nacimiento = models.DateField(null=True, blank=True)
     genero = models.CharField(max_length=20, choices=[
-        ('masculino', 'Masculino'),
-        ('femenino', 'Femenino'),
-        ('otro', 'Otro'),
-        ('prefiero_no_decirlo', 'Prefiero no decirlo')
+        ('masculino', _('Masculino')),
+        ('femenino', _('Femenino')),
+        ('otro', _('Otro')),
+        ('prefiero_no_decirlo', _('Prefiero no decirlo'))
     ], null=True, blank=True)
     telefono = models.CharField(max_length=20, null=True, blank=True)
     
@@ -74,36 +76,6 @@ class PerfilPWMS(models.Model):
 def crear_perfil_pwms(sender, instance, created, **kwargs):
     if created:
         PerfilPWMS.objects.create(usuario=instance)
-
-class RegistroPsicologico(models.Model):
-    """
-    Registros psicológicos periódicos
-    """
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='registros_psicologicos')
-    fecha = models.DateTimeField(auto_now_add=True)
-    
-    # Escalas de evaluación
-    nivel_estres = models.IntegerField(choices=[(i, str(i)) for i in range(1, 11)], help_text="1=Sin estrés, 10=Máximo estrés")
-    nivel_ansiedad = models.IntegerField(choices=[(i, str(i)) for i in range(1, 11)], help_text="1=Sin ansiedad, 10=Máxima ansiedad")
-    estado_animo = models.IntegerField(choices=[(i, str(i)) for i in range(1, 11)], help_text="1=Muy bajo, 10=Muy alto")
-    
-    # Campos para vocabulario
-    fatiga = models.IntegerField(choices=[(i, str(i)) for i in range(1, 11)], null=True, blank=True, help_text="Fatiga 1-10")
-    positive_affect = models.IntegerField(choices=[(i, str(i)) for i in range(1, 11)], null=True, blank=True, help_text="Afecto positivo 1-10")
-    negative_affect = models.IntegerField(choices=[(i, str(i)) for i in range(1, 11)], null=True, blank=True, help_text="Afecto negativo 1-10")
-    
-    # Datos cualitativos
-    notas_dia = models.TextField(help_text="¿Cómo te sientes hoy?")
-    eventos_significativos = models.TextField(null=True, blank=True, help_text="Eventos importantes del día")
-    pensamientos_recurrentes = models.TextField(null=True, blank=True)
-    
-    # Metadatos
-    creado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='registros_creados')
-    
-    class Meta:
-        ordering = ['-fecha']
-        verbose_name = "Registro Psicológico"
-        verbose_name_plural = "Registros Psicológicos"
 
 class EvaluacionNASATLX(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Usuario")
@@ -164,109 +136,6 @@ class EvaluacionNASATLX(models.Model):
         verbose_name = "Evaluación NASA TLX"
         ordering = ['-fecha_creacion']
         
-class SesionGrabacionNASATLX(models.Model):
-    """
-    Modelo para almacenar las grabaciones de video y frames de cada evaluación NASA TLX
-    """
-    evaluacion = models.OneToOneField(
-        EvaluacionNASATLX, 
-        on_delete=models.CASCADE,
-        related_name='sesion_grabacion',
-        verbose_name="Evaluación NASA TLX"
-    )
-    usuario = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name='sesiones_grabacion_tlx',
-        verbose_name="Usuario"
-    )
-    
-    # Archivo de video completo
-    archivo_video = models.FileField(
-        upload_to='videos_nasa_tlx/%Y/%m/%d/',
-        verbose_name="Video de la sesión",
-        null=True,
-        blank=True
-    )
-    nombre_video = models.CharField(
-        max_length=255,
-        verbose_name="Nombre del archivo de video",
-        blank=True
-    )
-    
-    # Metadatos de la grabación
-    fecha_grabacion = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Fecha de grabación"
-    )
-    duracion_segundos = models.IntegerField(
-        verbose_name="Duración (segundos)",
-        default=120,
-        help_text="Duración total de la grabación en segundos"
-    )
-    total_frames = models.IntegerField(
-        verbose_name="Total de frames",
-        default=0,
-        help_text="Número total de frames capturados"
-    )
-    intervalo_captura = models.IntegerField(
-        verbose_name="Intervalo de captura (segundos)",
-        default=10,
-        help_text="Intervalo en segundos entre cada frame"
-    )
-    
-    # Estado de la grabación
-    completada = models.BooleanField(
-        verbose_name="Grabación completada",
-        default=False
-    )
-    
-    class Meta:
-        verbose_name = "Sesión de Grabación NASA TLX"
-        verbose_name_plural = "Sesiones de Grabación NASA TLX"
-        ordering = ['-fecha_grabacion']
-    
-    def __str__(self):
-        return f"Sesión NASA TLX - {self.usuario.username} - {self.fecha_grabacion.strftime('%Y-%m-%d %H:%M')}"
-
-class FrameNASATLX(models.Model):
-    """
-    Modelo para almacenar cada frame capturado durante la evaluación NASA TLX
-    """
-    sesion = models.ForeignKey(
-        SesionGrabacionNASATLX,
-        on_delete=models.CASCADE,
-        related_name='frames',
-        verbose_name="Sesión de grabación"
-    )
-    
-    # Imagen del frame
-    imagen = models.ImageField(
-        upload_to='frames_nasa_tlx/%Y/%m/%d/',
-        verbose_name="Frame"
-    )
-    
-    # Metadatos del frame
-    timestamp_segundos = models.FloatField(
-        verbose_name="Timestamp (segundos)",
-        help_text="Momento exacto de captura en segundos desde inicio"
-    )
-    numero_frame = models.IntegerField(
-        verbose_name="Número de frame"
-    )
-    fecha_captura = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Fecha de captura"
-    )
-    
-    class Meta:
-        verbose_name = "Frame NASA TLX"
-        verbose_name_plural = "Frames NASA TLX"
-        ordering = ['numero_frame']
-        unique_together = ['sesion', 'numero_frame']  # Evitar frames duplicados
-    
-    def __str__(self):
-        return f"Frame {self.numero_frame} - {self.sesion}"
 
 class RegistroFisiologico(models.Model):
     """
@@ -357,165 +226,180 @@ class RegistroFisiologico(models.Model):
     def __str__(self):
         return f"{self.usuario.username} - {self.fecha.strftime('%Y-%m-%d %H:%M')}"
 
+from django.utils.translation import gettext_lazy as _
+
 class ZungAnxietyScale(models.Model):
     """
     Modelo para la Escala de Ansiedad de Zung (Self-Rating Anxiety Scale - SAS)
     """
+    
+    # ============================================
+    # OPCIONES DE RESPUESTA TRADUCIDAS
+    # ============================================
+    OPCIONES_ZUNG = [
+        (1, _('Rara vez')),
+        (2, _('Algunas veces')),
+        (3, _('Buena parte del tiempo')),
+        (4, _('La mayor parte del tiempo')),
+    ]
+    
+    # Niveles de ansiedad traducidos
+    NIVELES_ANSiedad = [
+        ('normal', _('Dentro de lo normal (25-44)')),
+        ('minima', _('Ansiedad mínima a moderada (45-59)')),
+        ('marcada', _('Ansiedad marcada a severa (60-74)')),
+        ('extrema', _('Ansiedad extrema (75-100)')),
+    ]
+    
     # Relación con el usuario
     usuario = models.ForeignKey(
         User, 
         on_delete=models.CASCADE, 
         related_name='pruebas_ansiedad_zung',
-        verbose_name="Usuario"
+        verbose_name=_("Usuario")
     )
     
     # Fecha del registro
     fecha_registro = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="Fecha de registro"
+        verbose_name=_("Fecha de registro")
     )
     fecha_actualizacion = models.DateTimeField(
         auto_now=True,
-        verbose_name="Última actualización"
+        verbose_name=_("Última actualización")
     )
     
     # Preguntas de la escala (20 items)
     p01_me_siento_mas_nervioso = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Me siento más nervioso y ansioso que de costumbre"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("1. Me siento más nervioso y ansioso que de costumbre")
     )
     p02_siento_miedo_sin_razon = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Siento miedo sin razón"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("2. Siento miedo sin razón")
     )
     p03_me_siento_alterado = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Me siento alterado o agitado"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("3. Me siento alterado o agitado")
     )
     p04_siento_que_me_desmorono = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Siento que me estoy desmoronando"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("4. Siento que me estoy desmoronando")
     )
     p05_siento_que_todo_bien = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Siento que todo está bien y no pasará nada malo"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("5. Siento que todo está bien y no pasará nada malo")
     )
     p06_temblor_sacudidas = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Tiemblan mis manos, brazos o piernas"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("6. Tiemblan mis manos, brazos o piernas")
     )
     p07_dolores_cabeza_cuello = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Tengo dolores de cabeza, cuello o espalda"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("7. Tengo dolores de cabeza, cuello o espalda")
     )
     p08_debilidad_fatiga = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Me siento débil y me canso fácilmente"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("8. Me siento débil y me canso fácilmente")
     )
     p09_siento_calma_tranquilidad = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Me siento calmado y puedo permanecer en calma fácilmente"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("9. Me siento calmado y puedo permanecer en calma fácilmente")
     )
     p10_siento_latidos_corazon = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Siento latidos del corazón rápidos"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("10. Siento latidos del corazón rápidos")
     )
     p11_mareos = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Tengo mareos o vértigo"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("11. Tengo mareos o vértigo")
     )
     p12_desmayos = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Siento que me voy a desmayar"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("12. Siento que me voy a desmayar")
     )
     p13_respiracion_normal = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Puedo respirar normal"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("13. Puedo respirar normal")
     )
     p14_entumecimiento_hormigueo = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Tengo entumecimiento u hormigueo en dedos, manos o pies"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("14. Tengo entumecimiento u hormigueo en dedos, manos o pies")
     )
     p15_dolores_estomacales = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Tengo dolores de estómago o indigestión"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("15. Tengo dolores de estómago o indigestión")
     )
     p16_necesidad_orinar = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Tengo necesidad frecuente de orinar"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("16. Tengo necesidad frecuente de orinar")
     )
     p17_manos_calidas_secas = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Mis manos están normalmente calientes y secas"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("17. Mis manos están normalmente calientes y secas")
     )
     p18_sonrojo_bochorno = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Mi cara se sonroja y siento bochornos"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("18. Mi cara se sonroja y siento bochornos")
     )
     p19_duermo_bien_descanso = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Duermo bien y descanso"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("19. Duermo bien y descanso")
     )
     p20_pesadillas = models.IntegerField(
-        choices=[(1, 'Rara vez'), (2, 'Algunas veces'), (3, 'Buena parte del tiempo'), (4, 'La mayor parte del tiempo')],
-        verbose_name="Tengo pesadillas"
+        choices=OPCIONES_ZUNG,
+        verbose_name=_("20. Tengo pesadillas")
     )
     
     # Metadatos de la escala
     puntuacion_bruta = models.IntegerField(
-        verbose_name="Puntuación bruta",
-        help_text="Suma total de las respuestas",
+        verbose_name=_("Puntuación bruta"),
+        help_text=_("Suma total de las respuestas"),
         null=True, blank=True
     )
     puntuacion_indice = models.IntegerField(
-        verbose_name="Índice de Ansiedad",
-        help_text="Puntuación bruta × 1.25 (escala de 25-100)",
+        verbose_name=_("Índice de Ansiedad"),
+        help_text=_("Puntuación bruta × 1.25 (escala de 25-100)"),
         null=True, blank=True
     )
     nivel_ansiedad = models.CharField(
         max_length=20,
-        choices=[
-            ('normal', 'Dentro de lo normal (25-44)'),
-            ('minima', 'Ansiedad mínima a moderada (45-59)'),
-            ('marcada', 'Ansiedad marcada a severa (60-74)'),
-            ('extrema', 'Ansiedad extrema (75-100)')
-        ],
-        verbose_name="Nivel de ansiedad",
+        choices=NIVELES_ANSiedad,
+        verbose_name=_("Nivel de ansiedad"),
         null=True, blank=True
     )
     observaciones = models.TextField(
-        verbose_name="Observaciones",
+        verbose_name=_("Observaciones"),
         blank=True,
         null=True
     )
     
-    # ========== NUEVOS CAMPOS PARA VIDEO ==========
+    # Campos para video
     video_path = models.CharField(
         max_length=500,
         blank=True,
         null=True,
-        verbose_name="Ruta del video"
+        verbose_name=_("Ruta del video")
     )
     video_metadata = models.JSONField(
         blank=True,
         null=True,
-        verbose_name="Metadatos del video (resolución, fps, etc.)"
+        verbose_name=_("Metadatos del video (resolución, fps, etc.)")
     )
     video_size = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name="Tamaño del video (bytes)"
+        verbose_name=_("Tamaño del video (bytes)")
     )
     video_duration = models.IntegerField(
         blank=True,
         null=True,
-        verbose_name="Duración del video (segundos)"
+        verbose_name=_("Duración del video (segundos)")
     )
-    # ==============================================
 
     class Meta:
-        verbose_name = "Escala de Ansiedad de Zung"
-        verbose_name_plural = "Escalas de Ansiedad de Zung"
+        verbose_name = _("Escala de Ansiedad de Zung")
+        verbose_name_plural = _("Escalas de Ansiedad de Zung")
         ordering = ['-fecha_registro']
         
     def __str__(self):
@@ -525,7 +409,6 @@ class ZungAnxietyScale(models.Model):
         """
         Calcula las puntuaciones de la escala considerando los items inversos
         """
-        # Items inversos: 5, 9, 13, 17, 19
         items_inversos = ['p05_siento_que_todo_bien', 'p09_siento_calma_tranquilidad', 
                           'p13_respiracion_normal', 'p17_manos_calidas_secas', 
                           'p19_duermo_bien_descanso']
@@ -567,7 +450,6 @@ class ZungAnxietyScale(models.Model):
         for i, valor in enumerate(campos):
             if valor:
                 if nombres_campos[i] in items_inversos:
-                    # Para items inversos: 1→4, 2→3, 3→2, 4→1
                     puntuacion_total += 5 - valor
                 else:
                     puntuacion_total += valor
@@ -590,7 +472,6 @@ class ZungAnxietyScale(models.Model):
     def save(self, *args, **kwargs):
         self.calcular_puntuaciones()
         super().save(*args, **kwargs)
-        
 class Mission(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nombre de la misión")
     habitat_type = models.CharField(max_length=50, verbose_name="Tipo de hábitat")
@@ -598,6 +479,7 @@ class Mission(models.Model):
     phases = models.JSONField(default=list, verbose_name="Fases (lista de dicts con name, start, end)")
     start_date = models.DateField(verbose_name="Fecha de inicio")
     crew_members = models.ManyToManyField(User, related_name='missions', verbose_name="Tripulantes")
+    description = models.TextField(verbose_name="Descripción", blank=True, null=True) 
     
     class Meta:
         verbose_name = "Misión"
@@ -605,39 +487,3 @@ class Mission(models.Model):
     
     def __str__(self):
         return self.name
-    
-    
-    
-class VideoAnalisisEstrés(models.Model):
-    """Almacena resultados del análisis de estrés por video"""
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    evaluacion_nasa = models.OneToOneField(EvaluacionNASATLX, on_delete=models.CASCADE, null=True, blank=True)
-    evaluacion_zung = models.OneToOneField(ZungAnxietyScale, on_delete=models.CASCADE, null=True, blank=True)
-    
-    fecha_analisis = models.DateTimeField(auto_now_add=True)
-    
-    # Resultados del análisis facial
-    puntuacion_estres_facial = models.FloatField(default=0.0, help_text="0-100")
-    emocion_dominante = models.CharField(max_length=50, blank=True)
-    
-    # Microexpresiones detectadas
-    micro_sonrisa = models.FloatField(default=0.0)
-    micro_ceño = models.FloatField(default=0.0)
-    micro_parpadeo = models.FloatField(default=0.0)
-    micro_labios = models.FloatField(default=0.0)
-    micro_frente = models.FloatField(default=0.0)
-    
-    # Métricas temporales
-    variabilidad_emocional = models.FloatField(default=0.0)
-    tiempo_relajado = models.FloatField(default=0.0)
-    tiempo_tension = models.FloatField(default=0.0)
-    
-    # Datos raw (opcional, para debug)
-    datos_raw = models.JSONField(null=True, blank=True)
-    
-    class Meta:
-        verbose_name = "Análisis de Estrés Facial"
-        verbose_name_plural = "Análisis de Estrés Facial"
-    
-    def __str__(self):
-        return f"Estrés facial: {self.puntuacion_estres_facial} - {self.fecha_analisis}"

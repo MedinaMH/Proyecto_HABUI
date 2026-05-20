@@ -26,7 +26,7 @@ urlpatterns = [
     path('', include('HABUI_APP.urls')),
     path('i18n/', include('django.conf.urls.i18n')), 
     # ========== URLs PWMS ==========
-    path('pwms/', include('PWMS.urls')),
+    path('pwms/', include('PWMS.urls', namespace='pwms')),  # Incluir URLs de PWMS con namespace
 ]
 
 if settings.DEBUG:

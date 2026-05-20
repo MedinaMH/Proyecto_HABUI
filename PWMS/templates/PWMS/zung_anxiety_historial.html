@@ -1,7 +1,8 @@
 {% extends 'PWMS/estructura_base_PWMS.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block titulo %}Historial Zung - Escala de Ansiedad - PWMS{% endblock %}
+{% block titulo %}{% trans "Historial Zung - Escala de Ansiedad" %} - PWMS{% endblock %}
 
 {% block contenido %}
 <div class="dashboard-container">
@@ -10,12 +11,12 @@
             <!-- Encabezado y botón nueva evaluación -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h2><i class="bi bi-clock-history me-2"></i> Historial de Escala de Ansiedad de Zung</h2>
-                    <p class="text-muted mb-0">Registro de tus evaluaciones de ansiedad (Self-Rating Anxiety Scale)</p>
+                    <h2><i class="bi bi-clock-history me-2"></i> {% trans "Historial de Escala de Ansiedad de Zung" %}</h2>
+                    <p class="text-muted mb-0">{% trans "Registro de tus evaluaciones de ansiedad (Self-Rating Anxiety Scale)" %}</p>
                 </div>
                 <div>
                     <a href="{% url 'PWMS:zung_anxiety_nuevo' %}" class="btn btn-danger btn-lg">
-                        <i class="bi bi-plus-circle me-2"></i>Nueva Evaluación
+                        <i class="bi bi-plus-circle me-2"></i>{% trans "Nueva Evaluación" %}
                     </a>
                 </div>
             </div>
@@ -27,7 +28,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="card-title text-white-50">Total Evaluaciones</h6>
+                                    <h6 class="card-title text-white-50">{% trans "Total Evaluaciones" %}</h6>
                                     <h2 class="display-6 mb-0">{{ total_evaluaciones|default:0 }}</h2>
                                 </div>
                                 <i class="bi bi-clipboard-check fs-1 opacity-50"></i>
@@ -40,7 +41,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="card-title text-white-50">Índice de Ansiedad Promedio</h6>
+                                    <h6 class="card-title text-white-50">{% trans "Índice de ansiedad promedio" %}</h6>
                                     <h2 class="display-6 mb-0">{{ promedio_indice|floatformat:1|default:0 }}</h2>
                                 </div>
                                 <i class="bi bi-emoji-frown fs-1 opacity-50"></i>
@@ -57,7 +58,7 @@
                         <div class="card-header bg-white rounded-top-4 border-0 pt-4 pb-2">
                             <h5 class="mb-0">
                                 <i class="bi bi-list-check me-2 text-danger"></i>
-                                Registros de la Escala de Zung
+                                {% trans "Registros de la Escala de Zung" %}
                             </h5>
                         </div>
                         <div class="card-body">
@@ -66,11 +67,11 @@
                                 <table class="table table-hover align-middle">
                                     <thead class="table-light">
                                         <tr>
-                                            <th><i class="bi bi-calendar-event me-1"></i> Fecha</th>
-                                            <th><i class="bi bi-percent me-1"></i> Índice Zung</th>
-                                            <th><i class="bi bi-emoji-frown me-1"></i> Nivel de Ansiedad</th>
-                                            <th><i class="bi bi-journal-text me-1"></i> Observaciones</th>
-                                            <th><i class="bi bi-eye me-1"></i> Detalle</th>
+                                            <th><i class="bi bi-calendar-event me-1"></i> {% trans "Fecha" %}</th>
+                                            <th><i class="bi bi-percent me-1"></i> {% trans "Índice Zung" %}</th>
+                                            <th><i class="bi bi-emoji-frown me-1"></i> {% trans "Nivel de Ansiedad" %}</th>
+                                            <th><i class="bi bi-journal-text me-1"></i> {% trans "Observaciones" %}</th>
+                                            <th><i class="bi bi-eye me-1"></i> {% trans "Detalle" %}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -88,26 +89,25 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                {% if prueba.nivel_ansiedad == 'normal' %}
-                                                    <span class="text-success fw-bold">Normal (25-44)</span>
-                                                {% elif prueba.nivel_ansiedad == 'minima' %}
-                                                    <span class="text-warning fw-bold">Mínima a moderada (45-59)</span>
-                                                {% elif prueba.nivel_ansiedad == 'marcada' %}
-                                                    <span class="text-danger fw-bold">Marcada a severa (60-74)</span>
-                                                {% else %}
-                                                    <span class="text-dark fw-bold">Extrema (75-100)</span>
-                                                {% endif %}
-                                            </td>
-                                            <td class="small text-muted">{{ prueba.observaciones|truncatechars:60|default:"—" }}</td>
+                                                <span class="
+                                                    {% if prueba.nivel_ansiedad == 'normal' %}text-success
+                                                    {% elif prueba.nivel_ansiedad == 'minima' %}text-warning
+                                                    {% elif prueba.nivel_ansiedad == 'marcada' %}text-danger
+                                                    {% else %}text-dark{% endif %} fw-bold">
+                                                    {{ prueba.get_nivel_ansiedad_display }}
+                                                </span>
+                                            </div>
+                                            </div>
+                                            <td class="small text-muted">{{ prueba.observaciones|truncatechars:60|default:"—" }} </td>
                                             <td>
                                                 <a href="{% url 'PWMS:zung_anxiety_resultados' prueba.id %}" 
                                                    class="btn btn-sm btn-outline-info rounded-pill"
                                                    data-bs-toggle="tooltip"
-                                                   title="Ver resultados completos">
-                                                    <i class="bi bi-eye"></i> Ver
+                                                   title="{% trans 'Ver resultados completos' %}">
+                                                    <i class="bi bi-eye"></i> {% trans "Ver" %}
                                                 </a>
                                             </td>
-                                        </tr>
+                                         </tr>
                                         {% endfor %}
                                     </tbody>
                                 </table>
@@ -119,23 +119,23 @@
                                 <ul class="pagination justify-content-center">
                                     {% if pruebas.has_previous %}
                                         <li class="page-item">
-                                            <a class="page-link" href="?page=1">&laquo; Primera</a>
+                                            <a class="page-link" href="?page=1">&laquo; {% trans "Primera" %}</a>
                                         </li>
                                         <li class="page-item">
-                                            <a class="page-link" href="?page={{ pruebas.previous_page_number }}">Anterior</a>
+                                            <a class="page-link" href="?page={{ pruebas.previous_page_number }}">{% trans "Anterior" %}</a>
                                         </li>
                                     {% endif %}
                                     
                                     <li class="page-item active">
-                                        <span class="page-link">Página {{ pruebas.number }} de {{ pruebas.paginator.num_pages }}</span>
+                                        <span class="page-link">{% trans "Página" %} {{ pruebas.number }} {% trans "de" %} {{ pruebas.paginator.num_pages }}</span>
                                     </li>
                                     
                                     {% if pruebas.has_next %}
                                         <li class="page-item">
-                                            <a class="page-link" href="?page={{ pruebas.next_page_number }}">Siguiente</a>
+                                            <a class="page-link" href="?page={{ pruebas.next_page_number }}">{% trans "Siguiente" %}</a>
                                         </li>
                                         <li class="page-item">
-                                            <a class="page-link" href="?page={{ pruebas.paginator.num_pages }}">Última &raquo;</a>
+                                            <a class="page-link" href="?page={{ pruebas.paginator.num_pages }}">{% trans "Última" %} &raquo;</a>
                                         </li>
                                     {% endif %}
                                 </ul>
@@ -145,10 +145,10 @@
                             {% else %}
                             <div class="text-center py-5">
                                 <i class="bi bi-clipboard-x display-1 text-muted mb-3"></i>
-                                <h4 class="text-muted">No hay evaluaciones registradas</h4>
-                                <p class="text-muted mb-4">Completa tu primera escala de ansiedad de Zung</p>
+                                <h4 class="text-muted">{% trans "No hay evaluaciones registradas" %}</h4>
+                                <p class="text-muted mb-4">{% trans "Completa tu primera escala de ansiedad de Zung" %}</p>
                                 <a href="{% url 'PWMS:zung_anxiety_nuevo' %}" class="btn btn-danger btn-lg">
-                                    <i class="bi bi-plus-circle me-2"></i>Comenzar Evaluación
+                                    <i class="bi bi-plus-circle me-2"></i>{% trans "Comenzar Evaluación" %}
                                 </a>
                             </div>
                             {% endif %}

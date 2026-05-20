@@ -1,0 +1,42 @@
+/* Tooltip D3 */
+.d3-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1000;
+    font-family: monospace;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.d3-tooltip strong {
+    color: #ffd966;
+}
+
+/* Contenedor de gráficas */
+#grafica-tlx, #grafica-zung {
+    min-height: 400px;
+}
+
+#grafica-radar-tlx {
+    min-height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.radar-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.radar-subtitle {
+    font-size: 11px;
+    color: #6c757d;
+    margin-top: 10px;
+}

@@ -1,0 +1,317 @@
+{% extends "modulo_control/estructura_base_control.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block titulo %}{% trans "Heatmap" %} - {{ mission.name }}{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">🔥 {% trans "Heatmap" %} - {{ mission.name }}</h3>
+                    <p class="mb-0 mt-1">{% trans "Visualización de Estrés, Ansiedad y Carga de Trabajo" %}</p>
+                    <small>📅 {% trans "Duración de la misión" %}: {{ mission.duration_days }} {% trans "días" %}</small>
+                </div>
+                <div class="card-body">
+                    <!-- Filtro por usuario -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <label class="fw-bold me-2">👥 {% trans "Filtrar" %}:</label>
+                                <select id="crewFilter" class="form-select" style="width: auto; display: inline-block;">
+                                    <option value="all">🌟 {% trans "Todos los tripulantes" %}</option>
+                                </select>
+                                <button class="btn btn-primary" onclick="aplicarFiltro()">
+                                    {% trans "Aplicar filtro" %}
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="limpiarFiltro()">
+                                    {% trans "Limpiar" %}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-success" onclick="descargarHeatmapActual()">
+                                📸 {% trans "Descargar actual" %}
+                            </button>
+                            <button class="btn btn-info text-white" onclick="descargarTodosLosHeatmaps()">
+                                📸 {% trans "Descargar todos" %}
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabs -->
+                    <div class="mb-3">
+                        <button class="btn btn-primary me-2" id="btnStress" onclick="showTab('stress')" style="background-color: #0d6efd; color: white; border: none; padding: 10px 20px;">
+                            😰 {% trans "Nivel de Estrés" %}
+                        </button>
+                        <button class="btn btn-primary me-2" id="btnAnxiety" onclick="showTab('anxiety')" style="background-color: #0d6efd; color: white; border: none; padding: 10px 20px;">
+                            😨 {% trans "Nivel de Ansiedad" %}
+                        </button>
+                        <button class="btn btn-primary" id="btnWorkload" onclick="showTab('workload')" style="background-color: #0d6efd; color: white; border: none; padding: 10px 20px;">
+                            ⚙️ {% trans "Carga de Trabajo" %}
+                        </button>
+                    </div>
+                    
+                    <!-- Contenido de tabs -->
+                    <div id="stressTab" class="tab-content active">
+                        <div class="alert alert-info">
+                            <strong>😰 {% trans "Nivel de Estrés" %}:</strong> {% trans "Escala de 1 (muy bajo) a 10 (muy alto)" %}
+                        </div>
+                        <div id="stressHeatmap" class="heatmap-container">
+                            <div class="text-center p-5">{% trans "Cargando datos de estrés..." %}</div>
+                        </div>
+                    </div>
+                    
+                    <div id="anxietyTab" class="tab-content" style="display:none;">
+                        <div class="alert alert-info">
+                            <strong>😨 {% trans "Nivel de Ansiedad" %}:</strong> {% trans "Escala de 1 (muy bajo) a 10 (muy alto)" %}
+                        </div>
+                        <div id="anxietyHeatmap" class="heatmap-container">
+                            <div class="text-center p-5">{% trans "Cargando datos de ansiedad..." %}</div>
+                        </div>
+                    </div>
+                    
+                    <div id="workloadTab" class="tab-content" style="display:none;">
+                        <div class="alert alert-info">
+                            <strong>⚙️ {% trans "Carga de Trabajo" %}:</strong> {% trans "Escala de 0 a 100 (NASA-TLX)" %}
+                        </div>
+                        <div id="workloadHeatmap" class="heatmap-container">
+                            <div class="text-center p-5">{% trans "Cargando datos de carga de trabajo..." %}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Leyenda -->
+                    <div class="row mt-4 pt-3 border-top">
+                        <div class="col text-center">
+                            <div class="d-flex justify-content-center gap-4 flex-wrap">
+                                <div><span style="display: inline-block; width: 30px; height: 20px; background: #3498db; border-radius: 4px;"></span> <span class="ms-1">{% trans "Muy Bajo" %}</span></div>
+                                <div><span style="display: inline-block; width: 30px; height: 20px; background: #48bb78; border-radius: 4px;"></span> <span class="ms-1">{% trans "Bajo" %}</span></div>
+                                <div><span style="display: inline-block; width: 30px; height: 20px; background: #f6e05e; border-radius: 4px;"></span> <span class="ms-1">{% trans "Moderado" %}</span></div>
+                                <div><span style="display: inline-block; width: 30px; height: 20px; background: #e53e3e; border-radius: 4px;"></span> <span class="ms-1">{% trans "Alto" %}</span></div>
+                                <div><span style="display: inline-block; width: 30px; height: 20px; background: #e2e8f0; border: 1px solid #ccc; border-radius: 4px;"></span> <span class="ms-1">{% trans "Sin Datos" %}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+    const missionId = {{ mission.id }};
+    const missionDuration = {{ mission.duration_days }};
+    let fullData = null;
+    let currentFilter = 'all';
+    
+    function getColor(value, type) {
+        if (value === null || value === undefined) return '#e2e8f0';
+        
+        if (type === 'stress' || type === 'anxiety') {
+            if (value <= 2) return '#3498db';
+            if (value <= 4) return '#48bb78';
+            if (value <= 7) return '#f6e05e';
+            return '#e53e3e';
+        } else {
+            if (value <= 20) return '#3498db';
+            if (value <= 40) return '#48bb78';
+            if (value <= 70) return '#f6e05e';
+            return '#e53e3e';
+        }
+    }
+    
+    function renderHeatmap(containerId, data, type, selectedCrew) {
+        const container = document.getElementById(containerId);
+        
+        if (!data || !data.crew_members || data.crew_members.length === 0) {
+            container.innerHTML = '<div class="alert alert-warning">{% trans "No hay datos disponibles" %}</div>';
+            return;
+        }
+        
+        let crewToShow = data.crew_members;
+        if (selectedCrew && selectedCrew !== 'all') {
+            crewToShow = data.crew_members.filter(crew => crew.username === selectedCrew);
+        }
+        
+        if (crewToShow.length === 0) {
+            container.innerHTML = '<div class="alert alert-warning">{% trans "No se encontró el tripulante seleccionado" %}</div>';
+            return;
+        }
+        
+        let html = '<div class="table-responsive">';
+        html += '<table class="table table-bordered table-sm">';
+        html += '<thead class="table-dark">';
+        html += '<tr>';
+        html += '<th style="min-width: 150px;">{% trans "Tripulante / Día" %}</th>';
+        for (let i = 1; i <= missionDuration; i++) {
+            html += `<th class="text-center">{% trans "Día" %} ${i}</th>`;
+        }
+        html += '</tr>';
+        html += '</thead><tbody>';
+        
+        for (const crew of crewToShow) {
+            html += '<tr>';
+            html += `<td><strong>${crew.username}</strong><br><small class="text-muted">${crew.role || ''}</small></td>`;
+            
+            const values = crew[type] || [];
+            for (let day = 1; day <= missionDuration; day++) {
+                const val = values[day - 1];
+                const color = getColor(val, type);
+                let display = '—';
+                if (val !== null && val !== undefined) {
+                    if (type === 'workload') {
+                        display = Math.round(val);
+                    } else {
+                        display = val.toFixed(1);
+                    }
+                }
+                html += `<td class="text-center" style="background-color: ${color}; font-weight: bold;">${display}</td>`;
+            }
+            html += '</tr>';
+        }
+        
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    }
+    
+    async function loadData() {
+        try {
+            const response = await fetch(`/pwms/api/mission/${missionId}/heatmap-data/`);
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            fullData = data;
+            
+            const select = document.getElementById('crewFilter');
+            select.innerHTML = '<option value="all">🌟 {% trans "Todos los tripulantes" %}</option>';
+            for (const crew of data.crew_members) {
+                select.innerHTML += `<option value="${crew.username}">👨‍🚀 ${crew.username}</option>`;
+            }
+            
+            renderAll('all');
+            
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('stressHeatmap').innerHTML = `<div class="alert alert-danger">{% trans "Error al cargar datos" %}: ${error.message}</div>`;
+            document.getElementById('anxietyHeatmap').innerHTML = `<div class="alert alert-danger">{% trans "Error al cargar datos" %}: ${error.message}</div>`;
+            document.getElementById('workloadHeatmap').innerHTML = `<div class="alert alert-danger">{% trans "Error al cargar datos" %}: ${error.message}</div>`;
+        }
+    }
+    
+    function renderAll(selectedCrew) {
+        if (!fullData) return;
+        renderHeatmap('stressHeatmap', fullData, 'stress', selectedCrew);
+        renderHeatmap('anxietyHeatmap', fullData, 'anxiety', selectedCrew);
+        renderHeatmap('workloadHeatmap', fullData, 'workload', selectedCrew);
+    }
+    
+    function aplicarFiltro() {
+        currentFilter = document.getElementById('crewFilter').value;
+        renderAll(currentFilter);
+    }
+    
+    function limpiarFiltro() {
+        document.getElementById('crewFilter').value = 'all';
+        currentFilter = 'all';
+        renderAll('all');
+    }
+    
+    function showTab(tabName) {
+        document.getElementById('stressTab').style.display = 'none';
+        document.getElementById('anxietyTab').style.display = 'none';
+        document.getElementById('workloadTab').style.display = 'none';
+        
+        document.getElementById('btnStress').style.backgroundColor = '#0d6efd';
+        document.getElementById('btnStress').classList.remove('btn-secondary');
+        document.getElementById('btnStress').classList.add('btn-primary');
+        
+        document.getElementById('btnAnxiety').style.backgroundColor = '#0d6efd';
+        document.getElementById('btnAnxiety').classList.remove('btn-secondary');
+        document.getElementById('btnAnxiety').classList.add('btn-primary');
+        
+        document.getElementById('btnWorkload').style.backgroundColor = '#0d6efd';
+        document.getElementById('btnWorkload').classList.remove('btn-secondary');
+        document.getElementById('btnWorkload').classList.add('btn-primary');
+        
+        if (tabName === 'stress') {
+            document.getElementById('stressTab').style.display = 'block';
+            document.getElementById('btnStress').style.backgroundColor = '#6c757d';
+            document.getElementById('btnStress').classList.remove('btn-primary');
+            document.getElementById('btnStress').classList.add('btn-secondary');
+        } else if (tabName === 'anxiety') {
+            document.getElementById('anxietyTab').style.display = 'block';
+            document.getElementById('btnAnxiety').style.backgroundColor = '#6c757d';
+            document.getElementById('btnAnxiety').classList.remove('btn-primary');
+            document.getElementById('btnAnxiety').classList.add('btn-secondary');
+        } else if (tabName === 'workload') {
+            document.getElementById('workloadTab').style.display = 'block';
+            document.getElementById('btnWorkload').style.backgroundColor = '#6c757d';
+            document.getElementById('btnWorkload').classList.remove('btn-primary');
+            document.getElementById('btnWorkload').classList.add('btn-secondary');
+        }
+    }
+    
+    async function descargarHeatmapActual() {
+        let tabName = 'stress';
+        if (document.getElementById('anxietyTab').style.display === 'block') {
+            tabName = 'anxiety';
+        } else if (document.getElementById('workloadTab').style.display === 'block') {
+            tabName = 'workload';
+        }
+        
+        const element = document.getElementById(`${tabName}Heatmap`);
+        const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff' });
+        const link = document.createElement('a');
+        link.download = `heatmap_${tabName}_${new Date().toISOString().slice(0,19)}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+    
+    async function descargarTodosLosHeatmaps() {
+        const tabs = ['stress', 'anxiety', 'workload'];
+        for (let i = 0; i < tabs.length; i++) {
+            showTab(tabs[i]);
+            await new Promise(r => setTimeout(r, 500));
+            const element = document.getElementById(`${tabs[i]}Heatmap`);
+            const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff' });
+            const link = document.createElement('a');
+            link.download = `heatmap_${tabs[i]}_${new Date().toISOString().slice(0,19)}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            await new Promise(r => setTimeout(r, 300));
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadData);
+</script>
+
+<style>
+    .heatmap-container {
+        overflow-x: auto;
+    }
+    .table {
+        font-size: 13px;
+    }
+    .table td, .table th {
+        vertical-align: middle;
+        padding: 10px 8px;
+    }
+    .btn-primary, .btn-success, .btn-info {
+        color: white;
+    }
+    .btn-primary {
+        background-color: #0d6efd !important;
+        border: none !important;
+    }
+    .btn-secondary {
+        background-color: #6c757d !important;
+        border: none !important;
+    }
+</style>
+{% endblock %}

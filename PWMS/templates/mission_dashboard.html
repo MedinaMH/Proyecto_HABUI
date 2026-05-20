@@ -1,0 +1,192 @@
+{% extends "modulo_control/estructura_base_control.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block titulo %}{% trans "Dashboard de Misión" %} - {{ mission.name }}{% endblock %}
+
+{% block contenido %} 
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <h1 class="card-title">🚀 {{ mission.name }}</h1>
+                    <p class="card-text mb-0">
+                        {% trans "Hábitat" %}: {{ mission.habitat_type }} | {{ mission.duration_days }} {% trans "días" %} | {% trans "Inicio" %}: {{ mission.start_date }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Panel de Estadísticas Generales -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0">📊 {% trans "Estadísticas Generales" %}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3 bg-light">
+                                <h3 class="display-4 text-primary mb-0">{{ crew_count }}</h3>
+                                <p class="text-muted mb-0">{% trans "Tripulantes" %}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3 bg-light">
+                                <h3 class="display-4 text-primary mb-0">{{ mission_days }}</h3>
+                                <p class="text-muted mb-0">{% trans "Días de Misión" %}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="border rounded p-3 bg-light">
+                                <h3 class="display-4 text-primary mb-0">{{ total_assessments }}</h3>
+                                <p class="text-muted mb-0">{% trans "Evaluaciones" %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Exportación y Acciones -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0">📄 {% trans "Exportar Datos" %}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-success" onclick="exportarXML()">📥 {% trans "Exportar a XML" %}</button>
+                        <a href="/pwms/api/mission/{{ mission.id }}/stats/" class="btn btn-info" target="_blank">📊 {% trans "Ver JSON" %}</a>
+                        <button class="btn btn-warning" onclick="editarMision()">✏️ {% trans "Editar Misión" %}</button>
+                        <a href="/pwms/mission/{{ mission.id }}/heatmap/" class="btn btn-danger">🔥 {% trans "Heatmap" %}</a>
+                        <a href="/pwms/missions/" class="btn btn-secondary">📋 {% trans "Volver a lista" %}</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Fases de la Misión -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0">📅 {% trans "Fases de la Misión" %}</h3>
+                </div>
+                <div class="card-body">
+                    {% if mission.phases %}
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% for phase in mission.phases %}
+                                <div class="border-start border-primary border-3 bg-light p-2 ps-3 rounded">
+                                    <strong>{{ phase.name }}</strong>
+                                    <span class="text-muted">: {% trans "Días" %} {{ phase.day_start }} - {{ phase.day_end }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">{% trans "No hay fases definidas" %}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Panel de Tripulación -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0">👥 {% trans "Tripulación" %}</h3>
+                </div>
+                <div class="card-body">
+                    <div id="crewStats">
+                        <div class="text-center text-muted p-5">{% trans "Cargando estadísticas..." %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const missionId = {{ mission.id }};
+    
+    async function loadMissionStats() {
+        try {
+            const response = await fetch('/pwms/api/mission/' + missionId + '/stats/');
+            if (!response.ok) throw new Error('{% trans "Error al cargar datos" %}');
+            const data = await response.json();
+            
+            const crewDiv = document.getElementById('crewStats');
+            
+            if (!data.crew_stats || data.crew_stats.length === 0) {
+                crewDiv.innerHTML = '<p class="text-center text-muted">{% trans "No hay tripulantes asignados a esta misión" %}</p>';
+                return;
+            }
+            
+            let html = '<div class="row">';
+            for (const crew of data.crew_stats) {
+                const avgStress = crew.avg_stress ? (crew.avg_stress / 10 * 100) : 0;
+                const avgAnxiety = crew.avg_anxiety ? (crew.avg_anxiety / 10 * 100) : 0;
+                const avgHeartRate = crew.avg_heart_rate || 0;
+                
+                let stressColor = '#28a745';
+                if (avgStress > 70) stressColor = '#dc3545';
+                else if (avgStress > 40) stressColor = '#fd7e14';
+                
+                html += `
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h4 class="mb-0">👨‍🚀 ${crew.username}</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>{% trans "Estrés promedio:" %}</span>
+                                        <span class="fw-bold">${crew.avg_stress ? crew.avg_stress.toFixed(1) : 'N/A'}/10</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar" style="width: ${avgStress}%; background: ${stressColor};"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>{% trans "Ansiedad promedio:" %}</span>
+                                        <span class="fw-bold">${crew.avg_anxiety ? crew.avg_anxiety.toFixed(1) : 'N/A'}/10</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar" style="width: ${avgAnxiety}%; background: #6f42c1;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>{% trans "FC promedio:" %}</span>
+                                        <span class="fw-bold">${avgHeartRate ? Math.round(avgHeartRate) : 'N/A'} bpm</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar" style="width: ${(avgHeartRate / 120 * 100)}%; background: #17a2b8;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-muted small">
+                                    <strong>{% trans "Evaluaciones NASA:" %}</strong> ${crew.nasa_scores?.length || 0}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            crewDiv.innerHTML = html;
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('crewStats').innerHTML = '<p class="text-center text-danger">{% trans "Error al cargar estadísticas" %}</p>';
+        }
+    }
+    
+    function exportarXML() {
+        window.location.href = '/pwms/mission/export-xml/?id=' + missionId;
+    }
+    
+    function editarMision() {
+        window.location.href = '/pwms/mission/edit/' + missionId + '/';
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadMissionStats);
+</script>
+{% endblock %}

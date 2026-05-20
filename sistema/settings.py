@@ -96,7 +96,10 @@ ROOT_URLCONF = 'sistema.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'templates',           # Para templates compartidos
+            BASE_DIR / 'PWMS' / 'templates',  # Para templates de PWMS
+            ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

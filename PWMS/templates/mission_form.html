@@ -1,0 +1,153 @@
+{% extends "modulo_control/estructura_base_control.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block titulo %}
+    {% if mission %}{% trans "Editar Misión" %}{% else %}{% trans "Nueva Misión" %}{% endif %}
+{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        {% if mission %}✏️ {% trans "Editar Misión" %}{% else %}➕ {% trans "Nueva Misión" %}{% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form id="missionForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Nombre de la Misión" %}</label>
+                            <input type="text" name="name" id="name" class="form-control" value="{{ mission.name|default:'' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Tipo de Hábitat" %}</label>
+                            <input type="text" name="habitat_type" id="habitat_type" class="form-control" value="{{ mission.habitat_type|default:'' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Duración (días)" %}</label>
+                            <input type="number" name="duration_days" id="duration_days" class="form-control" value="{{ mission.duration_days|default:'' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Fecha de Inicio" %}</label>
+                            <input type="date" name="start_date" id="start_date" class="form-control" value="{{ mission.start_date|default:'' }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Descripción" %}</label>
+                            <textarea name="description" id="description" class="form-control" rows="3">{{ mission.description|default:'' }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Tripulantes" %}</label>
+                            <div id="crew-list" class="mb-2">
+                                {% for user in all_users %}
+                                <div class="d-flex align-items-center gap-2 mb-2 p-2 border rounded">
+                                    <input type="checkbox" name="crew_members" value="{{ user.id }}" 
+                                           id="crew_{{ user.id }}"
+                                           class="form-check-input me-2"
+                                           {% if user in mission.crew_members.all %}checked{% endif %}>
+                                    <label for="crew_{{ user.id }}" class="flex-grow-1 mb-0">
+                                        <strong>{{ user.username }}</strong>
+                                        <span class="text-muted">({{ user.email }})</span>
+                                    </label>
+                                    <select name="crew_role_{{ user.id }}" class="form-select form-select-sm" style="width: 180px;">
+                                        <option value="">{% trans "Seleccionar rol..." %}</option>
+                                        <option value="Commander" {% if user.perfil_pwms.role == 'Commander' %}selected{% endif %}>👨‍✈️ {% trans "Comandante" %}</option>
+                                        <option value="Pilot" {% if user.perfil_pwms.role == 'Pilot' %}selected{% endif %}>👨‍🚀 {% trans "Piloto" %}</option>
+                                        <option value="Scientist" {% if user.perfil_pwms.role == 'Scientist' %}selected{% endif %}>🔬 {% trans "Científico" %}</option>
+                                        <option value="Engineer" {% if user.perfil_pwms.role == 'Engineer' %}selected{% endif %}>🔧 {% trans "Ingeniero" %}</option>
+                                        <option value="MedicalOfficer" {% if user.perfil_pwms.role == 'MedicalOfficer' %}selected{% endif %}>🩺 {% trans "Oficial Médico" %}</option>
+                                        <option value="PayloadSpecialist" {% if user.perfil_pwms.role == 'PayloadSpecialist' %}selected{% endif %}>📦 {% trans "Especialista de Carga" %}</option>
+                                    </select>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <small class="text-muted">{% trans "Selecciona los tripulantes y asígnales un rol" %}</small>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">💾 {% trans "Guardar" %}</button>
+                            <a href="/pwms/missions/" class="btn btn-secondary">{% trans "Cancelar" %}</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('missionForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const crewMembers = [];
+        const checkboxes = document.querySelectorAll('input[name="crew_members"]:checked');
+        
+        checkboxes.forEach(checkbox => {
+            const userId = checkbox.value;
+            const roleSelect = document.querySelector(`select[name="crew_role_${userId}"]`);
+            const role = roleSelect ? roleSelect.value : '';
+            
+            crewMembers.push({
+                user_id: parseInt(userId),
+                role: role
+            });
+        });
+        
+        const data = {
+            mission_id: {{ mission.id|default:'null' }},
+            name: document.getElementById('name').value,
+            habitat_type: document.getElementById('habitat_type').value,
+            duration_days: parseInt(document.getElementById('duration_days').value),
+            start_date: document.getElementById('start_date').value,
+            description: document.getElementById('description').value,
+            crew_members: crewMembers,
+            phases: []
+        };
+        
+        try {
+            const response = await fetch('/pwms/api/save-mission/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('{% trans "Misión guardada correctamente" %}');
+                window.location.href = '/pwms/missions/';
+            } else {
+                alert('{% trans "Error:" %} ' + result.error);
+            }
+        } catch (error) {
+            alert('{% trans "Error al guardar:" %} ' + error);
+        }
+    });
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}
